@@ -22,6 +22,9 @@ Walker::Walker(int n_p, int dim, bool do_init) {
         inv = zeros<mat > (n2, n_p);
         jast_grad = zeros<mat > (n_p, dim);
         spatial_grad = zeros<mat > (n_p, dim);
+
+        r2 = zeros(1, n_p);
+
         value = 0;
         lapl_sum = 0;
         slater_ratio = 0;
@@ -32,6 +35,19 @@ Walker::Walker(int n_p, int dim, bool do_init) {
         is_murdered = true;
     }
 
+}
+
+void Walker::calc_r_i2(int i) {
+    int j;
+    double r2i;
+    
+    r2i = 0;
+    for (j = 0; j < dim; j++) {
+        r2i += r(i, j) * r(i, j);
+    }
+    
+    r2[i] = r2i;
+   
 }
 
 double Walker::abs_relative(int i, int j) const {
@@ -49,15 +65,7 @@ double Walker::abs_relative(int i, int j) const {
 }
 
 double Walker::get_r_i2(int i) const {
-    int j;
-    double r2;
-
-    r2 = 0;
-    for (j = 0; j < dim; j++) {
-        r2 += r(i, j) * r(i, j);
-    }
-
-    return r2;
+    return r2(i);
 }
 
 void Walker::make_rel_matrix() {

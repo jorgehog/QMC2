@@ -34,8 +34,12 @@ public:
     mat spatial_grad;
     mat jast_grad;
     mat inv;
+    
+    rowvec r2;
 
     double get_r_i2(int i) const;
+    
+    void calc_r_i2(int i);
 
     double abs_relative(int i, int j) const;
 
@@ -56,7 +60,7 @@ public:
     void ressurect() {
         is_murdered = false;
     }
-
+    
 
 };
 

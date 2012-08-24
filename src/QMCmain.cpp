@@ -25,24 +25,24 @@ int main(int argc, char** argv) {
     //    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
 
-    random_seed = -1.234; //-time(NULL);
+    random_seed = -time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
     n_p = 2;
     dim = 2;
     w = 1;
 
-    n_c = 1000000;
+    n_c = 100000;
 
     bool vmc = true;
     bool dmc = false;
 
     string system = "QDots";
-    string sampling = "IS";
+    string sampling = "BF";
     string kinetics_type = "CF";
 
-    bool dist_out = true;
-    bool dist_in = false;
+    bool dist_out = false;
+    bool dist_in = true;
 
     bool use_jastrow = true;
     bool use_coulomb = true;

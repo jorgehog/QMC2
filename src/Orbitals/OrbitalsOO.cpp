@@ -17,7 +17,8 @@ Orbitals::Orbitals(int n_p, int dim) {
 
 oscillator_basis::oscillator_basis(int n_p, int dim, double alpha, double w)
 : Orbitals(n_p, dim) {
-    this->alpha = alpha;
+
+    set_parameter(alpha, 0);
     this->w = w;
 
     int max_implemented = 15; //for 30 particles
@@ -111,3 +112,20 @@ double oscillator_basis::lapl_phi(const Walker* walker, int particle, int q_num)
     return lapl_basis_functions[q_num]->eval(walker, particle);
 }
 
+double oscillator_basis::get_parameter(int n){
+    return alpha;
+}
+
+void oscillator_basis::set_parameter(double parameter, int n) {
+    alpha = parameter;
+}
+
+double oscillator_basis::get_variational_derivative(const Walker* walker, int n) const {
+    double dalpha = 0.0;
+    
+    for (int i = 0; i < n_p; i++) {
+        dalpha -= 0.5 * w * walker->get_r_i2(i);
+    }
+    
+    return dalpha;
+}

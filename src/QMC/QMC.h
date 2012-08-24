@@ -31,9 +31,9 @@ protected:
 
     virtual void initialize() = 0;
 
+    void diffuse_walker();
 
-
-    void update_pos(const Walker* walker_pre, Walker*walker_post, int particle) const;
+    void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
     void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const;
     double get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const;
 
@@ -43,7 +43,7 @@ protected:
     void update_walker(Walker*walker_pre, const Walker* walker_post, int particle) const;
     void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
 
-    void copy_walker(const Walker* parent, Walker* child) const;
+    Walker* clone_walker(const Walker* parent) const;
 
 public:
 
@@ -73,9 +73,17 @@ public:
         return jastrow;
     }
 
+    Orbitals* get_orbitals_ptr() {
+        return system->get_orbital_ptr();
+    }
+
     double get_accepted_ratio() const {
         return accepted / double(n_p);
     }
+
+    friend class Minimizer;
+    friend class ASGD;
+
 };
 
 class VMC : public QMC {
@@ -101,6 +109,9 @@ public:
 
     virtual void run_method();
     virtual void output() const;
+
+    friend class Minimizer;
+    friend class ASGD;
 
 };
 

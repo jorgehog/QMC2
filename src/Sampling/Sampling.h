@@ -22,7 +22,7 @@ public:
     void set_trial_pos(Walker* walker, bool load_VMC_dist = false, std::ifstream* file = NULL) const;
     double get_new_pos(const Walker* walker_pre, int i, int j) const;
 
-    virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
+    virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
     virtual double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const = 0;
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
     virtual void get_necessities(Walker* walker) const = 0;

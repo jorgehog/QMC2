@@ -34,6 +34,10 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
         }
     }
 
+    for (i = 0; i < n_p; i++) {
+        walker->calc_r_i2(i);
+    }
+    
     walker->make_rel_matrix();
 
     get_necessities(walker);
@@ -48,16 +52,6 @@ double Sampling::get_g_ratio(const Walker* walker_post, const Walker* walker_pre
     return diffusion->get_g_ratio(walker_post, walker_pre, particle);
 }
 
-void Sampling::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
-    for (int i = 0; i < dim; i++) {
-        walker_pre->r(particle, i) = walker_post->r(particle, i);
-    }
-
-    for (int i = 0; i < n_p; i++) {
-        walker_pre->r_rel(i, particle) = walker_pre->r_rel(particle, i) = walker_post->r_rel(i, particle);
-    }
-}
-
 double Sampling::get_branching_Gfunc(Walker* walker_pre, Walker* walker_post, double E_T) const {
     return diffusion->get_GBfunc(walker_pre, walker_post, E_T);
 }
@@ -68,7 +62,6 @@ Brute_Force::Brute_Force(int n_p, int dim, double timestep, long random_seed, do
 }
 
 void Brute_Force::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
-    this->Sampling::update_walker(walker_pre, walker_post, particle);
     walker_pre->value = walker_post->value;
 }
 
@@ -118,7 +111,7 @@ void Importance::update_necessities(const Walker* walker_pre, Walker* walker_pos
 }
 
 void Importance::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
-    this->Sampling::update_walker(walker_pre, walker_post, particle);
+
     qmc->get_kinetics_ptr()->update_walker_IS(walker_pre, walker_post, particle);
 
     for (int i = 0; i < n_p; i++) {

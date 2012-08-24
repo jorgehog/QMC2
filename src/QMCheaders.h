@@ -19,6 +19,8 @@
 
 #include "Walker/Walker.h"
 
+class Minimizer;
+
 #include "function/function.h"
 #include "Orbitals/OrbitalsOO.h"
 
@@ -31,6 +33,8 @@ class QMC;
 #include "Sampling/Sampling.h"
 #include "Kinetics/Kinetics.h"
 #include "QMC/QMC.h"
+#include "Minimizer/Minimizer.h"
+#include "Minimizer/ASGD/ASGD.h"
 
 #endif	/* QMCHEADERS_H */
 

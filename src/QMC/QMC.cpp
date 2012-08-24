@@ -57,6 +57,9 @@ void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle
                     = walker_post->abs_relative(particle, j);
         }
     }
+
+    walker_post->calc_r_i2(particle);
+
 }
 
 void QMC::update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const {
@@ -87,6 +90,17 @@ bool QMC::metropolis_test(double A) {
 }
 
 void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
+
+    for (int i = 0; i < dim; i++) {
+        walker_pre->r(particle, i) = walker_post->r(particle, i);
+    }
+
+    for (int i = 0; i < n_p; i++) {
+        walker_pre->r_rel(i, particle) = walker_pre->r_rel(particle, i) = walker_post->r_rel(i, particle);
+    }
+
+    walker_pre->r2[particle] = walker_post->r2[particle];
+
     sampling->update_walker(walker_pre, walker_post, particle);
 }
 
@@ -99,16 +113,39 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
         walker_post->r_rel(i, particle) = walker_post->r_rel(particle, i) = walker_pre->r_rel(i, particle);
     }
 
+    walker_post->r2[particle] = walker_pre->r2[particle];
+
     sampling->reset_walker(walker_pre, walker_post, particle);
 }
 
-void QMC::copy_walker(const Walker* parent, Walker* child) const {
+void QMC::diffuse_walker() {
+    for (int particle = 0; particle < n_p; particle++) {
 
-    child->r = parent->r;
-    child->r_rel = parent->r_rel;
-    child->ressurect();
+        update_pos(original_walker, trial_walker, particle);
+        update_necessities(original_walker, trial_walker, particle);
 
-    sampling->copy_walker(parent, child);
+        double A = get_acceptance_ratio(original_walker, trial_walker, particle);
+
+        if (metropolis_test(A)) {
+            update_walker(original_walker, trial_walker, particle);
+        } else {
+            reset_walker(original_walker, trial_walker, particle);
+        }
+    }
+}
+
+Walker* QMC::clone_walker(const Walker* parent) const {
+
+    Walker* clone = new Walker(n_p, dim, false);
+
+    clone->r2 = parent->r2;
+    clone->r = parent->r;
+    clone->r_rel = parent->r_rel;
+    clone->ressurect();
+
+    sampling->copy_walker(parent, clone);
+
+    return clone;
 
 }
 
@@ -139,7 +176,7 @@ VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System
 void VMC::initialize() {
     jastrow->initialize();
     sampling->set_trial_pos(original_walker);
-    copy_walker(original_walker, trial_walker);
+    trial_walker = clone_walker(original_walker);
 }
 
 void VMC::calculate_energy(Walker* walker) {
@@ -165,20 +202,8 @@ void VMC::run_method() {
     initialize();
 
     for (int cycle = 0; cycle < n_c; cycle++) {
-        for (int particle = 0; particle < n_p; particle++) {
 
-            update_pos(original_walker, trial_walker, particle);
-            update_necessities(original_walker, trial_walker, particle);
-
-            double A = get_acceptance_ratio(original_walker, trial_walker, particle);
-
-            if (metropolis_test(A)) {
-                update_walker(original_walker, trial_walker, particle);
-            } else {
-                reset_walker(original_walker, trial_walker, particle);
-            }
-        }
-
+        diffuse_walker();
 
         //WRAP INTO OBJECT CLASS OUTPUT.output
         if ((cycle > n_c / 2) && (cycle % 100 == 0)) {
@@ -394,13 +419,13 @@ void DMC::Evolve_walker(double GB) {
         for (n = 0; n < branch_mean - 1; n++) {
 
             n_w += 1;
-            copy_walker(trial_walker, Angry_mob[n_w - 1]);
+            Angry_mob[n_w - 1] = clone_walker(trial_walker);
         }
 
-        calculate_energy_necessities(trial_walker);
-        get_wf_value(trial_walker);
-        E_avg += GB * calculate_local_energy(trial_walker);
-        samples ++;
+        //calculate_energy_necessities(trial_walker);
+        //get_wf_value(trial_walker);
+        //E_avg += GB * calculate_local_energy(trial_walker);
+        //samples++;
 
     } else if (branch_mean == 0) {
         trial_walker->kill();
@@ -429,7 +454,7 @@ void DMC::bury_the_dead() {
                 //Index of the last newborn
                 index = newborn + n_w_last - 1 - j;
 
-                copy_walker(Angry_mob[index], Angry_mob[i]);
+                Angry_mob[i] = clone_walker(Angry_mob[index]);
 
                 //                Angry_mob[index] = new Walker(n_p, dim, false); //THIS MEMORY EFFICIENT?
 
@@ -448,7 +473,7 @@ void DMC::bury_the_dead() {
                  */
 
                 if (index2 > i) {
-                    copy_walker(Angry_mob[index2], Angry_mob[i]);
+                    Angry_mob[i] = clone_walker(Angry_mob[index2]);
                     Angry_mob[index2]->kill();
                 }
             }
@@ -478,13 +503,13 @@ void DMC::increase_walker_space() {
 
 void DMC::initialize_walker(int k) {
     trial_walker = Angry_mob[k];
-    copy_walker(trial_walker, original_walker);
+    original_walker = clone_walker(trial_walker);
     accepted = 0;
 }
 
 void DMC::update_energies(int n) {
-    E += E_avg / samples;
-    E_T = E / (n + 1); //+ (1. / 1000) * log((double) n_w_orig / n_w);
+    //E += E_avg / samples;
+    E_T = E / (n + 1) + (1. / 1000) * log((double) n_w_orig / n_w);
 }
 
 void DMC::run_method() {
@@ -510,7 +535,7 @@ void DMC::run_method() {
             }
 
             double GB = sampling->get_branching_Gfunc(original_walker, trial_walker, E_T);
-
+            cout << GB << endl;
             Evolve_walker(GB);
         }
 

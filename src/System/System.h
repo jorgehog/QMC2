@@ -38,6 +38,10 @@ public:
 
     virtual void copy_walker(const Walker* parent, Walker* child) const = 0;
     virtual void reset_walker_ISCF(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
+    
+    Orbitals* get_orbital_ptr() {
+        return orbital;
+    }
 };
 
 class Fermions : public System {
