@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
     //    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
 
+
     random_seed = -time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
@@ -33,19 +34,19 @@ int main(int argc, char** argv) {
     w = 1;
 
     n_c = 100000;
-
+    bool min = false;
     bool vmc = true;
     bool dmc = false;
 
     string system = "QDots";
-    string sampling = "BF";
+    string sampling = "IS";
     string kinetics_type = "CF";
 
     bool dist_out = false;
     bool dist_in = true;
 
-    bool use_jastrow = true;
-    bool use_coulomb = true;
+    bool use_jastrow = false;
+    bool use_coulomb = false;
 
 
     initVMC(n_p, dim, w, dt, system, sampling, alpha, beta);
@@ -53,6 +54,8 @@ int main(int argc, char** argv) {
     if ((use_jastrow == false) && (use_coulomb == false)) {
         alpha = 1;
     }
+    alpha = 0.5;
+
 
     if (dmc) {
         dt = 0.005;
@@ -115,7 +118,40 @@ int main(int argc, char** argv) {
 
     if (vmc) {
         VMC* vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, SYSTEM, kinetics, dist_out);
+        if (min) {
+            double max_step = 0.1;
+            double f_max = 1.0;
+            double f_min = -0.5;
+            double omega = 0.8;
+            double A = 70;
+            double a = 0.3;
+            int SGDsamples = 10000;
+            int n_walkers = 10;
+            int thermalization = 100000;
+            int n_cm = 5000;
+            int n_c_SGD = 100;
+            rowvec alpha = zeros(1, 1) + 0.5;
+            rowvec beta = zeros(1, 1) + 0.5;
 
+
+
+            Minimizer * minimizer = new ASGD(vmc,
+                    alpha,
+                    beta,
+                    SGDsamples,
+                    n_walkers,
+                    n_cm,
+                    thermalization,
+                    n_c_SGD,
+                    max_step,
+                    f_min,
+                    f_max,
+                    omega,
+                    a,
+                    A, 1, 0);
+
+            vmc = minimizer->minimize();
+        }
         vmc->run_method();
 
 

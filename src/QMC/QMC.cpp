@@ -134,18 +134,14 @@ void QMC::diffuse_walker() {
     }
 }
 
-Walker* QMC::clone_walker(const Walker* parent) const {
+void QMC::copy_walker(const Walker* parent, Walker* child) const {
 
-    Walker* clone = new Walker(n_p, dim, false);
+    child->r2 = parent->r2;
+    child->r = parent->r;
+    child->r_rel = parent->r_rel;
+    child->ressurect();
 
-    clone->r2 = parent->r2;
-    clone->r = parent->r;
-    clone->r_rel = parent->r_rel;
-    clone->ressurect();
-
-    sampling->copy_walker(parent, clone);
-
-    return clone;
+    sampling->copy_walker(parent, child);
 
 }
 
@@ -160,7 +156,7 @@ double QMC::calculate_local_energy(Walker* walker) const {
  
  
  */
-
+class VMC;
 VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System *system, Kinetics *kinetics, bool dist_to_file)
 : QMC(n_p, dim, n_c, jastrow, sampling, system, kinetics) {
 
@@ -176,7 +172,7 @@ VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System
 void VMC::initialize() {
     jastrow->initialize();
     sampling->set_trial_pos(original_walker);
-    trial_walker = clone_walker(original_walker);
+    copy_walker(original_walker, trial_walker);
 }
 
 void VMC::calculate_energy(Walker* walker) {
@@ -419,7 +415,7 @@ void DMC::Evolve_walker(double GB) {
         for (n = 0; n < branch_mean - 1; n++) {
 
             n_w += 1;
-            Angry_mob[n_w - 1] = clone_walker(trial_walker);
+            copy_walker(trial_walker, Angry_mob[n_w - 1]);
         }
 
         //calculate_energy_necessities(trial_walker);
@@ -454,7 +450,7 @@ void DMC::bury_the_dead() {
                 //Index of the last newborn
                 index = newborn + n_w_last - 1 - j;
 
-                Angry_mob[i] = clone_walker(Angry_mob[index]);
+                 copy_walker(Angry_mob[index], Angry_mob[i]);
 
                 //                Angry_mob[index] = new Walker(n_p, dim, false); //THIS MEMORY EFFICIENT?
 
@@ -473,7 +469,7 @@ void DMC::bury_the_dead() {
                  */
 
                 if (index2 > i) {
-                    Angry_mob[i] = clone_walker(Angry_mob[index2]);
+                    copy_walker(Angry_mob[index2], Angry_mob[i]);
                     Angry_mob[index2]->kill();
                 }
             }
@@ -503,7 +499,7 @@ void DMC::increase_walker_space() {
 
 void DMC::initialize_walker(int k) {
     trial_walker = Angry_mob[k];
-    original_walker = clone_walker(trial_walker);
+    copy_walker(trial_walker, original_walker);
     accepted = 0;
 }
 

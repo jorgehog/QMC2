@@ -43,7 +43,7 @@ protected:
     void update_walker(Walker*walker_pre, const Walker* walker_post, int particle) const;
     void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
 
-    Walker* clone_walker(const Walker* parent) const;
+    void copy_walker(const Walker* parent, Walker* child) const;
 
 public:
 

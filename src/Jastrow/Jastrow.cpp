@@ -144,7 +144,7 @@ double Pade_Jastrow::get_variational_derivative(const Walker* walker, int n) con
             dbeta -= a(i, j) * arg * arg;
         }
     }
-
+    
     return dbeta;
   
 }

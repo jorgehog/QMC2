@@ -9,20 +9,37 @@
 
 using namespace arma;
 
-ASGD::ASGD(VMC* vmc, int SGDsamples, int n_walkers, int n_c, int n_c_SGD, double f_min, double f_max, double w,
-        double a, double A, int NSP, int NJP)
-: Minimizer(vmc, NSP, NJP) {
+ASGD::ASGD(VMC* vmc,
+        const rowvec & alpha,
+        const rowvec & beta,
+        int SGDsamples,
+        int n_walkers,
+        int n_c,
+        int thermalization,
+        int n_c_SGD,
+        double max_step,
+        double f_min,
+        double f_max,
+        double w,
+        double a,
+        double A,
+        int NSP,
+        int NJP)
+: Minimizer(vmc, alpha, beta, NSP, NJP) {
 
     this->n_c = n_c;
+    this->thermalization = thermalization;
     this->n_c_SGD = n_c_SGD;
     this->SGDsamples = SGDsamples;
     this->n_walkers = n_walkers;
-    
+
     this->a = a;
     this->A = A;
     this->f_min = f_min;
     this->f_max = f_max;
     this->w = w;
+
+    this->max_step = max_step;
 
     walkers = new Walker*[n_walkers];
     for (int i = 0; i < n_walkers; i++) {
@@ -46,6 +63,7 @@ double ASGD::f(double x) {
 void ASGD::get_variational_gradients(double e_local) {
 
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
+
         double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(vmc->original_walker, alpha);
 
         gradient_local[alpha] += e_local * dalpha;
@@ -70,81 +88,101 @@ VMC* ASGD::minimize() {
 
     vmc->initialize();
 
-    for (int cycle = 0; cycle < n_walkers * n_c; cycle++) {
+    for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
 
         vmc->diffuse_walker();
 
-        if ((cycle % n_c) == 0) {
-            walkers[k] = vmc->clone_walker(vmc->original_walker);
+        if (cycle > thermalization && ((cycle % n_c)) == 0) {
+
+            vmc->copy_walker(vmc->original_walker, walkers[k]);
             k++;
+
         }
     }
 
 
-    for (int sample = 0; sample < SGDsamples; sample++) {
+    for (int sample = 1; sample <= SGDsamples; sample++) {
 
         E = 0;
         gradient = zeros(1, Nparams);
         gradient_local = zeros(1, Nparams);
 
         for (int k = 0; k < n_walkers; k++) {
-            for (int cycle = 0; cycle < n_c_SGD; cycle++) {
 
-                vmc->original_walker = vmc->clone_walker(walkers[k]);
-                vmc->trial_walker = vmc->clone_walker(walkers[k]);
+            vmc->copy_walker(walkers[k], vmc->original_walker);
+            vmc->copy_walker(walkers[k], vmc->trial_walker);
+
+            for (int cycle = 0; cycle < n_c_SGD; cycle++) {
 
                 vmc->diffuse_walker();
 
                 vmc->calculate_energy_necessities(vmc->original_walker);
                 double e_local = vmc->calculate_local_energy(vmc->original_walker);
                 E += e_local;
+//                cout << e_local << endl;
 
                 get_variational_gradients(e_local);
-
             }
+
+            vmc->copy_walker(vmc->original_walker, walkers[k]);
+            vmc->copy_walker(vmc->trial_walker, walkers[k]);
+
         }
 
 
         int scale = n_walkers*n_c_SGD;
 
         E /= scale;
+
+        //debug: Scale and E now works
+
         gradient_tot = 2 * (gradient_local - gradient * E) / scale;
 
         double x = -dot(gradient_tot, gradient_old);
+        double t_test = t_prev + f(x);
 
-        t = (t_prev + f(x))*(t < 0);
+        t = t_test * (t_test > 0);
+
+        //        cout <<"x "<<x<<" t "<< t <<" t_prev " << t_prev << " t_test " << t_test <<" step "<< step << "test "<<1*(t_test > 0)<< endl;
 
         //output progress
-
+//        if ((sample % 100) == 0) {
+//            output("cycle:", sample);
+//            cout << gradient_tot << endl;
+//            cout << E / sample << endl;
+//        }
 
         for (int param = 0; param < Nparams; param++) {
 
             step = a / (t + A) * gradient_tot[param];
-            
             if (step * step > max_step * max_step) {
                 step *= max_step / fabs(step);
             }
-            
+
+            //            step = 0.25 / (sample * sample) * gradient_tot[param];
+
             if (param < Nspatial_params) {
-                
                 double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
+                //                cout << gradient_tot << endl;
+                //                cout << -step << "\t" << alpha << endl;
                 vmc->get_orbitals_ptr()->set_parameter(abs(alpha - step), param);
-                
+
             } else {
-                
+
                 double beta = vmc->get_jastrow_ptr()->get_parameter(param - Nspatial_params);
                 vmc->get_jastrow_ptr()->set_parameter(abs(beta - step), param);
-                
+
             }
-            
-            
-            t_prev = t;
-            gradient_old = gradient_tot;
 
         }
+
+        t_prev = t;
+        gradient_old = gradient_tot;
+
     }
-    
-    output();
-    
+
+    output("Finished minimizing. Final parameters:", -1);
+
+    vmc->accepted = 0;
     return vmc;
 }

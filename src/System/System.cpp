@@ -24,7 +24,7 @@ double System::get_potential_energy(const Walker* walker) {
     for (std::vector<Potential*>::iterator pot = potentials.begin(); pot != potentials.end(); ++pot) {
         potE += (*pot)->get_pot_E(walker);
     }
-
+    
     return potE;
 }
 

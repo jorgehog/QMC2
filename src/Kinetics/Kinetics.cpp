@@ -166,14 +166,13 @@ double Closed_form::get_KE(const Walker* walker) {
 
 
     e_kinetic = xterm = 0;
-
+    
     //the X-term
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
             xterm += walker->jast_grad(i, j) * walker->spatial_grad(i, j);
         }
     }
-
 
     e_kinetic = 2 * xterm + walker->lapl_sum;
 

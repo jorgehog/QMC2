@@ -10,31 +10,31 @@
 
 class Minimizer {
 protected:
-    
+
     VMC* vmc;
-    
+
     int Nspatial_params;
     int Njastrow_params;
     int Nparams;
-    
+
     //virtual void get_variational_gradients(); is this a general req?
-    
+
 public:
-    
-    Minimizer(VMC* vmc, int NSP, int NJP);
-    
-    Orbitals* get_orbitals(){
+
+    Minimizer(VMC* vmc, const rowvec & alpha, const rowvec & beta, int NSP, int NJP);
+
+    Orbitals* get_orbitals() {
         return vmc->get_orbitals_ptr();
     }
-    
+
     Jastrow* get_jastrow() {
         return vmc->get_jastrow_ptr();
     }
-    
+
     virtual VMC* minimize() = 0;
-    
-    void output();
-    
+
+    void output(std::string message, double number);
+
 };
 
 

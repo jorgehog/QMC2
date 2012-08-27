@@ -15,6 +15,7 @@ protected:
     int n_c_SGD;
     int SGDsamples;
     int n_walkers;
+    int thermalization;
 
     int k;
 
@@ -22,7 +23,7 @@ protected:
     double t;
     double step;
     double max_step;
-    
+
     double E;
 
     double a;
@@ -34,10 +35,10 @@ protected:
     Walker** walkers;
 
     rowvec parameter;
-    
+
     rowvec gradient;
     rowvec gradient_local;
-    
+
     rowvec gradient_old;
     rowvec gradient_tot;
 
@@ -45,8 +46,22 @@ protected:
     void get_variational_gradients(double e_local);
 
 public:
-    ASGD(VMC* vmc, int SDSsamples, int n_walkers, int n_c, int n_c_SGD, double f_min, double f_max, double w,
-            double a = 1, double A = 1, int NSP = 1, int NJP = 1);
+    ASGD(VMC* vmc,
+            const rowvec & alpha,
+            const rowvec & beta,
+            int SGDsamples,
+            int n_walkers,
+            int n_c,
+            int thermalization,
+            int n_c_SGD,
+            double max_step,
+            double f_min,
+            double f_max,
+            double w,
+            double a = 1,
+            double A = 1,
+            int NSP = 1,
+            int NJP = 1);
 
     virtual VMC* minimize();
 
