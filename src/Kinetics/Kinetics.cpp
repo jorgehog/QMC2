@@ -37,7 +37,7 @@ double Numerical::get_KE(const Walker* walker) {
             wfplus->r(i, j) = wfminus->r(i, j) = walker->r(i, j);
         }
     }
-    double SMALL;
+
     e_kinetic = 0;
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
@@ -49,31 +49,12 @@ double Numerical::get_KE(const Walker* walker) {
 
             wfplus->calc_r_i2();
             wfminus->calc_r_i2();
-            
-            //            cout << "-------------" << endl;
-            //            for (int I = 0; I < n_p; I++){
-            //                for (int J = 0; J < dim; J++){
-            //                    cout << wfplus->r(I,J) << "\t";
-            //                }
-            //                cout << endl;
-            //            }
-            //            
-            //            for (int I = 0; I < n_p; I++){
-            //                cout << wfplus->r2(I) << endl;
-            //            }
-            //            
-            //            cout << i << "\t" << j <<endl;
-            //            cout << "-------------" << endl;
 
             qmc->get_wf_value(wfplus);
             qmc->get_wf_value(wfminus);
 
             wf_min = wfminus->value;
             wf_plus = wfplus->value;
-
-            SMALL = wf_min + wf_plus - 2 * wf;
-
-//                        if (abs(SMALL) < 1e-5) cout <<SMALL <<"\t" <<-SMALL*h2*0.5/wf << "\t" <<wf <<"\t"<<wf_plus << "\t"<<wf_min<<endl;
 
             e_kinetic -= (wf_min + wf_plus - 2 * wf);
             wfplus->r(i, j) = walker->r(i, j);
@@ -82,16 +63,7 @@ double Numerical::get_KE(const Walker* walker) {
     }
 
     e_kinetic = 0.5 * h2 * e_kinetic / wf;
-//    if (abs(e_kinetic-2) < 0.1) {
-//        cout << "SUCCESS" << endl;
-////        cout << "wf " << wf << endl;
-////        cout << "ek " << e_kinetic << endl;
-////        cout << walker->r << walker->r2 << walker->r_rel << endl;
-////        cout << SMALL << endl;
-////        cout << "------------------\n";
-////        exit(1);
-//    }
-    
+
     return e_kinetic;
 }
 

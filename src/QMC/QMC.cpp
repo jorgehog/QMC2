@@ -231,10 +231,6 @@ void VMC::run_method() {
         //        }
         ///
 
-        //        cout << original_walker->r << original_walker->r_rel << original_walker->r2 << trial_walker->value << endl;
-        //        cout << "-----------------------------------------\n";
-        //        cout << trial_walker->r << trial_walker->r_rel << trial_walker->r2 << trial_walker->value << endl;
-
         if (cycle > thermalization) {
             calculate_energy_necessities(original_walker);
             calculate_energy(original_walker);

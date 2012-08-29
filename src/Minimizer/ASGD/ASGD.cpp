@@ -69,8 +69,6 @@ void ASGD::get_variational_gradients(double e_local) {
 
     }
 
-
-
     for (int beta = 0; beta < Njastrow_params; beta++) {
 
         double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(vmc->original_walker, beta);
@@ -138,16 +136,12 @@ VMC* ASGD::minimize() {
 
         E /= scale;
 
-        //debug: Scale and E now works
-
         gradient_tot = 2 * (gradient_local - gradient * E) / scale;
 
         double x = -dot(gradient_tot, gradient_old);
         double t_test = t_prev + f(x);
 
         t = t_test * (t_test > 0);
-
-        // cout << "x " << x << " t " << t << " t_prev " << t_prev << " t_test " << t_test << " step " << step << "test " << 1 * (t_test > 0) << endl;
 
         //output progress
         if ((sample % 100) == 0) {

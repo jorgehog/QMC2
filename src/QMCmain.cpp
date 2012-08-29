@@ -55,8 +55,6 @@ int main(int argc, char** argv) {
         alpha = 1;
     }
  
-//    alpha = 1.16; //test
-
 
     if (dmc) {
         dt = 0.005;
