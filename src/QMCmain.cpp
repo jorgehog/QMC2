@@ -29,11 +29,11 @@ int main(int argc, char** argv) {
     random_seed = -time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
-    n_p = 2;
+    n_p = 12;
     dim = 2;
     w = 1;
 
-    n_c = 100000;
+    n_c = 1000000;
     bool min = false;
     bool vmc = true;
     bool dmc = false;
@@ -43,10 +43,10 @@ int main(int argc, char** argv) {
     string kinetics_type = "CF";
 
     bool dist_out = false;
-    bool dist_in = true;
+    bool dist_in = false;
 
-    bool use_jastrow = false;
-    bool use_coulomb = false;
+    bool use_jastrow = true;
+    bool use_coulomb = true;
 
 
     initVMC(n_p, dim, w, dt, system, sampling, alpha, beta);
@@ -54,7 +54,8 @@ int main(int argc, char** argv) {
     if ((use_jastrow == false) && (use_coulomb == false)) {
         alpha = 1;
     }
-    alpha = 0.5;
+ 
+//    alpha = 1.16; //test
 
 
     if (dmc) {
@@ -127,7 +128,7 @@ int main(int argc, char** argv) {
             double a = 0.3;
             int SGDsamples = 10000;
             int n_walkers = 10;
-            int thermalization = 100000;
+            int thermalization = 1000000;
             int n_cm = 5000;
             int n_c_SGD = 100;
             rowvec alpha = zeros(1, 1) + 0.5;
@@ -148,7 +149,7 @@ int main(int argc, char** argv) {
                     f_max,
                     omega,
                     a,
-                    A, 1, 0);
+                    A);
 
             vmc = minimizer->minimize();
         }

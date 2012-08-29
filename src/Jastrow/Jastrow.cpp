@@ -18,11 +18,13 @@ Jastrow::Jastrow() {
 }
 
 No_Jastrow::No_Jastrow() {
-
+    active = false;
 }
 
 Pade_Jastrow::Pade_Jastrow(int n_p, int dim, double beta)
 : Jastrow(n_p, dim) {
+    
+    active = true;
 
     set_parameter(beta, 0);
 

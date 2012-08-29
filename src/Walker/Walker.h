@@ -21,7 +21,7 @@ protected:
 public:
 
     Walker(int n_p, int dim, bool do_init = true);
-
+    
     double slater_ratio;
     double value;
     double lapl_sum;
@@ -34,12 +34,13 @@ public:
     mat spatial_grad;
     mat jast_grad;
     mat inv;
-    
+
     rowvec r2;
 
     double get_r_i2(int i) const;
-    
+
     void calc_r_i2(int i);
+    void calc_r_i2();
 
     double abs_relative(int i, int j) const;
 
@@ -47,7 +48,7 @@ public:
 
     bool is_singular() const;
 
-    bool check_bad_qforce() const;
+    bool check_bad_qforce();
 
     void kill() {
         is_murdered = true;
@@ -60,7 +61,7 @@ public:
     void ressurect() {
         is_murdered = false;
     }
-    
+
 
 };
 

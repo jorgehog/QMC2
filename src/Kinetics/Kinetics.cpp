@@ -27,28 +27,43 @@ Numerical::Numerical(int n_p, int dim, double h)
 }
 
 double Numerical::get_KE(const Walker* walker) {
-    int i, j;
-    double e_kinetic, wf, wf_min, wf_plus;
 
-    //kinetic energy:
+    double e_kinetic, wf, wf_min, wf_plus;
 
     wf = walker->value;
 
-    for (i = 0; i < n_p; i++) {
-        for (j = 0; j < dim; j++) {
+    for (int i = 0; i < n_p; i++) {
+        for (int j = 0; j < dim; j++) {
             wfplus->r(i, j) = wfminus->r(i, j) = walker->r(i, j);
         }
     }
-
+    double SMALL;
     e_kinetic = 0;
-    for (i = 0; i < n_p; i++) {
-        for (j = 0; j < dim; j++) {
+    for (int i = 0; i < n_p; i++) {
+        for (int j = 0; j < dim; j++) {
             wfplus->r(i, j) = walker->r(i, j) + h;
             wfminus->r(i, j) = walker->r(i, j) - h;
 
             wfplus->make_rel_matrix();
             wfminus->make_rel_matrix();
 
+            wfplus->calc_r_i2();
+            wfminus->calc_r_i2();
+            
+            //            cout << "-------------" << endl;
+            //            for (int I = 0; I < n_p; I++){
+            //                for (int J = 0; J < dim; J++){
+            //                    cout << wfplus->r(I,J) << "\t";
+            //                }
+            //                cout << endl;
+            //            }
+            //            
+            //            for (int I = 0; I < n_p; I++){
+            //                cout << wfplus->r2(I) << endl;
+            //            }
+            //            
+            //            cout << i << "\t" << j <<endl;
+            //            cout << "-------------" << endl;
 
             qmc->get_wf_value(wfplus);
             qmc->get_wf_value(wfminus);
@@ -56,7 +71,9 @@ double Numerical::get_KE(const Walker* walker) {
             wf_min = wfminus->value;
             wf_plus = wfplus->value;
 
-            //cout << "SMALL " << wf_min + wf_plus - 2 * wf << endl;
+            SMALL = wf_min + wf_plus - 2 * wf;
+
+//                        if (abs(SMALL) < 1e-5) cout <<SMALL <<"\t" <<-SMALL*h2*0.5/wf << "\t" <<wf <<"\t"<<wf_plus << "\t"<<wf_min<<endl;
 
             e_kinetic -= (wf_min + wf_plus - 2 * wf);
             wfplus->r(i, j) = walker->r(i, j);
@@ -65,7 +82,16 @@ double Numerical::get_KE(const Walker* walker) {
     }
 
     e_kinetic = 0.5 * h2 * e_kinetic / wf;
-
+//    if (abs(e_kinetic-2) < 0.1) {
+//        cout << "SUCCESS" << endl;
+////        cout << "wf " << wf << endl;
+////        cout << "ek " << e_kinetic << endl;
+////        cout << walker->r << walker->r2 << walker->r_rel << endl;
+////        cout << SMALL << endl;
+////        cout << "------------------\n";
+////        exit(1);
+//    }
+    
     return e_kinetic;
 }
 
@@ -89,6 +115,9 @@ void Numerical::get_QF(Walker* walker) {
 
             wfplus->make_rel_matrix();
             wfminus->make_rel_matrix();
+            
+            wfplus->calc_r_i2();
+            wfminus->calc_r_i2();
 
             qmc->get_wf_value(wfplus);
             qmc->get_wf_value(wfminus);
@@ -166,7 +195,7 @@ double Closed_form::get_KE(const Walker* walker) {
 
 
     e_kinetic = xterm = 0;
-    
+
     //the X-term
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {

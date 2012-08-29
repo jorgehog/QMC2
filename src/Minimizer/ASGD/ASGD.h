@@ -59,9 +59,7 @@ public:
             double f_max,
             double w,
             double a = 1,
-            double A = 1,
-            int NSP = 1,
-            int NJP = 1);
+            double A = 1);
 
     virtual VMC* minimize();
 

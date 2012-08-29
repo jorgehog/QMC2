@@ -98,6 +98,8 @@ void test_nocol_nojast() {
 
     if (success == false) {
         std::cout << "%TEST_FAILED% time=0 testname=no_col_no_jast (nocolnojast_test) message=test failed" << std::endl;
+    } else {
+        std::cout << "%TEST_PASSED% time=0 testname=no_col_no_jsat (nocolnojast_test) message=yay" << std::endl;
     }
 }
 
@@ -337,21 +339,22 @@ void test_ISnum_nocoljast() {
 
             HO_basis = new oscillator_basis(n_p, dim, alpha, w);
 
-            HO_pot = new Harmonic_osc(n_p, dim, w, false);
+            HO_pot = new Harmonic_osc(n_p, dim, w);
 
             jastrow = new No_Jastrow();
 
             kinetics = new Numerical(n_p, dim, h);
 
-            Quantum_Dots = new Fermions(n_p, dim, HO_pot, HO_basis);
+            Quantum_Dots = new Fermions(n_p, dim, HO_basis);
+            Quantum_Dots->add_potential(HO_pot);
 
             sample_method = new Importance(n_p, dim, dt, random_seed);
 
             vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
-
-
+            
+            cout << "foer" << endl;
             vmc->run_method();
-
+            cout << "etter" << endl;
             var = vmc->get_var();
             E = vmc->get_energy();
             double E_CF = 1. / 3 * (i + 1)*(i + 2)*(2 * i + 3) * w;
@@ -438,7 +441,9 @@ void test_ISnum() {
 
             kinetics = new Numerical(n_p, dim, 0.001);
 
-            Quantum_Dots = new Fermions(n_p, dim, HO_pot, HO_basis);
+            Quantum_Dots = new Fermions(n_p, dim, HO_basis);
+            Quantum_Dots->add_potential(HO_pot);
+            Quantum_Dots->add_potential(new Coulomb(n_p, dim));
 
             sample_method = new Importance(n_p, dim, dt, random_seed);
 
@@ -529,7 +534,9 @@ void test_ISCF() {
 
             kinetics = new Closed_form(n_p, dim);
 
-            Quantum_Dots = new Fermions(n_p, dim, HO_pot, HO_basis);
+            Quantum_Dots = new Fermions(n_p, dim, HO_basis);
+            Quantum_Dots->add_potential(HO_pot);
+            Quantum_Dots->add_potential(new Coulomb(n_p, dim));
 
             sample_method = new Importance(n_p, dim, dt, random_seed);
 
@@ -560,7 +567,7 @@ void test_ISCF() {
 }
 
 int main(int argc, char** argv) {
-    std::cout << "%SUITE_STARTING% VMCtest" << std::endl;
+    std::cout << "%SUITE_STARTING% vmcTEST" << std::endl;
     std::cout << "%SUITE_STARTED%" << std::endl;
 
     /*

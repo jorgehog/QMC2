@@ -8,6 +8,7 @@
 #include "../QMCheaders.h"
 
 QMC::QMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System *system, Kinetics *kinetics) {
+
     this->n_p = n_p;
     this->dim = dim;
     this->n_c = n_c;
@@ -22,6 +23,7 @@ QMC::QMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System
     this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
+    this->thermalization = n_c / 10 * (n_c <= 1e6) + 1e5 * (n_c >= 1e6);
 
 }
 
@@ -59,6 +61,8 @@ void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle
     }
 
     walker_post->calc_r_i2(particle);
+
+    update_necessities(original_walker, trial_walker, particle);
 
 }
 
@@ -121,8 +125,8 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 void QMC::diffuse_walker() {
     for (int particle = 0; particle < n_p; particle++) {
 
+        sampling->reset_control_parameters();
         update_pos(original_walker, trial_walker, particle);
-        update_necessities(original_walker, trial_walker, particle);
 
         double A = get_acceptance_ratio(original_walker, trial_walker, particle);
 
@@ -131,6 +135,7 @@ void QMC::diffuse_walker() {
         } else {
             reset_walker(original_walker, trial_walker, particle);
         }
+
     }
 }
 
@@ -157,6 +162,7 @@ double QMC::calculate_local_energy(Walker* walker) const {
  
  */
 class VMC;
+
 VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System *system, Kinetics *kinetics, bool dist_to_file)
 : QMC(n_p, dim, n_c, jastrow, sampling, system, kinetics) {
 
@@ -171,7 +177,10 @@ VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System
 
 void VMC::initialize() {
     jastrow->initialize();
+
+    sampling->reset_control_parameters();
     sampling->set_trial_pos(original_walker);
+
     copy_walker(original_walker, trial_walker);
 }
 
@@ -197,28 +206,39 @@ void VMC::run_method() {
 
     initialize();
 
-    for (int cycle = 0; cycle < n_c; cycle++) {
+    //OK
+    //    cout << original_walker->r << original_walker->r_rel << original_walker->r2 << trial_walker->value << endl;
+    //    cout << "-----------------------------------------\n";
+    //    cout << trial_walker->r << trial_walker->r_rel << trial_walker->r2 << trial_walker->value << endl;
+    //    exit(1);
+
+    for (int cycle = 1; cycle <= n_c + thermalization; cycle++) {
 
         diffuse_walker();
 
         //WRAP INTO OBJECT CLASS OUTPUT.output
-        if ((cycle > n_c / 2) && (cycle % 100 == 0)) {
-            for (int i = 0; i < n_p; i++) {
-                for (int j = 0; j < dim; j++) {
-                    if (j == dim - 1) {
-                        dist << original_walker->r(i, j);
-                    } else {
-                        dist << original_walker->r(i, j) << " ";
-                    }
-                }
-                dist << endl;
-            }
-        }
+        //        if ((cycle > n_c / 2) && (cycle % 100 == 0)) {
+        //            for (int i = 0; i < n_p; i++) {
+        //                for (int j = 0; j < dim; j++) {
+        //                    if (j == dim - 1) {
+        //                        dist << original_walker->r(i, j);
+        //                    } else {
+        //                        dist << original_walker->r(i, j) << " ";
+        //                    }
+        //                }
+        //                dist << endl;
+        //            }
+        //        }
         ///
 
-        calculate_energy_necessities(original_walker);
-        calculate_energy(original_walker);
+        //        cout << original_walker->r << original_walker->r_rel << original_walker->r2 << trial_walker->value << endl;
+        //        cout << "-----------------------------------------\n";
+        //        cout << trial_walker->r << trial_walker->r_rel << trial_walker->r2 << trial_walker->value << endl;
 
+        if (cycle > thermalization) {
+            calculate_energy_necessities(original_walker);
+            calculate_energy(original_walker);
+        }
     }
 
     scale_values();
@@ -450,7 +470,7 @@ void DMC::bury_the_dead() {
                 //Index of the last newborn
                 index = newborn + n_w_last - 1 - j;
 
-                 copy_walker(Angry_mob[index], Angry_mob[i]);
+                copy_walker(Angry_mob[index], Angry_mob[i]);
 
                 //                Angry_mob[index] = new Walker(n_p, dim, false); //THIS MEMORY EFFICIENT?
 

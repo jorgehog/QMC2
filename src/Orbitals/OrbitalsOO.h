@@ -37,7 +37,7 @@ public:
 
 class oscillator_basis : public Orbitals {
 private:
-    double alpha;
+    double *alpha;
     double w;
 
     virtual double get_parameter(int n);

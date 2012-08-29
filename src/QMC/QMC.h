@@ -17,6 +17,7 @@ protected:
     int dim;
 
     int accepted;
+    int thermalization;
 
     Walker* original_walker;
     Walker* trial_walker;
@@ -33,7 +34,6 @@ protected:
 
     void diffuse_walker();
 
-    void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
     void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const;
     double get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const;
 
@@ -55,6 +55,7 @@ public:
     void get_wf_value(Walker* walker) const;
     void get_laplsum(Walker* walker) const;
 
+    void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
     double calculate_local_energy(Walker* walker) const;
 
     System* get_system_ptr() {

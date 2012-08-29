@@ -38,16 +38,23 @@ Walker::Walker(int n_p, int dim, bool do_init) {
 }
 
 void Walker::calc_r_i2(int i) {
-    int j;
-    double r2i;
-    
-    r2i = 0;
-    for (j = 0; j < dim; j++) {
+
+    double r2i = 0;
+
+    for (int j = 0; j < dim; j++) {
         r2i += r(i, j) * r(i, j);
     }
-    
+
     r2[i] = r2i;
-   
+
+}
+
+void Walker::calc_r_i2() {
+
+    for (int i = 0; i < n_p; i++) {
+        this->calc_r_i2(i);
+    }
+
 }
 
 double Walker::abs_relative(int i, int j) const {
@@ -96,7 +103,7 @@ bool Walker::is_singular() const {
     return false;
 }
 
-bool Walker::check_bad_qforce() const {
+bool Walker::check_bad_qforce() {
     double qforce_test = 0;
 
     for (int i = 0; i < n_p; i++) {

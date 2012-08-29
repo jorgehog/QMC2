@@ -13,6 +13,8 @@ protected:
     int n_p;
     int n2;
     int dim;
+    
+    bool active;
 
     virtual double get_parameter(int n) = 0;
     virtual void set_parameter(double param, int n) = 0;

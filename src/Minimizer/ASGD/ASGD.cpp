@@ -22,10 +22,8 @@ ASGD::ASGD(VMC* vmc,
         double f_max,
         double w,
         double a,
-        double A,
-        int NSP,
-        int NJP)
-: Minimizer(vmc, alpha, beta, NSP, NJP) {
+        double A)
+: Minimizer(vmc, alpha, beta) {
 
     this->n_c = n_c;
     this->thermalization = thermalization;
@@ -78,13 +76,21 @@ void ASGD::get_variational_gradients(double e_local) {
         double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(vmc->original_walker, beta);
 
         gradient_local[Nspatial_params + beta] += e_local*dbeta;
-        gradient[Nspatial_params + beta] = dbeta;
+        gradient[Nspatial_params + beta] += dbeta;
 
     }
 
 }
 
 VMC* ASGD::minimize() {
+#include <ostream>
+
+    ofstream file;
+    file.open("alpha.dat");
+    int debug1;
+    double aGrad, bGrad, sumE;
+    aGrad = bGrad = sumE = 0;
+    debug1 = 1;
 
     vmc->initialize();
 
@@ -92,15 +98,13 @@ VMC* ASGD::minimize() {
 
         vmc->diffuse_walker();
 
-        if (cycle > thermalization && ((cycle % n_c)) == 0) {
+        if ((cycle > thermalization) && (cycle % n_c) == 0) {
 
             vmc->copy_walker(vmc->original_walker, walkers[k]);
             k++;
-
         }
     }
-
-
+    
     for (int sample = 1; sample <= SGDsamples; sample++) {
 
         E = 0;
@@ -118,8 +122,8 @@ VMC* ASGD::minimize() {
 
                 vmc->calculate_energy_necessities(vmc->original_walker);
                 double e_local = vmc->calculate_local_energy(vmc->original_walker);
+                
                 E += e_local;
-//                cout << e_local << endl;
 
                 get_variational_gradients(e_local);
             }
@@ -143,38 +147,49 @@ VMC* ASGD::minimize() {
 
         t = t_test * (t_test > 0);
 
-        //        cout <<"x "<<x<<" t "<< t <<" t_prev " << t_prev << " t_test " << t_test <<" step "<< step << "test "<<1*(t_test > 0)<< endl;
+        // cout << "x " << x << " t " << t << " t_prev " << t_prev << " t_test " << t_test << " step " << step << "test " << 1 * (t_test > 0) << endl;
 
         //output progress
-//        if ((sample % 100) == 0) {
-//            output("cycle:", sample);
-//            cout << gradient_tot << endl;
-//            cout << E / sample << endl;
-//        }
+        if ((sample % 100) == 0) {
+            output("cycle:", sample);
+            cout << gradient_tot << endl;
+            cout << E << endl;
+        }
 
-        for (int param = 0; param < Nparams; param++) {
+        aGrad += gradient_tot[0];
+        bGrad += gradient_tot[1];
+        sumE += E;
+        file << aGrad / debug1 << "\t" << bGrad / debug1 << "\t";
+
+        for (int param = 0; param < Nspatial_params; param++) {
 
             step = a / (t + A) * gradient_tot[param];
             if (step * step > max_step * max_step) {
                 step *= max_step / fabs(step);
             }
 
-            //            step = 0.25 / (sample * sample) * gradient_tot[param];
-
-            if (param < Nspatial_params) {
-                double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
-                //                cout << gradient_tot << endl;
-                //                cout << -step << "\t" << alpha << endl;
-                vmc->get_orbitals_ptr()->set_parameter(abs(alpha - step), param);
-
-            } else {
-
-                double beta = vmc->get_jastrow_ptr()->get_parameter(param - Nspatial_params);
-                vmc->get_jastrow_ptr()->set_parameter(abs(beta - step), param);
-
-            }
+            double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
+            file << abs(alpha - step) << "\t";
+            vmc->get_orbitals_ptr()->set_parameter(abs(alpha - step), param);
 
         }
+
+        for (int param = 0; param < Njastrow_params; param++) {
+
+            step = a / (t + A) * gradient_tot[Nspatial_params + param];
+            if (step * step > max_step * max_step) {
+                step *= max_step / fabs(step);
+            }
+
+            double beta = vmc->get_jastrow_ptr()->get_parameter(param);
+            file << abs(beta - step) << "\t";
+            vmc->get_jastrow_ptr()->set_parameter(abs(beta - step), param);
+
+
+        }
+
+        file << sumE / debug1 << endl;
+        debug1++;
 
         t_prev = t;
         gradient_old = gradient_tot;
@@ -182,7 +197,8 @@ VMC* ASGD::minimize() {
     }
 
     output("Finished minimizing. Final parameters:", -1);
-
+    file.close();
     vmc->accepted = 0;
+
     return vmc;
 }
