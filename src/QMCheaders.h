@@ -9,6 +9,7 @@
 #define	QMCHEADERS_H
 
 #include <armadillo>
+#include <stdlib.h>
 #include <iostream> 
 #include <fstream>
 #include <math.h>
@@ -32,9 +33,17 @@ class QMC;
 #include "Diffusion/Diffusion.h"
 #include "Sampling/Sampling.h"
 #include "Kinetics/Kinetics.h"
+
+#include "OutputHandler/OutputHandler.h"
+#include "OutputHandler/Distribution/Distribution.h"
+#include "OutputHandler/BlockingData/BlockingData.h"
+#include "OutputHandler/None/None.h"
+
 #include "QMC/QMC.h"
+
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"
+
 
 #endif	/* QMCHEADERS_H */
 

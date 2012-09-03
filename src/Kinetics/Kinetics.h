@@ -18,7 +18,7 @@ protected:
 
 public:
 
-
+    Kinetics();
     Kinetics(int n_p, int dim);
 
     virtual double get_KE(const Walker* walker) = 0;
@@ -51,6 +51,7 @@ public:
 
 class NoKinetics : public Kinetics {
 public:
+    NoKinetics();
     
     virtual double get_KE(const Walker* walker) {
         return 0;

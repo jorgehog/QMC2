@@ -15,9 +15,13 @@ protected:
     int n_p;
     int n2;
     int dim;
-    
+
+    int cycle;
+
     int accepted;
     int thermalization;
+    
+    double local_E;
 
     Walker* original_walker;
     Walker* trial_walker;
@@ -27,11 +31,20 @@ protected:
     System *system;
     Kinetics *kinetics;
 
-    QMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System *system, Kinetics *kinetics);
+    std::vector<OutputHandler*> output_handler;
+
+    QMC(int n_p, int dim, int n_c,
+            Sampling *sampling,
+            System *system,
+            Kinetics *kinetics = new NoKinetics(),
+            Jastrow *jastrow = new No_Jastrow());
 
 
     virtual void initialize() = 0;
 
+    void dump_output();
+    void finalize_output();
+    
     void diffuse_walker();
 
     void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const;
@@ -46,7 +59,9 @@ protected:
     void copy_walker(const Walker* parent, Walker* child) const;
 
 public:
-
+    
+    void add_output(OutputHandler* output_handler);
+    
     virtual void run_method() = 0;
     virtual void output() const = 0;
 
@@ -79,11 +94,15 @@ public:
     }
 
     double get_accepted_ratio() const {
-        return accepted / double(n_p*(n_c + thermalization));
+        return accepted / double(n_p * (n_c + thermalization));
     }
 
     friend class Minimizer;
     friend class ASGD;
+
+    friend class OutputHandler;
+    friend class Distribution;
+    friend class BlockingData;
 
 };
 
@@ -91,16 +110,18 @@ class VMC : public QMC {
 protected:
     double vmc_E, E2;
 
-    bool dist_to_file;
-
     virtual void initialize();
     void calculate_energy(Walker* walker);
     void scale_values();
 
 public:
 
-    VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling,
-            System *system, Kinetics *kinetics, bool dist_to_file = false);
+    VMC(int n_p, int dim, int n_c,
+            Sampling *sampling,
+            System *system,
+            Kinetics *kinetics = new NoKinetics,
+            Jastrow *jastrow = new No_Jastrow()
+            );
 
     double get_var() const;
     double get_energy() const;
@@ -134,11 +155,13 @@ protected:
     void Evolve_walker(double GB);
     void update_energies(int n);
 
-    //problem: DMC not equal for IMPORTANCE vs. BF
 public:
-    DMC(int n_p, int dim, int n_w, int n_c, double E_T, Jastrow *jastrow, Sampling *sampling,
-            System *system, Kinetics *kinetics, bool dist_from_file = false);
-
+    DMC(int n_p, int dim, int n_w, int n_c, double E_T, 
+            Sampling *sampling,
+            System *system, 
+            Kinetics *kinetics = new NoKinetics(), 
+            Jastrow *jastrow = new No_Jastrow(), 
+            bool dist_from_file = false);
 
     virtual void run_method();
 

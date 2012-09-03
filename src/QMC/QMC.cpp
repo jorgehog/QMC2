@@ -7,7 +7,11 @@
 
 #include "../QMCheaders.h"
 
-QMC::QMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System *system, Kinetics *kinetics) {
+QMC::QMC(int n_p, int dim, int n_c,
+        Sampling *sampling,
+        System *system,
+        Kinetics *kinetics,
+        Jastrow *jastrow) {
 
     this->n_p = n_p;
     this->dim = dim;
@@ -18,12 +22,34 @@ QMC::QMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System
     this->sampling = sampling;
     this->system = system;
     this->kinetics = kinetics;
+    this->output_handler = output_handler;
 
     this->sampling->set_qmc_ptr(this);
     this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
     this->thermalization = n_c / 10 * (n_c <= 1e6) + 1e5 * (n_c >= 1e6);
+
+}
+
+void QMC::add_output(OutputHandler* output_handler) {
+    output_handler->set_qmc_ptr(this);
+    this->output_handler.push_back(output_handler);
+}
+
+void QMC::dump_output() {
+
+    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
+        (*output_obj)->dump();
+    }
+
+}
+
+void QMC::finalize_output() {
+
+    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
+        (*output_obj)->finalize();
+    }
 
 }
 
@@ -163,8 +189,12 @@ double QMC::calculate_local_energy(Walker* walker) const {
  */
 class VMC;
 
-VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System *system, Kinetics *kinetics, bool dist_to_file)
-: QMC(n_p, dim, n_c, jastrow, sampling, system, kinetics) {
+VMC::VMC(int n_p, int dim, int n_c,
+        Sampling *sampling,
+        System *system,
+        Kinetics *kinetics,
+        Jastrow *jastrow)
+: QMC(n_p, dim, n_c, sampling, system, kinetics, jastrow) {
 
     vmc_E = 0;
     E2 = 0;
@@ -172,7 +202,6 @@ VMC::VMC(int n_p, int dim, int n_c, Jastrow *jastrow, Sampling *sampling, System
     original_walker = new Walker(n_p, dim);
     trial_walker = new Walker(n_p, dim);
 
-    this->dist_to_file = dist_to_file;
 }
 
 void VMC::initialize() {
@@ -186,7 +215,7 @@ void VMC::initialize() {
 
 void VMC::calculate_energy(Walker* walker) {
 
-    double local_E = calculate_local_energy(walker);
+    local_E = calculate_local_energy(walker);
 
     vmc_E += local_E;
     E2 += local_E*local_E;
@@ -199,55 +228,24 @@ void VMC::scale_values() {
 
 void VMC::run_method() {
 
-    //WRAP INTO OBJECT CLASS OUTPUT.init
-    ofstream dist;
-    dist.open("dist_out.dat");
-    //
-
     initialize();
 
-    //OK
-    //    cout << original_walker->r << original_walker->r_rel << original_walker->r2 << trial_walker->value << endl;
-    //    cout << "-----------------------------------------\n";
-    //    cout << trial_walker->r << trial_walker->r_rel << trial_walker->r2 << trial_walker->value << endl;
-    //    exit(1);
-    double ek = 0;
-    double ep = 0;
-    for (int cycle = 1; cycle <= n_c + thermalization; cycle++) {
+    for (cycle = 1; cycle <= n_c + thermalization; cycle++) {
 
         diffuse_walker();
 
-        //WRAP INTO OBJECT CLASS OUTPUT.output
-        //        if ((cycle > n_c / 2) && (cycle % 100 == 0)) {
-        //            for (int i = 0; i < n_p; i++) {
-        //                for (int j = 0; j < dim; j++) {
-        //                    if (j == dim - 1) {
-        //                        dist << original_walker->r(i, j);
-        //                    } else {
-        //                        dist << original_walker->r(i, j) << " ";
-        //                    }
-        //                }
-        //                dist << endl;
-        //            }
-        //        }
-        ///
-
-
         if (cycle > thermalization) {
-            ek += sum(original_walker->r2);
             calculate_energy_necessities(original_walker);
             calculate_energy(original_walker);
+
+            dump_output();
+            
         }
     }
 
-
-    ek /= n_c;
-    ep /= n_c;
-    cout << ek << "\t" << ep << endl;
     scale_values();
 
-    //WRAP INTO OBJECT CLASS OUTPUT.finalize
-    dist.close();
+    finalize_output();
 
 }
 
@@ -285,14 +283,20 @@ DMC
  
  */
 
-DMC::DMC(int n_p, int dim, int n_w, int n_c, double E_T, Jastrow *jastrow, Sampling *sampling,
-        System *system, Kinetics *kinetics, bool dist_from_file)
-: QMC(n_p, dim, n_c, jastrow, sampling, system, kinetics) {
+
+DMC::DMC(int n_p, int dim, int n_w, int n_c, double E_T,
+        Sampling *sampling,
+        System *system,
+        Kinetics *kinetics,
+        Jastrow *jastrow,
+        bool dist_from_file)
+: QMC(n_p, dim, n_c, sampling, system, kinetics, jastrow) {
 
     this->dist_from_file = dist_from_file;
     this->n_w_orig = n_w;
     this->E_T = E_T;
     E = 0;
+
 }
 
 void DMC::initialize() {

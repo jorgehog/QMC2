@@ -33,9 +33,9 @@ int main(int argc, char** argv) {
     dim = 2;
     w = 1;
 
-    n_c = 1000000;
-    bool min = true;
-    bool vmc = false;
+    n_c = 100000;
+    bool min = false;
+    bool vmc = true;
     bool dmc = false;
 
     string system = "QDots";
@@ -43,6 +43,8 @@ int main(int argc, char** argv) {
     string kinetics_type = "CF";
 
     bool dist_out = false;
+    bool blocking_out = false;
+    
     bool dist_in = false;
 
     bool use_jastrow = true;
@@ -66,8 +68,8 @@ int main(int argc, char** argv) {
     Potential* onebody_pot;
     System* SYSTEM;
     Sampling* sample_method;
-    Jastrow* jastrow;
-
+    Jastrow* jastrow;    
+    
     if (kinetics_type == "Num") {
         h = 0.0001;
         kinetics = new Numerical(n_p, dim, h);
@@ -116,7 +118,22 @@ int main(int argc, char** argv) {
 
     if (vmc || min) {
 
-        VMC* vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, SYSTEM, kinetics, dist_out);
+        VMC* vmc = new VMC(n_p, dim, n_c, 
+                sample_method, 
+                SYSTEM, 
+                kinetics, 
+                jastrow);
+        if (dist_out){
+            
+            OutputHandler* dist = new Distribution("dist_out");
+            vmc->add_output(dist);
+        
+        } else if (blocking_out) {
+            
+            OutputHandler* blocking = new BlockingData("blocking_out");
+            vmc->add_output(blocking);
+        
+        }
 
         if (min) {
             double max_step = 0.1;
@@ -128,7 +145,7 @@ int main(int argc, char** argv) {
             int SGDsamples = 10000;
             int n_walkers = 1;
             int thermalization = 1000000;
-            int n_cm = n_walkers*100000;
+            int n_cm = n_walkers * 100000;
             int n_c_SGD = 100;
             rowvec alpha = zeros(1, 1) + 1.0;
             rowvec beta = zeros(1, 1) + 0.5;
@@ -152,7 +169,7 @@ int main(int argc, char** argv) {
 
             vmc = minimizer->minimize();
         }
-        
+
         if (vmc) {
             vmc->run_method();
             vmc->output();
@@ -185,7 +202,13 @@ int main(int argc, char** argv) {
         }
 
 
-        DMC* dmc = new DMC(n_p, dim, n_w, n_c, E_T, jastrow, sample_method, SYSTEM, kinetics, dist_in);
+        DMC* dmc = new DMC(n_p, dim, n_w, n_c, E_T, 
+                sample_method, 
+                SYSTEM, 
+                kinetics, 
+                jastrow, 
+                dist_in);
+        
         dmc->run_method();
         dmc->output();
     }
