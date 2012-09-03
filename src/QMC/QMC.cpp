@@ -211,7 +211,8 @@ void VMC::run_method() {
     //    cout << "-----------------------------------------\n";
     //    cout << trial_walker->r << trial_walker->r_rel << trial_walker->r2 << trial_walker->value << endl;
     //    exit(1);
-
+    double ek = 0;
+    double ep = 0;
     for (int cycle = 1; cycle <= n_c + thermalization; cycle++) {
 
         diffuse_walker();
@@ -231,12 +232,18 @@ void VMC::run_method() {
         //        }
         ///
 
+
         if (cycle > thermalization) {
+            ek += sum(original_walker->r2);
             calculate_energy_necessities(original_walker);
             calculate_energy(original_walker);
         }
     }
 
+
+    ek /= n_c;
+    ep /= n_c;
+    cout << ek << "\t" << ep << endl;
     scale_values();
 
     //WRAP INTO OBJECT CLASS OUTPUT.finalize
@@ -247,7 +254,7 @@ void VMC::run_method() {
 void VMC::output() const {
     std::cout << "VMC energy: " << get_energy() << std::endl;
     std::cout << "VMC variance: " << get_var() << std::endl;
-    std::cout << "Acceptance ratio: " << get_accepted_ratio() / n_c << endl;
+    std::cout << "Acceptance ratio: " << get_accepted_ratio() << endl;
 }
 
 double VMC::get_var() const {

@@ -11,6 +11,11 @@
 class ASGD : public Minimizer {
 protected:
 
+    //DEBUG
+    arma::rowvec e;
+    
+    
+    
     int n_c;
     int n_c_SGD;
     int SGDsamples;

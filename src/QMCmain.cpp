@@ -26,16 +26,16 @@ int main(int argc, char** argv) {
 
 
 
-    random_seed = -time(NULL);
+    random_seed = -1.234; //-time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
-    n_p = 12;
+    n_p = 2;
     dim = 2;
     w = 1;
 
     n_c = 1000000;
-    bool min = false;
-    bool vmc = true;
+    bool min = true;
+    bool vmc = false;
     bool dmc = false;
 
     string system = "QDots";
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
     if ((use_jastrow == false) && (use_coulomb == false)) {
         alpha = 1;
     }
- 
+
 
     if (dmc) {
         dt = 0.005;
@@ -114,9 +114,10 @@ int main(int argc, char** argv) {
 
 
 
+    if (vmc || min) {
 
-    if (vmc) {
         VMC* vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, SYSTEM, kinetics, dist_out);
+
         if (min) {
             double max_step = 0.1;
             double f_max = 1.0;
@@ -125,11 +126,11 @@ int main(int argc, char** argv) {
             double A = 70;
             double a = 0.3;
             int SGDsamples = 10000;
-            int n_walkers = 10;
+            int n_walkers = 1;
             int thermalization = 1000000;
-            int n_cm = 5000;
+            int n_cm = n_walkers*100000;
             int n_c_SGD = 100;
-            rowvec alpha = zeros(1, 1) + 0.5;
+            rowvec alpha = zeros(1, 1) + 1.0;
             rowvec beta = zeros(1, 1) + 0.5;
 
 
@@ -151,7 +152,11 @@ int main(int argc, char** argv) {
 
             vmc = minimizer->minimize();
         }
-        vmc->run_method();
+        
+        if (vmc) {
+            vmc->run_method();
+            vmc->output();
+        }
 
 
         //    cumul_e = cumul_e2 = 0;
@@ -167,12 +172,11 @@ int main(int argc, char** argv) {
         //        
         //        vmc->output();
         //    }
-        vmc->output();
+
         if (dmc) {
             E_T = vmc->get_energy();
         }
     }
-
     if (dmc) {
 
         int n_w = 1000;

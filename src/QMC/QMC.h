@@ -15,7 +15,7 @@ protected:
     int n_p;
     int n2;
     int dim;
-
+    
     int accepted;
     int thermalization;
 
@@ -79,7 +79,7 @@ public:
     }
 
     double get_accepted_ratio() const {
-        return accepted / double(n_p);
+        return accepted / double(n_p*(n_c + thermalization));
     }
 
     friend class Minimizer;
