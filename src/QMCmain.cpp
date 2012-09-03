@@ -42,8 +42,8 @@ int main(int argc, char** argv) {
     string sampling = "IS";
     string kinetics_type = "CF";
 
-    bool dist_out = false;
-    bool blocking_out = false;
+    bool dist_out = true;
+    bool blocking_out = true;
     
     bool dist_in = false;
 
@@ -128,7 +128,9 @@ int main(int argc, char** argv) {
             OutputHandler* dist = new Distribution("dist_out");
             vmc->add_output(dist);
         
-        } else if (blocking_out) {
+        } 
+        
+        if (blocking_out) {
             
             OutputHandler* blocking = new BlockingData("blocking_out");
             vmc->add_output(blocking);

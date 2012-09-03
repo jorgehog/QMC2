@@ -6,7 +6,6 @@
  */
 
 #include "../../QMCheaders.h"
-#include "BlockingData.h"
 
 BlockingData::BlockingData(std::string filename,
         std::string path,
