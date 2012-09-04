@@ -13,7 +13,7 @@ Distribution::Distribution(std::string filename,
         int my_rank,
         int num_procs)
 : OutputHandler(filename, path, parallel, my_rank, num_procs) {
-
+    
 }
 
 void Distribution::dump() {

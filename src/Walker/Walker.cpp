@@ -123,3 +123,27 @@ bool Walker::check_bad_qforce() {
     }
 
 }
+
+void Walker::print(std::string header){
+    using namespace std;
+
+    cout << endl;
+    cout << "---- ---- ---- " << header << " ---- ---- ----" << endl;
+    
+    cout << "r\n" << this->r << endl;
+    cout << "r_rel\n" << this->r_rel << endl;
+    cout << "r2\n" << this->r2 << endl;
+
+    cout << "S grad\n" << this->spatial_grad << endl;
+    cout << "J grad\n" << this->jast_grad << endl;
+
+    cout << "Qforce\n" << this->qforce << endl;
+    cout << "inv\n" << this->inv << endl;
+
+    cout << "Lapl_sum\t" << this->lapl_sum << endl;
+    cout << "Value\t" << this->value << endl;
+    cout << "S ratio\t" << this->slater_ratio << endl;
+
+    cout << "---- ---- ---- ---- ---- ---- ----" << endl;
+    cout << endl;
+}

@@ -30,6 +30,9 @@ class Minimizer;
 #include "System/System.h"
 
 class QMC;
+class VMC;
+class DMC;
+
 #include "Diffusion/Diffusion.h"
 #include "Sampling/Sampling.h"
 #include "Kinetics/Kinetics.h"
@@ -37,6 +40,7 @@ class QMC;
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"
 #include "OutputHandler/BlockingData/BlockingData.h"
+#include "OutputHandler/stdoutDMC/stdoutDMC.h"
 #include "OutputHandler/None/None.h"
 
 #include "QMC/QMC.h"

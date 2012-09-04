@@ -48,9 +48,13 @@ double Sampling::get_g_ratio(const Walker* walker_post, const Walker* walker_pre
     return diffusion->get_g_ratio(walker_post, walker_pre, particle);
 }
 
-double Sampling::get_branching_Gfunc(Walker* walker_pre, Walker* walker_post, double E_T) const {
-    return diffusion->get_GBfunc(walker_pre, walker_post, E_T);
+double Sampling::get_branching_Gfunc(double E_x, double E_y, double E_T) const {
+    return diffusion->get_GBfunc(E_x, E_y, E_T);
 }
+
+//double Sampling::get_branching_Gfunc(Walker* walker_pre, Walker* walker_post, double E_T) const {
+//    return diffusion->get_GBfunc(walker_pre, walker_post, E_T);
+//}
 
 Brute_Force::Brute_Force(int n_p, int dim, double timestep, long random_seed, double D) : Sampling(n_p, dim) {
     is_importance = false;

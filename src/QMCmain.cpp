@@ -26,26 +26,26 @@ int main(int argc, char** argv) {
 
 
 
-    random_seed = -1.234; //-time(NULL);
+    random_seed = -time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
     n_p = 2;
     dim = 2;
     w = 1;
 
-    n_c = 100000;
+    n_c = 1000000;
     bool min = false;
     bool vmc = true;
-    bool dmc = false;
+    bool dmc = true;
 
     string system = "QDots";
     string sampling = "IS";
     string kinetics_type = "CF";
 
     bool dist_out = true;
-    bool blocking_out = true;
+    bool blocking_out = false;
     
-    bool dist_in = false;
+    bool dist_in = true;
 
     bool use_jastrow = true;
     bool use_coulomb = true;
@@ -55,11 +55,6 @@ int main(int argc, char** argv) {
     //cout << alpha << " " << beta << endl;
     if ((use_jastrow == false) && (use_coulomb == false)) {
         alpha = 1;
-    }
-
-
-    if (dmc) {
-        dt = 0.005;
     }
 
 
@@ -198,18 +193,27 @@ int main(int argc, char** argv) {
     }
     if (dmc) {
 
+        n_c = 1000;
+        dt = 0.01;
         int n_w = 1000;
+        int n_b = 100;
+        
         if (!vmc) {
             E_T = 3.00031;
         }
 
+        sample_method->set_dt(dt);
 
-        DMC* dmc = new DMC(n_p, dim, n_w, n_c, E_T, 
+        DMC* dmc = new DMC(n_p, dim, n_w, n_c, n_b, E_T, 
                 sample_method, 
                 SYSTEM, 
                 kinetics, 
                 jastrow, 
                 dist_in);
+        
+        OutputHandler* DMCout = new stdoutDMC();
+        
+        dmc->add_output(DMCout);
         
         dmc->run_method();
         dmc->output();

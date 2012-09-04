@@ -37,11 +37,16 @@ public:
     virtual void copy_walker(const Walker* parent, Walker* child) const = 0;
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
 
-    double get_branching_Gfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
+    //    double get_branching_Gfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
+    double get_branching_Gfunc(double E_x, double E_y, double E_T) const;
 
     void set_qmc_ptr(QMC* qmc) {
         diffusion->set_qmc_ptr(qmc);
         this->qmc = qmc;
+    }
+
+    void set_dt(double dt) {
+        diffusion->set_dt(dt);
     }
 
     //    bool get_importance_bool() {

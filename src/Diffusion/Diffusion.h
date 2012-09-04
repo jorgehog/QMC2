@@ -29,12 +29,18 @@ public:
 
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const = 0;
 
-    virtual double get_GBfunc(Walker* walker_pre, Walker* walker_post, double E_T) const = 0;
+//    virtual double get_GBfunc(Walker* walker_pre, Walker* walker_post, double E_T) const = 0;
+    double get_GBfunc(double E_x, double E_y, double E_T) const;
 
     double call_RNG();
 
     void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;
+    }
+    
+    void set_dt(double dt){
+        this->timestep = dt;
+        this->std = sqrt(2*D*dt);
     }
 };
 
@@ -45,7 +51,7 @@ public:
     virtual double get_new_pos(const Walker* walker, int i, int j);
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
 
-    virtual double get_GBfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
+//    virtual double get_GBfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
 
 };
 
@@ -57,7 +63,7 @@ public:
     virtual double get_new_pos(const Walker* walker, int i, int j);
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
 
-    virtual double get_GBfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
+//    virtual double get_GBfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
 };
 #endif	/* DIFFUSION_H */
 

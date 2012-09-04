@@ -10,6 +10,8 @@
 
 class OutputHandler {
 protected:
+    bool is_vmc;
+    bool is_dmc;
     
     bool parallel;
     int my_rank;
@@ -21,6 +23,8 @@ protected:
     std::ofstream file;
 
     QMC* qmc;
+    DMC* dmc;
+    VMC* vmc;
 
 public:
 
@@ -34,10 +38,8 @@ public:
 
     virtual void dump() = 0;
     virtual void finalize();
-
-    void set_qmc_ptr(QMC* qmc) {
-        this->qmc = qmc;
-    }
+    
+    void set_qmc_ptr(QMC* qmc);
 
 };
 

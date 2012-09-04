@@ -13,9 +13,11 @@ BlockingData::BlockingData(std::string filename,
         int my_rank,
         int num_procs)
 : OutputHandler(filename, path, parallel, my_rank, num_procs) {
-
+    
+    this->is_vmc = true;
+    
 }
 
 void BlockingData::dump() {
-    file << qmc->local_E << endl;
+    file << vmc->local_E << endl;
 }

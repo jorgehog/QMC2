@@ -22,14 +22,13 @@ QMC::QMC(int n_p, int dim, int n_c,
     this->sampling = sampling;
     this->system = system;
     this->kinetics = kinetics;
-    this->output_handler = output_handler;
-
+    
     this->sampling->set_qmc_ptr(this);
     this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
     this->thermalization = n_c / 10 * (n_c <= 1e6) + 1e5 * (n_c >= 1e6);
-
+    
 }
 
 void QMC::add_output(OutputHandler* output_handler) {
@@ -239,7 +238,7 @@ void VMC::run_method() {
             calculate_energy(original_walker);
 
             dump_output();
-            
+
         }
     }
 
@@ -284,7 +283,7 @@ DMC
  */
 
 
-DMC::DMC(int n_p, int dim, int n_w, int n_c, double E_T,
+DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
         Sampling *sampling,
         System *system,
         Kinetics *kinetics,
@@ -293,27 +292,34 @@ DMC::DMC(int n_p, int dim, int n_w, int n_c, double E_T,
 : QMC(n_p, dim, n_c, sampling, system, kinetics, jastrow) {
 
     this->dist_from_file = dist_from_file;
+
+    this->block_size = block_size;
     this->n_w_orig = n_w;
     this->E_T = E_T;
+
     E = 0;
 
 }
 
 void DMC::initialize() {
 
+
     jastrow->initialize();
     original_walker = new Walker(n_p, dim);
+
 
     K = 10;
     int max_walkers = K * n_w_orig;
 
     Angry_mob = new Walker*[max_walkers];
+
     for (int i = 0; i < max_walkers; i++) {
         Angry_mob[i] = new Walker(n_p, dim);
     }
 
 
     if (dist_from_file) {
+
         ifstream dist;
         dist.open("dist_out.dat");
 
@@ -326,132 +332,55 @@ void DMC::initialize() {
         for (int k = n_w_orig; k < K * n_w_orig; k++) {
             Angry_mob[k] = new Walker(n_p, dim, false);
         }
+
         dist.close();
+
     } else {
+
         for (int k = 0; k < n_w_orig; k++) {
+
             Angry_mob[k] = new Walker(n_p, dim);
+
             while (Angry_mob[k]->is_singular()) {
                 sampling->set_trial_pos(Angry_mob[k]);
             }
+
         }
 
         for (int k = n_w_orig; k < K * n_w_orig; k++) {
             Angry_mob[k] = new Walker(n_p, dim, false);
         }
+
     }
 
-    E = E_T;
     n_w = n_w_orig;
+
 }
 
-//void DMC::increase_walker_space() {
-//    int i, j, k, l;
-//
-//    //creating tmp-replacement
-//    Walker **tmp = new Walker*[2 * K * n_w_orig];
-//
-//    for (i = 0; i < 2 * K * n_w_orig; i++) {
-//        tmp[i] = new Walker(this);
-//    }
-//
-//    //copying current walkers into the tmp
-//    for (l = 0; l < K * n_w_orig; l++) {
-//        for (i = 0; i < n_p; i++) {
-//            for (j = 0; j < dim; j++) {
-//                tmp[l]->r[i][j] = Angry_mob[l]->r[i][j];
-//            }
-//
-//            for (k = i + 1; k < n_p; k++) {
-//                tmp[l]->r_rel[i][k] = tmp[l]->r_rel[k][i] = Angry_mob[l]->r[i][k];
-//            }
-//        }
-//
-//        if (is_importance()) {
-//            for (i = 0; i < n_p; i++) {
-//                for (j = 0; j < dim; j++) {
-//                    tmp[l]->qforce[i][j] = Angry_mob[l]->qforce[i][j];
-//                }
-//            }
-//        }
-//        tmp[l]->is_murdered = Angry_mob[l]->is_murdered;
-//    }
-//
-//    //deleting the old
-//    for (i = 0; i < K * n_w_orig; i++) {
-//        delete Angry_mob[i];
-//    }
-//
-//    delete[] Angry_mob;
-//
-//    //creating a new with more room
-//    K *= 2;
-//    Walker** Angry_mob = new Walker*[K * n_w_orig];
-//
-//    for (i = 0; i < K * n_w_orig; i++) {
-//        Angry_mob[i] = new Walker(this);
-//    }
-//
-//
-//
-//    //copying from tmp into the new
-//    for (l = 0; l < K * n_w_orig; l++) {
-//        for (i = 0; i < n_p; i++) {
-//            for (j = 0; j < dim; j++) {
-//                Angry_mob[l]->r[i][j] = tmp[l]->r[i][j];
-//            }
-//
-//            for (k = i + 1; k < n_p; k++) {
-//                Angry_mob[l]->r_rel[i][k] = Angry_mob[l]->r_rel[k][i] = tmp[l]->r[i][k];
-//            }
-//        }
-//
-//        if (is_importance()) {
-//            for (i = 0; i < n_p; i++) {
-//                for (j = 0; j < dim; j++) {
-//                    Angry_mob[l]->qforce[i][j] = tmp[l]->qforce[i][j];
-//                }
-//            }
-//        }
-//        Angry_mob[l]->is_murdered = tmp[l]->is_murdered;
-//
-//    }
-//
-//
-//    //deleting tmp
-//    for (i = 0; i < K * n_w_orig; i++) {
-//        delete tmp[i];
-//    }
-//
-//    delete[] tmp;
-//
-//    this->Angry_mob = Angry_mob;
-//
-//}
-
 void DMC::output() const {
-    cout << "DMC energy: " << E / n_c << endl;
+    cout << "DMC energy: " << dmc_E / n_c << endl;
 }
 
 void DMC::Evolve_walker(double GB) {
-    int n;
-    int branch_mean;
 
-    branch_mean = int(GB + sampling->call_RNG()); //random int with mean=GB
+    int branch_mean = int(GB + sampling->call_RNG()); //random int with mean=GB
 
-    if (branch_mean >= 1) {
-        for (n = 0; n < branch_mean - 1; n++) {
+    if (branch_mean == 0) {
+        //        cout << "died" << endl;
+        trial_walker->kill();
 
+    } else {
+
+        for (int n = 1; n < branch_mean; n++) {
+            //            cout << "spawned" << endl;
             n_w += 1;
             copy_walker(trial_walker, Angry_mob[n_w - 1]);
+
         }
 
-        //calculate_energy_necessities(trial_walker);
-        //get_wf_value(trial_walker);
-        //E_avg += GB * calculate_local_energy(trial_walker);
-        //samples++;
+        E += GB * local_E;
+        samples++;
 
-    } else if (branch_mean == 0) {
-        trial_walker->kill();
     }
 }
 
@@ -520,60 +449,63 @@ void DMC::bury_the_dead() {
 
 }
 
-void DMC::increase_walker_space() {
-
-}
-
 void DMC::initialize_walker(int k) {
     trial_walker = Angry_mob[k];
     copy_walker(trial_walker, original_walker);
     accepted = 0;
 }
 
-void DMC::update_energies(int n) {
-    //E += E_avg / samples;
-    E_T = E / (n + 1) + (1. / 1000) * log((double) n_w_orig / n_w);
+void DMC::update_energies() {
+    dmc_E += E / samples;
+    E_T = dmc_E / cycle; //+ (1. / 1000) * log((double) n_w_orig / n_w);
 }
 
 void DMC::run_method() {
 
     initialize();
 
-    //DEBUGGING
-    ofstream file;
-    file.open("e_vs_t.dat");
+    for (cycle = 1; cycle <= n_c; cycle++) {
 
-
-    for (int cycle = 0; cycle < n_c; cycle++) {
         n_w_last = n_w;
-        E_avg = 0;
+        E = 0;
         samples = 0;
+
         for (int k = 0; k < n_w_last; k++) {
+
             initialize_walker(k);
+            int b = 0;
 
+            while ((!trial_walker->is_dead())*(b < block_size)) {
 
-            for (int particle = 0; particle < n_p; particle++) {
-                update_pos(original_walker, trial_walker, particle);
-                //metro+++
+                calculate_energy_necessities(original_walker);
+                double local_E_orig = calculate_local_energy(original_walker);
+
+                diffuse_walker();
+
+                calculate_energy_necessities(trial_walker);
+                local_E = calculate_local_energy(trial_walker);
+
+                double GB = sampling->get_branching_Gfunc(local_E, local_E_orig, E_T);
+
+                Evolve_walker(GB);
+
+                b++;
             }
-
-            double GB = sampling->get_branching_Gfunc(original_walker, trial_walker, E_T);
-            cout << GB << endl;
-            Evolve_walker(GB);
         }
 
         bury_the_dead();
 
-        update_energies(cycle);
+        update_energies();
 
 
         ///DEBUGGING
-        if (cycle % (n_c / 1000) == 0) {
-            cout << "\r";
-            printf("%1.5f %1.5f %1.5f %1.5f%%", E_T, E / (cycle + 1), (double) n_w / n_w_orig, (double) (cycle + 1) / n_c * 100);
-            file << (cycle + 1) * 0.01 << "\t" << E / (cycle + 1) << "\t" << (double) n_w / n_w_orig << endl;
-        }
+        printf("%1.5f %1.5f %1.5f%%", dmc_E / cycle, (double) n_w / n_w_orig, (double) cycle / n_c * 100);
+        cout << endl;
+        
+        dump_output();
 
     }
+    
+    finalize_output();
 }
 

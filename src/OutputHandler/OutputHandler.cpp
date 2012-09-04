@@ -17,6 +17,9 @@ OutputHandler::OutputHandler(std::string filename,
         int my_rank,
         int num_procs) {
 
+    this->is_dmc = false;
+    this->is_vmc = false;
+    
     this->my_rank = my_rank;
     this->num_procs = num_procs;
     this->parallel = parallel;
@@ -30,6 +33,16 @@ OutputHandler::OutputHandler(std::string filename,
 
     this->file.open(((path + filename) + ".dat").c_str());
 
+}
+
+void OutputHandler::set_qmc_ptr(QMC* qmc){
+    if (this->is_dmc){
+        dmc = (DMC*)qmc;
+    } else if (this->is_vmc) {
+        vmc = (VMC*)qmc;
+    } else {
+        this->qmc = qmc;
+    }
 }
 
 void OutputHandler::finalize() {

@@ -10,6 +10,7 @@
 
 class QMC {
 protected:
+
     int n_c;
 
     int n_p;
@@ -20,7 +21,7 @@ protected:
 
     int accepted;
     int thermalization;
-    
+
     double local_E;
 
     Walker* original_walker;
@@ -44,7 +45,7 @@ protected:
 
     void dump_output();
     void finalize_output();
-    
+
     void diffuse_walker();
 
     void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const;
@@ -59,9 +60,9 @@ protected:
     void copy_walker(const Walker* parent, Walker* child) const;
 
 public:
-    
+
     void add_output(OutputHandler* output_handler);
-    
+
     virtual void run_method() = 0;
     virtual void output() const = 0;
 
@@ -96,18 +97,14 @@ public:
     double get_accepted_ratio() const {
         return accepted / double(n_p * (n_c + thermalization));
     }
-
-    friend class Minimizer;
-    friend class ASGD;
-
-    friend class OutputHandler;
+    
     friend class Distribution;
-    friend class BlockingData;
 
 };
 
 class VMC : public QMC {
 protected:
+
     double vmc_E, E2;
 
     virtual void initialize();
@@ -135,37 +132,53 @@ public:
     friend class Minimizer;
     friend class ASGD;
 
+    friend class BlockingData;
+
 };
 
 class DMC : public QMC {
 protected:
 
     int K; //Factor of empty space for walkers over initial walkers
-    int n_w_orig, n_w, n_w_last;
+    int n_w_orig;
+    int n_w;
+    int n_w_last;
+
+    int block_size;
     int samples;
-    double E_T, E, E_avg;
+
+    double dmc_E;
+    double E_T;
+    double E;
+
     bool dist_from_file;
 
     Walker **Angry_mob;
 
-    virtual void initialize();
+    void initialize();
+
     void initialize_walker(int k);
-    void increase_walker_space();
-    void bury_the_dead();
     void Evolve_walker(double GB);
-    void update_energies(int n);
+
+    void bury_the_dead();
+
+    void update_energies();
 
 public:
-    DMC(int n_p, int dim, int n_w, int n_c, double E_T, 
+
+    DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
             Sampling *sampling,
-            System *system, 
-            Kinetics *kinetics = new NoKinetics(), 
-            Jastrow *jastrow = new No_Jastrow(), 
+            System *system,
+            Kinetics *kinetics = new NoKinetics(),
+            Jastrow *jastrow = new No_Jastrow(),
             bool dist_from_file = false);
 
     virtual void run_method();
 
     virtual void output() const;
+    
+    friend class stdoutDMC;
+
 };
 
 

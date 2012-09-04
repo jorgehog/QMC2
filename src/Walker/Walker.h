@@ -61,6 +61,8 @@ public:
     void ressurect() {
         is_murdered = false;
     }
+    
+    void print(std::string header = "----");
 
 
 };
