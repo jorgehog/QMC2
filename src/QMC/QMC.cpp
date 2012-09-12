@@ -296,16 +296,16 @@ DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
     this->block_size = block_size;
     this->n_w_orig = n_w;
     this->E_T = E_T;
-
-    E = 0;
-
+    
 }
 
 void DMC::initialize() {
 
+    E = 0;
+    dmc_E = 0;
 
     jastrow->initialize();
-    original_walker = new Walker(n_p, dim);
+    trial_walker = new Walker(n_p, dim);
 
 
     K = 10;
@@ -366,13 +366,13 @@ void DMC::Evolve_walker(double GB) {
     int branch_mean = int(GB + sampling->call_RNG()); //random int with mean=GB
 
     if (branch_mean == 0) {
-        //        cout << "died" << endl;
+        
         trial_walker->kill();
 
     } else {
 
         for (int n = 1; n < branch_mean; n++) {
-            //            cout << "spawned" << endl;
+            
             n_w += 1;
             copy_walker(trial_walker, Angry_mob[n_w - 1]);
 
@@ -450,8 +450,8 @@ void DMC::bury_the_dead() {
 }
 
 void DMC::initialize_walker(int k) {
-    trial_walker = Angry_mob[k];
-    copy_walker(trial_walker, original_walker);
+    original_walker = Angry_mob[k];
+    copy_walker(original_walker, trial_walker);
     accepted = 0;
 }
 
@@ -463,7 +463,7 @@ void DMC::update_energies() {
 void DMC::run_method() {
 
     initialize();
-
+    
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         n_w_last = n_w;
@@ -473,6 +473,7 @@ void DMC::run_method() {
         for (int k = 0; k < n_w_last; k++) {
 
             initialize_walker(k);
+
             int b = 0;
 
             while ((!trial_walker->is_dead())*(b < block_size)) {

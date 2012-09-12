@@ -70,7 +70,7 @@ void test_nocol_nojast() {
 
             sample_method = new Brute_Force(n_p, dim, dt, random_seed);
 
-            vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
+            vmc = new VMC(n_p, dim, n_c, sample_method, Quantum_Dots, kinetics, jastrow);
 
 
             vmc->run_method();
@@ -171,7 +171,7 @@ void test_col_jast_num() {
 
             sample_method = new Brute_Force(n_p, dim, dt, random_seed);
 
-            vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
+            vmc = new VMC(n_p, dim, n_c, sample_method, Quantum_Dots, kinetics, jastrow);
 
             vmc->run_method();
 
@@ -265,7 +265,7 @@ void test_col_jast_CF() {
 
             sample_method = new Brute_Force(n_p, dim, dt, random_seed);
 
-            vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
+            vmc = new VMC(n_p, dim, n_c, sample_method, Quantum_Dots, kinetics, jastrow);
 
             vmc->run_method();
 
@@ -350,8 +350,8 @@ void test_ISnum_nocoljast() {
 
             sample_method = new Importance(n_p, dim, dt, random_seed);
 
-            vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
-            
+            vmc = new VMC(n_p, dim, n_c, sample_method, Quantum_Dots, kinetics, jastrow);
+
             cout << "foer" << endl;
             vmc->run_method();
             cout << "etter" << endl;
@@ -447,7 +447,7 @@ void test_ISnum() {
 
             sample_method = new Importance(n_p, dim, dt, random_seed);
 
-            vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
+            vmc = new VMC(n_p, dim, n_c, sample_method, Quantum_Dots, kinetics, jastrow);
 
             vmc->run_method();
 
@@ -540,7 +540,7 @@ void test_ISCF() {
 
             sample_method = new Importance(n_p, dim, dt, random_seed);
 
-            vmc = new VMC(n_p, dim, n_c, jastrow, sample_method, Quantum_Dots, kinetics);
+            vmc = new VMC(n_p, dim, n_c, sample_method, Quantum_Dots, kinetics, jastrow);
 
             vmc->run_method();
 

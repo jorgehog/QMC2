@@ -5,6 +5,12 @@ fileName = "DMC_out.dat"
 filePath = os.path.expanduser("~") + "/NetBeansProjects/nbQMC2/" + fileName
 
 cmd = ""
+
+if len(sys.argv) > 1:
+	exactE = float(sys.argv[1])
+else:
+	exactE = 0;
+
 while (cmd != "q"):
 
 	DMCout = open(filePath , "r")
@@ -13,6 +19,7 @@ while (cmd != "q"):
 	Eavg = []
 	N = []
 	Navg = []
+	ET = []
 
 	for line in DMCout:
 		raw = line.split()
@@ -20,10 +27,12 @@ while (cmd != "q"):
 		Eavg.append(float(raw[1]))
 		N.append(float(raw[2]))
 		Navg.append(float(raw[3]))
+		ET.append(float(raw[4]))
 
 	DMCout.close()
 
-	if len(E) == len(Eavg) == len(N):
+
+	if len(E) == len(Eavg) == len(N) == len(Navg) == len(ET):
 
 		figure(1)
 		plot(E, 'r')
@@ -34,6 +43,8 @@ while (cmd != "q"):
 		xlabel("cycle")
 		ylabel("E")
 		legend(["E", "Eavg"])
+		if (exactE != 0):
+			plot(zeros(len(E)) + exactE, 'g')
 
 		figure(2)
 		plot(N, 'r')
@@ -45,5 +56,15 @@ while (cmd != "q"):
 		ylabel("N/N_0")
 		legend(["N", "Navg"])
 
+		figure(3)
+		plot(ET, 'b')
+		title("E_t")
+		xlabel("cycle")
+		ylabel("Et")
+		if (exactE != 0):
+			hold("on")
+			plot(zeros(len(E)) + exactE, 'g')
 
-	cmd = raw_input("press Enter to plot again or 'q' to end")
+		cmd = raw_input("press Enter to plot again or 'q' to end")
+	else:
+		cmd = "rerun"

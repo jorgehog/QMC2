@@ -30,6 +30,8 @@ void stdoutDMC::dump() {
     file << dmc->dmc_E / dmc->cycle << "\t";
     file << sumE / n << "\t";
     file << dmc->n_w / (double) dmc->n_w_orig << "\t";
-    file << sumN / n << endl;
+    file << sumN / n << "\t";
+    file << dmc->E_T << endl;
+    
 
 }

@@ -193,8 +193,8 @@ int main(int argc, char** argv) {
     }
     if (dmc) {
 
-        n_c = 1000;
-        dt = 0.01;
+        n_c = 10000;
+        dt = 0.001;
         int n_w = 1000;
         int n_b = 100;
         

@@ -9,15 +9,14 @@
 #define	POTENTIAL_H
 
 class Potential {
-public:
-    Potential(int n_p, int dim);
-
-    virtual double get_pot_E(const Walker* walker) const = 0;
-
 protected:
     int n_p;
     int dim;
 
+public:
+    Potential(int n_p, int dim);
+
+    virtual double get_pot_E(const Walker* walker) const = 0;
 
 };
 
@@ -35,11 +34,11 @@ public:
 
 class Coulomb : public Potential {
 public:
-    
+
     Coulomb(int n_p, int dim);
-    
+
     virtual double get_pot_E(const Walker* walker) const;
-    
+
 };
 
 
