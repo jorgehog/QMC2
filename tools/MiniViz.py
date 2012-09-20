@@ -1,8 +1,8 @@
-from scitools.std import *
+from scitools.std import plot, figure
 import os
 
-path = os.path.environ "/NetBeansProjects/nbQMC2/"
-filename = "MiniOut.dat"
+path = os.path.expanduser('~') + "/NetBeansProjects/nbQMC2/"
+filename = "alpha.dat"
 
 
 
@@ -22,8 +22,9 @@ if len(raw) == N:
 	for i in range(N):
 		figure(i+1)
 		plot(plotData[i], title=titles[i])
+  
+#Occurs if no Jastrow data written to file:
 else:
-	print "hei"
 	maping = [0,2,4]
 	maping2 = [0,2,3];
 	for i in range(len(raw)-1):

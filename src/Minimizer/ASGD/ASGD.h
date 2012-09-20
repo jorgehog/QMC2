@@ -11,11 +11,6 @@
 class ASGD : public Minimizer {
 protected:
 
-    //DEBUG
-    arma::rowvec e;
-    
-    
-    
     int n_c;
     int n_c_SGD;
     int SGDsamples;
@@ -38,6 +33,7 @@ protected:
     double w;
 
     Walker** walkers;
+    Walker** trial_walkers;
 
     rowvec parameter;
 
@@ -48,7 +44,7 @@ protected:
     rowvec gradient_tot;
 
     double f(double x);
-    void get_variational_gradients(double e_local);
+    void get_variational_gradients(Walker* walker, double e_local);
 
 public:
     ASGD(VMC* vmc,
@@ -67,6 +63,7 @@ public:
             double A = 1);
 
     virtual VMC* minimize();
+    std::ofstream DEBAG;
 
 };
 

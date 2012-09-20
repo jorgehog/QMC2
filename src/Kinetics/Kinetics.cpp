@@ -9,8 +9,8 @@
 
 using namespace std;
 
-Kinetics::Kinetics(){
-    
+Kinetics::Kinetics() {
+
 }
 
 Kinetics::Kinetics(int n_p, int dim) {
@@ -19,8 +19,12 @@ Kinetics::Kinetics(int n_p, int dim) {
     this->dim = dim;
 }
 
-NoKinetics::NoKinetics(){
-    
+NoKinetics::NoKinetics() {
+
+}
+
+Numerical::Numerical() {
+
 }
 
 Numerical::Numerical(int n_p, int dim, double h)
@@ -39,6 +43,9 @@ double Numerical::get_KE(const Walker* walker) {
     double e_kinetic, wf, wf_min, wf_plus;
 
     wf = walker->value;
+
+    //    qmc->get_wf_value(walker); FUNKER
+    //    if (abs(wf - walker->value) > 0.001) cout << "fail" << endl;
 
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
@@ -95,7 +102,7 @@ void Numerical::get_QF(Walker* walker) {
 
             wfplus->make_rel_matrix();
             wfminus->make_rel_matrix();
-            
+
             wfplus->calc_r_i2();
             wfminus->calc_r_i2();
 
@@ -144,6 +151,10 @@ void Numerical::copy_walker_IS(const Walker* parent, Walker* child) const {
 
 void Numerical::reset_walker_IS(const Walker* walker_pre, Walker* walker_post, int particle) const {
     //Nothing to reset;
+}
+
+Closed_form::Closed_form() {
+
 }
 
 Closed_form::Closed_form(int n_p, int dim)

@@ -46,7 +46,7 @@ protected:
     void dump_output();
     void finalize_output();
 
-    void diffuse_walker();
+    void diffuse_walker(Walker* original, Walker* trial);
 
     void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const;
     double get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const;

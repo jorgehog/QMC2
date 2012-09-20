@@ -40,8 +40,10 @@ ASGD::ASGD(VMC* vmc,
     this->max_step = max_step;
 
     walkers = new Walker*[n_walkers];
+    trial_walkers = new Walker*[n_walkers];
     for (int i = 0; i < n_walkers; i++) {
-        walkers[i] = new Walker(vmc->n_p, vmc->dim, false);
+        walkers[i] = new Walker(vmc->n_p, vmc->dim);
+        trial_walkers[i] = new Walker(vmc->n_p, vmc->dim);
     }
 
     gradient = zeros(1, Nparams);
@@ -52,19 +54,17 @@ ASGD::ASGD(VMC* vmc,
 
     t_prev = 0;
 
-    e = zeros(1, 2);
-
 }
 
 double ASGD::f(double x) {
     return f_min + (f_max - f_min) / (1 - (f_max / f_min) * exp(-x / w));
 }
 
-void ASGD::get_variational_gradients(double e_local) {
+void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
 
-        double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(vmc->original_walker, alpha);
+        double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker, alpha);
 
         gradient_local[alpha] += e_local * dalpha;
         gradient[alpha] += dalpha;
@@ -73,7 +73,7 @@ void ASGD::get_variational_gradients(double e_local) {
 
     for (int beta = 0; beta < Njastrow_params; beta++) {
 
-        double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(vmc->original_walker, beta);
+        double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(walker, beta);
 
         gradient_local[Nspatial_params + beta] += e_local*dbeta;
         gradient[Nspatial_params + beta] += dbeta;
@@ -83,39 +83,33 @@ void ASGD::get_variational_gradients(double e_local) {
 }
 
 VMC* ASGD::minimize() {
-#include <ostream>
 
+
+    /* DEBUG */
     ofstream file;
     file.open("alpha.dat");
-    ofstream DEBAG;
     DEBAG.open("sammenliknnBF_CF.dat");
     int debug1;
     double aGrad, bGrad, sumE;
     aGrad = bGrad = sumE = 0;
     debug1 = 1;
+    //
+
 
     vmc->initialize();
-    //    double test = 0;
 
     for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
-        vmc->diffuse_walker();
+        vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
 
         if ((cycle > thermalization) && (cycle % n_c) == 0) {
 
             vmc->copy_walker(vmc->original_walker, walkers[k]);
+            vmc->copy_walker(vmc->original_walker, trial_walkers[k]);
             k++;
         }
 
     }
-
-    //    for (int k = 0; k < n_walkers; k++) {
-    //        cout << sum(walkers[k]->r2) << endl;
-    //        test += sum(walkers[k]->r2);
-    //    }
-    //    cout << test / (n_walkers*n_c) << endl;
-    //    test = 0;
-    //    double test2 = 0;
-    //    double test3 = 0;
+    //D:100% match this far
 
     for (int sample = 1; sample <= SGDsamples; sample++) {
 
@@ -124,41 +118,25 @@ VMC* ASGD::minimize() {
         gradient_local = zeros(1, Nparams);
 
         for (int k = 0; k < n_walkers; k++) {
-
-            vmc->copy_walker(walkers[k], vmc->original_walker);
-            vmc->copy_walker(walkers[k], vmc->trial_walker);
-
+            
             for (int cycle = 0; cycle < n_c_SGD; cycle++) {
 
-                vmc->diffuse_walker();
+                vmc->diffuse_walker(walkers[k], trial_walkers[k]);
 
-                vmc->calculate_energy_necessities(vmc->original_walker);
+                vmc->calculate_energy_necessities(walkers[k]);
 
-                //                e(0) += sum(vmc->original_walker->r2);
-
-                double e_local = vmc->calculate_local_energy(vmc->original_walker);
+                double e_local = vmc->calculate_local_energy(walkers[k]);
                 E += e_local;
 
+                get_variational_gradients(walkers[k], e_local);
 
-                //            test += sum(vmc->original_walker->r2);
-
-                get_variational_gradients(e_local);
             }
-
-            vmc->copy_walker(vmc->original_walker, walkers[k]);
-            vmc->copy_walker(vmc->trial_walker, walkers[k]);
-
         }
 
-
         int scale = n_walkers*n_c_SGD;
-        //        e /= scale;
-        //        cout << e << endl;
-        //        test /= scale;
-        //        test2 += test;
+
+        //        cout << E / scale << endl;
         E /= scale;
-        //        test3 += E;
-        //cout << "UAHH " << test << endl;
 
         gradient_tot = 2 * (gradient_local - gradient * E) / scale;
 
@@ -174,10 +152,14 @@ VMC* ASGD::minimize() {
             cout << E << endl;
         }
 
+
+        //        
         aGrad += gradient_tot[0];
         bGrad += gradient_tot[1];
         sumE += E;
         file << aGrad / debug1 << "\t" << bGrad / debug1 << "\t";
+        //
+
 
         for (int param = 0; param < Nspatial_params; param++) {
 
@@ -188,15 +170,7 @@ VMC* ASGD::minimize() {
 
             double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
             file << abs(alpha - step) << "\t";
-            //            DEBAG << "BEFOH " << alpha << endl;
-            //            DEBAG << "GRAD " << gradient_tot[param] << endl;
-            //            DEBAG << "stepfac " << a / (t + A) << endl;
-            //            DEBAG << "E " << E << endl;
-            //            DEBAG << "SHALL BE " << abs(alpha - step) <<endl;
             vmc->get_orbitals_ptr()->set_parameter(abs(alpha - step), param);
-            //            DEBAG << "AFTAH " << vmc->get_orbitals_ptr()->get_parameter(param) << endl;
-            //            DEBAG << "\n";
-
         }
 
         for (int param = 0; param < Njastrow_params; param++) {
@@ -208,7 +182,6 @@ VMC* ASGD::minimize() {
 
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
             file << abs(beta - step) << "\t";
-            //            cout << "-----------------------------------------------------" << endl;
             vmc->get_jastrow_ptr()->set_parameter(abs(beta - step), param);
 
 
@@ -221,11 +194,10 @@ VMC* ASGD::minimize() {
         gradient_old = gradient_tot;
 
     }
-    //    cout << "TROLOL " << test3/SGDsamples << endl;
+
     output("Finished minimizing. Final parameters:", -1);
     file.close();
-    //    DEBAG.close();
+    DEBAG.close();
     vmc->accepted = 0;
-    //    cout << "UAHHH!! " << test2 / SGDsamples << endl;
     return vmc;
 }

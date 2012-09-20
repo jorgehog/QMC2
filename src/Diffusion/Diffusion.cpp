@@ -18,7 +18,7 @@ Diffusion::Diffusion(int n_p, int dim, double timestep, long random_seed, double
 
 double Diffusion::call_RNG() {
 
-    return ran3(&random_seed);
+    return ran2(&random_seed);
 }
 
 double Diffusion::get_new_pos(const Walker* walker, int i, int j) {

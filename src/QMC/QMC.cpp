@@ -22,13 +22,13 @@ QMC::QMC(int n_p, int dim, int n_c,
     this->sampling = sampling;
     this->system = system;
     this->kinetics = kinetics;
-    
+
     this->sampling->set_qmc_ptr(this);
     this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
     this->thermalization = n_c / 10 * (n_c <= 1e6) + 1e5 * (n_c >= 1e6);
-    
+
 }
 
 void QMC::add_output(OutputHandler* output_handler) {
@@ -87,7 +87,7 @@ void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle
 
     walker_post->calc_r_i2(particle);
 
-    update_necessities(original_walker, trial_walker, particle);
+    update_necessities(walker_pre, walker_post, particle);
 
 }
 
@@ -147,18 +147,18 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
     sampling->reset_walker(walker_pre, walker_post, particle);
 }
 
-void QMC::diffuse_walker() {
+void QMC::diffuse_walker(Walker* original, Walker* trial) {
     for (int particle = 0; particle < n_p; particle++) {
 
         sampling->reset_control_parameters();
-        update_pos(original_walker, trial_walker, particle);
+        update_pos(original, trial, particle);
 
-        double A = get_acceptance_ratio(original_walker, trial_walker, particle);
+        double A = get_acceptance_ratio(original, trial, particle);
 
         if (metropolis_test(A)) {
-            update_walker(original_walker, trial_walker, particle);
+            update_walker(original, trial, particle);
         } else {
-            reset_walker(original_walker, trial_walker, particle);
+            reset_walker(original, trial, particle);
         }
 
     }
@@ -229,17 +229,19 @@ void VMC::run_method() {
 
     initialize();
 
-    for (cycle = 1; cycle <= n_c + thermalization; cycle++) {
+    for (cycle = 1; cycle <= thermalization; cycle++) {
+        diffuse_walker(original_walker, trial_walker);
+    }
 
-        diffuse_walker();
+    for (cycle = 1; cycle <= n_c; cycle++) {
 
-        if (cycle > thermalization) {
-            calculate_energy_necessities(original_walker);
-            calculate_energy(original_walker);
+        diffuse_walker(original_walker, trial_walker);
 
-            dump_output();
+        calculate_energy_necessities(original_walker);
+        calculate_energy(original_walker);
 
-        }
+        dump_output();
+
     }
 
     scale_values();
@@ -296,7 +298,7 @@ DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
     this->block_size = block_size;
     this->n_w_orig = n_w;
     this->E_T = E_T;
-    
+
 }
 
 void DMC::initialize() {
@@ -366,13 +368,13 @@ void DMC::Evolve_walker(double GB) {
     int branch_mean = int(GB + sampling->call_RNG()); //random int with mean=GB
 
     if (branch_mean == 0) {
-        
+
         trial_walker->kill();
 
     } else {
 
         for (int n = 1; n < branch_mean; n++) {
-            
+
             n_w += 1;
             copy_walker(trial_walker, Angry_mob[n_w - 1]);
 
@@ -463,7 +465,7 @@ void DMC::update_energies() {
 void DMC::run_method() {
 
     initialize();
-    
+
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         n_w_last = n_w;
@@ -481,7 +483,7 @@ void DMC::run_method() {
                 calculate_energy_necessities(original_walker);
                 double local_E_orig = calculate_local_energy(original_walker);
 
-                diffuse_walker();
+                diffuse_walker(original_walker, trial_walker);
 
                 calculate_energy_necessities(trial_walker);
                 local_E = calculate_local_energy(trial_walker);
@@ -502,11 +504,11 @@ void DMC::run_method() {
         ///DEBUGGING
         printf("%1.5f %1.5f %1.5f%%", dmc_E / cycle, (double) n_w / n_w_orig, (double) cycle / n_c * 100);
         cout << endl;
-        
+
         dump_output();
 
     }
-    
+
     finalize_output();
 }
 

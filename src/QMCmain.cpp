@@ -9,12 +9,13 @@
 #include "QMCheaders.h"
 
 #include <sys/time.h>
-using namespace std;
 
 /*
  * 
  */
 int main(int argc, char** argv) {
+    using namespace std;
+
     int n_p, dim, n_c, numprocs, my_rank;
     double alpha, beta, w, dt, h, cumul_e, cumul_e2, e, e2, E_T;
     long random_seed;
@@ -33,28 +34,28 @@ int main(int argc, char** argv) {
     dim = 2;
     w = 1;
 
-    n_c = 1000000;
-    bool min = false;
-    bool vmc = true;
-    bool dmc = true;
+    n_c = 100000;
+    bool doMin = true;
+    bool doVmc = true;
+    bool doDmc = false;
 
     string system = "QDots";
-    string sampling = "IS";
+    string sampling = "BF";
     string kinetics_type = "CF";
 
-    bool dist_out = true;
+    bool dist_out = false;
     bool blocking_out = false;
-    
+
     bool dist_in = true;
 
-    bool use_jastrow = true;
-    bool use_coulomb = true;
+    bool use_jastrow = false;
+    bool use_coulomb = false;
 
 
     initVMC(n_p, dim, w, dt, system, sampling, alpha, beta);
     //cout << alpha << " " << beta << endl;
     if ((use_jastrow == false) && (use_coulomb == false)) {
-        alpha = 1;
+        alpha = 1.07176;
     }
 
 
@@ -63,8 +64,8 @@ int main(int argc, char** argv) {
     Potential* onebody_pot;
     System* SYSTEM;
     Sampling* sample_method;
-    Jastrow* jastrow;    
-    
+    Jastrow* jastrow;
+
     if (kinetics_type == "Num") {
         h = 0.0001;
         kinetics = new Numerical(n_p, dim, h);
@@ -111,28 +112,28 @@ int main(int argc, char** argv) {
 
 
 
-    if (vmc || min) {
+    if (doVmc || doMin) {
 
-        VMC* vmc = new VMC(n_p, dim, n_c, 
-                sample_method, 
-                SYSTEM, 
-                kinetics, 
+        VMC* vmc = new VMC(n_p, dim, n_c,
+                sample_method,
+                SYSTEM,
+                kinetics,
                 jastrow);
-        if (dist_out){
-            
+        if (dist_out) {
+
             OutputHandler* dist = new Distribution("dist_out");
             vmc->add_output(dist);
-        
-        } 
-        
-        if (blocking_out) {
-            
-            OutputHandler* blocking = new BlockingData("blocking_out");
-            vmc->add_output(blocking);
-        
+
         }
 
-        if (min) {
+        if (blocking_out) {
+
+            OutputHandler* blocking = new BlockingData("blocking_out");
+            vmc->add_output(blocking);
+
+        }
+
+        if (doMin) {
             double max_step = 0.1;
             double f_max = 1.0;
             double f_min = -0.5;
@@ -140,11 +141,11 @@ int main(int argc, char** argv) {
             double A = 70;
             double a = 0.3;
             int SGDsamples = 10000;
-            int n_walkers = 1;
-            int thermalization = 1000000;
-            int n_cm = n_walkers * 100000;
+            int n_walkers = 10;
+            int thermalization = 100000;
+            int n_cm = n_walkers * 1000;
             int n_c_SGD = 100;
-            rowvec alpha = zeros(1, 1) + 1.0;
+            rowvec alpha = zeros(1, 1) + 0.5;
             rowvec beta = zeros(1, 1) + 0.5;
 
 
@@ -167,7 +168,7 @@ int main(int argc, char** argv) {
             vmc = minimizer->minimize();
         }
 
-        if (vmc) {
+        if (doVmc) {
             vmc->run_method();
             vmc->output();
         }
@@ -187,34 +188,34 @@ int main(int argc, char** argv) {
         //        vmc->output();
         //    }
 
-        if (dmc) {
+        if (doDmc) {
             E_T = vmc->get_energy();
         }
     }
-    if (dmc) {
+    if (doDmc) {
 
         n_c = 10000;
         dt = 0.001;
         int n_w = 1000;
         int n_b = 100;
-        
-        if (!vmc) {
+
+        if (!doVmc) {
             E_T = 3.00031;
         }
 
         sample_method->set_dt(dt);
 
-        DMC* dmc = new DMC(n_p, dim, n_w, n_c, n_b, E_T, 
-                sample_method, 
-                SYSTEM, 
-                kinetics, 
-                jastrow, 
+        DMC* dmc = new DMC(n_p, dim, n_w, n_c, n_b, E_T,
+                sample_method,
+                SYSTEM,
+                kinetics,
+                jastrow,
                 dist_in);
-        
+
         OutputHandler* DMCout = new stdoutDMC();
-        
+
         dmc->add_output(DMCout);
-        
+
         dmc->run_method();
         dmc->output();
     }

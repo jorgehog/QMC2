@@ -7,7 +7,6 @@
 
 #include "../QMCheaders.h"
 
-using namespace std;
 
 Sampling::Sampling(int n_p, int dim) {
     this->n_p = n_p;
@@ -66,6 +65,8 @@ void Brute_Force::update_walker(Walker* walker_pre, const Walker* walker_post, i
 }
 
 void Brute_Force::get_necessities(Walker* walker) {
+    using namespace std;
+    
     qmc->get_wf_value(walker);
 
     if (walker->value < 0.001) {
@@ -81,6 +82,8 @@ void Brute_Force::get_necessities(Walker* walker) {
 }
 
 void Brute_Force::update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) {
+    using namespace std;
+    
     qmc->get_wf_value(walker_post);
 
     if (walker_post->value < 0.001) {
@@ -96,7 +99,7 @@ void Brute_Force::update_necessities(const Walker* walker_pre, Walker* walker_po
 }
 
 void Brute_Force::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
-    //walker_post->value = walker_pre->value; will be overwritten.
+//    walker_post->value = walker_pre->value; //will be overwritten.
 }
 
 void Brute_Force::calculate_energy_necessities_CF(Walker* walker) const {
@@ -159,6 +162,8 @@ double Importance::get_spatial_ratio(const Walker* walker_post, const Walker* wa
 }
 
 void Importance::get_necessities(Walker* walker) {
+    using namespace std;
+
     qmc->get_kinetics_ptr()->get_necessities_IS(walker);
     qmc->get_kinetics_ptr()->get_QF(walker);
 

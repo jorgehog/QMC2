@@ -85,6 +85,7 @@ protected:
     Walker* wfminus;
 
 public:
+    Numerical();
     Numerical(int n_p, int dim, double h = 0.0001);
 
     virtual double get_KE(const Walker* walker);
@@ -109,6 +110,7 @@ public:
 
 class Closed_form : public Kinetics {
 public:
+    Closed_form();
     Closed_form(int n_p, int dim);
 
     virtual double get_KE(const Walker* walker);

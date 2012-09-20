@@ -1,9 +1,10 @@
 #include <iostream>
-using namespace std;
 
 //TMP FUNC. WILL BE PYTHON SCRIPTED
 
 void initVMC(int n_p, int dim, double w, double &dt, std::string type, std::string sampling, double &alpha, double &beta) {
+    using namespace std;
+    
     
     if (sampling == "BF") {
         dt = 0.5;
