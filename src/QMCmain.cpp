@@ -26,21 +26,21 @@ int main(int argc, char** argv) {
     //    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
 
-
-    random_seed = -time(NULL);
+    random_seed = -1.234;
+//    random_seed = -time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
     n_p = 2;
     dim = 2;
     w = 1;
 
-    n_c = 100000;
-    bool doMin = true;
+    n_c = 1E5;
+    bool doMin = false;
     bool doVmc = true;
-    bool doDmc = false;
+    bool doDmc = true;
 
     string system = "QDots";
-    string sampling = "BF";
+    string sampling = "IS";
     string kinetics_type = "CF";
 
     bool dist_out = false;
@@ -48,14 +48,14 @@ int main(int argc, char** argv) {
 
     bool dist_in = true;
 
-    bool use_jastrow = false;
-    bool use_coulomb = false;
+    bool use_jastrow = true;
+    bool use_coulomb = true;
 
 
     initVMC(n_p, dim, w, dt, system, sampling, alpha, beta);
     //cout << alpha << " " << beta << endl;
     if ((use_jastrow == false) && (use_coulomb == false)) {
-        alpha = 1.07176;
+        alpha = 1;
     }
 
 
@@ -138,12 +138,12 @@ int main(int argc, char** argv) {
             double f_max = 1.0;
             double f_min = -0.5;
             double omega = 0.8;
-            double A = 70;
+            double A = 20;
             double a = 0.3;
             int SGDsamples = 10000;
             int n_walkers = 10;
             int thermalization = 100000;
-            int n_cm = n_walkers * 1000;
+            int n_cm = 1000;
             int n_c_SGD = 100;
             rowvec alpha = zeros(1, 1) + 0.5;
             rowvec beta = zeros(1, 1) + 0.5;
@@ -223,6 +223,23 @@ int main(int argc, char** argv) {
 
 
     //    MPI_Finalize();
+//    ofstream paramSpaceOut;
+//    paramSpaceOut.open("alphaVsE.dat");
+//    VMC* vmc;
+//    for (double alpha = 0.5; alpha <= 1.5; alpha+=0.1){
+//        SP_basis = new oscillator_basis(n_p, dim, alpha, w);
+//        SYSTEM = new Fermions(n_p, dim, SP_basis);
+//        SYSTEM->add_potential(onebody_pot);
+//        vmc = new VMC(n_p, dim, n_c,
+//                sample_method,
+//                SYSTEM,
+//                kinetics,
+//                jastrow);
+//        cout << alpha << endl;
+//        vmc->run_method();
+//        paramSpaceOut << alpha << "\t" << vmc->get_energy() << endl;
+//    }
+//    paramSpaceOut.close();
     return 0;
 }
 

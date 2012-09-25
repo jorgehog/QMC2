@@ -32,7 +32,7 @@ public:
     }
 
     virtual VMC* minimize() = 0;
-
+    virtual VMC* minimizeTEST() = 0;
     void output(std::string message, double number);
 
 };

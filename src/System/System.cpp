@@ -24,7 +24,7 @@ double System::get_potential_energy(const Walker* walker) {
     for (std::vector<Potential*>::iterator pot = potentials.begin(); pot != potentials.end(); ++pot) {
         potE += (*pot)->get_pot_E(walker);
     }
-    
+
     return potE;
 }
 
@@ -62,7 +62,7 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
 
 void Fermions::initialize_slaters(const Walker* walker) {
     int i, q_num;
-
+    
     for (i = 0; i < n2; i++) {
         for (q_num = 0; q_num < n2; q_num++) {
             s_up(i, q_num) = orbital->phi(walker, i, q_num);
@@ -70,8 +70,9 @@ void Fermions::initialize_slaters(const Walker* walker) {
         }
     }
 
-    //    cout <<"UP"<< s_down*walker->inv(span(0,2), span(3,5)) << endl;
-    //    cout <<"DOWN"<< s_up*walker->inv(span(0,2),span(0,2)) << endl;
+
+    //    cout << "UP" << s_down * walker->inv(span(0, 2), span(3, 5)) << endl;
+//    cout << "DOWN" << s_up * walker->inv(span(0, 2), span(0, 2)) << endl;
 }
 
 double Fermions::get_det() {
@@ -79,8 +80,10 @@ double Fermions::get_det() {
 }
 
 void Fermions::invert_slaters() {
+
     s_up = arma::inv(s_up);
     s_down = arma::inv(s_down);
+
 }
 
 void Fermions::make_merged_inv(Walker* walker) {
@@ -124,13 +127,11 @@ void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int 
     //updating the part of the inverse with the same spin as particle i
     for (k = 0; k < n2; k++) {
         for (j = start; j < n2 + start; j++) {
-            sum = 0;
             if (j == particle) {
-                for (l = 0; l < n2; l++) {
-                    sum += orbital->phi(walker_old, particle, l) * walker_old->inv(l, j);
-                }
-                walker_new->inv(k, j) = walker_old->inv(k, particle) / walker_new->slater_ratio*sum;
+                walker_new->inv(k, j) = walker_old->inv(k, particle) / walker_new->slater_ratio;
             } else {
+                
+                sum = 0;
                 for (l = 0; l < n2; l++) {
                     sum += orbital->phi(walker_new, particle, l) * walker_old->inv(l, j);
                 }

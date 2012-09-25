@@ -17,8 +17,6 @@ protected:
     int n_walkers;
     int thermalization;
 
-    int k;
-
     double t_prev;
     double t;
     double step;
@@ -63,7 +61,13 @@ public:
             double A = 1);
 
     virtual VMC* minimize();
+    virtual VMC* minimizeTEST();
+    double TESTWF(Walker* walker);
+    double TEST_E(Walker* walker);
+    double TEST_G(Walker* walker_post, Walker* walker_pre);
+    void TEST_DIFF(Walker* original, Walker* trial);
     std::ofstream DEBAG;
+    long random_seed;
 
 };
 

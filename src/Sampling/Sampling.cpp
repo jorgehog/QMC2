@@ -43,8 +43,8 @@ double Sampling::get_new_pos(const Walker* walker_pre, int particle, int j) cons
     return diffusion->get_new_pos(walker_pre, particle, j);
 }
 
-double Sampling::get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const {
-    return diffusion->get_g_ratio(walker_post, walker_pre, particle);
+double Sampling::get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
+    return diffusion->get_g_ratio(walker_post, walker_pre);
 }
 
 double Sampling::get_branching_Gfunc(double E_x, double E_y, double E_T) const {
@@ -65,37 +65,11 @@ void Brute_Force::update_walker(Walker* walker_pre, const Walker* walker_post, i
 }
 
 void Brute_Force::get_necessities(Walker* walker) {
-    using namespace std;
-    
     qmc->get_wf_value(walker);
-
-    if (walker->value < 0.001) {
-        Sampling::set_trial_pos(walker);
-        singularity_control_parameter++;
-    }
-
-    if (singularity_control_parameter > 1e4) {
-        cout << "WF requirements not met through 10000 recursive calls of Sampling::set_trial_pos." << endl;
-        cout << "Last value=" << walker->value << "Required higher than " << 0.001 << endl;
-        exit(1);
-    }
 }
 
 void Brute_Force::update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) {
-    using namespace std;
-    
     qmc->get_wf_value(walker_post);
-
-    if (walker_post->value < 0.001) {
-        qmc->update_pos(walker_pre, walker_post, particle);
-        singularity_control_parameter++;
-    }
-
-    if (singularity_control_parameter > 1e4) {
-        cout << "WF requirements not met through 10000 recursive calls of QMC::update_pos." << endl;
-        cout << "Last value=" << walker_post->value << " Required higher than " << 0.001 << endl;
-        exit(1);
-    }
 }
 
 void Brute_Force::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
@@ -115,9 +89,6 @@ void Brute_Force::copy_walker(const Walker* parent, Walker* child) const {
     child->value = parent->value;
 }
 
-void Brute_Force::reset_control_parameters() {
-    singularity_control_parameter = 0;
-}
 
 Importance::Importance(int n_p, int dim, double timestep, long random_seed, double D) : Sampling(n_p, dim) {
     is_importance = true;
@@ -162,26 +133,8 @@ double Importance::get_spatial_ratio(const Walker* walker_post, const Walker* wa
 }
 
 void Importance::get_necessities(Walker* walker) {
-    using namespace std;
 
     qmc->get_kinetics_ptr()->get_necessities_IS(walker);
     qmc->get_kinetics_ptr()->get_QF(walker);
 
-    if (qforce_check_recursion_control_parameter < 1e3) {
-        if (walker->check_bad_qforce()) {
-            qforce_check_recursion_control_parameter++;
-            Sampling::set_trial_pos(walker);
-        }
-    } else {
-        
-        cout << "qf\n" << walker->qforce << "inv\n" << walker->inv <<"r\n" <<walker->r << "r_rel\n" << walker->r_rel << "r2\n"<<walker->r2 << endl; 
-        
-        cout << "Qforce requirements not met through 1000 recursive calls of Sampling::set_trial_pos." << endl;
-        cout << "Required less than " << (500 * n_p - 6000)*(n_p >= 12) + 1000 << endl;
-        exit(1);
-    }
-}
-
-void Importance::reset_control_parameters() {
-    qforce_check_recursion_control_parameter = 0;
 }

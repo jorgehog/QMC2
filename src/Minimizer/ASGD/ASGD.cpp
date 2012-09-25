@@ -52,7 +52,7 @@ ASGD::ASGD(VMC* vmc,
     gradient_old = zeros(1, Nparams);
     gradient_tot = zeros(1, Nparams);
 
-    t_prev = 0;
+    t_prev = A;
 
 }
 
@@ -88,7 +88,7 @@ VMC* ASGD::minimize() {
     /* DEBUG */
     ofstream file;
     file.open("alpha.dat");
-    DEBAG.open("sammenliknnBF_CF.dat");
+    DEBAG.open("sammenliknnBF_Num.dat");
     int debug1;
     double aGrad, bGrad, sumE;
     aGrad = bGrad = sumE = 0;
@@ -98,42 +98,44 @@ VMC* ASGD::minimize() {
 
     vmc->initialize();
 
+    int k = 0;
     for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
         vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
 
         if ((cycle > thermalization) && (cycle % n_c) == 0) {
-
             vmc->copy_walker(vmc->original_walker, walkers[k]);
-            vmc->copy_walker(vmc->original_walker, trial_walkers[k]);
+            vmc->copy_walker(vmc->trial_walker, trial_walkers[k]);
             k++;
         }
-
     }
-    //D:100% match this far
 
+    //D:100% match this far for BF and IS. Walker copy funker for alle.
+
+    int corrLength = 1;
     for (int sample = 1; sample <= SGDsamples; sample++) {
 
         E = 0;
         gradient = zeros(1, Nparams);
         gradient_local = zeros(1, Nparams);
 
-        for (int k = 0; k < n_walkers; k++) {
-            
+        for (k = 0; k < n_walkers; k++) {
             for (int cycle = 0; cycle < n_c_SGD; cycle++) {
 
                 vmc->diffuse_walker(walkers[k], trial_walkers[k]);
 
-                vmc->calculate_energy_necessities(walkers[k]);
-
-                double e_local = vmc->calculate_local_energy(walkers[k]);
-                E += e_local;
-
-                get_variational_gradients(walkers[k], e_local);
+                if (cycle % corrLength == 0) {
+                    vmc->calculate_energy_necessities(walkers[k]);
+                    double e_local = vmc->calculate_local_energy(walkers[k]);
+                    E += e_local;
+                    DEBAG << E / ((cycle + 1)*(k + 1)) << endl;
+                    get_variational_gradients(walkers[k], e_local);
+                }
 
             }
+            DEBAG << "Changed Walker" << endl;
         }
 
-        int scale = n_walkers*n_c_SGD;
+        int scale = n_walkers * n_c_SGD / corrLength;
 
         //        cout << E / scale << endl;
         E /= scale;
@@ -141,9 +143,11 @@ VMC* ASGD::minimize() {
         gradient_tot = 2 * (gradient_local - gradient * E) / scale;
 
         double x = -dot(gradient_tot, gradient_old);
-        double t_test = t_prev + f(x);
 
-        t = t_test * (t_test > 0);
+        t = t_prev + f(x);
+        if (t < 0) {
+            t = 0;
+        }
 
         //        output progress
         if ((sample % 100) == 0) {
@@ -164,13 +168,13 @@ VMC* ASGD::minimize() {
         for (int param = 0; param < Nspatial_params; param++) {
 
             step = a / (t + A) * gradient_tot[param];
-            if (step * step > max_step * max_step) {
+            if (fabs(step) > max_step) {
                 step *= max_step / fabs(step);
             }
-
+            file << fabs(step) << "\t";
             double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
-            file << abs(alpha - step) << "\t";
-            vmc->get_orbitals_ptr()->set_parameter(abs(alpha - step), param);
+            file << fabs(alpha - step) << "\t";
+            vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
         }
 
         for (int param = 0; param < Njastrow_params; param++) {
@@ -181,12 +185,13 @@ VMC* ASGD::minimize() {
             }
 
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
-            file << abs(beta - step) << "\t";
-            vmc->get_jastrow_ptr()->set_parameter(abs(beta - step), param);
+            file << fabs(beta - step) << "\t";
+            vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
 
 
         }
 
+        file << E << "\t";
         file << sumE / debug1 << endl;
         debug1++;
 
@@ -199,5 +204,167 @@ VMC* ASGD::minimize() {
     file.close();
     DEBAG.close();
     vmc->accepted = 0;
+    return vmc;
+}
+
+double ASGD::TESTWF(Walker* walker) {
+    double alpha = vmc->get_orbitals_ptr()->get_parameter(0);
+    double X = walker->r(0, 0);
+    return exp(-alpha * alpha * X * X);
+}
+
+double ASGD::TEST_E(Walker* walker) {
+    double alpha = vmc->get_orbitals_ptr()->get_parameter(0);
+    double X = walker->r(0, 0);
+    return alpha * alpha + X * X * (0.5 - 2 * alpha * alpha*alpha*alpha);
+}
+
+double ASGD::TEST_G(Walker* walker_post, Walker* walker_pre) {
+    double g_ratio = 0;
+    double D = 0.5;
+    double timestep = 0.05;
+    int particle = 0;
+    int j = 0;
+
+    g_ratio += 0.5 * (walker_pre->qforce(particle, j) + walker_post->qforce(particle, j))*
+            (D * timestep * 0.5 * (walker_pre->qforce(particle, j) - walker_post->qforce(particle, j))
+            - walker_post->r(particle, j) + walker_pre->r(particle, j));
+
+
+    return exp(g_ratio);
+}
+
+void ASGD::TEST_DIFF(Walker* original, Walker* trial) {
+    double ALP = vmc->get_orbitals_ptr()->get_parameter(0);
+    double X = original->r(0, 0);
+    double dt = 0.05;
+    double std = sqrt(dt);
+
+    double QF = -2 * ALP * ALP*X;
+    original->qforce(0, 0) = QF;
+
+    trial->r(0, 0) = X + 0.5 * dt * QF + gaussian_deviate(&random_seed) * std;
+    double Xnew = trial->r(0, 0);
+    trial->qforce(0, 0) = -2 * ALP * ALP*Xnew;
+
+    double A = TESTWF(trial) / TESTWF(original);
+    A = A * A * TEST_G(trial, original);
+
+    if (ran3(&random_seed) <= A) {
+        original->r(0, 0) = trial->r(0, 0);
+    } 
+}
+
+VMC* ASGD::minimizeTEST() {
+
+    int dim = 1;
+    int n_p = 1;
+
+
+
+
+    random_seed = -1.234;
+    double dt = 0.05;
+
+
+
+
+
+    double std = sqrt(dt);
+
+    vmc->original_walker->r(0, 0) = gaussian_deviate(&random_seed) * std;
+    vmc->trial_walker->r(0, 0) = vmc->original_walker->r(0, 0);
+
+    int k = 0;
+    for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
+
+        TEST_DIFF(vmc->original_walker, vmc->trial_walker);
+
+        if ((cycle > thermalization) && (cycle % n_c) == 0) {
+            vmc->copy_walker(vmc->original_walker, walkers[k]);
+            vmc->copy_walker(vmc->trial_walker, trial_walkers[k]);
+            k++;
+        }
+    }
+
+    //D:100% match this far for BF and IS. Walker copy funker for alle.
+    double gradient_old = 0;
+    double gradient_tot = 0;
+    double ALPH;
+    int corrLength = 1;
+    for (int sample = 1; sample <= SGDsamples; sample++) {
+
+        E = 0;
+        double gradient = 0;
+        double gradient_local = 0;
+
+        for (k = 0; k < n_walkers; k++) {
+            for (int cycle = 0; cycle < n_c_SGD; cycle++) {
+
+                TEST_DIFF(walkers[k], trial_walkers[k]);
+
+
+
+                double e_local = TEST_E(walkers[k]);
+                E += e_local;
+
+                ALPH = vmc->get_orbitals_ptr()->get_parameter(0);
+                double X = walkers[k]->r(0, 0);
+                double dalpha = -ALPH * X*X;
+
+                gradient_local += e_local * dalpha;
+                gradient += dalpha;
+
+
+            }
+
+        }
+
+        int scale = n_walkers * n_c_SGD / corrLength;
+
+        //        cout << E / scale << endl;
+        E /= scale;
+//        cout << gradient_local << " " << gradient*E << endl;
+        gradient_tot = 2 * (gradient_local - gradient * E) / scale;
+
+        double x = -gradient_tot*gradient_old;
+
+        t = t_prev + f(x);
+        if (t < 0) {
+            t = 0;
+        }
+
+        //        output progress
+        if ((sample % 100) == 0) {
+            cout << "CYCLE " << sample << endl;
+            ALPH = vmc->get_orbitals_ptr()->get_parameter(0);
+            cout << ALPH << endl;
+            cout << E << " CF: " << 0.5 * ALPH * ALPH + 1.0 / (8 * ALPH * ALPH) << endl;
+            cout << gradient_tot << " CF: " << ALPH - 1.0 / (4 * ALPH * ALPH * ALPH) << endl;
+        }
+
+
+
+
+
+
+        step = a / (t + A) * gradient_tot;
+        if (fabs(step) > max_step) {
+            step *= max_step / fabs(step);
+        }
+
+        double alpha = vmc->get_orbitals_ptr()->get_parameter(0);
+
+        vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), 0);
+
+
+
+        t_prev = t;
+        gradient_old = gradient_tot;
+
+    }
+    ALPH = vmc->get_orbitals_ptr()->get_parameter(0);
+    cout << "FOUND" << ALPH << " CF: " << 1. / sqrt(2) << endl;
+
     return vmc;
 }

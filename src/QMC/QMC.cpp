@@ -27,7 +27,8 @@ QMC::QMC(int n_p, int dim, int n_c,
     this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
-    this->thermalization = n_c / 10 * (n_c <= 1e6) + 1e5 * (n_c >= 1e6);
+//    this->thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
+    this->thermalization = 100000;
 
 }
 
@@ -97,7 +98,7 @@ void QMC::update_necessities(const Walker* walker_pre, Walker* walker_post, int 
 
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
     double spatial_jast = sampling->get_spatial_ratio(walker_post, walker_pre, particle);
-    double G = sampling->get_g_ratio(walker_post, walker_pre, particle);
+    double G = sampling->get_g_ratio(walker_post, walker_pre);
 
     return spatial_jast * spatial_jast * G;
 }
@@ -150,7 +151,6 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 void QMC::diffuse_walker(Walker* original, Walker* trial) {
     for (int particle = 0; particle < n_p; particle++) {
 
-        sampling->reset_control_parameters();
         update_pos(original, trial, particle);
 
         double A = get_acceptance_ratio(original, trial, particle);
@@ -206,7 +206,6 @@ VMC::VMC(int n_p, int dim, int n_c,
 void VMC::initialize() {
     jastrow->initialize();
 
-    sampling->reset_control_parameters();
     sampling->set_trial_pos(original_walker);
 
     copy_walker(original_walker, trial_walker);

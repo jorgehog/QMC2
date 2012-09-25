@@ -20,14 +20,12 @@ protected:
 public:
     Sampling(int n_p, int dim);
 
-    virtual void reset_control_parameters() = 0;
-
     void set_trial_pos(Walker* walker, bool load_VMC_dist = false, std::ifstream* file = NULL);
     double get_new_pos(const Walker* walker_pre, int i, int j) const;
 
     virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
     virtual double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const = 0;
-    virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
+    virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const;
     virtual void get_necessities(Walker* walker) = 0;
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) = 0;
 
@@ -62,16 +60,10 @@ public:
 };
 
 class Importance : public Sampling {
-protected:
-
-    int qforce_check_recursion_control_parameter;
-
 public:
     Importance(int n_p, int dim, double timestep, long random_seed, double D = 0.5);
 
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
-
-    virtual void reset_control_parameters();
 
     virtual void get_necessities(Walker* walker);
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle);
@@ -87,14 +79,8 @@ public:
 };
 
 class Brute_Force : public Sampling {
-protected:
-
-    int singularity_control_parameter;
-
 public:
     Brute_Force(int n_p, int dim, double timestep, long random_seed, double D = 0.5);
-
-    virtual void reset_control_parameters();
 
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
 

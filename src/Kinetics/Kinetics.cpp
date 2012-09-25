@@ -227,6 +227,8 @@ void Closed_form::calculate_energy_necessities(Walker* walker) const {
 void Closed_form::update_necessities_IS(const Walker* walker_pre, Walker* walker_post, int particle) const {
     walker_post->slater_ratio = qmc->get_system_ptr()->get_spatial_ratio(walker_pre, walker_post, particle);
     qmc->get_system_ptr()->calc_for_newpos(walker_pre, walker_post, particle);
+//    qmc->get_system_ptr()->initialize(walker_post);
+//    cout << walker_post->inv(0,0)*qmc->get_orbitals_ptr()->phi(walker_post,0,0) << endl;
     qmc->get_gradients(walker_post, particle);
 }
 

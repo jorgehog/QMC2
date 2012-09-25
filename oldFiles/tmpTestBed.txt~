@@ -1,0 +1,22 @@
+double QMC::calculate_local_energy(Walker* walker) const {
+    walker = new Walker(n_p, dim);
+    walker->r(0,0) = 1;
+    walker->r(0,1) = 0;
+    walker->r(1,0) = 2;
+    walker->r(1,1) = 0;
+    walker->calc_r_i2();
+    walker->make_rel_matrix();
+    sampling->get_necessities(walker);
+    calculate_energy_necessities(walker);
+    walker->print("lol");
+    cout << kinetics->get_KE(walker) << endl;
+    cout << system->get_potential_energy(walker) << endl;
+    exit(1);
+    return kinetics->get_KE(walker) + system->get_potential_energy(walker);
+}
+
+2p
+w=1
+alpha=0.5
+LAPL = -0.75
+POT = 2.5

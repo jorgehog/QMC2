@@ -26,10 +26,8 @@ double Diffusion::get_new_pos(const Walker* walker, int i, int j) {
 }
 
 double Diffusion::get_GBfunc(double E_x, double E_y, double E_T) const {
-     return exp(-(0.5*(E_x + E_y) - E_T)*timestep*qmc->get_accepted_ratio());
+    return exp(-(0.5 * (E_x + E_y) - E_T) * timestep * qmc->get_accepted_ratio());
 }
-
-
 
 Simple::Simple(int n_p, int dim, double timestep, long random_seed, double D)
 : Diffusion(n_p, dim, timestep, random_seed, D) {
@@ -40,7 +38,7 @@ double Simple::get_new_pos(const Walker* walker, int i, int j) {
     return Diffusion::get_new_pos(walker, i, j);
 }
 
-double Simple::get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const {
+double Simple::get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
     return 1;
 }
 
@@ -62,13 +60,15 @@ double Fokker_Planck::get_new_pos(const Walker* walker, int i, int j) {
     return D * timestep * walker->qforce(i, j) + Diffusion::get_new_pos(walker, i, j);
 }
 
-double Fokker_Planck::get_g_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const {
+double Fokker_Planck::get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
 
     double g_ratio = 0;
-    for (int j = 0; j < dim; j++) {
-        g_ratio += 0.5 * (walker_pre->qforce(particle, j) + walker_post->qforce(particle, j))*
-                (D * timestep * 0.5 * (walker_pre->qforce(particle, j) - walker_post->qforce(particle, j))
-                - walker_post->r(particle, j) + walker_pre->r(particle, j));
+    for (int i = 0; i < n_p; i++) {
+        for (int j = 0; j < dim; j++) {
+            g_ratio += 0.5 * (walker_pre->qforce(i, j) + walker_post->qforce(i, j))*
+                    (D * timestep * 0.5 * (walker_pre->qforce(i, j) - walker_post->qforce(i, j))
+                    - walker_post->r(i, j) + walker_pre->r(i, j));
+        }
     }
 
     return exp(g_ratio);

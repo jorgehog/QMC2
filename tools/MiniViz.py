@@ -8,27 +8,31 @@ filename = "alpha.dat"
 
 fil = open(path + filename, 'r')
 
-N = 5
+N = 7
 
 plotData = [[] for i in range(N)]
-titles = ["AlphaGrad", "BetaGrad", "alpha", "beta", "E"]
+titles = ["AlphaGrad", "BetaGrad","aStep", "alpha", "beta", "E", "Em"]
 
 for line in fil:	
 	raw = line.split()
 	for i in range(len(raw)):
-		plotData[i].append(float(raw[i]))
+         plotData[i].append(float(raw[i]))
 
-if len(raw) == N:
-	for i in range(N):
-		figure(i+1)
-		plot(plotData[i], title=titles[i])
+if len(raw) == N-1:
+    N = 5;
+    titles.remove("BetaGrad");
+    titles.remove("beta");
+    plotData.pop(1);
   
-#Occurs if no Jastrow data written to file:
-else:
-	maping = [0,2,4]
-	maping2 = [0,2,3];
-	for i in range(len(raw)-1):
-		figure(i+1)
-		plot(plotData[maping2[i]], title=titles[maping[i]])
+for i in range(N):
+    if (titles[i] == "Em"):
+        figure(i)
+    else:
+        figure(i+1)
+    
+    if (titles[i]=="E"):
+        plot(plotData[i], legend=titles[i], hold="on")
+    else:
+        plot(plotData[i], legend=titles[i])
 
 raw_input()
