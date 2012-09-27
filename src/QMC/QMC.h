@@ -24,9 +24,6 @@ protected:
 
     double local_E;
 
-    Walker* original_walker;
-    Walker* trial_walker;
-
     Jastrow *jastrow;
     Sampling *sampling;
     System *system;
@@ -64,7 +61,7 @@ public:
     void add_output(OutputHandler* output_handler);
 
     virtual void run_method() = 0;
-    virtual void output() const = 0;
+    virtual void user_output() const = 0;
 
     void get_gradients(Walker* walker, int particle) const;
     void get_gradients(Walker* walker) const;
@@ -94,11 +91,10 @@ public:
         return system->get_orbital_ptr();
     }
 
-    double get_accepted_ratio() const {
-        return accepted / double(n_p * (n_c + thermalization));
+    double get_accepted_ratio(int total_cycles) const {
+        return accepted/double(total_cycles);
     }
-    
-    friend class Distribution;
+
 
 };
 
@@ -106,6 +102,9 @@ class VMC : public QMC {
 protected:
 
     double vmc_E, E2;
+
+    Walker* original_walker;
+    Walker* trial_walker;
 
     virtual void initialize();
     void calculate_energy(Walker* walker);
@@ -127,11 +126,12 @@ public:
     void set_e2(double e2);
 
     virtual void run_method();
-    virtual void output() const;
+    virtual void user_output() const;
 
     friend class Minimizer;
     friend class ASGD;
 
+    friend class Distribution;
     friend class BlockingData;
 
 };
@@ -143,6 +143,8 @@ protected:
     int n_w_orig;
     int n_w;
     int n_w_last;
+    
+    int deaths;
 
     int block_size;
     int samples;
@@ -153,20 +155,28 @@ protected:
 
     bool dist_from_file;
 
-    Walker **Angry_mob;
+    Walker **original_walkers;
+    Walker *trial_walker;
 
     void initialize();
+    
+    void iterate_walker(int k, int n_b);
 
-    void initialize_walker(int k);
-    void Evolve_walker(double GB);
+    void Evolve_walker(int k, double GB);
 
     void bury_the_dead();
 
     void update_energies();
+    
+    void reset_parameters(){
+        n_w_last = n_w;
+        E = samples = deaths = 0;
+    }
 
 public:
 
-    DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
+    DMC(int n_p, int dim, int n_w, int n_c, int block_size, int therm,
+            double E_T,
             Sampling *sampling,
             System *system,
             Kinetics *kinetics = new NoKinetics(),
@@ -175,8 +185,8 @@ public:
 
     virtual void run_method();
 
-    virtual void output() const;
-    
+    virtual void user_output() const;
+
     friend class stdoutDMC;
 
 };

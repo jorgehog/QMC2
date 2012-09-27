@@ -26,7 +26,7 @@ double Diffusion::get_new_pos(const Walker* walker, int i, int j) {
 }
 
 double Diffusion::get_GBfunc(double E_x, double E_y, double E_T) const {
-    return exp(-(0.5 * (E_x + E_y) - E_T) * timestep * qmc->get_accepted_ratio());
+    return exp(-(0.5 * (E_x + E_y) - E_T) * timestep);
 }
 
 Simple::Simple(int n_p, int dim, double timestep, long random_seed, double D)

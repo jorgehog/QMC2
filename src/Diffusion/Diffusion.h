@@ -42,6 +42,11 @@ public:
         this->timestep = dt;
         this->std = sqrt(2*D*dt);
     }
+    
+    double get_dt() const {
+        return timestep;
+    }
+    
 };
 
 class Fokker_Planck : public Diffusion {

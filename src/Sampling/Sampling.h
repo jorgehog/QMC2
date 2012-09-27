@@ -46,6 +46,10 @@ public:
     void set_dt(double dt) {
         diffusion->set_dt(dt);
     }
+    
+    double get_dt() const {
+        return diffusion->get_dt();
+    }
 
     //    bool get_importance_bool() {
     //        return is_importance;

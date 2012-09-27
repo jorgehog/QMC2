@@ -29,7 +29,6 @@ Walker::Walker(int n_p, int dim, bool do_init) {
         lapl_sum = 0;
         slater_ratio = 0;
 
-
         is_murdered = false;
     } else {
         is_murdered = true;

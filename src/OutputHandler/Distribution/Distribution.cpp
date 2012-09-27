@@ -13,18 +13,18 @@ Distribution::Distribution(std::string filename,
         int my_rank,
         int num_procs)
 : OutputHandler(filename, path, parallel, my_rank, num_procs) {
-    
+    this->is_vmc = true;
 }
 
 void Distribution::dump() {
 
-    if ((qmc->cycle > qmc->n_c / 2) && (qmc->cycle % 100 == 0)) {
-        for (int i = 0; i < qmc->n_p; i++) {
-            for (int j = 0; j < qmc->dim; j++) {
-                if (j == qmc->dim - 1) {
-                    file << qmc->original_walker->r(i, j);
+    if ((vmc->cycle > vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
+        for (int i = 0; i < vmc->n_p; i++) {
+            for (int j = 0; j < vmc->dim; j++) {
+                if (j == vmc->dim - 1) {
+                    file << vmc->original_walker->r(i, j);
                 } else {
-                    file << qmc->original_walker->r(i, j) << " ";
+                    file << vmc->original_walker->r(i, j) << " ";
                 }
             }
             file << endl;

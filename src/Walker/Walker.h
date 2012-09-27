@@ -25,7 +25,8 @@ public:
     double slater_ratio;
     double value;
     double lapl_sum;
-
+    double E;
+    
     mat r;
     mat r_rel;
 
@@ -57,9 +58,21 @@ public:
     bool is_dead() {
         return is_murdered;
     }
+    
+    bool is_alive() {
+        return !is_murdered;
+    }
 
     void ressurect() {
         is_murdered = false;
+    }
+    
+    void set_E(double E) {
+        this->E = E; 
+    }
+    
+    double get_E() const {
+        return E;
     }
     
     void print(std::string header = "----");

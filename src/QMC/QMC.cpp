@@ -27,8 +27,6 @@ QMC::QMC(int n_p, int dim, int n_c,
     this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
-//    this->thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
-    this->thermalization = 100000;
 
 }
 
@@ -169,7 +167,9 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
     child->r2 = parent->r2;
     child->r = parent->r;
     child->r_rel = parent->r_rel;
+
     child->ressurect();
+    child->set_E(parent->get_E());
 
     sampling->copy_walker(parent, child);
 
@@ -200,6 +200,8 @@ VMC::VMC(int n_p, int dim, int n_c,
 
     original_walker = new Walker(n_p, dim);
     trial_walker = new Walker(n_p, dim);
+
+    this->thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
 
 }
 
@@ -244,15 +246,15 @@ void VMC::run_method() {
     }
 
     scale_values();
-
+    user_output();
     finalize_output();
 
 }
 
-void VMC::output() const {
+void VMC::user_output() const {
     std::cout << "VMC energy: " << get_energy() << std::endl;
     std::cout << "VMC variance: " << get_var() << std::endl;
-    std::cout << "Acceptance ratio: " << get_accepted_ratio() << endl;
+    std::cout << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
 }
 
 double VMC::get_var() const {
@@ -284,7 +286,8 @@ DMC
  */
 
 
-DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
+DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, int therm,
+        double E_T,
         Sampling *sampling,
         System *system,
         Kinetics *kinetics,
@@ -296,7 +299,18 @@ DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, double E_T,
 
     this->block_size = block_size;
     this->n_w_orig = n_w;
+    this->thermalization = therm;
     this->E_T = E_T;
+
+    K = 5;
+    int max_walkers = K * n_w_orig;
+
+    original_walkers = new Walker*[max_walkers];
+    trial_walker = new Walker(n_p, dim);
+
+    for (int i = 0; i < max_walkers; i++) {
+        original_walkers[i] = new Walker(n_p, dim);
+    }
 
 }
 
@@ -306,18 +320,6 @@ void DMC::initialize() {
     dmc_E = 0;
 
     jastrow->initialize();
-    trial_walker = new Walker(n_p, dim);
-
-
-    K = 10;
-    int max_walkers = K * n_w_orig;
-
-    Angry_mob = new Walker*[max_walkers];
-
-    for (int i = 0; i < max_walkers; i++) {
-        Angry_mob[i] = new Walker(n_p, dim);
-    }
-
 
     if (dist_from_file) {
 
@@ -325,13 +327,7 @@ void DMC::initialize() {
         dist.open("dist_out.dat");
 
         for (int k = 0; k < n_w_orig; k++) {
-            Angry_mob[k] = new Walker(n_p, dim);
-            sampling->set_trial_pos(Angry_mob[k], true, &dist);
-
-        }
-
-        for (int k = n_w_orig; k < K * n_w_orig; k++) {
-            Angry_mob[k] = new Walker(n_p, dim, false);
+            sampling->set_trial_pos(original_walkers[k], true, &dist);
         }
 
         dist.close();
@@ -339,43 +335,48 @@ void DMC::initialize() {
     } else {
 
         for (int k = 0; k < n_w_orig; k++) {
-
-            Angry_mob[k] = new Walker(n_p, dim);
-
-            while (Angry_mob[k]->is_singular()) {
-                sampling->set_trial_pos(Angry_mob[k]);
+            while (original_walkers[k]->is_singular()) {
+                sampling->set_trial_pos(original_walkers[k]);
             }
-
         }
 
-        for (int k = n_w_orig; k < K * n_w_orig; k++) {
-            Angry_mob[k] = new Walker(n_p, dim, false);
-        }
+    }
 
+    for (int k = 0; k < n_w_orig; k++) {
+        calculate_energy_necessities(original_walkers[k]);
+        original_walkers[k]->set_E(calculate_local_energy(original_walkers[k]));
+    }
+
+    for (int k = n_w_orig; k < K * n_w_orig; k++) {
+        original_walkers[k] = new Walker(n_p, dim, false);
     }
 
     n_w = n_w_orig;
 
 }
 
-void DMC::output() const {
-    cout << "DMC energy: " << dmc_E / n_c << endl;
+void DMC::user_output() const {
+    printf("%1.5f %1.5f %1.5f%%", dmc_E / cycle, (double) n_w / n_w_orig,
+            (double) cycle / n_c * 100);
+    cout << endl;
 }
 
-void DMC::Evolve_walker(double GB) {
+void DMC::Evolve_walker(int k, double GB) {
 
     int branch_mean = int(GB + sampling->call_RNG()); //random int with mean=GB
+    double dE = (original_walkers[k]->get_E() - E_T);
+    dE = dE*dE;
 
-    if (branch_mean == 0) {
+    if (branch_mean == 0 || dE > 1. / sampling->get_dt()) {
 
-        trial_walker->kill();
+        original_walkers[k]->kill();
 
     } else {
 
         for (int n = 1; n < branch_mean; n++) {
 
-            n_w += 1;
-            copy_walker(trial_walker, Angry_mob[n_w - 1]);
+            copy_walker(original_walkers[k], original_walkers[n_w]);
+            n_w++;
 
         }
 
@@ -385,125 +386,72 @@ void DMC::Evolve_walker(double GB) {
     }
 }
 
-void DMC::bury_the_dead() {
-    int index, index2;
-    //cout << "called" << endl;
-    int newborn = n_w - n_w_last;
-    int j = 0;
-
-
-    for (int i = 0; i < n_w; i++) {
-
-        if (Angry_mob[i]->is_dead()) {
-
-            /* Fills the newborn into the dead people's homes.
-             * if j < newborn ensures that only newborn get dead people's homes
-             * index = last born newborn
-             * we then reset the newborn's array element.
-             */
-
-            if (j < newborn) {
-
-                //Index of the last newborn
-                index = newborn + n_w_last - 1 - j;
-
-                copy_walker(Angry_mob[index], Angry_mob[i]);
-
-                //                Angry_mob[index] = new Walker(n_p, dim, false); //THIS MEMORY EFFICIENT?
-
-                j++;
-            } else {
-
-                index2 = n_w_last - 1;
-
-                //Find the last alive walker
-                while (Angry_mob[index2]->is_dead()) {
-                    index2--;
-                }
-
-                /* test ensures previously moved is not moved again.
-                 * compresses all alive to the start of the array.
-                 */
-
-                if (index2 > i) {
-                    copy_walker(Angry_mob[index2], Angry_mob[i]);
-                    Angry_mob[index2]->kill();
-                }
-            }
-        }
-    }
-
-    //Finding the last alive walker below n_w_now
-    for (int i = 0; i < n_w_last; i++) {
-        if (!Angry_mob[i]->is_dead()) {
-            ////
-            ////            //clearing up if someone is dead;
-            ////            Angry_mob[i] = new Walker(n_p, dim, false);
-            //        } else {
-            n_w = i + 1;
-        }
-    }
-
-    //if there are more newborn than dead, at this point n_w = n_w_now;
-    //adding the newborns which didn't get a home to that list:
-    n_w += newborn - j;
-
-}
-
-void DMC::initialize_walker(int k) {
-    original_walker = Angry_mob[k];
-    copy_walker(original_walker, trial_walker);
-    accepted = 0;
-}
-
 void DMC::update_energies() {
     dmc_E += E / samples;
-    E_T = dmc_E / cycle; //+ (1. / 1000) * log((double) n_w_orig / n_w);
+    E_T = dmc_E / cycle;
+}
+
+void DMC::iterate_walker(int k, int n_b) {
+
+    copy_walker(original_walkers[k], trial_walker);
+
+    for (int b = 0; b < n_b; b++) {
+
+        double local_E_prev = original_walkers[k]->get_E();
+
+        diffuse_walker(original_walkers[k], trial_walker);
+
+        calculate_energy_necessities(original_walkers[k]);
+        local_E = calculate_local_energy(original_walkers[k]);
+        original_walkers[k]->set_E(local_E);
+
+        double GB = sampling->get_branching_Gfunc(local_E, local_E_prev, E_T);
+
+        Evolve_walker(k, GB);
+
+        if (original_walkers[k]->is_dead()) {
+            deaths++;
+            break;
+        }
+    }
 }
 
 void DMC::run_method() {
 
     initialize();
 
-    for (cycle = 1; cycle <= n_c; cycle++) {
+    for (cycle = 1; cycle <= thermalization; cycle++) {
 
-        n_w_last = n_w;
-        E = 0;
-        samples = 0;
+        reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
 
-            initialize_walker(k);
+            iterate_walker(k, 10);
 
-            int b = 0;
-
-            while ((!trial_walker->is_dead())*(b < block_size)) {
-
-                calculate_energy_necessities(original_walker);
-                double local_E_orig = calculate_local_energy(original_walker);
-
-                diffuse_walker(original_walker, trial_walker);
-
-                calculate_energy_necessities(trial_walker);
-                local_E = calculate_local_energy(trial_walker);
-
-                double GB = sampling->get_branching_Gfunc(local_E, local_E_orig, E_T);
-
-                Evolve_walker(GB);
-
-                b++;
-            }
         }
 
         bury_the_dead();
-
         update_energies();
 
+        user_output();
 
-        ///DEBUGGING
-        printf("%1.5f %1.5f %1.5f%%", dmc_E / cycle, (double) n_w / n_w_orig, (double) cycle / n_c * 100);
-        cout << endl;
+    }
 
+    dmc_E = 0;
+    for (cycle = 1; cycle <= n_c; cycle++) {
+
+        reset_parameters();
+
+        for (int k = 0; k < n_w_last; k++) {
+
+            iterate_walker(k, block_size);
+
+        }
+
+        bury_the_dead();
+        update_energies();
+
+        user_output();
         dump_output();
 
     }
@@ -511,3 +459,60 @@ void DMC::run_method() {
     finalize_output();
 }
 
+void DMC::bury_the_dead() {
+
+    int newborn = n_w - n_w_last;
+    int last_alive = n_w - 1;
+    int i = 0;
+    int k = 0;
+
+    while (k < newborn && i < n_w_last) {
+        if (original_walkers[i]->is_dead()) {
+
+            copy_walker(original_walkers[last_alive], original_walkers[i]);
+            delete original_walkers[last_alive];
+            original_walkers[last_alive] = new Walker(n_p, dim, false);
+            last_alive--;
+            k++;
+        }
+        i++;
+    }
+
+
+    if (deaths > newborn) {
+        int difference = deaths - newborn;
+        int i = 0;
+        int first_dead = 0;
+
+        //we have to delete [difference] spots to compress array.
+        while (i != difference) {
+
+            //Finds last living walker and deletes any dead walkers at array end
+            while (original_walkers[last_alive]->is_dead()) {
+                delete original_walkers[last_alive];
+                original_walkers[last_alive] = new Walker(n_p, dim, false);
+                i++;
+                last_alive--;
+            }
+
+            //Find the first dead walker
+            while (original_walkers[first_dead]->is_alive()) {
+                first_dead++;
+            }
+
+            //If there is a dead walker earlier in the array, the last living
+            //takes the spot.
+            if (first_dead < last_alive) {
+                copy_walker(original_walkers[last_alive], original_walkers[first_dead]);
+                delete original_walkers[last_alive];
+                original_walkers[last_alive] = new Walker(n_p, dim, false);
+
+                i++;
+                last_alive--;
+                first_dead++;
+            }
+        }
+    }
+
+    n_w = n_w - deaths;
+}

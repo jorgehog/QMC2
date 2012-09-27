@@ -26,24 +26,24 @@ int main(int argc, char** argv) {
     //    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
 
-    random_seed = -1.234;
-//    random_seed = -time(NULL);
+//    random_seed = -1.234;
+    random_seed = -time(NULL);
     //    random_seed = -time(NULL) - my_rank;
 
     n_p = 2;
     dim = 2;
     w = 1;
 
-    n_c = 1E5;
+    n_c = 1E7;
     bool doMin = false;
-    bool doVmc = true;
+    bool doVmc = false;
     bool doDmc = true;
 
     string system = "QDots";
     string sampling = "IS";
     string kinetics_type = "CF";
 
-    bool dist_out = false;
+    bool dist_out = true;
     bool blocking_out = false;
 
     bool dist_in = true;
@@ -170,7 +170,6 @@ int main(int argc, char** argv) {
 
         if (doVmc) {
             vmc->run_method();
-            vmc->output();
         }
 
 
@@ -195,9 +194,10 @@ int main(int argc, char** argv) {
     if (doDmc) {
 
         n_c = 10000;
-        dt = 0.001;
+        int therm = 10000;
+        dt = 0.01;
         int n_w = 1000;
-        int n_b = 100;
+        int n_b = 30;
 
         if (!doVmc) {
             E_T = 3.00031;
@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
 
         sample_method->set_dt(dt);
 
-        DMC* dmc = new DMC(n_p, dim, n_w, n_c, n_b, E_T,
+        DMC* dmc = new DMC(n_p, dim, n_w, n_c, n_b, therm, E_T,
                 sample_method,
                 SYSTEM,
                 kinetics,
@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
         dmc->add_output(DMCout);
 
         dmc->run_method();
-        dmc->output();
+        cout << "DMC FIN." << endl;
     }
 
 
