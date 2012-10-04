@@ -1,10 +1,10 @@
 from scitools.std import *
-import os
+from pyLibQMC import paths
 
 fileName = "DMC_out.dat"
-filePath = os.path.expanduser("~") + "/NetBeansProjects/nbQMC2/" + fileName
+filePath = paths.IDEPath + "/" + fileName
 
-dynamicAxis = True
+dynamicAxis = False
 
 cmd = ""
 
@@ -33,11 +33,11 @@ while (cmd != "q"):
 
 	DMCout.close()
 
-	n= int(len(E)*(9./10))
-	k = 10
-	tmpEavg = sum(E[-n:])/n
-	dE = abs(max(E[-n:]) - tmpEavg) 
-	tmpAxis = [n,len(E), tmpEavg - k*dE, tmpEavg + k*dE] 
+	#n= int(len(E)*(9./10))
+	#k = 10
+	#tmpEavg = sum(E[-n:])/n
+	#dE = abs(max(E[-n:]) - tmpEavg) 
+	#tmpAxis = [n,len(E), tmpEavg - k*dE, tmpEavg + k*dE] 
 
 	if len(E) == len(Eavg) == len(N) == len(Navg) == len(ET):
 
@@ -53,8 +53,8 @@ while (cmd != "q"):
 		if (exactE != 0):
 			plot(zeros(len(E)) + exactE, 'g')
 		
-		if dynamicAxis:
-			axis(tmpAxis)
+		#if dynamicAxis:
+	#		axis(tmpAxis)
 		
 
 		figure(2)

@@ -27,6 +27,12 @@ Numerical::Numerical() {
 
 }
 
+Numerical::Numerical(GeneralParams gP) {
+
+    Numerical::Numerical(gP.n_p, gP.dim, gP.h);
+
+}
+
 Numerical::Numerical(int n_p, int dim, double h)
 : Kinetics(n_p, dim) {
     this->h = h;
@@ -157,6 +163,11 @@ Closed_form::Closed_form() {
 
 }
 
+Closed_form::Closed_form(GeneralParams gP)
+: Kinetics(gP.n_p, gP.dim) {
+
+}
+
 Closed_form::Closed_form(int n_p, int dim)
 : Kinetics(n_p, dim) {
 
@@ -211,7 +222,7 @@ void Closed_form::get_QF(Walker* walker) {
 }
 
 double Closed_form::get_spatial_ratio_IS(const Walker* walker_post, const Walker* walker_pre, int particle) const {
-    return walker_post->slater_ratio * qmc->get_jastrow_ptr()->get_j_ratio(walker_post, walker_pre, particle);
+    return walker_post->spatial_ratio * qmc->get_jastrow_ptr()->get_j_ratio(walker_post, walker_pre, particle);
 }
 
 void Closed_form::get_necessities_IS(Walker* walker) const {
@@ -225,10 +236,8 @@ void Closed_form::calculate_energy_necessities(Walker* walker) const {
 }
 
 void Closed_form::update_necessities_IS(const Walker* walker_pre, Walker* walker_post, int particle) const {
-    walker_post->slater_ratio = qmc->get_system_ptr()->get_spatial_ratio(walker_pre, walker_post, particle);
+    walker_post->spatial_ratio = qmc->get_system_ptr()->get_spatial_ratio(walker_pre, walker_post, particle);
     qmc->get_system_ptr()->calc_for_newpos(walker_pre, walker_post, particle);
-//    qmc->get_system_ptr()->initialize(walker_post);
-//    cout << walker_post->inv(0,0)*qmc->get_orbitals_ptr()->phi(walker_post,0,0) << endl;
     qmc->get_gradients(walker_post, particle);
 }
 

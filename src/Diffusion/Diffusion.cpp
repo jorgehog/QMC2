@@ -17,7 +17,6 @@ Diffusion::Diffusion(int n_p, int dim, double timestep, long random_seed, double
 }
 
 double Diffusion::call_RNG() {
-
     return ran2(&random_seed);
 }
 

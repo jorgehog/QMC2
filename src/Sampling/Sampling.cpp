@@ -7,10 +7,13 @@
 
 #include "../QMCheaders.h"
 
-
 Sampling::Sampling(int n_p, int dim) {
     this->n_p = n_p;
     this->dim = dim;
+}
+
+Sampling::Sampling(){
+    
 }
 
 void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* file) {
@@ -55,10 +58,17 @@ double Sampling::get_branching_Gfunc(double E_x, double E_y, double E_T) const {
 //    return diffusion->get_GBfunc(walker_pre, walker_post, E_T);
 //}
 
-Brute_Force::Brute_Force(int n_p, int dim, double timestep, long random_seed, double D) : Sampling(n_p, dim) {
-    is_importance = false;
+Brute_Force::Brute_Force(int n_p, int dim, long random_seed, double timestep, double D)
+: Sampling(n_p, dim) {
     diffusion = new Simple(n_p, dim, timestep, random_seed, D);
 }
+
+Brute_Force::Brute_Force(GeneralParams gP){
+
+    Brute_Force::Brute_Force(gP.n_p, gP.dim, gP.random_seed);
+    
+}
+
 
 void Brute_Force::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
     walker_pre->value = walker_post->value;
@@ -73,7 +83,7 @@ void Brute_Force::update_necessities(const Walker* walker_pre, Walker* walker_po
 }
 
 void Brute_Force::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
-//    walker_post->value = walker_pre->value; //will be overwritten.
+    //    walker_post->value = walker_pre->value; //will be overwritten.
 }
 
 void Brute_Force::calculate_energy_necessities_CF(Walker* walker) const {
@@ -89,10 +99,16 @@ void Brute_Force::copy_walker(const Walker* parent, Walker* child) const {
     child->value = parent->value;
 }
 
-
-Importance::Importance(int n_p, int dim, double timestep, long random_seed, double D) : Sampling(n_p, dim) {
-    is_importance = true;
+Importance::Importance(int n_p, int dim, long random_seed, double timestep, double D)
+: Sampling(n_p, dim) {
     diffusion = new Fokker_Planck(n_p, dim, timestep, random_seed, D);
+}
+
+Importance::Importance(GeneralParams gP) {
+
+    Importance::Importance(gP.n_p, gP.dim, gP.random_seed);
+
+
 }
 
 void Importance::calculate_energy_necessities_CF(Walker* walker) const {
@@ -108,9 +124,6 @@ void Importance::copy_walker(const Walker* parent, Walker* child) const {
 void Importance::update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) {
     qmc->get_kinetics_ptr()->update_necessities_IS(walker_pre, walker_post, particle);
     qmc->get_kinetics_ptr()->get_QF(walker_post);
-
-    //Empirically no need to test the new QF. Importance sampling behaves nice enough either way.
-    //as long as the initial value is OK.
 }
 
 void Importance::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {

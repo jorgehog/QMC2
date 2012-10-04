@@ -15,14 +15,18 @@ Orbitals::Orbitals(int n_p, int dim) {
     basis_functions = new function*[max_implemented];
 }
 
+Orbitals::Orbitals(){
+    
+}
+
 oscillator_basis::oscillator_basis(int n_p, int dim, double alpha, double w)
 : Orbitals(n_p, dim) {
 
     this->alpha = new double();
     set_parameter(alpha, 0);
-    
+
     this->w = w;
-    
+
     int max_implemented = 15; //for 30 particles
 
     dell_basis_functions = new function**[dim];
@@ -96,6 +100,12 @@ oscillator_basis::oscillator_basis(int n_p, int dim, double alpha, double w)
     lapl_basis_functions[12] = new lapl_HO_13(this->alpha, w);
     lapl_basis_functions[13] = new lapl_HO_14(this->alpha, w);
     lapl_basis_functions[14] = new lapl_HO_15(this->alpha, w);
+
+}
+
+oscillator_basis::oscillator_basis(GeneralParams gP, VariationalParams vP) {
+
+    oscillator_basis::oscillator_basis(gP.n_p, gP.dim, vP.alpha, gP.w);
 
 }
 

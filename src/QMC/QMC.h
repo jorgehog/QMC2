@@ -31,21 +31,15 @@ protected:
 
     std::vector<OutputHandler*> output_handler;
 
-    QMC(int n_p, int dim, int n_c,
-            Sampling *sampling,
-            System *system,
-            Kinetics *kinetics = new NoKinetics(),
-            Jastrow *jastrow = new No_Jastrow());
-
-
     virtual void initialize() = 0;
+
+    virtual bool move_autherized(double A) = 0;
 
     void dump_output();
     void finalize_output();
 
     void diffuse_walker(Walker* original, Walker* trial);
 
-    void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const;
     double get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const;
 
     void calculate_energy_necessities(Walker* walker) const;
@@ -57,6 +51,13 @@ protected:
     void copy_walker(const Walker* parent, Walker* child) const;
 
 public:
+
+    QMC(int n_p, int dim, int n_c,
+            Sampling *sampling,
+            System *system,
+            Kinetics *kinetics = new NoKinetics(),
+            Jastrow *jastrow = new No_Jastrow());
+    QMC();
 
     void add_output(OutputHandler* output_handler);
 
@@ -92,7 +93,7 @@ public:
     }
 
     double get_accepted_ratio(int total_cycles) const {
-        return accepted/double(total_cycles);
+        return accepted / double(total_cycles);
     }
 
 
@@ -107,6 +108,9 @@ protected:
     Walker* trial_walker;
 
     virtual void initialize();
+
+    virtual bool move_autherized(double A);
+
     void calculate_energy(Walker* walker);
     void scale_values();
 
@@ -118,6 +122,8 @@ public:
             Kinetics *kinetics = new NoKinetics,
             Jastrow *jastrow = new No_Jastrow()
             );
+
+    VMC(GeneralParams &, VMCparams &, SystemObjects &);
 
     double get_var() const;
     double get_energy() const;
@@ -140,10 +146,10 @@ class DMC : public QMC {
 protected:
 
     int K; //Factor of empty space for walkers over initial walkers
-    int n_w_orig;
+
     int n_w;
     int n_w_last;
-    
+
     int deaths;
 
     int block_size;
@@ -159,16 +165,18 @@ protected:
     Walker *trial_walker;
 
     void initialize();
-    
-    void iterate_walker(int k, int n_b);
+
+    virtual bool move_autherized(double A);
+
+    void iterate_walker(int k, int n_b = 1);
 
     void Evolve_walker(int k, double GB);
 
     void bury_the_dead();
 
     void update_energies();
-    
-    void reset_parameters(){
+
+    void reset_parameters() {
         n_w_last = n_w;
         E = samples = deaths = 0;
     }
@@ -182,6 +190,8 @@ public:
             Kinetics *kinetics = new NoKinetics(),
             Jastrow *jastrow = new No_Jastrow(),
             bool dist_from_file = false);
+
+    DMC(GeneralParams &, DMCparams &, SystemObjects &);
 
     virtual void run_method();
 

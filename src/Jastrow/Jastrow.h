@@ -84,6 +84,7 @@ protected:
 public:
 
     Pade_Jastrow(int n_p, int dim, double beta);
+    Pade_Jastrow(GeneralParams, VariationalParams);
 
     virtual void initialize();
 

@@ -1,12 +1,12 @@
 from scitools.std import plot, figure
-import os
 
-path = os.path.expanduser('~') + "/NetBeansProjects/nbQMC2/"
+from pyLibQMC import paths
+
 filename = "alpha.dat"
 
 
 
-fil = open(path + filename, 'r')
+fil = open(paths.IDEPath + "/" + filename, 'r')
 
 N = 7
 

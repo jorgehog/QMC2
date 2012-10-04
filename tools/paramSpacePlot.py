@@ -6,18 +6,18 @@ Created on Thu Sep 20 16:48:27 2012
 """
 
 from scitools.std import plot, figure
-import os
+from pyLibQMC import paths
 
 two = False
 
 
 filename = "alphaVsE.dat"
 filenameBF = "alphaVsE_BF.dat"
-path = os.path.expanduser("~") + "/NetBeansProjects/nbQMC2/"
+path = paths.IDEPath
 
-inFile_IS = open(path + filename, 'r')
+inFile_IS = open(path + "/" + filename, 'r')
 if two:
-    inFile_BF = open(path + filenameBF, 'r')
+    inFile_BF = open(path + "/" + filenameBF, 'r')
 
 
 alpha = []

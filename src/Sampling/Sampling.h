@@ -15,10 +15,10 @@ protected:
 
     Diffusion* diffusion;
     QMC* qmc;
-    bool is_importance;
 
 public:
     Sampling(int n_p, int dim);
+    Sampling();
 
     void set_trial_pos(Walker* walker, bool load_VMC_dist = false, std::ifstream* file = NULL);
     double get_new_pos(const Walker* walker_pre, int i, int j) const;
@@ -46,14 +46,10 @@ public:
     void set_dt(double dt) {
         diffusion->set_dt(dt);
     }
-    
+
     double get_dt() const {
         return diffusion->get_dt();
     }
-
-    //    bool get_importance_bool() {
-    //        return is_importance;
-    //    }
 
     double call_RNG() {
         return diffusion->call_RNG();
@@ -65,7 +61,8 @@ public:
 
 class Importance : public Sampling {
 public:
-    Importance(int n_p, int dim, double timestep, long random_seed, double D = 0.5);
+    Importance(int n_p, int dim, long random_seed, double timestep = 0.01, double D = 0.5);
+    Importance(GeneralParams);
 
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
 
@@ -84,7 +81,8 @@ public:
 
 class Brute_Force : public Sampling {
 public:
-    Brute_Force(int n_p, int dim, double timestep, long random_seed, double D = 0.5);
+    Brute_Force(int n_p, int dim, long random_seed, double timestep = 0.5, double D = 0.5);
+    Brute_Force(GeneralParams);
 
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
 

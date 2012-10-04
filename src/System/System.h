@@ -20,6 +20,7 @@ protected:
 
 public:
     System(int n_p, int dim, Orbitals* orbital);
+    System();
     
     void add_potential(Potential* pot);
 
@@ -60,6 +61,7 @@ protected:
 
 public:
     Fermions(int n_p, int dim, Orbitals* orbital);
+    Fermions(GeneralParams, Orbitals*);
 
     virtual void initialize(Walker* walker);
     virtual void get_spatial_grad(Walker* walker, int particle) const;

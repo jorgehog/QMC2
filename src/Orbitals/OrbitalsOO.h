@@ -28,6 +28,7 @@ protected:
 public:
 
     Orbitals(int n_p, int dim);
+    Orbitals();
 
     virtual double phi(const Walker* walker, int particle, int q_num) const = 0;
     virtual double del_phi(const Walker* walker, int particle, int q_num, int d) const = 0;
@@ -46,6 +47,7 @@ private:
     
 public:
     oscillator_basis(int n_p, int dim, double alpha, double w = 1.0);
+    oscillator_basis(GeneralParams, VariationalParams);
 
 
     virtual double phi(const Walker* walker, int particle, int q_num) const;

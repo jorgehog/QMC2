@@ -22,7 +22,7 @@ public:
 
     Walker(int n_p, int dim, bool do_init = true);
     
-    double slater_ratio;
+    double spatial_ratio;
     double value;
     double lapl_sum;
     double E;

@@ -15,6 +15,7 @@ protected:
 
 public:
     Potential(int n_p, int dim);
+    Potential();
 
     virtual double get_pot_E(const Walker* walker) const = 0;
 
@@ -27,6 +28,7 @@ protected:
 public:
 
     Harmonic_osc(int n_p, int dim, double W);
+    Harmonic_osc(GeneralParams);
 
     virtual double get_pot_E(const Walker* walker) const;
 
@@ -36,6 +38,7 @@ class Coulomb : public Potential {
 public:
 
     Coulomb(int n_p, int dim);
+    Coulomb(GeneralParams);
 
     virtual double get_pot_E(const Walker* walker) const;
 

@@ -23,12 +23,18 @@ No_Jastrow::No_Jastrow() {
 
 Pade_Jastrow::Pade_Jastrow(int n_p, int dim, double beta)
 : Jastrow(n_p, dim) {
-    
+
     active = true;
 
     set_parameter(beta, 0);
 
     a = arma::zeros<arma::mat > (n_p, n_p);
+}
+
+Pade_Jastrow::Pade_Jastrow(GeneralParams gP, VariationalParams vP) {
+
+    Pade_Jastrow::Pade_Jastrow(gP.n_p, gP.dim, vP.beta);
+
 }
 
 void Pade_Jastrow::initialize() {
@@ -146,7 +152,7 @@ double Pade_Jastrow::get_variational_derivative(const Walker* walker, int n) con
             dbeta -= a(i, j) * arg * arg;
         }
     }
-    
+
     return dbeta;
-  
+
 }

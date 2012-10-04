@@ -45,20 +45,7 @@ protected:
     void get_variational_gradients(Walker* walker, double e_local);
 
 public:
-    ASGD(VMC* vmc,
-            const rowvec & alpha,
-            const rowvec & beta,
-            int SGDsamples,
-            int n_walkers,
-            int n_c,
-            int thermalization,
-            int n_c_SGD,
-            double max_step,
-            double f_min,
-            double f_max,
-            double w,
-            double a = 1,
-            double A = 1);
+    ASGD(VMC*, MinimizerParams);
 
     virtual VMC* minimize();
     virtual VMC* minimizeTEST();

@@ -9,30 +9,30 @@
 
 using namespace arma;
 
-Walker::Walker(int n_p, int dim, bool do_init) {
+Walker::Walker(int n_p, int dim, bool alive) {
     this->dim = dim;
     this->n_p = n_p;
     this->n2 = n_p / 2;
 
 
-    if (do_init) {
-        r = zeros<mat > (n_p, dim);
-        r_rel = zeros<mat > (n_p, n_p);
-        qforce = zeros<mat > (n_p, dim);
-        inv = zeros<mat > (n2, n_p);
-        jast_grad = zeros<mat > (n_p, dim);
-        spatial_grad = zeros<mat > (n_p, dim);
-
-        r2 = zeros(1, n_p);
-
-        value = 0;
-        lapl_sum = 0;
-        slater_ratio = 0;
-
+    if (alive) {
         is_murdered = false;
     } else {
         is_murdered = true;
     }
+    
+    r = zeros<mat > (n_p, dim);
+    r_rel = zeros<mat > (n_p, n_p);
+    qforce = zeros<mat > (n_p, dim);
+    jast_grad = zeros<mat > (n_p, dim);
+    spatial_grad = zeros<mat > (n_p, dim);
+
+    r2 = zeros(1, n_p);
+
+    value = 0;
+    lapl_sum = 0;
+    spatial_ratio = 0;
+    inv = zeros<mat > (n2, n_p);
 
 }
 
@@ -123,12 +123,12 @@ bool Walker::check_bad_qforce() {
 
 }
 
-void Walker::print(std::string header){
+void Walker::print(std::string header) {
     using namespace std;
 
     cout << endl;
     cout << "---- ---- ---- " << header << " ---- ---- ----" << endl;
-    
+
     cout << "r\n" << this->r << endl;
     cout << "r_rel\n" << this->r_rel << endl;
     cout << "r2\n" << this->r2 << endl;
@@ -141,7 +141,7 @@ void Walker::print(std::string header){
 
     cout << "Lapl_sum\t" << this->lapl_sum << endl;
     cout << "Value\t" << this->value << endl;
-    cout << "S ratio\t" << this->slater_ratio << endl;
+    cout << "S ratio\t" << this->spatial_ratio << endl;
 
     cout << "---- ---- ---- ---- ---- ---- ----" << endl;
     cout << endl;

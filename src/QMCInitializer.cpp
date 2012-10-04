@@ -9,7 +9,7 @@ void initVMC(int n_p, int dim, double w, double &dt, std::string type, std::stri
     if (sampling == "BF") {
         dt = 0.5;
     } else if (sampling == "IS") {
-        dt = 0.05;
+        dt = 0.01;
     } else {
         cout << "Unknown sample method" << endl;
     }
@@ -66,8 +66,8 @@ void initVMC(int n_p, int dim, double w, double &dt, std::string type, std::stri
             }
         } else if (n_p == 20) {
             if (w == 1) {
-                alpha = 0.84;
-                beta = 0.76;
+                alpha = 0.8351;
+                beta = 0.7451;
             } else {
                 //            alpha = 0.87;
                 //            beta = 0.68;

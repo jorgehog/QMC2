@@ -14,6 +14,10 @@ System::System(int n_p, int dim, Orbitals* orbital) {
     this->orbital = orbital;
 }
 
+System::System(){
+    
+}
+
 void System::add_potential(Potential* pot) {
     potentials.push_back(pot);
 }
@@ -35,6 +39,12 @@ Fermions::Fermions(int n_p, int dim, Orbitals* orbital)
 
     s_up = arma::zeros<arma::mat > (n_p / 2, n_p / 2);
     s_down = arma::zeros<arma::mat > (n_p / 2, n_p / 2);
+
+}
+
+Fermions::Fermions(GeneralParams gP, Orbitals* orbital) {
+
+    Fermions::Fermions(gP.n_p, gP.dim, orbital);
 
 }
 
@@ -62,7 +72,7 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
 
 void Fermions::initialize_slaters(const Walker* walker) {
     int i, q_num;
-    
+
     for (i = 0; i < n2; i++) {
         for (q_num = 0; q_num < n2; q_num++) {
             s_up(i, q_num) = orbital->phi(walker, i, q_num);
@@ -72,7 +82,7 @@ void Fermions::initialize_slaters(const Walker* walker) {
 
 
     //    cout << "UP" << s_down * walker->inv(span(0, 2), span(3, 5)) << endl;
-//    cout << "DOWN" << s_up * walker->inv(span(0, 2), span(0, 2)) << endl;
+    //    cout << "DOWN" << s_up * walker->inv(span(0, 2), span(0, 2)) << endl;
 }
 
 double Fermions::get_det() {
@@ -128,14 +138,14 @@ void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int 
     for (k = 0; k < n2; k++) {
         for (j = start; j < n2 + start; j++) {
             if (j == particle) {
-                walker_new->inv(k, j) = walker_old->inv(k, particle) / walker_new->slater_ratio;
+                walker_new->inv(k, j) = walker_old->inv(k, particle) / walker_new->spatial_ratio;
             } else {
-                
+
                 sum = 0;
                 for (l = 0; l < n2; l++) {
                     sum += orbital->phi(walker_new, particle, l) * walker_old->inv(l, j);
                 }
-                walker_new->inv(k, j) = walker_old->inv(k, j) - walker_old->inv(k, particle) / walker_new->slater_ratio*sum;
+                walker_new->inv(k, j) = walker_old->inv(k, j) - walker_old->inv(k, particle) / walker_new->spatial_ratio*sum;
             }
         }
     }

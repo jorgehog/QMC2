@@ -9,35 +9,22 @@
 
 using namespace arma;
 
-ASGD::ASGD(VMC* vmc,
-        const rowvec & alpha,
-        const rowvec & beta,
-        int SGDsamples,
-        int n_walkers,
-        int n_c,
-        int thermalization,
-        int n_c_SGD,
-        double max_step,
-        double f_min,
-        double f_max,
-        double w,
-        double a,
-        double A)
-: Minimizer(vmc, alpha, beta) {
+ASGD::ASGD(VMC* vmc, MinimizerParams mP)
+: Minimizer(vmc, mP.alpha, mP.beta) {
 
-    this->n_c = n_c;
-    this->thermalization = thermalization;
-    this->n_c_SGD = n_c_SGD;
-    this->SGDsamples = SGDsamples;
-    this->n_walkers = n_walkers;
+    this->n_c = mP.n_cm;
+    this->thermalization = mP.thermalization;
+    this->n_c_SGD = mP.n_c_SGD;
+    this->SGDsamples = mP.SGDsamples;
+    this->n_walkers = mP.n_walkers;
 
-    this->a = a;
-    this->A = A;
-    this->f_min = f_min;
-    this->f_max = f_max;
-    this->w = w;
+    this->a = mP.a;
+    this->A = mP.A;
+    this->f_min = mP.f_min;
+    this->f_max = mP.f_max;
+    this->w = mP.omega;
 
-    this->max_step = max_step;
+    this->max_step = mP.max_step;
 
     walkers = new Walker*[n_walkers];
     trial_walkers = new Walker*[n_walkers];

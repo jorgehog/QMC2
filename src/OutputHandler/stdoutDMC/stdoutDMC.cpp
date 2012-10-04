@@ -24,12 +24,12 @@ stdoutDMC::stdoutDMC(std::string filename,
 void stdoutDMC::dump() {
     
     sumE += dmc->dmc_E / dmc->cycle;
-    sumN += dmc->n_w / (double) dmc->n_w_orig;
+    sumN += dmc->n_w;
     n++;
 
     file << dmc->dmc_E / dmc->cycle << "\t";
     file << sumE / n << "\t";
-    file << dmc->n_w / (double) dmc->n_w_orig << "\t";
+    file << dmc->n_w << "\t";
     file << sumN / n << "\t";
     file << dmc->E_T << endl;
     
