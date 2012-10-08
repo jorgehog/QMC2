@@ -18,7 +18,7 @@ Distribution::Distribution(std::string filename,
 
 void Distribution::dump() {
 
-    if ((vmc->cycle > vmc->n_c / 2) && (vmc->cycle % 200 == 0)) {
+    if ((vmc->cycle > vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
         for (int i = 0; i < vmc->n_p; i++) {
             for (int j = 0; j < vmc->dim; j++) {
                 if (j == vmc->dim - 1) {

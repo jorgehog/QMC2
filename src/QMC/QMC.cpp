@@ -292,7 +292,8 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
 : QMC(gP.n_p, gP.dim, dP.n_c, sO.sample_method, sO.SYSTEM, sO.kinetics, sO.jastrow) {
 
     this->dist_from_file = dP.dist_in;
-
+    this->dist_in_path = dP.dist_in_path;
+    
     this->block_size = dP.n_b;
     this->n_w = dP.n_w;
     this->thermalization = dP.therm;
@@ -323,9 +324,8 @@ void DMC::initialize() {
     if (dist_from_file) {
 
         ifstream dist;
-        string path = "/home/jorgmeister/scratch/";
         string name = "dist_out.dat";
-        dist.open((path + name).c_str());
+        dist.open((dist_in_path + name).c_str());
 
         for (int k = 0; k < n_w; k++) {
             sampling->set_trial_pos(original_walkers[k], true, &dist);
@@ -334,12 +334,12 @@ void DMC::initialize() {
         dist.close();
 
     } else {
-
+        double tmpDt = sampling->get_dt();
+        sampling->set_dt(0.5);
         for (int k = 0; k < n_w; k++) {
-            while (original_walkers[k]->is_singular()) {
-                sampling->set_trial_pos(original_walkers[k]);
-            }
+            sampling->set_trial_pos(original_walkers[k]);
         }
+        sampling->set_dt(tmpDt);
 
     }
 
@@ -434,7 +434,6 @@ void DMC::iterate_walker(int k, int n_b) {
 void DMC::run_method() {
 
     initialize();
-
 
     dmc_E = 0;
     for (cycle = 1; cycle <= thermalization; cycle++) {

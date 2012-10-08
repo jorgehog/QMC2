@@ -72,9 +72,9 @@ VMC* ASGD::minimize() {
 
 
     /* DEBUG */
-    ofstream file;
-    file.open("alpha.dat");
-    DEBAG.open("sammenliknnBF_Num.dat");
+//    ofstream file;
+//    file.open("alpha.dat");
+//    DEBAG.open("sammenliknnBF_Num.dat");
     int debug1;
     double aGrad, bGrad, sumE;
     aGrad = bGrad = sumE = 0;
@@ -113,12 +113,12 @@ VMC* ASGD::minimize() {
                     vmc->calculate_energy_necessities(walkers[k]);
                     double e_local = vmc->calculate_local_energy(walkers[k]);
                     E += e_local;
-                    DEBAG << E / ((cycle + 1)*(k + 1)) << endl;
+//                    DEBAG << E / ((cycle + 1)*(k + 1)) << endl;
                     get_variational_gradients(walkers[k], e_local);
                 }
 
             }
-            DEBAG << "Changed Walker" << endl;
+//            DEBAG << "Changed Walker" << endl;
         }
 
         int scale = n_walkers * n_c_SGD / corrLength;
@@ -147,7 +147,7 @@ VMC* ASGD::minimize() {
         aGrad += gradient_tot[0];
         bGrad += gradient_tot[1];
         sumE += E;
-        file << aGrad / debug1 << "\t" << bGrad / debug1 << "\t";
+//        file << aGrad / debug1 << "\t" << bGrad / debug1 << "\t";
         //
 
 
@@ -157,9 +157,9 @@ VMC* ASGD::minimize() {
             if (fabs(step) > max_step) {
                 step *= max_step / fabs(step);
             }
-            file << fabs(step) << "\t";
+//            file << fabs(step) << "\t";
             double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
-            file << fabs(alpha - step) << "\t";
+//            file << fabs(alpha - step) << "\t";
             vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
         }
 
@@ -171,14 +171,14 @@ VMC* ASGD::minimize() {
             }
 
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
-            file << fabs(beta - step) << "\t";
+//            file << fabs(beta - step) << "\t";
             vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
 
 
         }
 
-        file << E << "\t";
-        file << sumE / debug1 << endl;
+//        file << E << "\t";
+//        file << sumE / debug1 << endl;
         debug1++;
 
         t_prev = t;
@@ -187,8 +187,8 @@ VMC* ASGD::minimize() {
     }
 
     output("Finished minimizing. Final parameters:", -1);
-    file.close();
-    DEBAG.close();
+//    file.close();
+//    DEBAG.close();
     vmc->accepted = 0;
     return vmc;
 }

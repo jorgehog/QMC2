@@ -72,8 +72,7 @@ void Fermions::initialize_slaters(const Walker* walker) {
             s_down(i, q_num) = orbital->phi(walker, i + n2, q_num);
         }
     }
-
-
+    
     //    cout << "UP" << s_down * walker->inv(span(0, 2), span(3, 5)) << endl;
     //    cout << "DOWN" << s_up * walker->inv(span(0, 2), span(0, 2)) << endl;
 }
@@ -83,7 +82,6 @@ double Fermions::get_det() {
 }
 
 void Fermions::invert_slaters() {
-
     s_up = arma::inv(s_up);
     s_down = arma::inv(s_down);
 
@@ -91,7 +89,7 @@ void Fermions::invert_slaters() {
 
 void Fermions::make_merged_inv(Walker* walker) {
     int i, j;
-
+    
     initialize_slaters(walker);
     invert_slaters();
 

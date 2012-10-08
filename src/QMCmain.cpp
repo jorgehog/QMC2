@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
 
     if (generalParams.doVMC || generalParams.doMIN) {
-
+  
         VMC* vmc = new VMC(generalParams, vmcParams, systemObjects);
         systemObjects.sample_method->set_dt(vmcParams.dt);
 
@@ -171,7 +171,7 @@ void parseCML(char** argv, VMCparams & vmcParams,
 
     //Default values:
     outputParams.blocking_out = false;
-    outputParams.dist_out = true;
+    outputParams.dist_out = false;
     outputParams.outputSuffix = "";
     outputParams.outputPath = "/home/jorgmeister/scratch/";
 
@@ -215,6 +215,7 @@ void parseCML(char** argv, VMCparams & vmcParams,
     dmcParams.n_c = 1000;
     dmcParams.therm = 1000;
     dmcParams.dist_in = outputParams.dist_out & generalParams.doVMC;
+    dmcParams.dist_in_path = "/home/jorgmeister/scratch/";
 
 
     //variationalParams.alpha = 0.987;
@@ -296,4 +297,8 @@ void parseCML(char** argv, VMCparams & vmcParams,
     if (def.compare(argv[42]) != 0) variationalParams.alpha = atof(argv[42]);
     if (def.compare(argv[43]) != 0) variationalParams.beta = atof(argv[43]);
 
+    
+    if (outputParams.dist_out){
+        dmcParams.dist_in_path = outputParams.outputPath;
+    }
 }

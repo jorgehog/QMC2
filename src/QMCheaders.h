@@ -22,6 +22,7 @@ struct DMCparams {
     int n_c, therm, n_w, n_b;
     double dt, E_T;
     bool dist_in;
+    string dist_in_path;
 
 };
 

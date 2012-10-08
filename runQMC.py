@@ -23,12 +23,15 @@ def selectFiles(Files):
     while True:
         dumpStrList(Files)
     
-        action = raw_input("type 'display/run 0' to view content of / run first file.") 
+        action = raw_input("type 'display/run 0' to view content of / run first file:") 
 #        action = "run 0 1"
 
         if action.split()[0] == "run" or action.split()[0] == "display":
 
-            fileIDs = [int(ID) for ID in action.split()[1:]]
+            if action.split()[1] == "all":
+                fileIDs = range(len(Files))
+            else:
+                fileIDs = [int(ID) for ID in action.split()[1:]]
             
 
             legal = len(fileIDs) > 0
@@ -246,6 +249,9 @@ def varParameterMap(n_p, dim, w, system):
 
 
 def consistencyCheck(cmlArgs):
+    
+
+    
     #no minimization initialized -> get param set
     if (cmlArgs[11]=="0" or cmlArgs[11]=="def"):
 
@@ -270,8 +276,13 @@ def consistencyCheck(cmlArgs):
             cmlArgs[41] = str(alpha);
         if cmlArgs[42] == "def":
             cmlArgs[42] = str(beta);
-
             
+            
+    #No col -> no jast, alpha=1
+    if (cmlArgs[14] == "0"):
+        cmlArgs[15] = "0";
+        cmlArgs[41] = "1";
+        
     return cmlArgs
             
         
@@ -332,6 +343,7 @@ def convertToCMLargs(arglist):
                
     
     key = ""
+
     for arg in arglist:
         if arg.startswith("-"):
             key = arg[1:];
@@ -351,6 +363,7 @@ def initRuns(CMLargs, stdoutFileFlag, dirs):
 
     i = 0
     for CMLarg in CMLargs:
+        print "Running job ", dirs[i]
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutFileFlag
         os.system(paths.programPath + "/" + variables.QMC2programName + " " + CMLarg + stdout)
         i+=1

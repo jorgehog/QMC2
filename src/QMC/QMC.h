@@ -153,6 +153,7 @@ protected:
     double E;
 
     bool dist_from_file;
+    std::string dist_in_path;
 
     Walker **original_walkers;
     Walker *trial_walker;
