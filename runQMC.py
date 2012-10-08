@@ -23,28 +23,40 @@ def selectFiles(Files):
     while True:
         dumpStrList(Files)
     
-#        action = raw_input("type 'display/run 0' to view content of / run first file.") 
-        action = "run 0 1"
+        action = raw_input("type 'display/run 0' to view content of / run first file.") 
+#        action = "run 0 1"
 
         if action.split()[0] == "run" or action.split()[0] == "display":
 
-            if action.split()[0] == "run":
-                fileIDs = [int(ID) for ID in action.split()[1:]]
+            fileIDs = [int(ID) for ID in action.split()[1:]]
+            
 
-                legal = True
-                for ID in fileIDs:
-                    if fileIDs.count(ID) > 1:
-                        print "Several instances of file#", ID
-                        legal = False
+            legal = len(fileIDs) > 0
+            for ID in fileIDs:
+                if fileIDs.count(ID) > 1:
+                    print "Several instances of file#", ID
+                    legal = False
                 
                 
-                for ID in fileIDs:
-                    if ID >= len(Files) or ID < 0:
-                        print "Invalid file", ID
-                        legal = False
+            for ID in fileIDs:
+                if ID >= len(Files) or ID < 0:
+                    print "Invalid file", ID
+                    legal = False
+
+            if legal:
+                
+                
+                if action.split()[0] == "run":
+                    return [Files[ID] for ID in fileIDs]
                     
-                if legal:
-                    return [Files[n] for n in fileIDs]
+                else:
+                    for ID in fileIDs:
+                        print "----------------------\n" + Files[ID] + ":\n"
+                        os.system("cat %s" % paths.iniFilePath + "/" + Files[ID])
+                        print "----------------------\n"
+                    
+                    
+                
         
         
         else:
