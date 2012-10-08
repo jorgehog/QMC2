@@ -26,7 +26,7 @@ struct DMCparams {
 };
 
 struct VMCparams {
-    int n_c, therm;
+    int n_c;
     double dt;
 
 };
@@ -39,6 +39,7 @@ struct VariationalParams {
 struct GeneralParams {
     int n_p, dim;
     long random_seed;
+    double D;
 
     double h, w;
 

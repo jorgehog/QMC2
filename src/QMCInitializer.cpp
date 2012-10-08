@@ -2,17 +2,8 @@
 
 //TMP FUNC. WILL BE PYTHON SCRIPTED
 
-void initVMC(int n_p, int dim, double w, double &dt, std::string type, std::string sampling, double &alpha, double &beta) {
+void initVMC(int n_p, int dim, double w, double &dt, std::string type, double &alpha, double &beta) {
     using namespace std;
-    
-    
-    if (sampling == "BF") {
-        dt = 0.5;
-    } else if (sampling == "IS") {
-        dt = 0.01;
-    } else {
-        cout << "Unknown sample method" << endl;
-    }
     
     
     if ((dim == 2) && (type == "QDots")) {

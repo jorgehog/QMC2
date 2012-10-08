@@ -1,4 +1,5 @@
 git add gitadd.sh
+git add runQMC.py
 
 git add ./src/*
 

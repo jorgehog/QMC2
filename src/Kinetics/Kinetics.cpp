@@ -27,20 +27,13 @@ Numerical::Numerical() {
 
 }
 
-Numerical::Numerical(GeneralParams gP) {
-
-    Numerical::Numerical(gP.n_p, gP.dim, gP.h);
-
-}
-
-Numerical::Numerical(int n_p, int dim, double h)
-: Kinetics(n_p, dim) {
-    this->h = h;
+Numerical::Numerical(GeneralParams & gP)
+: Kinetics(gP.n_p, gP.dim) {
+    this->h = gP.h;
     this->h2 = 1. / (h * h);
 
     wfminus = new Walker(n_p, dim);
     wfplus = new Walker(n_p, dim);
-
 
 }
 
@@ -163,13 +156,8 @@ Closed_form::Closed_form() {
 
 }
 
-Closed_form::Closed_form(GeneralParams gP)
+Closed_form::Closed_form(GeneralParams & gP)
 : Kinetics(gP.n_p, gP.dim) {
-
-}
-
-Closed_form::Closed_form(int n_p, int dim)
-: Kinetics(n_p, dim) {
 
 }
 

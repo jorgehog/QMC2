@@ -86,8 +86,7 @@ protected:
 
 public:
     Numerical();
-    Numerical(GeneralParams);
-    Numerical(int n_p, int dim, double h = 0.0001);
+    Numerical(GeneralParams &);
 
     virtual double get_KE(const Walker* walker);
     virtual void get_QF(Walker* walker);
@@ -112,8 +111,7 @@ public:
 class Closed_form : public Kinetics {
 public:
     Closed_form();
-    Closed_form(GeneralParams);
-    Closed_form(int n_p, int dim);
+    Closed_form(GeneralParams &);
 
     virtual double get_KE(const Walker* walker);
     virtual void get_QF(Walker* walker);

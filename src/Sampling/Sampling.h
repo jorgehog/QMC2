@@ -61,8 +61,8 @@ public:
 
 class Importance : public Sampling {
 public:
-    Importance(int n_p, int dim, long random_seed, double timestep = 0.01, double D = 0.5);
-    Importance(GeneralParams);
+
+    Importance(GeneralParams &);
 
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
 
@@ -81,8 +81,8 @@ public:
 
 class Brute_Force : public Sampling {
 public:
-    Brute_Force(int n_p, int dim, long random_seed, double timestep = 0.5, double D = 0.5);
-    Brute_Force(GeneralParams);
+
+    Brute_Force(GeneralParams &);
 
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
 

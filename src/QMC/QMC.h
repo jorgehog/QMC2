@@ -116,13 +116,6 @@ protected:
 
 public:
 
-    VMC(int n_p, int dim, int n_c,
-            Sampling *sampling,
-            System *system,
-            Kinetics *kinetics = new NoKinetics,
-            Jastrow *jastrow = new No_Jastrow()
-            );
-
     VMC(GeneralParams &, VMCparams &, SystemObjects &);
 
     double get_var() const;
@@ -182,14 +175,6 @@ protected:
     }
 
 public:
-
-    DMC(int n_p, int dim, int n_w, int n_c, int block_size, int therm,
-            double E_T,
-            Sampling *sampling,
-            System *system,
-            Kinetics *kinetics = new NoKinetics(),
-            Jastrow *jastrow = new No_Jastrow(),
-            bool dist_from_file = false);
 
     DMC(GeneralParams &, DMCparams &, SystemObjects &);
 

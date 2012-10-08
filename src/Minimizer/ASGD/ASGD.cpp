@@ -9,7 +9,7 @@
 
 using namespace arma;
 
-ASGD::ASGD(VMC* vmc, MinimizerParams mP)
+ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
 : Minimizer(vmc, mP.alpha, mP.beta) {
 
     this->n_c = mP.n_cm;
@@ -40,7 +40,6 @@ ASGD::ASGD(VMC* vmc, MinimizerParams mP)
     gradient_tot = zeros(1, Nparams);
 
     t_prev = A;
-
 }
 
 double ASGD::f(double x) {

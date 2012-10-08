@@ -1,0 +1,18 @@
+ 
+    //    ofstream paramSpaceOut;
+    //    paramSpaceOut.open("alphaVsE.dat");
+    //    VMC* vmc;
+    //    for (double alpha = 0.5; alpha <= 1.5; alpha+=0.1){
+    //        SP_basis = new oscillator_basis(n_p, dim, alpha, w);
+    //        SYSTEM = new Fermions(n_p, dim, SP_basis);
+    //        SYSTEM->add_potential(onebody_pot);
+    //        vmc = new VMC(n_p, dim, n_c,
+    //                sample_method,
+    //                SYSTEM,
+    //                kinetics,
+    //                jastrow);
+    //        cout << alpha << endl;
+    //        vmc->run_method();
+    //        paramSpaceOut << alpha << "\t" << vmc->get_energy() << endl;
+    //    }
+    //    paramSpaceOut.close();

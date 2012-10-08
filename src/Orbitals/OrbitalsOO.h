@@ -46,7 +46,6 @@ private:
     virtual double get_variational_derivative(const Walker* walker, int n) const;
     
 public:
-    oscillator_basis(int n_p, int dim, double alpha, double w = 1.0);
     oscillator_basis(GeneralParams, VariationalParams);
 
 

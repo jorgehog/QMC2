@@ -187,12 +187,10 @@ double QMC::calculate_local_energy(Walker* walker) const {
  
  */
 
-VMC::VMC(int n_p, int dim, int n_c,
-        Sampling *sampling,
-        System *system,
-        Kinetics *kinetics,
-        Jastrow *jastrow)
-: QMC(n_p, dim, n_c, sampling, system, kinetics, jastrow) {
+
+
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO)
+: QMC(gP.n_p, gP.dim, vP.n_c, sO.sample_method, sO.SYSTEM, sO.kinetics, sO.jastrow) {
 
     vmc_E = 0;
     E2 = 0;
@@ -201,12 +199,6 @@ VMC::VMC(int n_p, int dim, int n_c,
     trial_walker = new Walker(n_p, dim);
 
     this->thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
-
-}
-
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO) {
-
-    VMC::VMC(gP.n_p, gP.dim, vP.n_c, sO.sample_method, sO.SYSTEM, sO.kinetics, sO.jastrow);
 
 }
 
@@ -295,35 +287,22 @@ DMC
  */
 
 
-DMC::DMC(int n_p, int dim, int n_w, int n_c, int block_size, int therm,
-        double E_T,
-        Sampling *sampling,
-        System *system,
-        Kinetics *kinetics,
-        Jastrow *jastrow,
-        bool dist_from_file)
-: QMC(n_p, dim, n_c, sampling, system, kinetics, jastrow) {
 
-    this->dist_from_file = dist_from_file;
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
+: QMC(gP.n_p, gP.dim, dP.n_c, sO.sample_method, sO.SYSTEM, sO.kinetics, sO.jastrow) {
 
-    this->block_size = block_size;
-    this->n_w = n_w;
-    this->thermalization = therm;
-    this->E_T = E_T;
+    this->dist_from_file = dP.dist_in;
+
+    this->block_size = dP.n_b;
+    this->n_w = dP.n_w;
+    this->thermalization = dP.therm;
+    this->E_T = dP.E_T;
 
     K = 5;
     int max_walkers = K * n_w;
 
     original_walkers = new Walker*[max_walkers];
     trial_walker = new Walker(n_p, dim);
-
-
-}
-
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO) {
-
-    DMC::DMC(gP.n_p, gP.dim, dP.n_w, dP.n_c, dP.n_b, dP.therm, dP.E_T,
-            sO.sample_method, sO.SYSTEM, sO.kinetics, sO.jastrow, dP.dist_in);
 
 }
 
@@ -334,7 +313,6 @@ bool DMC::move_autherized(double A) {
 void DMC::initialize() {
 
     jastrow->initialize();
-    E_T = 0;
 
     //Initializing active walkers
     for (int k = 0; k < n_w; k++) {
@@ -345,7 +323,9 @@ void DMC::initialize() {
     if (dist_from_file) {
 
         ifstream dist;
-        dist.open("dist_out.dat");
+        string path = "/home/jorgmeister/scratch/";
+        string name = "dist_out.dat";
+        dist.open((path + name).c_str());
 
         for (int k = 0; k < n_w; k++) {
             sampling->set_trial_pos(original_walkers[k], true, &dist);
@@ -367,10 +347,16 @@ void DMC::initialize() {
     for (int k = 0; k < n_w; k++) {
         calculate_energy_necessities(original_walkers[k]);
         double El = calculate_local_energy(original_walkers[k]);
-        E_T += El;
+
         original_walkers[k]->set_E(El);
     }
-    E_T /= n_w;
+
+    if (E_T == 0) {
+        for (int k = 0; k < n_w; k++) {
+            E_T += original_walkers[k]->get_E();
+        }
+        E_T /= n_w;
+    }
 
     //Creating unactive walker objects (note: 3. arg=false implies dead) 
     for (int k = n_w; k < K * n_w; k++) {

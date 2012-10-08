@@ -9,7 +9,7 @@ import sys, os, re
 
 sys.path.append(os.getcwd() + "/tools")
 
-from pyLibQMC import paths, variables
+from pyLibQMC import paths, variables, add_date
 
 
 
@@ -19,41 +19,47 @@ def dumpStrList(aList):
         print "[%d] %s" % (i, element)
         i+=1
 
-def selectFile(Files):
+def selectFiles(Files):
     while True:
         dumpStrList(Files)
     
-        action = raw_input("type 'display/run 0' to view content of / run first file.") 
-#        action = "run 1"
+#        action = raw_input("type 'display/run 0' to view content of / run first file.") 
+        action = "run 0 1"
 
-        if re.findall("run \d+|display \d+", action):
-            cmd, n = action.split()
-            n = int(n)
-            
-            if n >= len(Files):
-                print "Invalid file"
-            else:
-                if cmd == "display":
-                    os.system("cat %s" % paths.iniFilePath + "/" + Files[n])
-                else:
-                    return Files[n]
+        if action.split()[0] == "run" or action.split()[0] == "display":
+
+            if action.split()[0] == "run":
+                fileIDs = [int(ID) for ID in action.split()[1:]]
+
+                legal = True
+                for ID in fileIDs:
+                    if fileIDs.count(ID) > 1:
+                        print "Several instances of file#", ID
+                        legal = False
+                
+                
+                for ID in fileIDs:
+                    if ID >= len(Files) or ID < 0:
+                        print "Invalid file", ID
+                        legal = False
                     
+                if legal:
+                    return [Files[n] for n in fileIDs]
+        
+        
         else:
             print "Invalid option"
 
 def setTag(arglist, line):
    
    if line.startswith('general'):
-
        if "-g" not in arglist:
            arglist.append("-g")
-        
-        
+             
    elif line.startswith('VMC'):
        if "-v" not in arglist:
            arglist.append("-v")
-    
-        
+      
    elif line.startswith('DMC'):
        if "-d" not in arglist:
            arglist.append("-d")
@@ -71,6 +77,20 @@ def setTag(arglist, line):
            arglist.append("-vp")
 
 
+def initializeDir(path, filename, date=True):
+    
+    dirName = filename.split(".")[0]
+    
+    if date:
+        dirName = add_date(dirName) 
+    
+    PATH = path + "/" + dirName
+
+    os.mkdir(PATH)
+
+    return PATH    
+    
+
 def parseFiles():
     iniDirContent = os.listdir(paths.iniFilePath)
     iniFiles = []
@@ -84,22 +104,56 @@ def parseFiles():
     else:
         print "Found iniFile(s):\n-----------------------------"
     
-    iniFile = open(paths.iniFilePath + "/" + selectFile(iniFiles), 'r')
-    
-    
-    arglist = []
-    for line in iniFile:
+    fileNames = selectFiles(iniFiles)
 
-        setTag(arglist, line)
-        raw = re.findall(".+\s*=\s*.+", line)
-            
-        if raw:
-            arglist.append(raw[0].replace(" ", ""))
+    superDir = initializeDir(paths.scratchPath, "QMCrun")
+    
+    dirs = []
+    parsedFiles = []
+    for fileName in fileNames:
+        #Initialize a new directory for the run
+        dirPath = initializeDir(superDir, fileName, date=False)
+        dirs.append(dirPath)
+        filePath = paths.iniFilePath + "/" + fileName        
         
-                
+        #Copy the iniFile to the runDir
+        os.system("cp %s %s" % (filePath, dirPath + "/" + fileName))
+        iniFile = open(filePath, 'r')
+    
+        #Read the iniFile
+        arglist = []        
+        outPathSet = False
+        for line in iniFile:
+
+            setTag(arglist, line)
+            raw = re.findall(".+\s*=\s*.+", line)
+        
+            if not outPathSet:
+                if arglist[-1] == "-o":
+                    arglist.append("outputPath=%s/" % dirPath)
+                    outPathSet = True
+        
+            if raw:
+                arglist.append(raw[0].replace(" ", ""))
+    
+        if not outPathSet:
+            arglist.append("-o")
+            arglist.append("outputPath=%s/" % dirPath)
             
-            
-    return convertToCMLargs(arglist)
+        parsedFiles.append(convertToCMLargs(arglist))
+    
+    return parsedFiles, dirs
+
+def valConvert(val):
+    
+    if re.findall("\d+\.?\d*[E/e][+\-]?\d+", val):
+        suff, expo = re.findall("(\d+\.?\d*)[E/e]([+\-]?\d+)", val)[0]
+        
+        val = str(float(suff)*10**int(expo));
+        
+    return val
+        
+        
 
 def varParameterMap(n_p, dim, w, system):
     
@@ -179,9 +233,40 @@ def varParameterMap(n_p, dim, w, system):
         print "Unknown type ", system, "with dim=", dim 
 
 
+def consistencyCheck(cmlArgs):
+    #no minimization initialized -> get param set
+    if (cmlArgs[11]=="0" or cmlArgs[11]=="def"):
+
+        n_p = 2;
+        dim = 2;
+        w = 1;
+        system = "QDots"
+
+        if (cmlArgs[4] != "def"):
+            n_p = int(cmlArgs[4]);
+        if (cmlArgs[5] != "def"):
+            dim = int(cmlArgs[5]);
+        if (cmlArgs[6] != "def"):
+            w = float(cmlArgs[6])
+        if (cmlArgs[18] != "def"):
+            system = cmlArgs[18]
+            
+        
+        alpha, beta = varParameterMap(n_p, dim, w, system);
+
+        if cmlArgs[41] == "def":
+            cmlArgs[41] = str(alpha);
+        if cmlArgs[42] == "def":
+            cmlArgs[42] = str(beta);
+
+            
+    return cmlArgs
+            
+        
+
+
 def convertToCMLargs(arglist):
-    nInputs = 41;
-    print arglist
+    nInputs = 43;
     cmlArgs = ["def"]*nInputs
     
     cmlMAPo = {"blocking_out":  0,
@@ -230,6 +315,9 @@ def convertToCMLargs(arglist):
                "alpha":         39,
                "beta":          40}
                
+    cmlMAPvp = {"alpha":        41,
+                "beta":         42}
+               
     
     key = ""
     for arg in arglist:
@@ -238,23 +326,37 @@ def convertToCMLargs(arglist):
         else:
             name, val = arg.split("=");
             index = eval("cmlMAP" + key + "[name]")
+            val = valConvert(val)
             cmlArgs[index] = val
 
+    cmlArgs = consistencyCheck(cmlArgs)
     cmlArgs = " ".join(cmlArgs)
-    return [cmlArgs]
+    
+    return cmlArgs
+    
             
-def initRuns(CMLargs):
+def initRuns(CMLargs, stdoutFileFlag, dirs):
+
+    i = 0
     for CMLarg in CMLargs:
-        os.system(paths.programPath + "/" + variables.QMC2programName + " " + CMLarg)
-        
+        stdout = (" > %s/stdout.txt" % dirs[i])*stdoutFileFlag
+        os.system(paths.programPath + "/" + variables.QMC2programName + " " + CMLarg + stdout)
+        i+=1
 
 def main():
+    stdoutFileFlag = False
+    if "stdoutToFile" in sys.argv:
+        stdoutFileFlag = True
+        sys.argv.remove("stdoutToFile")
+
+    
     if len(sys.argv) == 1:
-        CMLargs = parseFiles()
+        CMLargs, dirs = parseFiles()
     else:
         CMLargs = [convertToCMLargs(sys.argv[1:])]
-    print CMLargs
+        dirs = [paths.scratchPath]
+    
 
-    initRuns(CMLargs)
+    initRuns(CMLargs, stdoutFileFlag, dirs)
     
 main()

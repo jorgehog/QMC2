@@ -14,8 +14,8 @@ System::System(int n_p, int dim, Orbitals* orbital) {
     this->orbital = orbital;
 }
 
-System::System(){
-    
+System::System() {
+
 }
 
 void System::add_potential(Potential* pot) {
@@ -32,20 +32,13 @@ double System::get_potential_energy(const Walker* walker) {
     return potE;
 }
 
-Fermions::Fermions(int n_p, int dim, Orbitals* orbital)
-: System(n_p, dim, orbital) {
+Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
+: System(gP.n_p, gP.dim, orbital) {
 
     n2 = n_p / 2;
 
     s_up = arma::zeros<arma::mat > (n_p / 2, n_p / 2);
     s_down = arma::zeros<arma::mat > (n_p / 2, n_p / 2);
-
-}
-
-Fermions::Fermions(GeneralParams gP, Orbitals* orbital) {
-
-    Fermions::Fermions(gP.n_p, gP.dim, orbital);
-
 }
 
 void Fermions::initialize(Walker* walker) {

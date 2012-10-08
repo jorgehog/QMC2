@@ -45,7 +45,7 @@ protected:
     void get_variational_gradients(Walker* walker, double e_local);
 
 public:
-    ASGD(VMC*, MinimizerParams);
+    ASGD(VMC*, MinimizerParams &);
 
     virtual VMC* minimize();
     virtual VMC* minimizeTEST();

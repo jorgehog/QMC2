@@ -12,8 +12,8 @@ Sampling::Sampling(int n_p, int dim) {
     this->dim = dim;
 }
 
-Sampling::Sampling(){
-    
+Sampling::Sampling() {
+
 }
 
 void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* file) {
@@ -58,17 +58,12 @@ double Sampling::get_branching_Gfunc(double E_x, double E_y, double E_T) const {
 //    return diffusion->get_GBfunc(walker_pre, walker_post, E_T);
 //}
 
-Brute_Force::Brute_Force(int n_p, int dim, long random_seed, double timestep, double D)
-: Sampling(n_p, dim) {
-    diffusion = new Simple(n_p, dim, timestep, random_seed, D);
+
+Brute_Force::Brute_Force(GeneralParams & gP)
+: Sampling(gP.n_p, gP.dim) {
+    diffusion = new Simple(n_p, dim, 0, gP.random_seed, gP.D);
+
 }
-
-Brute_Force::Brute_Force(GeneralParams gP){
-
-    Brute_Force::Brute_Force(gP.n_p, gP.dim, gP.random_seed);
-    
-}
-
 
 void Brute_Force::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
     walker_pre->value = walker_post->value;
@@ -99,16 +94,10 @@ void Brute_Force::copy_walker(const Walker* parent, Walker* child) const {
     child->value = parent->value;
 }
 
-Importance::Importance(int n_p, int dim, long random_seed, double timestep, double D)
-: Sampling(n_p, dim) {
-    diffusion = new Fokker_Planck(n_p, dim, timestep, random_seed, D);
-}
-
-Importance::Importance(GeneralParams gP) {
-
-    Importance::Importance(gP.n_p, gP.dim, gP.random_seed);
-
-
+Importance::Importance(GeneralParams & gP)
+: Sampling(gP.n_p, gP.dim) {
+    diffusion = new Fokker_Planck(n_p, dim, 0, gP.random_seed, gP.D);
+    
 }
 
 void Importance::calculate_energy_necessities_CF(Walker* walker) const {

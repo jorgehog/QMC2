@@ -18,18 +18,13 @@ Potential::Potential(){
     
 }
 
-Harmonic_osc::Harmonic_osc(int n_p, int dim, double w)
-: Potential(n_p, dim) {
+Harmonic_osc::Harmonic_osc(GeneralParams & gP)
+: Potential(gP.n_p, gP.dim) {
 
-    this->w = w;
-
-}
-
-Harmonic_osc::Harmonic_osc(GeneralParams gP) {
-
-    Harmonic_osc::Harmonic_osc(gP.n_p, gP.dim, gP.w);
+    this->w = gP.w;
 
 }
+
 
 double Harmonic_osc::get_pot_E(const Walker* walker) const {
 
@@ -42,16 +37,11 @@ double Harmonic_osc::get_pot_E(const Walker* walker) const {
     return e_potential;
 }
 
-Coulomb::Coulomb(int n_p, int dim)
-: Potential(n_p, dim) {
+Coulomb::Coulomb(GeneralParams & gP)
+: Potential(gP.n_p, gP.dim) {
 
 }
 
-Coulomb::Coulomb(GeneralParams gP) {
-
-    Coulomb::Coulomb(gP.n_p, gP.dim);
-
-}
 
 double Coulomb::get_pot_E(const Walker* walker) const {
 

@@ -21,20 +21,14 @@ No_Jastrow::No_Jastrow() {
     active = false;
 }
 
-Pade_Jastrow::Pade_Jastrow(int n_p, int dim, double beta)
-: Jastrow(n_p, dim) {
+Pade_Jastrow::Pade_Jastrow(GeneralParams & gP, VariationalParams & vP)
+: Jastrow(gP.n_p, gP.dim) {
 
     active = true;
 
-    set_parameter(beta, 0);
+    set_parameter(vP.beta, 0);
 
     a = arma::zeros<arma::mat > (n_p, n_p);
-}
-
-Pade_Jastrow::Pade_Jastrow(GeneralParams gP, VariationalParams vP) {
-
-    Pade_Jastrow::Pade_Jastrow(gP.n_p, gP.dim, vP.beta);
-
 }
 
 void Pade_Jastrow::initialize() {
