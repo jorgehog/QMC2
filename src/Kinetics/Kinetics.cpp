@@ -7,8 +7,6 @@
 
 #include "../QMCheaders.h"
 
-using namespace std;
-
 Kinetics::Kinetics() {
 
 }

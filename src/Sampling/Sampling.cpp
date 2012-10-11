@@ -135,8 +135,6 @@ double Importance::get_spatial_ratio(const Walker* walker_post, const Walker* wa
 }
 
 void Importance::get_necessities(Walker* walker) {
-
     qmc->get_kinetics_ptr()->get_necessities_IS(walker);
     qmc->get_kinetics_ptr()->get_QF(walker);
-
 }

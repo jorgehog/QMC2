@@ -5,7 +5,7 @@ Created on Fri Oct  5 16:29:12 2012
 @author: jorgehog
 """
 
-import sys, os, re
+import sys, os, re, shutil
 
 sys.path.append(os.getcwd() + "/tools")
 
@@ -157,7 +157,7 @@ def parseFiles():
             
         parsedFiles.append(convertToCMLargs(arglist))
     
-    return parsedFiles, dirs
+    return parsedFiles, dirs, superDir
 
 def valConvert(val):
     
@@ -359,7 +359,7 @@ def convertToCMLargs(arglist):
     return cmlArgs
     
             
-def initRuns(CMLargs, stdoutFileFlag, dirs):
+def initRuns(CMLargs, stdoutFileFlag, dirs, superDir):
 
     i = 0
     for CMLarg in CMLargs:
@@ -367,6 +367,9 @@ def initRuns(CMLargs, stdoutFileFlag, dirs):
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutFileFlag
         os.system(paths.programPath + "/" + variables.QMC2programName + " " + CMLarg + stdout)
         i+=1
+    if superDir:
+        shutil.copy(paths.toolsPath + "/output2tex.py", superDir)
+    
 
 def main():
     stdoutFileFlag = False
@@ -376,12 +379,13 @@ def main():
 
     
     if len(sys.argv) == 1:
-        CMLargs, dirs = parseFiles()
+        CMLargs, dirs, superDir = parseFiles()
     else:
         CMLargs = [convertToCMLargs(sys.argv[1:])]
         dirs = [paths.scratchPath]
+        superDir = None
     
 
-    initRuns(CMLargs, stdoutFileFlag, dirs)
+    initRuns(CMLargs, stdoutFileFlag, dirs, superDir)
     
 main()

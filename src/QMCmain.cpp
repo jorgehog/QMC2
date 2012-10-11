@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     }
 
     if (generalParams.system == "QDots") {
-        systemObjects.SP_basis = new oscillator_basis(generalParams, variationalParams);
+        systemObjects.SP_basis = new AlphaHarmonicOscillator(generalParams, variationalParams);
 
         systemObjects.onebody_pot = new Harmonic_osc(generalParams);
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
 
     if (generalParams.doVMC || generalParams.doMIN) {
-  
+
         VMC* vmc = new VMC(generalParams, vmcParams, systemObjects);
         systemObjects.sample_method->set_dt(vmcParams.dt);
 
@@ -201,11 +201,6 @@ void parseCML(char** argv, VMCparams & vmcParams,
 
 
     vmcParams.n_c = 1E6;
-    if (generalParams.sampling == "IS") {
-        vmcParams.dt = 0.01;
-    } else {
-        vmcParams.dt = 0.5;
-    }
 
 
     dmcParams.dt = 0.001;
@@ -226,7 +221,7 @@ void parseCML(char** argv, VMCparams & vmcParams,
     minimizerParams.f_max = 1.0;
     minimizerParams.f_min = -0.5;
     minimizerParams.omega = 0.8;
-    minimizerParams.A = 20;
+    minimizerParams.A = 50;
     minimizerParams.a = 0.3;
     minimizerParams.SGDsamples = 2000;
     minimizerParams.n_walkers = 10;
@@ -263,6 +258,15 @@ void parseCML(char** argv, VMCparams & vmcParams,
     if (def.compare(argv[16]) != 0) generalParams.use_jastrow = (bool)atoi(argv[16]);
 
     if (def.compare(argv[17]) != 0) generalParams.sampling = argv[17];
+
+    //Seting timestep
+    if (generalParams.sampling == "IS") {
+        vmcParams.dt = 0.01;
+    } else {
+        vmcParams.dt = 0.5;
+    }
+    //
+
     if (def.compare(argv[18]) != 0) generalParams.kinetics_type = argv[18];
     if (def.compare(argv[19]) != 0) generalParams.system = argv[19];
 
@@ -297,8 +301,8 @@ void parseCML(char** argv, VMCparams & vmcParams,
     if (def.compare(argv[42]) != 0) variationalParams.alpha = atof(argv[42]);
     if (def.compare(argv[43]) != 0) variationalParams.beta = atof(argv[43]);
 
-    
-    if (outputParams.dist_out){
+
+    if (outputParams.dist_out) {
         dmcParams.dist_in_path = outputParams.outputPath;
     }
 }

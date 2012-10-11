@@ -230,7 +230,7 @@ void VMC::scale_values() {
 void VMC::run_method() {
 
     initialize();
-
+    
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
     }
@@ -293,7 +293,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
 
     this->dist_from_file = dP.dist_in;
     this->dist_in_path = dP.dist_in_path;
-    
+
     this->block_size = dP.n_b;
     this->n_w = dP.n_w;
     this->thermalization = dP.therm;

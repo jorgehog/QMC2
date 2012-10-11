@@ -15,7 +15,6 @@
 #include <math.h>
 #include <vector>
 
-#include "QMCInitializer.h"
 #include "lib.h"
 
 struct DMCparams {
@@ -107,8 +106,14 @@ struct SystemObjects {
 
 class Minimizer;
 
-#include "function/function.h"
-#include "Orbitals/OrbitalsOO.h"
+#include "BasisFunctions/BasisFunctions.h"
+#include "BasisFunctions/semiAlphaHO/semiAlphaHO.h"
+#include "BasisFunctions/alphaHO/alphaHO.h"
+
+#include "Orbitals/Orbitals.h"
+#include "Orbitals/AlphaHarmonicOscillatorOld/AlphaHarmonicOscillatorOld.h"
+#include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
+#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
 #include "Potential/Potential.h"
 #include "Jastrow/Jastrow.h"

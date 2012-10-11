@@ -64,10 +64,9 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
 }
 
 void Fermions::initialize_slaters(const Walker* walker) {
-    int i, q_num;
 
-    for (i = 0; i < n2; i++) {
-        for (q_num = 0; q_num < n2; q_num++) {
+    for (int i = 0; i < n2; i++) {
+        for (int q_num = 0; q_num < n2; q_num++) {
             s_up(i, q_num) = orbital->phi(walker, i, q_num);
             s_down(i, q_num) = orbital->phi(walker, i + n2, q_num);
         }
