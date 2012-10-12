@@ -41,7 +41,7 @@ void Walker::calc_r_i2(int i) {
     double r2i = 0;
 
     for (int j = 0; j < dim; j++) {
-        r2i += r(i, j) * r(i, j);
+        r2i += r.at(i,j) * r.at(i,j);
     }
 
     r2[i] = r2i;
@@ -62,7 +62,7 @@ double Walker::abs_relative(int i, int j) const {
 
     r_ij = 0;
     for (k = 0; k < dim; k++) {
-        tmp = (r(i, k) - r(j, k));
+        tmp = (r.at(i,k) - r.at(j,k));
         r_ij += tmp*tmp;
     }
     r_ij = sqrt(r_ij);
@@ -71,7 +71,7 @@ double Walker::abs_relative(int i, int j) const {
 }
 
 double Walker::get_r_i2(int i) const {
-    return r2(i);
+    return r2.at(i);
 }
 
 void Walker::make_rel_matrix() {
@@ -80,7 +80,7 @@ void Walker::make_rel_matrix() {
 
     for (i = 0; i < n_p - 1; i++) {
         for (j = i + 1; j < n_p; j++) {
-            r_rel(i, j) = r_rel(j, i) = abs_relative(i, j);
+            r_rel.at(i,j) = r_rel.at(j,i) = abs_relative(i, j);
         }
     }
 }
@@ -93,7 +93,7 @@ bool Walker::is_singular() const {
 
     for (i = 0; i < n_p; i++) {
         for (j = i + 1; j < n_p; j++) {
-            if (r_rel(i, j) < eps) {
+            if (r_rel.at(i,j) < eps) {
                 return true;
             }
         }
@@ -107,7 +107,7 @@ bool Walker::check_bad_qforce() {
 
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
-            double tmp = qforce(i, j);
+            double tmp = qforce.at(i,j);
             if (tmp * tmp > qforce_test) {
                 qforce_test = tmp*tmp;
             }

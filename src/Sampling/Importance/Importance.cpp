@@ -35,7 +35,7 @@ void Importance::update_walker(Walker* walker_pre, const Walker* walker_post, in
 
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
-            walker_pre->qforce(i, j) = walker_post->qforce(i, j);
+            walker_pre->qforce.at(i,j) = walker_post->qforce.at(i,j);
         }
     }
 }

@@ -24,8 +24,8 @@ __NECESSITIES__
 
 def setPosParam(string, expr, i):
     
-    getX =  "    double x = walker->r(i, 0);\n"
-    getY =  "    double y = walker->r(i, 1);\n"
+    getX =  "    double x = walker->r.at(i, 0);\n"
+    getY =  "    double y = walker->r.at(i, 1);\n"
     getX2 = "    double x2 = x*x;\n"
     getY2 = "    double y2 = y*y;\n"
 
@@ -67,9 +67,11 @@ expr = [["1",[0,0,0,0]],
         ["2*k*y*(4*k2*x2 - 2)",[0,1,1,0]],
         ["8*k2*k*x2*x - 12*k*x",[1,0,1,0]],
         ["16*k2*k2*y2*y2 - 48*k2*y2 + 12",[0,0,0,1]],
-        ["2*k*x*(8*k2*k*y2*y - 12*k*y)",[1,1,0,1]],
+      #  ["2*k*x*(8*k2*k*y2*y - 12*k*y)",[1,1,0,1]],
+        ["2*k*x*(k*y*(8*k2*y2 -12))",[1,1,0,1]],
         ["4*(2*k2*x2 - 1)*(2*k2*y2 - 1)",[0,0,1,1]],
-        ["2*k*y*(8*k2*k*x2*x - 12*k*x)",[1,1,1,0]],
+         ["2*k*y*(k*x*(8*k2*x2 -12))",[1,1,1,0]],
+      #  ["2*k*y*(8*k2*k*x2*x - 12*k*x)",[1,1,1,0]],
         ["16*k2*k2*x2*x2 - 48*k2*x2 + 12",[0,0,1,0]]]
 
 lapl_expr = [["k2*(k2*r2 - 2)", [0,0,0,0]],

@@ -37,9 +37,9 @@ void Pade_Jastrow::initialize() {
         for (j = 0; j < n_p; j++) {
 
             if ((j < n2 && i < n2) || (j >= n2 && i >= n2)) {
-                a(i, j) = a_sym;
+                a.at(i,j) = a_sym;
             } else {
-                a(i, j) = a_asym;
+                a.at(i,j) = a_asym;
             }
         }
     }
@@ -52,7 +52,7 @@ double Pade_Jastrow::get_val(const Walker* walker) const {
     arg = 0;
     for (i = 0; i < n_p - 1; i++) {
         for (j = i + 1; j < n_p; j++) {
-            arg += a(i, j) * walker->r_rel(i, j) / (1.0 + beta * walker->r_rel(i, j));
+            arg += a.at(i,j) * walker->r_rel.at(i,j) / (1.0 + beta * walker->r_rel.at(i,j));
         }
     }
 
@@ -67,15 +67,15 @@ void Pade_Jastrow::get_grad(Walker* walker) const {
         for (k = 0; k < dim; k++) {
             deriv = 0;
             for (j = 0; j < i; j++) {
-                b_ij = 1.0 + beta * walker->r_rel(i, j);
-                deriv += a(i, j) * (walker->r(i, k) - walker->r(j, k)) / (walker->r_rel(i, j) * b_ij * b_ij);
+                b_ij = 1.0 + beta * walker->r_rel.at(i,j);
+                deriv += a.at(i,j) * (walker->r.at(i,k) - walker->r.at(j,k)) / (walker->r_rel.at(i,j) * b_ij * b_ij);
             }
             for (j = i + 1; j < n_p; j++) {
-                b_ij = 1.0 + beta * walker->r_rel(i, j);
-                deriv += a(i, j) * (walker->r(i, k) - walker->r(j, k)) / (walker->r_rel(i, j) * b_ij * b_ij);
+                b_ij = 1.0 + beta * walker->r_rel.at(i,j);
+                deriv += a.at(i,j) * (walker->r.at(i,k) - walker->r.at(j,k)) / (walker->r_rel.at(i,j) * b_ij * b_ij);
             }
 
-            walker->jast_grad(i, k) = deriv;
+            walker->jast_grad.at(i,k) = deriv;
         }
     }
 
@@ -87,8 +87,8 @@ double Pade_Jastrow::get_j_ratio(const Walker* walker_new, const Walker* walker_
 
     j_ratio = 0;
     for (j = 0; j < n_p; j++) {
-        j_ratio += a(i, j) * (walker_new->r_rel(i, j) / (1.0 + beta * walker_new->r_rel(i, j)) -
-                walker_old->r_rel(i, j) / (1.0 + beta * walker_old->r_rel(i, j)));
+        j_ratio += a.at(i,j) * (walker_new->r_rel.at(i,j) / (1.0 + beta * walker_new->r_rel.at(i,j)) -
+                walker_old->r_rel.at(i,j) / (1.0 + beta * walker_old->r_rel.at(i,j)));
     }
 
 
@@ -103,12 +103,12 @@ double Pade_Jastrow::get_lapl_sum(const Walker* walker) const {
 
     for (k = 0; k < n_p; k++) {
         for (j = k + 1; j < n_p; j++) {
-            b_kj = 1 + beta * walker->r_rel(k, j);
-            sum2 += a(k, j) * (1 - beta * walker->r_rel(k, j)) / (walker->r_rel(k, j) * b_kj * b_kj * b_kj);
+            b_kj = 1 + beta * walker->r_rel.at(k,j);
+            sum2 += a.at(k,j) * (1 - beta * walker->r_rel.at(k,j)) / (walker->r_rel.at(k,j) * b_kj * b_kj * b_kj);
         }
 
         for (d = 0; d < dim; d++) {
-            sum1 += walker->jast_grad(k, d) * walker->jast_grad(k, d);
+            sum1 += walker->jast_grad.at(k,d) * walker->jast_grad.at(k,d);
         }
     }
 
@@ -129,8 +129,8 @@ double Pade_Jastrow::get_variational_derivative(const Walker* walker, int n) con
 
     for (int i = 0; i < n_p - 1; i++) {
         for (int j = i + 1; j < n_p; j++) {
-            double arg = walker->r_rel(i, j) / (1.0 + beta * walker->r_rel(i, j));
-            dbeta -= a(i, j) * arg * arg;
+            double arg = walker->r_rel.at(i,j) / (1.0 + beta * walker->r_rel.at(i,j));
+            dbeta -= a.at(i,j) * arg * arg;
         }
     }
 

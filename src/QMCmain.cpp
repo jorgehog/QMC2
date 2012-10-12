@@ -179,14 +179,11 @@ void parseCML(int argc, char** argv,
     outputParams.outputSuffix = "";
     outputParams.outputPath = "/home/jorgmeister/scratch/";
 
-
-    generalParams.n_p = 2;
+    generalParams.n_p = 30;
+    //    generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
-
-    generalParams.random_seed = -123451;
-    
-//    generalParams.random_seed = -time(NULL);
+    generalParams.random_seed = -time(NULL);
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
@@ -206,8 +203,8 @@ void parseCML(int argc, char** argv,
     generalParams.system = "QDots";
 
 
-    vmcParams.n_c = 1E6;
-
+    //    vmcParams.n_c = 1E6;
+    vmcParams.n_c = 1E3;
 
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;
@@ -219,8 +216,10 @@ void parseCML(int argc, char** argv,
     dmcParams.dist_in_path = "/home/jorgmeister/scratch/";
 
     if (argc == 1) {
-        variationalParams.alpha = 0.987;
-        variationalParams.beta = 0.398;
+        variationalParams.alpha = 0.78;
+        variationalParams.beta = 0.85;
+        //        variationalParams.alpha = 0.987;
+        //        variationalParams.beta = 0.398;
     }
 
     minimizerParams.max_step = 0.1;

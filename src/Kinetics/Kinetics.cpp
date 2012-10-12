@@ -17,4 +17,3 @@ Kinetics::Kinetics(int n_p, int dim) {
     this->n2 = n_p / 2;
     this->dim = dim;
 }
-

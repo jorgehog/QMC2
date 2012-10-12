@@ -25,13 +25,13 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
         for (i = 0; i < n_p; i++) {
             for (j = 0; j < dim; j++) {
                 *file >> pos;
-                walker->r(i, j) = pos;
+                walker->r.at(i,j) = pos;
             }
         }
     } else {
         for (i = 0; i < n_p; i++) {
             for (j = 0; j < dim; j++) {
-                walker->r(i, j) = diffusion->Diffusion::get_new_pos(walker, i, j);
+                walker->r.at(i,j) = diffusion->Diffusion::get_new_pos(walker, i, j);
             }
         }
     }

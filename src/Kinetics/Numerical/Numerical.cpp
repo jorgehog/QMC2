@@ -33,15 +33,15 @@ double Numerical::get_KE(const Walker* walker) {
 
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
-            wfplus->r(i, j) = wfminus->r(i, j) = walker->r(i, j);
+            wfplus->r.at(i,j) = wfminus->r.at(i,j) = walker->r.at(i,j);
         }
     }
 
     e_kinetic = 0;
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
-            wfplus->r(i, j) = walker->r(i, j) + h;
-            wfminus->r(i, j) = walker->r(i, j) - h;
+            wfplus->r.at(i,j) = walker->r.at(i,j) + h;
+            wfminus->r.at(i,j) = walker->r.at(i,j) - h;
 
             wfplus->make_rel_matrix();
             wfminus->make_rel_matrix();
@@ -56,8 +56,8 @@ double Numerical::get_KE(const Walker* walker) {
             wf_plus = wfplus->value;
 
             e_kinetic -= (wf_min + wf_plus - 2 * wf);
-            wfplus->r(i, j) = walker->r(i, j);
-            wfminus->r(i, j) = walker->r(i, j);
+            wfplus->r.at(i,j) = walker->r.at(i,j);
+            wfminus->r.at(i,j) = walker->r.at(i,j);
         }
     }
 
@@ -74,15 +74,15 @@ void Numerical::get_QF(Walker* walker) {
 
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
-            wfplus->r(i, j) = wfminus->r(i, j) = walker->r(i, j);
+            wfplus->r.at(i,j) = wfminus->r.at(i,j) = walker->r.at(i,j);
         }
     }
 
 
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
-            wfplus->r(i, j) = walker->r(i, j) + h;
-            wfminus->r(i, j) = walker->r(i, j) - h;
+            wfplus->r.at(i,j) = walker->r.at(i,j) + h;
+            wfminus->r.at(i,j) = walker->r.at(i,j) - h;
 
             wfplus->make_rel_matrix();
             wfminus->make_rel_matrix();
@@ -96,10 +96,10 @@ void Numerical::get_QF(Walker* walker) {
             wf_min = wfminus->value;
             wf_plus = wfplus->value;
 
-            walker->qforce(i, j) = (wf_plus - wf_min) / (wf * h);
+            walker->qforce.at(i,j) = (wf_plus - wf_min) / (wf * h);
 
-            wfplus->r(i, j) = walker->r(i, j);
-            wfminus->r(i, j) = walker->r(i, j);
+            wfplus->r.at(i,j) = walker->r.at(i,j);
+            wfminus->r.at(i,j) = walker->r.at(i,j);
 
         }
     }

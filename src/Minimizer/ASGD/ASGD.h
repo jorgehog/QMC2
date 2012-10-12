@@ -48,11 +48,7 @@ public:
     ASGD(VMC*, MinimizerParams &);
 
     virtual VMC* minimize();
-    virtual VMC* minimizeTEST();
-    double TESTWF(Walker* walker);
-    double TEST_E(Walker* walker);
-    double TEST_G(Walker* walker_post, Walker* walker_pre);
-    void TEST_DIFF(Walker* original, Walker* trial);
+
     std::ofstream DEBAG;
     long random_seed;
 
