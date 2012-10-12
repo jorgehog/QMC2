@@ -35,7 +35,6 @@ public:
     virtual void copy_walker(const Walker* parent, Walker* child) const = 0;
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
 
-    //    double get_branching_Gfunc(Walker* walker_pre, Walker* walker_post, double E_T) const;
     double get_branching_Gfunc(double E_x, double E_y, double E_T) const;
 
     void set_qmc_ptr(QMC* qmc) {
@@ -55,50 +54,6 @@ public:
         return diffusion->call_RNG();
     }
 
-
-
-};
-
-class Importance : public Sampling {
-public:
-
-    Importance(GeneralParams &);
-
-    void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
-
-    virtual void get_necessities(Walker* walker);
-    virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle);
-    virtual void calculate_energy_necessities_CF(Walker* walker) const;
-
-    virtual double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
-
-    virtual void copy_walker(const Walker* parent, Walker* child) const;
-    virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
-
-
-
-};
-
-class Brute_Force : public Sampling {
-public:
-
-    Brute_Force(GeneralParams &);
-
-    void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const;
-
-    virtual double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
-
-    virtual void get_necessities(Walker* walker);
-    virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle);
-
-    virtual void calculate_energy_necessities_CF(Walker* walker) const;
-
-
-    virtual void copy_walker(const Walker* parent, Walker* child) const;
-    virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
-
-
 };
 
 #endif	/* SAMPLING_H */
-

@@ -55,7 +55,7 @@ public:
     QMC(int n_p, int dim, int n_c,
             Sampling *sampling,
             System *system,
-            Kinetics *kinetics = new NoKinetics(),
+            Kinetics *kinetics,
             Jastrow *jastrow = new No_Jastrow());
     QMC();
 
@@ -96,97 +96,6 @@ public:
         return accepted / double(total_cycles);
     }
 
-
 };
-
-class VMC : public QMC {
-protected:
-
-    double vmc_E, E2;
-
-    Walker* original_walker;
-    Walker* trial_walker;
-
-    virtual void initialize();
-
-    virtual bool move_autherized(double A);
-
-    void calculate_energy(Walker* walker);
-    void scale_values();
-
-public:
-
-    VMC(GeneralParams &, VMCparams &, SystemObjects &);
-
-    double get_var() const;
-    double get_energy() const;
-    double get_e2() const;
-    void set_e(double e);
-    void set_e2(double e2);
-
-    virtual void run_method();
-    virtual void user_output() const;
-
-    friend class Minimizer;
-    friend class ASGD;
-
-    friend class Distribution;
-    friend class BlockingData;
-
-};
-
-class DMC : public QMC {
-protected:
-
-    int K; //Factor of empty space for walkers over initial walkers
-
-    int n_w;
-    int n_w_last;
-
-    int deaths;
-
-    int block_size;
-    int samples;
-
-    double dmc_E;
-    double E_T;
-    double E;
-
-    bool dist_from_file;
-    std::string dist_in_path;
-
-    Walker **original_walkers;
-    Walker *trial_walker;
-
-    void initialize();
-
-    virtual bool move_autherized(double A);
-
-    void iterate_walker(int k, int n_b = 1);
-
-    void Evolve_walker(int k, double GB);
-
-    void bury_the_dead();
-
-    void update_energies();
-
-    void reset_parameters() {
-        n_w_last = n_w;
-        E = samples = deaths = 0;
-    }
-
-public:
-
-    DMC(GeneralParams &, DMCparams &, SystemObjects &);
-
-    virtual void run_method();
-
-    virtual void user_output() const;
-
-    friend class stdoutDMC;
-
-};
-
-
 
 #endif	/* QMC_H */

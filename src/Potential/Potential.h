@@ -21,27 +21,5 @@ public:
 
 };
 
-class Harmonic_osc : public Potential {
-protected:
-    double w;
-
-public:
-
-    Harmonic_osc(GeneralParams &);
-
-    virtual double get_pot_E(const Walker* walker) const;
-
-};
-
-class Coulomb : public Potential {
-public:
-
-    Coulomb(GeneralParams &);
-
-    virtual double get_pot_E(const Walker* walker) const;
-
-};
-
-
 #endif	/* POTENTIAL_H */
 

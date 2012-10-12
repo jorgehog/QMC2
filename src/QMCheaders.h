@@ -116,24 +116,41 @@ class Minimizer;
 #include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
 #include "Potential/Potential.h"
+#include "Potential/Coulomb/Coulomb.h"
+#include "Potential/Harmonic_osc/Harmonic_osc.h"
+
 #include "Jastrow/Jastrow.h"
+#include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
+#include "Jastrow/No_Jastrow/No_Jastrow.h"
+
 #include "System/System.h"
+#include "System/Fermions/Fermions.h"
+
 
 class QMC;
 class VMC;
 class DMC;
 
 #include "Diffusion/Diffusion.h"
+#include "Diffusion/Simple/Simple.h"
+#include "Diffusion/Fokker_Planck/Fokker_Planck.h"
+
 #include "Sampling/Sampling.h"
+#include "Sampling/Brute_Force/Brute_Force.h"
+#include "Sampling/Importance/Importance.h"
+
 #include "Kinetics/Kinetics.h"
+#include "Kinetics/Numerical/Numerical.h"
+#include "Kinetics/Closed_form/Closed_form.h"
 
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"
 #include "OutputHandler/BlockingData/BlockingData.h"
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
-#include "OutputHandler/None/None.h"
 
 #include "QMC/QMC.h"
+#include "QMC/VMC/VMC.h"
+#include "QMC/DMC/DMC.h"
 
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"
