@@ -9,6 +9,37 @@ from pyLibQMC import paths
 
 validation = True
 fullruns = False
+test = False
+
+if test:
+    wList = [0.5,1]
+    npList = [2]
+    
+    rawFile = """general:
+n_p = __NP__
+w = __W__
+use_coulomb = 0
+doDMC = 1
+
+DMC:
+n_b=1
+n_c=100
+
+"""
+    for w in wList:
+        for np in npList:
+                filename = "SCRIPTTEST_np%d_w%s.ini" % (np, str(w).replace(".", ""))
+                iniFile = rawFile.replace("__NP__", str(np))
+                iniFile = iniFile.replace("__W__", str(w))
+            
+                outFile = open(paths.iniFilePath + "/" + filename, 'w')
+                outFile.write(iniFile)
+                outFile.close()
+
+    
+    
+    
+
 
 if validation:
 
@@ -22,18 +53,23 @@ use_coulomb = 0
 doVMC = 1
 doDMC = 1
 doMIN = 1
+sampling=BF
 
 VMC:
 n_c = 1E3
 
 DMC:
-n_b=10
-therm=100
-n_c=100
+n_b=1
+therm=10
+n_c=10
+
 
 MIN:
-SGDsamples=1000
-n_c_SGD=100
+SGDsamples=10
+n_c_SGD=10
+therm=0
+n_c=1
+alpha=1
 
 """
 

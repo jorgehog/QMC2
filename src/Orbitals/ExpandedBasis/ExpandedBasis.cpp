@@ -31,7 +31,7 @@ double ExpandedBasis::phi(const Walker* walker, int particle, int q_num) const {
 
     double value = 0;
     for (int m = 0; m < basis_size; m++) {
-        value += coeffs(particle, m) * basis->basis_functions[q_num]->eval(walker, particle);
+        value += coeffs(particle, m) * basis->phi(walker, particle, q_num);
     }
 
     return value;
@@ -42,7 +42,7 @@ double ExpandedBasis::del_phi(const Walker* walker, int particle, int q_num, int
 
     double value = 0;
     for (int m = 0; m < basis_size; m++) {
-        value += coeffs(particle, m) * basis->dell_basis_functions[d][q_num]->eval(walker, particle);
+        value += coeffs(particle, m) * basis->del_phi(walker, particle, q_num, d);
     }
 
     return value;
@@ -53,7 +53,7 @@ double ExpandedBasis::lapl_phi(const Walker* walker, int particle, int q_num) co
 
     double value = 0;
     for (int m = 0; m < basis_size; m++) {
-        value += coeffs(particle, m) * basis->lapl_basis_functions[q_num]->eval(walker, particle);
+        value += coeffs(particle, m) * basis->lapl_phi(walker, particle, q_num);
     }
 
     return value;

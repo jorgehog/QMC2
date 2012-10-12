@@ -35,7 +35,6 @@ public:
     virtual double del_phi(const Walker* walker, int particle, int q_num, int d) const;
     virtual double lapl_phi(const Walker* walker, int particle, int q_num) const;
 
-    friend class ExpandedBasis;
 };
 
 

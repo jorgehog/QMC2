@@ -13,7 +13,13 @@ def getVmcE(path):
     
     pattern = "VMC energy: (\d+\.?\d*)"
     
-    return float(re.findall(pattern, stdoutRaw)[0])
+    r = re.findall(pattern, stdoutRaw)
+    
+    if r:
+        return float(r[0])
+    else:
+        return "N/A"
+
 
 def getDmcE(path):
     stdout = open(path + "/stdout.txt", 'r')
@@ -22,8 +28,14 @@ def getDmcE(path):
     
     pattern = "dmcE:\s*(\d+\.?\d*)\s*\|\s*Nw:\s*\d+\|\s*100\.?[0]*%"
     
-    #[0] = therm; [1] = production
-    return float(re.findall(pattern, stdoutRaw)[1])
+    r = re.findall(pattern, stdoutRaw)
+    
+    if r:
+        #[0] = therm; [1] = production
+        return float(r[1])
+    else:
+        return "N/A"
+
 
 def getAlpha(path):
     stdout = open(path + "/stdout.txt", 'r')
@@ -31,9 +43,15 @@ def getAlpha(path):
     stdout.close()
     
     pattern = "Finished minimizing. Final parameters:"+\
-    "\s*Alpha:\s*(\d+\.?\d*)\s*Beta:\s*\d+\.?\d*"
+    "\s*Alpha:\s*(\d+\.?\d*)(\s*Beta:\s*\d+\.?\d*)?"
+    
+    r = re.findall(pattern, stdoutRaw)
 
-    return float(re.findall(pattern, stdoutRaw)[0])
+    if r:
+        return float(r[0][0])
+    else:
+        return "N/A"
+
 
 def getBeta(path):
     stdout = open(path + "/stdout.txt", 'r')
@@ -43,7 +61,13 @@ def getBeta(path):
     pattern = "Finished minimizing. Final parameters:"+\
     "\s*Alpha:\s*\d+\.?\d*\s*Beta:\s*(\d+\.?\d*)"
 
-    return float(re.findall(pattern, stdoutRaw)[0])
+    r = re.findall(pattern, stdoutRaw)
+
+    if r:
+        return float(r[0])
+    else:
+        return "N/A"
+
 
 def setGenPar(path, param):
     
@@ -59,11 +83,11 @@ def setGenPar(path, param):
     wp = "w\s*=\s*(\d+\.?\d*)"
     if re.findall(npp, iniRaw):
         np = int(re.findall(npp, iniRaw)[0])
+        param['n_p'] = np
     if re.findall(wp, iniRaw):
         w = float(re.findall(wp, iniRaw)[0])
+        param['w'] = w
     
-    param['n_p'] = np
-    param['w'] = w
 
 def dumpData(runparams):
     print "Found data:"
@@ -114,11 +138,11 @@ __TABLE__
 \end{table}
 """
     
-    spacing = 8    
+    spacing = 8 
     
     placement = ""
     for i in range(len(mapping)):
-        placement += "c"
+        placement += "c" + "|"*(i==1)
     
     header = ""
     for key in mapping:
@@ -126,6 +150,8 @@ __TABLE__
         key = key.replace("beta", r"$\beta$")
         key = key.replace("n_p", "N")
         key = key.replace("w", r"$\omega$")
+        key = key.replace("E_DMC", "$\mathrm{E_{DMC}}$")
+        key = key.replace("E_VMC", "$\mathrm{E_{VMC}}$")
         
         header += " %s &" % key.center(spacing)
     header = (header[:-1] + r"\\")
@@ -145,7 +171,48 @@ __TABLE__
     return texcode
     
     
+def get_map(runpaths):
+
+    mapVarPar = False
+    mapBeta = False
+    mapVMC = False
+    mapDMC = False
     
+    mapVarPattern = "doMIN\s*=\s*1"
+    notMapBetaPattern = "use_coulomb\s*=\s*0|use_jastrow\s*=\s*0"
+    mapVMCPattern = "doVMC\s*=\s*1"
+    mapDMCPattern = "doDMC\s*=\s*1"
+    
+    mapping = ['n_p', 'w']
+    for runpath in runpaths:
+        for filename in os.listdir(runpath):
+            if filename.split(".")[1] == "ini":
+                ininame = filename
+                ini = open(runpath + "/" + ininame, 'r')
+                iniRaw = "\n".join(ini.readlines())
+                ini.close()
+                
+                if re.findall(mapVarPattern, iniRaw):
+                    mapVarPar = True
+                if re.findall(mapVMCPattern, iniRaw):
+                    mapVMC = True
+                if re.findall(mapDMCPattern, iniRaw):
+                    mapDMC = True
+                if not re.findall(notMapBetaPattern, iniRaw):
+                    mapBeta = True
+    
+    if mapVMC:
+        mapping.append('E_VMC')
+    if mapDMC:
+        mapping.append('E_DMC')
+    if mapVarPar:
+        mapping.append('alpha')
+        if mapBeta:
+            mapping.append('beta')            
+                
+                
+    return mapping
+
     
 def main():
     
@@ -162,7 +229,9 @@ def main():
     if not runpaths:
        print "Found no runs"
        sys.exit(1) 
-                
+              
+    mapping = get_map(runpaths)           
+    
     runparams = []
     for i in range(len(runpaths)):
         runparams.append({})
@@ -177,17 +246,17 @@ def main():
         runparam = runparams[i]
         
         setGenPar(runpath, runparam)
-        runparam['E_{VMC}'] = getVmcE(runpath)
-        runparam['E_{DMC}'] = getDmcE(runpath)
+        runparam['E_VMC'] = getVmcE(runpath)
+        runparam['E_DMC'] = getDmcE(runpath)
         runparam['alpha'] = getAlpha(runpath)
         runparam['beta'] = getBeta(runpath)
   
     
-    mapping = ['n_p', 'w', 'E_{VMC}', 'E_{DMC}', 'alpha', 'beta']
+    
     tableParams = zeros(len(runparams), len(mapping))
 
     for i in range(len(runparams)):
-        for key in runparams[i].keys():
+        for key in mapping:
             tableParams[i][mapping.index(key)] = runparams[i][key]
 
     tableParams.sort()

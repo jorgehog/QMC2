@@ -136,7 +136,7 @@ VMC* ASGD::minimize() {
         }
 
         //        output progress
-        if ((sample % 100) == 0) {
+        if ((sample % 1) == 0) {
             output("cycle:", sample);
             cout << gradient_tot << endl;
             cout << E << endl;
