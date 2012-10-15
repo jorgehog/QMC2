@@ -11,6 +11,7 @@
 class Sampling {
 protected:
     int n_p;
+    int n2;
     int dim;
 
     Diffusion* diffusion;

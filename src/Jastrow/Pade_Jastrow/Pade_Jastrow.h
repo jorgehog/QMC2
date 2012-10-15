@@ -24,7 +24,10 @@ public:
     virtual void initialize();
 
     virtual void get_grad(Walker* walker) const;
-
+    virtual void get_grad(const Walker* walker_pre, Walker* walker_post, int i) const;
+    virtual void get_dJ_matrix(Walker *walker, int i) const;
+    
+    
     virtual double get_j_ratio(const Walker* walker_new, const Walker* walker_old, int i) const;
     virtual double get_val(const Walker* walker) const;
     virtual double get_lapl_sum(const Walker* walker) const;

@@ -20,7 +20,7 @@ double Coulomb::get_pot_E(const Walker* walker) const {
 
     for (int i = 0; i < n_p - 1; i++) {
         for (int j = i + 1; j < n_p; j++) {
-            e_coulomb += 1 / walker->r_rel.at(i,j);
+            e_coulomb += 1 / walker->r_rel(i,j);
         }
     }
 

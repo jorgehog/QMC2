@@ -35,6 +35,9 @@ public:
     mat spatial_grad;
     mat jast_grad;
     mat inv;
+    
+    mat phi;
+    cube dJ;
 
     rowvec r2;
 

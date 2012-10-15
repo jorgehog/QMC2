@@ -8,6 +8,8 @@
 #ifndef QMCHEADERS_H
 #define	QMCHEADERS_H
 
+#define ARMA_NO_DEBUG
+
 #include <armadillo>
 #include <stdlib.h>
 #include <iostream> 

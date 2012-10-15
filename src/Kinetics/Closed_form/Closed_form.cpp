@@ -24,13 +24,13 @@ void Closed_form::update_walker_IS(Walker* walker_pre, const Walker* walker_post
 
     for (int i = start; i < start + n2; i++) {
         for (int j = 0; j < dim; j++) {
-            walker_pre->spatial_grad.at(i,j) = walker_post->spatial_grad.at(i,j);
+            walker_pre->spatial_grad(i,j) = walker_post->spatial_grad(i,j);
         }
     }
 
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
-            walker_pre->jast_grad.at(i,j) = walker_post->jast_grad.at(i,j);
+            walker_pre->jast_grad(i,j) = walker_post->jast_grad(i,j);
         }
     }
 }
@@ -45,7 +45,7 @@ double Closed_form::get_KE(const Walker* walker) {
     //the X-term
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
-            xterm += walker->jast_grad.at(i,j) * walker->spatial_grad.at(i,j);
+            xterm += walker->jast_grad(i,j) * walker->spatial_grad(i,j);
         }
     }
 
@@ -60,7 +60,7 @@ void Closed_form::get_QF(Walker* walker) {
 
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
-            walker->qforce.at(i,j) = 2 * (walker->jast_grad.at(i,j) + walker->spatial_grad.at(i,j));
+            walker->qforce(i,j) = 2 * (walker->jast_grad(i,j) + walker->spatial_grad(i,j));
         }
     }
 }
@@ -82,7 +82,7 @@ void Closed_form::calculate_energy_necessities(Walker* walker) const {
 void Closed_form::update_necessities_IS(const Walker* walker_pre, Walker* walker_post, int particle) const {
     walker_post->spatial_ratio = qmc->get_system_ptr()->get_spatial_ratio(walker_pre, walker_post, particle);
     qmc->get_system_ptr()->calc_for_newpos(walker_pre, walker_post, particle);
-    qmc->get_gradients(walker_post, particle);
+    qmc->get_gradients(walker_pre, walker_post, particle);
 }
 
 void Closed_form::copy_walker_BF(const Walker* parent, Walker* child) const {
@@ -105,7 +105,7 @@ void Closed_form::reset_walker_IS(const Walker* walker_pre, Walker* walker_post,
     //updating the part with the same spin as the moved particle
     for (int i = start; i < n2 + start; i++) {
         for (int j = 0; j < dim; j++) {
-            walker_post->spatial_grad.at(i,j) = walker_pre->spatial_grad.at(i,j);
+            walker_post->spatial_grad(i,j) = walker_pre->spatial_grad(i,j);
         }
     }
 }

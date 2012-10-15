@@ -29,7 +29,12 @@ public:
 
     virtual double get_val(const Walker* walker) const = 0;
     virtual double get_j_ratio(const Walker* walker_new, const Walker* walker_old, int i) const = 0;
+    
     virtual void get_grad(Walker* walker) const = 0;
+    virtual void get_grad(const Walker* walker_pre, Walker* walker_post, int i) const = 0;
+    virtual void get_dJ_matrix(Walker* walker, int i) const = 0;
+    virtual void get_dJ_matrix(Walker* walker) const;
+    
     virtual double get_lapl_sum(const Walker* walker) const = 0;
   
     friend class Minimizer;

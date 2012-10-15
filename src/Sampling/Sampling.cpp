@@ -9,6 +9,7 @@
 
 Sampling::Sampling(int n_p, int dim) {
     this->n_p = n_p;
+    this->n2 = n_p / 2;
     this->dim = dim;
 }
 
@@ -25,19 +26,28 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
         for (i = 0; i < n_p; i++) {
             for (j = 0; j < dim; j++) {
                 *file >> pos;
-                walker->r.at(i,j) = pos;
+                walker->r(i, j) = pos;
             }
         }
     } else {
         for (i = 0; i < n_p; i++) {
             for (j = 0; j < dim; j++) {
-                walker->r.at(i,j) = diffusion->Diffusion::get_new_pos(walker, i, j);
+                walker->r(i, j) = diffusion->Diffusion::get_new_pos(walker, i, j);
             }
         }
     }
 
     walker->calc_r_i2();
+
+    for (i = 0; i < n2; i++) {
+        for (j = 0; j < n2; j++) {
+            walker->phi(i, j) = qmc->get_orbitals_ptr()->phi(walker, i, j);
+            walker->phi(i + n2, j) = qmc->get_orbitals_ptr()->phi(walker, i + n2, j);
+        }
+    }
+
     walker->make_rel_matrix();
+    qmc->get_jastrow_ptr()->get_dJ_matrix(walker);
     get_necessities(walker);
 
 }

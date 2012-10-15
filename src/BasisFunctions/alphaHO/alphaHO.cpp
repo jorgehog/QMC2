@@ -362,7 +362,7 @@ double alphaHO_0::eval(const Walker* walker, int i) const {
 double dell_alphaHO_0_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
 
 
     double H = -(*k2)*x;
@@ -374,7 +374,7 @@ double dell_alphaHO_0_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_0_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
 
 
     double H = -(*k2)*y;
@@ -399,7 +399,7 @@ double lapl_alphaHO_0::eval(const Walker* walker, int i) const {
 double alphaHO_1::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
 
 
     double H = 2*(*k)*y;
@@ -411,8 +411,8 @@ double alphaHO_1::eval(const Walker* walker, int i) const {
 double dell_alphaHO_1_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
 
 
     double H = -2*(*k2)*(*k)*x*y;
@@ -424,7 +424,7 @@ double dell_alphaHO_1_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_1_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -437,7 +437,7 @@ double dell_alphaHO_1_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_1::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
 
 
     double H = 2*(*k2)*(*k)*y*((*k2)*r2-4);
@@ -451,7 +451,7 @@ double lapl_alphaHO_1::eval(const Walker* walker, int i) const {
 double alphaHO_2::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
 
 
     double H = 2*(*k)*x;
@@ -463,7 +463,7 @@ double alphaHO_2::eval(const Walker* walker, int i) const {
 double dell_alphaHO_2_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -476,8 +476,8 @@ double dell_alphaHO_2_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_2_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
 
 
     double H = -2*(*k2)*(*k)*x*y;
@@ -489,9 +489,9 @@ double dell_alphaHO_2_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_2::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -506,7 +506,7 @@ double lapl_alphaHO_2::eval(const Walker* walker, int i) const {
 double alphaHO_3::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -519,8 +519,8 @@ double alphaHO_3::eval(const Walker* walker, int i) const {
 double dell_alphaHO_3_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -533,7 +533,7 @@ double dell_alphaHO_3_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_3_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -546,7 +546,7 @@ double dell_alphaHO_3_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_3::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -561,8 +561,8 @@ double lapl_alphaHO_3::eval(const Walker* walker, int i) const {
 double alphaHO_4::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
 
 
     double H = 4*(*k2)*x*y;
@@ -574,8 +574,8 @@ double alphaHO_4::eval(const Walker* walker, int i) const {
 double dell_alphaHO_4_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -588,8 +588,8 @@ double dell_alphaHO_4_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_4_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -602,8 +602,8 @@ double dell_alphaHO_4_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_4::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
 
 
     double H = 4*(*k2)*(*k2)*x*y*((*k2)*r2-6);
@@ -617,7 +617,7 @@ double lapl_alphaHO_4::eval(const Walker* walker, int i) const {
 double alphaHO_5::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -630,7 +630,7 @@ double alphaHO_5::eval(const Walker* walker, int i) const {
 double dell_alphaHO_5_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -643,8 +643,8 @@ double dell_alphaHO_5_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_5_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -657,7 +657,7 @@ double dell_alphaHO_5_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_5::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
 
 
     double H = 2*(*k2)*(2*(*k2)*x*x-1)*((*k2)*r2-6);
@@ -671,7 +671,7 @@ double lapl_alphaHO_5::eval(const Walker* walker, int i) const {
 double alphaHO_6::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -684,8 +684,8 @@ double alphaHO_6::eval(const Walker* walker, int i) const {
 double dell_alphaHO_6_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -698,7 +698,7 @@ double dell_alphaHO_6_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_6_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -711,7 +711,7 @@ double dell_alphaHO_6_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_6::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -726,8 +726,8 @@ double lapl_alphaHO_6::eval(const Walker* walker, int i) const {
 double alphaHO_7::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -740,9 +740,9 @@ double alphaHO_7::eval(const Walker* walker, int i) const {
 double dell_alphaHO_7_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -755,8 +755,8 @@ double dell_alphaHO_7_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_7_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -769,8 +769,8 @@ double dell_alphaHO_7_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_7::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -785,8 +785,8 @@ double lapl_alphaHO_7::eval(const Walker* walker, int i) const {
 double alphaHO_8::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -799,8 +799,8 @@ double alphaHO_8::eval(const Walker* walker, int i) const {
 double dell_alphaHO_8_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double x2 = x*x;
 
 
@@ -813,9 +813,9 @@ double dell_alphaHO_8_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_8_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -828,8 +828,8 @@ double dell_alphaHO_8_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_8::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -844,7 +844,7 @@ double lapl_alphaHO_8::eval(const Walker* walker, int i) const {
 double alphaHO_9::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -857,7 +857,7 @@ double alphaHO_9::eval(const Walker* walker, int i) const {
 double dell_alphaHO_9_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -870,8 +870,8 @@ double dell_alphaHO_9_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_9_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double x2 = x*x;
 
 
@@ -884,7 +884,7 @@ double dell_alphaHO_9_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_9::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -899,7 +899,7 @@ double lapl_alphaHO_9::eval(const Walker* walker, int i) const {
 double alphaHO_10::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -912,8 +912,8 @@ double alphaHO_10::eval(const Walker* walker, int i) const {
 double dell_alphaHO_10_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -926,7 +926,7 @@ double dell_alphaHO_10_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_10_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -939,7 +939,7 @@ double dell_alphaHO_10_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_10::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -954,8 +954,8 @@ double lapl_alphaHO_10::eval(const Walker* walker, int i) const {
 double alphaHO_11::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -968,8 +968,8 @@ double alphaHO_11::eval(const Walker* walker, int i) const {
 double dell_alphaHO_11_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
     double y2 = y*y;
 
@@ -983,8 +983,8 @@ double dell_alphaHO_11_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_11_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -997,8 +997,8 @@ double dell_alphaHO_11_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_11::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -1013,9 +1013,9 @@ double lapl_alphaHO_11::eval(const Walker* walker, int i) const {
 double alphaHO_12::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -1028,9 +1028,9 @@ double alphaHO_12::eval(const Walker* walker, int i) const {
 double dell_alphaHO_12_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -1043,8 +1043,8 @@ double dell_alphaHO_12_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_12_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
     double y2 = y*y;
 
@@ -1058,9 +1058,9 @@ double dell_alphaHO_12_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_12::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -1075,8 +1075,8 @@ double lapl_alphaHO_12::eval(const Walker* walker, int i) const {
 double alphaHO_13::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double x2 = x*x;
 
 
@@ -1089,8 +1089,8 @@ double alphaHO_13::eval(const Walker* walker, int i) const {
 double dell_alphaHO_13_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -1103,9 +1103,9 @@ double dell_alphaHO_13_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_13_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
-    double y = walker->r.at(i, 1);
+    double y = walker->r(i, 1);
     double y2 = y*y;
 
 
@@ -1118,8 +1118,8 @@ double dell_alphaHO_13_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_13::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
-    double y = walker->r.at(i, 1);
+    double x = walker->r(i, 0);
+    double y = walker->r(i, 1);
     double x2 = x*x;
 
 
@@ -1134,7 +1134,7 @@ double lapl_alphaHO_13::eval(const Walker* walker, int i) const {
 double alphaHO_14::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -1147,7 +1147,7 @@ double alphaHO_14::eval(const Walker* walker, int i) const {
 double dell_alphaHO_14_x::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -1160,8 +1160,8 @@ double dell_alphaHO_14_x::eval(const Walker* walker, int i) const {
 double dell_alphaHO_14_y::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double y = walker->r.at(i, 1);
-    double x = walker->r.at(i, 0);
+    double y = walker->r(i, 1);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 
@@ -1174,7 +1174,7 @@ double dell_alphaHO_14_y::eval(const Walker* walker, int i) const {
 double lapl_alphaHO_14::eval(const Walker* walker, int i) const {
 
     double r2 = walker->get_r_i2(i);
-    double x = walker->r.at(i, 0);
+    double x = walker->r(i, 0);
     double x2 = x*x;
 
 

@@ -26,8 +26,11 @@ public:
     No_Jastrow();
 
     virtual void get_grad(Walker* walker) const {};
+    virtual void get_grad(const Walker* walker_pre, Walker* walker_post, int i) const {};
 
     virtual void initialize() {};
+    
+    virtual void get_dJ_matrix(Walker* walker, int i) const {};
 
     virtual double get_j_ratio(const Walker* walker_post, const Walker* walker_pre, int i) const {
         return 1;

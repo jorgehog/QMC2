@@ -64,7 +64,7 @@ public:
     virtual void run_method() = 0;
     virtual void user_output() const = 0;
 
-    void get_gradients(Walker* walker, int particle) const;
+    void get_gradients(const Walker* walker_pre, Walker* walker_post, int particle) const;
     void get_gradients(Walker* walker) const;
     void get_wf_value(Walker* walker) const;
     void get_laplsum(Walker* walker) const;
@@ -72,23 +72,23 @@ public:
     void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
     double calculate_local_energy(Walker* walker) const;
 
-    System* get_system_ptr() {
+    System* get_system_ptr() const {
         return system;
     }
 
-    Kinetics* get_kinetics_ptr() {
+    Kinetics* get_kinetics_ptr() const {
         return kinetics;
     }
 
-    Sampling* get_sampling_ptr() {
+    Sampling* get_sampling_ptr() const {
         return sampling;
     }
 
-    Jastrow* get_jastrow_ptr() {
+    Jastrow* get_jastrow_ptr() const {
         return jastrow;
     }
 
-    Orbitals* get_orbitals_ptr() {
+    Orbitals* get_orbitals_ptr() const {
         return system->get_orbital_ptr();
     }
 

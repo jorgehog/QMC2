@@ -183,7 +183,8 @@ void parseCML(int argc, char** argv,
     //    generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
-    generalParams.random_seed = -time(NULL);
+//    generalParams.random_seed = -time(NULL);
+    generalParams.random_seed = -1234;
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 

@@ -17,3 +17,9 @@ Jastrow::Jastrow(int n_p, int dim) {
 Jastrow::Jastrow() {
 
 }
+
+void Jastrow::get_dJ_matrix(Walker* walker) const {
+    for (int i = 0; i < n_p; i++){
+        this->get_dJ_matrix(walker, i);
+    }
+}
