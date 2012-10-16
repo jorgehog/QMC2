@@ -37,6 +37,7 @@ public:
     mat inv;
     
     mat phi;
+    mat dell_phi;
     cube dJ;
 
     rowvec r2;

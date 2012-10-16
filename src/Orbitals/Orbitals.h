@@ -14,7 +14,11 @@ protected:
     int n2;
     int dim;
     int max_implemented;
-
+    
+    double h;
+    double h2;
+    double two_h;
+    
     BasisFunctions** basis_functions;
     BasisFunctions*** dell_basis_functions;
     BasisFunctions** lapl_basis_functions;
@@ -23,6 +27,9 @@ protected:
     virtual void set_parameter(double parameter, int n) = 0;
     virtual double get_variational_derivative(const Walker* walker, int n) const = 0;
 
+    double num_diff(const Walker* walker, int particle, int q_num, int d) const;
+    double num_ddiff(const Walker* walker, int particle, int q_num) const;
+    
     friend class Minimizer;
     friend class ASGD;
 
