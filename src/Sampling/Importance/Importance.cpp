@@ -7,11 +7,10 @@
 
 #include "../../QMCheaders.h"
 
-
 Importance::Importance(GeneralParams & gP)
 : Sampling(gP.n_p, gP.dim) {
     diffusion = new Fokker_Planck(n_p, dim, 0, gP.random_seed, gP.D);
-    
+
 }
 
 void Importance::calculate_energy_necessities_CF(Walker* walker) const {
@@ -33,11 +32,8 @@ void Importance::update_walker(Walker* walker_pre, const Walker* walker_post, in
 
     qmc->get_kinetics_ptr()->update_walker_IS(walker_pre, walker_post, particle);
 
-    for (int i = 0; i < n_p; i++) {
-        for (int j = 0; j < dim; j++) {
-            walker_pre->qforce(i,j) = walker_post->qforce(i,j);
-        }
-    }
+    walker_pre->qforce = walker_post->qforce;
+
 }
 
 void Importance::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {

@@ -59,18 +59,7 @@ void Fermions::invert_slaters() {
 }
 
 void Fermions::make_merged_inv(Walker* walker) {
-//    int i, j;
 
-    //    initialize_slaters(walker);
-    //    invert_slaters();
-    //
-    //    //merging the inverse matrices
-    //    for (i = 0; i < n2; i++) {
-    //        for (j = 0; j < n2; j++) {
-    //            walker->inv(i, j) = s_up(i, j);
-    //            walker->inv(i, j + n2) = s_down(i, j);
-    //        }
-    //    }
     int end;
     for (int start = 0; start < n_p; start += n2) {
         end = n2 + start - 1;
