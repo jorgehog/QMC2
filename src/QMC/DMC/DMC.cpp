@@ -27,10 +27,6 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
 
 }
 
-bool DMC::move_autherized(double A) {
-    return metropolis_test(A)&(A > 0);
-}
-
 void DMC::initialize() {
 
     jastrow->initialize();

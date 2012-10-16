@@ -29,9 +29,6 @@ void VMC::initialize() {
     copy_walker(original_walker, trial_walker);
 }
 
-bool VMC::move_autherized(double A) {
-    return metropolis_test(A);
-}
 
 void VMC::calculate_energy(Walker* walker) {
 
@@ -77,22 +74,4 @@ void VMC::user_output() const {
     std::cout << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
 }
 
-double VMC::get_var() const {
-    return E2 - vmc_E*vmc_E;
-}
 
-double VMC::get_e2() const {
-    return E2;
-}
-
-void VMC::set_e(double E) {
-    vmc_E = E;
-}
-
-void VMC::set_e2(double E2) {
-    this->E2 = E2;
-}
-
-double VMC::get_energy() const {
-    return vmc_E;
-}

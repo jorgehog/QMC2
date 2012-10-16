@@ -7,9 +7,9 @@
 
 #include "../QMCheaders.h"
 
-using namespace arma;
-
 Walker::Walker(int n_p, int dim, bool alive) {
+    using namespace arma;
+
     this->dim = dim;
     this->n_p = n_p;
     this->n2 = n_p / 2;
@@ -56,12 +56,14 @@ void Walker::calc_r_i2(int i) {
 
 }
 
-void Walker::calc_r_i2() {
+void Walker::make_rel_matrix() {
+    int i, j;
 
-    for (int i = 0; i < n_p; i++) {
-        this->calc_r_i2(i);
+    for (i = 0; i < n_p - 1; i++) {
+        for (j = i + 1; j < n_p; j++) {
+            r_rel(i, j) = r_rel(j, i) = abs_relative(i, j);
+        }
     }
-
 }
 
 double Walker::abs_relative(int i, int j) const {
@@ -78,58 +80,6 @@ double Walker::abs_relative(int i, int j) const {
     return r_ij;
 }
 
-double Walker::get_r_i2(int i) const {
-    return r2(i);
-}
-
-void Walker::make_rel_matrix() {
-    int i, j;
-
-
-    for (i = 0; i < n_p - 1; i++) {
-        for (j = i + 1; j < n_p; j++) {
-            r_rel(i, j) = r_rel(j, i) = abs_relative(i, j);
-        }
-    }
-}
-
-bool Walker::is_singular() const {
-    int i, j;
-    double eps;
-
-    eps = 0.1;
-
-    for (i = 0; i < n_p; i++) {
-        for (j = i + 1; j < n_p; j++) {
-            if (r_rel(i, j) < eps) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool Walker::check_bad_qforce() {
-    double qforce_test = 0;
-
-    for (int i = 0; i < n_p; i++) {
-        for (int j = 0; j < dim; j++) {
-            double tmp = qforce(i, j);
-            if (tmp * tmp > qforce_test) {
-                qforce_test = tmp*tmp;
-            }
-        }
-    }
-
-    //expression from regression table
-    if (qforce_test > (500 * n_p - 6000)*(n_p >= 12) + 1000) {
-        return true;
-    } else {
-        return false;
-    }
-
-}
 
 void Walker::print(std::string header) {
     using namespace std;

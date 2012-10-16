@@ -18,7 +18,9 @@ protected:
 
     virtual void initialize();
 
-    virtual bool move_autherized(double A);
+    virtual bool move_autherized(double A) {
+        return metropolis_test(A);
+    };
 
     void calculate_energy(Walker* walker);
     void scale_values();
@@ -27,11 +29,25 @@ public:
 
     VMC(GeneralParams &, VMCparams &, SystemObjects &);
 
-    double get_var() const;
-    double get_energy() const;
-    double get_e2() const;
-    void set_e(double e);
-    void set_e2(double e2);
+    double get_var() const {
+        return E2 - vmc_E*vmc_E;
+    }
+
+    double get_e2() const {
+        return E2;
+    }
+
+    void set_e(double E) {
+        vmc_E = E;
+    }
+
+    void set_e2(double E2) {
+        this->E2 = E2;
+    }
+
+    double get_energy() const {
+        return vmc_E;
+    }
 
     virtual void run_method();
     virtual void user_output() const;

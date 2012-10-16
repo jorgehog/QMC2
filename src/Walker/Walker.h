@@ -21,12 +21,12 @@ protected:
 public:
 
     Walker(int n_p, int dim, bool do_init = true);
-    
+
     double spatial_ratio;
     double value;
     double lapl_sum;
     double E;
-    
+
     mat r;
     mat r_rel;
 
@@ -35,25 +35,30 @@ public:
     mat spatial_grad;
     mat jast_grad;
     mat inv;
-    
+
     mat phi;
     arma::field<mat> dell_phi;
     cube dJ;
 
     rowvec r2;
 
-    double get_r_i2(int i) const;
+
 
     void calc_r_i2(int i);
-    void calc_r_i2();
+
+    void calc_r_i2() {
+        for (int i = 0; i < n_p; i++) {
+            this->calc_r_i2(i);
+        }
+    };
 
     double abs_relative(int i, int j) const;
 
     void make_rel_matrix();
 
-    bool is_singular() const;
-
-    bool check_bad_qforce();
+    double get_r_i2(int i) const {
+        return r2(i);
+    };
 
     void kill() {
         is_murdered = true;
@@ -62,7 +67,7 @@ public:
     bool is_dead() {
         return is_murdered;
     }
-    
+
     bool is_alive() {
         return !is_murdered;
     }
@@ -70,15 +75,15 @@ public:
     void ressurect() {
         is_murdered = false;
     }
-    
+
     void set_E(double E) {
-        this->E = E; 
+        this->E = E;
     }
-    
+
     double get_E() const {
         return E;
     }
-    
+
     void print(std::string header = "----");
 
 

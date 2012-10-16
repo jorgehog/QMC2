@@ -11,6 +11,7 @@
 class System {
 protected:
     int n_p;
+    int n2;
     int dim;
     double a_sym;
     double a_asym;
@@ -28,7 +29,7 @@ public:
     
     virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
     
-    virtual void calc_for_newpos(const Walker* walker_old, Walker* walker_new, int particle) const = 0;
+    virtual void calc_for_newpos(const Walker* walker_old, Walker* walker_new, int particle) = 0;
 
     virtual double get_spatial_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
 

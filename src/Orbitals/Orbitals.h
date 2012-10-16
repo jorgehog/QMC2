@@ -14,11 +14,11 @@ protected:
     int n2;
     int dim;
     int max_implemented;
-    
+
     double h;
     double h2;
     double two_h;
-    
+
     BasisFunctions** basis_functions;
     BasisFunctions*** dell_basis_functions;
     BasisFunctions** lapl_basis_functions;
@@ -29,7 +29,7 @@ protected:
 
     double num_diff(const Walker* walker, int particle, int q_num, int d) const;
     double num_ddiff(const Walker* walker, int particle, int q_num) const;
-    
+
     friend class Minimizer;
     friend class ASGD;
 
@@ -38,9 +38,17 @@ public:
     Orbitals(int n_p, int dim);
     Orbitals();
 
-    virtual double phi(const Walker* walker, int particle, int q_num) const;
-    virtual double del_phi(const Walker* walker, int particle, int q_num, int d) const;
-    virtual double lapl_phi(const Walker* walker, int particle, int q_num) const;
+    virtual double phi(const Walker* walker, int particle, int q_num) const {
+        return basis_functions[q_num]->eval(walker, particle);
+    }
+
+    virtual double del_phi(const Walker* walker, int particle, int q_num, int d) const {
+        return dell_basis_functions[d][q_num]->eval(walker, particle);
+    }
+
+    virtual double lapl_phi(const Walker* walker, int particle, int q_num) const {
+        return lapl_basis_functions[q_num]->eval(walker, particle);
+    }
 
 };
 

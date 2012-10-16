@@ -7,7 +7,6 @@
 
 #include "../../QMCheaders.h"
 
-
 Closed_form::Closed_form() {
 
 }
@@ -17,35 +16,15 @@ Closed_form::Closed_form(GeneralParams & gP)
 
 }
 
-void Closed_form::update_walker_IS(Walker* walker_pre, const Walker* walker_post, int particle) const {
-    int start = n2 * (particle >= n2);
-
-    qmc->get_system_ptr()->update_walker(walker_pre, walker_post, particle);
-
-    for (int i = start; i < start + n2; i++) {
-        for (int j = 0; j < dim; j++) {
-            walker_pre->spatial_grad(i,j) = walker_post->spatial_grad(i,j);
-        }
-    }
-
-    for (int i = 0; i < n_p; i++) {
-        for (int j = 0; j < dim; j++) {
-            walker_pre->jast_grad(i,j) = walker_post->jast_grad(i,j);
-        }
-    }
-}
-
 double Closed_form::get_KE(const Walker* walker) {
     int i, j;
     double xterm, e_kinetic;
 
-
     e_kinetic = xterm = 0;
 
-    //the X-term
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
-            xterm += walker->jast_grad(i,j) * walker->spatial_grad(i,j);
+            xterm += walker->jast_grad(i, j) * walker->spatial_grad(i, j);
         }
     }
 
@@ -60,7 +39,7 @@ void Closed_form::get_QF(Walker* walker) {
 
     for (i = 0; i < n_p; i++) {
         for (j = 0; j < dim; j++) {
-            walker->qforce(i,j) = 2 * (walker->jast_grad(i,j) + walker->spatial_grad(i,j));
+            walker->qforce(i, j) = 2 * (walker->jast_grad(i, j) + walker->spatial_grad(i, j));
         }
     }
 }
@@ -97,15 +76,22 @@ void Closed_form::copy_walker_IS(const Walker* parent, Walker* child) const {
 }
 
 void Closed_form::reset_walker_IS(const Walker* walker_pre, Walker* walker_post, int particle) const {
+    int start = n2 * (particle >= n2);
+    int end = start + n2 - 1;
 
     qmc->get_system_ptr()->reset_walker_ISCF(walker_pre, walker_post, particle);
 
-    int start = n2 * (particle >= n2);
+    walker_post->spatial_grad(span(start, end), span()) = walker_pre->spatial_grad(span(start, end), span());
+    walker_post->jast_grad = walker_pre->jast_grad;
+}
 
-    //updating the part with the same spin as the moved particle
-    for (int i = start; i < n2 + start; i++) {
-        for (int j = 0; j < dim; j++) {
-            walker_post->spatial_grad(i,j) = walker_pre->spatial_grad(i,j);
-        }
-    }
+void Closed_form::update_walker_IS(Walker* walker_pre, const Walker* walker_post, int particle) const {
+    int start = n2 * (particle >= n2);
+    int end = start + n2 - 1;
+
+    qmc->get_system_ptr()->update_walker(walker_pre, walker_post, particle);
+
+    walker_pre->spatial_grad(span(start, end), span()) = walker_post->spatial_grad(span(start, end), span());
+    walker_pre->jast_grad = walker_post->jast_grad;
+
 }

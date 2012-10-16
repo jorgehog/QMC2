@@ -33,7 +33,9 @@ protected:
 
     void initialize();
 
-    virtual bool move_autherized(double A);
+    virtual bool move_autherized(double A) {
+        return metropolis_test(A)&(A > 0);
+    };
 
     void iterate_walker(int k, int n_b = 1);
 

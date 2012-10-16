@@ -118,7 +118,10 @@ int main(int argc, char** argv) {
         }
 
         if (generalParams.doVMC) {
+            arma::wall_clock t;
+            t.tic();
             vmc->run_method();
+            cout <<endl<< t.toc() << endl;;
             dmcParams.E_T = vmc->get_energy();
         }
 
@@ -205,7 +208,7 @@ void parseCML(int argc, char** argv,
 
 
     //    vmcParams.n_c = 1E6;
-    vmcParams.n_c = 1E3;
+    vmcParams.n_c = 1E4;
 
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;

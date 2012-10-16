@@ -78,16 +78,3 @@ double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) const 
     return ddiff;
 }
 
-double Orbitals::phi(const Walker* walker, int particle, int q_num) const {
-    return basis_functions[q_num]->eval(walker, particle);
-}
-
-double Orbitals::del_phi(const Walker* walker, int particle, int q_num, int d) const {
-    return dell_basis_functions[d][q_num]->eval(walker, particle);
-}
-
-double Orbitals::lapl_phi(const Walker* walker, int particle, int q_num) const {
-    return lapl_basis_functions[q_num]->eval(walker, particle);
-}
-
-
