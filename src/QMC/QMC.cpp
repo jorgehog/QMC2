@@ -89,9 +89,12 @@ void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle
     }
 
     walker_post->calc_r_i2(particle);
-
     for (int j = 0; j < n2; j++) {
         walker_post->phi(particle, j) = get_orbitals_ptr()->phi(walker_post, particle, j);
+
+        for (int k = 0; k < dim; k++) {
+            walker_post->dell_phi(particle)(k, j) = get_orbitals_ptr()->del_phi(walker_post, particle, j, k);
+        }
     }
 
     jastrow->get_dJ_matrix(walker_post, particle);
@@ -130,15 +133,16 @@ void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int parti
 
     for (int i = 0; i < n_p; i++) {
         walker_pre->r_rel(i, particle) = walker_pre->r_rel(particle, i) = walker_post->r_rel(i, particle);
-        
-        for (int k = 0; k < dim; k++){
-                    walker_pre->dJ(particle, i, k) = walker_post->dJ(particle, i, k);
-                    walker_pre->dJ(i, particle, k) = walker_post->dJ(i, particle, k);
+
+        for (int k = 0; k < dim; k++) {
+            walker_pre->dJ(particle, i, k) = walker_post->dJ(particle, i, k);
+            walker_pre->dJ(i, particle, k) = walker_post->dJ(i, particle, k);
         }
     }
 
     for (int i = 0; i < n2; i++) {
         walker_pre->phi(particle, i) = walker_post->phi(particle, i);
+        walker_pre->dell_phi(particle)(span(), i) = walker_post->dell_phi(particle)(span(), i);
     }
 
     walker_pre->r2[particle] = walker_post->r2[particle];
@@ -153,15 +157,16 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 
     for (int i = 0; i < n_p; i++) {
         walker_post->r_rel(i, particle) = walker_post->r_rel(particle, i) = walker_pre->r_rel(i, particle);
-        
-        for (int k = 0; k < dim; k++){
-                    walker_post->dJ(particle, i, k) = walker_pre->dJ(particle, i, k);
-                    walker_post->dJ(i, particle, k) = walker_pre->dJ(i, particle, k);
+
+        for (int k = 0; k < dim; k++) {
+            walker_post->dJ(particle, i, k) = walker_pre->dJ(particle, i, k);
+            walker_post->dJ(i, particle, k) = walker_pre->dJ(i, particle, k);
         }
     }
 
     for (int i = 0; i < n2; i++) {
         walker_post->phi(particle, i) = walker_pre->phi(particle, i);
+        walker_post->dell_phi(particle)(span(), i) = walker_pre->dell_phi(particle)(span(), i);
     }
 
     walker_post->r2[particle] = walker_pre->r2[particle];
@@ -192,8 +197,9 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
     child->r_rel = parent->r_rel;
 
     child->phi = parent->phi;
+    child->dell_phi = parent->dell_phi;
     child->dJ = parent->dJ;
-    
+
     child->ressurect();
     child->set_E(parent->get_E());
 

@@ -26,16 +26,15 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
 
     start = n2 * (particle >= n2);
 
-    walker->spatial_grad(span(start, start + n2 - 1), span(0, dim - 1)) = arma::zeros<mat > (n2, dim);
+//    walker->spatial_grad(span(start, start + n2 - 1), span(0, dim - 1)) = arma::zeros<mat > (n2, dim);
 
     //updating the part with the same spin as the moved particle
+//    cout << walker->dell_phi << endl;
+//    cout << "-----" << endl;
     for (i = start; i < n2 + start; i++) {
-        for (j = 0; j < n2; j++) {
-            for (k = 0; k < dim; k++) {
-                walker->spatial_grad(i, k) += orbital->del_phi(walker, i, j, k) * walker->inv(j, i);
-            }
-        }
+        walker->spatial_grad(i, span()) = strans(walker->dell_phi(i)*walker->inv(span(), i));
     }
+
 }
 
 void Fermions::initialize_slaters(const Walker* walker) {
@@ -77,8 +76,6 @@ void Fermions::make_merged_inv(Walker* walker) {
         end = n2 + start - 1;
         walker->inv(span(0, n2 - 1), span(start, end)) = arma::inv(walker->phi(span(start, end), span(0, n2 - 1)));
     }
-
-
 }
 
 double Fermions::get_spatial_wf(const Walker* walker) {

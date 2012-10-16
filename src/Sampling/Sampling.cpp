@@ -41,8 +41,14 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
 
     for (i = 0; i < n2; i++) {
         for (j = 0; j < n2; j++) {
+            
             walker->phi(i, j) = qmc->get_orbitals_ptr()->phi(walker, i, j);
             walker->phi(i + n2, j) = qmc->get_orbitals_ptr()->phi(walker, i + n2, j);
+
+            for (int k = 0; k < dim; k++) {
+                walker->dell_phi(i)(k,j) = qmc->get_orbitals_ptr()->del_phi(walker, i, j, k);
+                walker->dell_phi(i + n2)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker, i + n2, j, k);
+            }
         }
     }
 

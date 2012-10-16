@@ -37,7 +37,7 @@ public:
     mat inv;
     
     mat phi;
-    mat dell_phi;
+    arma::field<mat> dell_phi;
     cube dJ;
 
     rowvec r2;

@@ -20,7 +20,7 @@ Walker::Walker(int n_p, int dim, bool alive) {
     } else {
         is_murdered = true;
     }
-    
+
     r = zeros<mat > (n_p, dim);
     r_rel = zeros<mat > (n_p, n_p);
     qforce = zeros<mat > (n_p, dim);
@@ -33,10 +33,15 @@ Walker::Walker(int n_p, int dim, bool alive) {
     lapl_sum = 0;
     spatial_ratio = 0;
     inv = zeros<mat > (n2, n_p);
-    
+
     phi = zeros<mat > (n_p, n2);
-    dJ = zeros<cube > (n_p, n_p, dim);
+    dell_phi = arma::field<mat > (n_p, 1);
+    for (int i = 0; i < n_p; i++){
+        dell_phi(i) = zeros<mat>(dim, n2);
+    }
     
+    dJ = zeros<cube > (n_p, n_p, dim);
+
 }
 
 void Walker::calc_r_i2(int i) {
@@ -44,7 +49,7 @@ void Walker::calc_r_i2(int i) {
     double r2i = 0;
 
     for (int j = 0; j < dim; j++) {
-        r2i += r(i,j) * r(i,j);
+        r2i += r(i, j) * r(i, j);
     }
 
     r2[i] = r2i;
@@ -65,7 +70,7 @@ double Walker::abs_relative(int i, int j) const {
 
     r_ij = 0;
     for (k = 0; k < dim; k++) {
-        tmp = (r(i,k) - r(j,k));
+        tmp = (r(i, k) - r(j, k));
         r_ij += tmp*tmp;
     }
     r_ij = sqrt(r_ij);
@@ -83,7 +88,7 @@ void Walker::make_rel_matrix() {
 
     for (i = 0; i < n_p - 1; i++) {
         for (j = i + 1; j < n_p; j++) {
-            r_rel(i,j) = r_rel(j,i) = abs_relative(i, j);
+            r_rel(i, j) = r_rel(j, i) = abs_relative(i, j);
         }
     }
 }
@@ -96,7 +101,7 @@ bool Walker::is_singular() const {
 
     for (i = 0; i < n_p; i++) {
         for (j = i + 1; j < n_p; j++) {
-            if (r_rel(i,j) < eps) {
+            if (r_rel(i, j) < eps) {
                 return true;
             }
         }
@@ -110,7 +115,7 @@ bool Walker::check_bad_qforce() {
 
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < dim; j++) {
-            double tmp = qforce(i,j);
+            double tmp = qforce(i, j);
             if (tmp * tmp > qforce_test) {
                 qforce_test = tmp*tmp;
             }
