@@ -19,8 +19,6 @@ public:
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle);
     virtual void calculate_energy_necessities_CF(Walker* walker) const;
 
-    virtual double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
-
     virtual void copy_walker(const Walker* parent, Walker* child) const;
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
 

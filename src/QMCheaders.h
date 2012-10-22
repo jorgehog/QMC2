@@ -8,7 +8,7 @@
 #ifndef QMCHEADERS_H
 #define	QMCHEADERS_H
 
-#define ARMA_NO_DEBUG
+//#define ARMA_NO_DEBUG
 
 #include <armadillo>
 #include <stdlib.h>
@@ -56,7 +56,6 @@ struct GeneralParams {
 
     std::string system;
     std::string sampling;
-    std::string kinetics_type;
 
 };
 
@@ -85,7 +84,6 @@ struct OutputParams {
 
 };
 
-class Kinetics;
 class Orbitals;
 class Potential;
 class System;
@@ -93,7 +91,6 @@ class Sampling;
 class Jastrow;
 
 struct SystemObjects {
-    Kinetics* kinetics;
     Orbitals* SP_basis;
     Potential* onebody_pot;
     System* SYSTEM;
@@ -105,6 +102,7 @@ struct SystemObjects {
 #include "Walker/Walker.h"
 
 class Minimizer;
+class OutputHandler;
 
 #include "BasisFunctions/BasisFunctions.h"
 #include "BasisFunctions/semiAlphaHO/semiAlphaHO.h"
@@ -126,10 +124,9 @@ class Minimizer;
 #include "System/System.h"
 #include "System/Fermions/Fermions.h"
 
-
-class QMC;
-class VMC;
-class DMC;
+#include "QMC/QMC.h"
+#include "QMC/VMC/VMC.h"
+#include "QMC/DMC/DMC.h"
 
 #include "Diffusion/Diffusion.h"
 #include "Diffusion/Simple/Simple.h"
@@ -139,18 +136,10 @@ class DMC;
 #include "Sampling/Brute_Force/Brute_Force.h"
 #include "Sampling/Importance/Importance.h"
 
-#include "Kinetics/Kinetics.h"
-#include "Kinetics/Numerical/Numerical.h"
-#include "Kinetics/Closed_form/Closed_form.h"
-
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"
 #include "OutputHandler/BlockingData/BlockingData.h"
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
-
-#include "QMC/QMC.h"
-#include "QMC/VMC/VMC.h"
-#include "QMC/DMC/DMC.h"
 
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"

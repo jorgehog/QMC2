@@ -27,7 +27,6 @@ protected:
     Jastrow *jastrow;
     Sampling *sampling;
     System *system;
-    Kinetics *kinetics;
 
     std::vector<OutputHandler*> output_handler;
 
@@ -55,7 +54,6 @@ public:
     QMC(int n_p, int dim, int n_c,
             Sampling *sampling,
             System *system,
-            Kinetics *kinetics,
             Jastrow *jastrow = new No_Jastrow());
     QMC();
 
@@ -64,20 +62,22 @@ public:
     virtual void run_method() = 0;
     virtual void user_output() const = 0;
 
+    double get_KE(const Walker* walker) const;
+    void get_QF(Walker* walker) const;
+
     void get_gradients(const Walker* walker_pre, Walker* walker_post, int particle) const;
     void get_gradients(Walker* walker) const;
     void get_wf_value(Walker* walker) const;
     void get_laplsum(Walker* walker) const;
 
     void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
-    double calculate_local_energy(Walker* walker) const;
+
+    double calculate_local_energy(const Walker* walker) const {
+        return get_KE(walker) + system->get_potential_energy(walker);
+    }
 
     System* get_system_ptr() const {
         return system;
-    }
-
-    Kinetics* get_kinetics_ptr() const {
-        return kinetics;
     }
 
     Sampling* get_sampling_ptr() const {

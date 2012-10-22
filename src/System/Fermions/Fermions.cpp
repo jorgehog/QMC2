@@ -118,7 +118,7 @@ void Fermions::copy_walker(const Walker* parent, Walker* child) const {
     child->inv = parent->inv;
 }
 
-void Fermions::reset_walker_ISCF(const Walker* walker_pre, Walker* walker_post, int particle) const {
+void Fermions::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
     using namespace arma;
     
     int start = n2 * (particle >= n2);

@@ -44,14 +44,14 @@ int main(int argc, char** argv) {
             outputParams,
             systemObjects);
 
-    if (generalParams.kinetics_type == "Num") {
-        systemObjects.kinetics = new Numerical(generalParams);
-    } else if (generalParams.kinetics_type == "CF") {
-        systemObjects.kinetics = new Closed_form(generalParams);
-    } else {
-        cout << "unknown kinetics" << endl;
-        exit(1);
-    }
+//    if (generalParams.kinetics_type == "Num") {
+//        systemObjects.kinetics = new Numerical(generalParams);
+//    } else if (generalParams.kinetics_type == "CF") {
+//        systemObjects.kinetics = new Closed_form(generalParams);
+//    } else {
+//        cout << "unknown kinetics" << endl;
+//        exit(1);
+//    }
 
     if (generalParams.sampling == "IS") {
         systemObjects.sample_method = new Importance(generalParams);
@@ -203,7 +203,7 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.kinetics_type = "CF";
+//    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
 
@@ -269,7 +269,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[16]) != 0) generalParams.use_jastrow = (bool)atoi(argv[16]);
 
         if (def.compare(argv[17]) != 0) generalParams.sampling = argv[17];
-        if (def.compare(argv[18]) != 0) generalParams.kinetics_type = argv[18];
+//        if (def.compare(argv[18]) != 0) generalParams.kinetics_type = argv[18];
         if (def.compare(argv[19]) != 0) generalParams.system = argv[19];
 
 

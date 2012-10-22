@@ -7,9 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO)
-: QMC(gP.n_p, gP.dim, vP.n_c, sO.sample_method, sO.SYSTEM, sO.kinetics, sO.jastrow) {
+: QMC(gP.n_p, gP.dim, vP.n_c, sO.sample_method, sO.SYSTEM, sO.jastrow) {
 
     vmc_E = 0;
     E2 = 0;
@@ -23,12 +22,9 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO)
 
 void VMC::initialize() {
     jastrow->initialize();
-
     sampling->set_trial_pos(original_walker);
-
     copy_walker(original_walker, trial_walker);
 }
-
 
 void VMC::calculate_energy(Walker* walker) {
 
@@ -46,7 +42,7 @@ void VMC::scale_values() {
 void VMC::run_method() {
 
     initialize();
-    
+
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
     }
@@ -70,7 +66,7 @@ void VMC::run_method() {
 
 void VMC::user_output() const {
     using namespace std;
-    
+
     cout << "VMC energy: " << get_energy() << endl;
     cout << "VMC variance: " << get_var() << endl;
     cout << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;

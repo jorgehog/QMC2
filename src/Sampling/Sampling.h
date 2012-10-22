@@ -25,7 +25,7 @@ public:
     double get_new_pos(const Walker* walker_pre, int i, int j) const;
 
     virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
-    virtual double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const = 0;
+
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const;
     virtual void get_necessities(Walker* walker) = 0;
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) = 0;
@@ -37,6 +37,10 @@ public:
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
 
     double get_branching_Gfunc(double E_x, double E_y, double E_T) const;
+
+    double get_spatialjast_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const {
+        return walker_post->spatial_ratio * qmc->get_jastrow_ptr()->get_j_ratio(walker_post, walker_pre, particle);
+    }
 
     void set_qmc_ptr(QMC* qmc) {
         diffusion->set_qmc_ptr(qmc);

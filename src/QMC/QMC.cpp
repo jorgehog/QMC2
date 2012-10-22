@@ -10,7 +10,6 @@
 QMC::QMC(int n_p, int dim, int n_c,
         Sampling *sampling,
         System *system,
-        Kinetics *kinetics,
         Jastrow *jastrow) {
 
     this->n_p = n_p;
@@ -21,10 +20,8 @@ QMC::QMC(int n_p, int dim, int n_c,
     this->jastrow = jastrow;
     this->sampling = sampling;
     this->system = system;
-    this->kinetics = kinetics;
 
     this->sampling->set_qmc_ptr(this);
-    this->kinetics->set_qmc_ptr(this);
 
     this->accepted = 0;
 
@@ -98,19 +95,26 @@ void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle
     }
 
     jastrow->get_dJ_matrix(walker_post, particle);
+    walker_post->spatial_ratio = system->get_spatial_ratio(walker_pre, walker_post, particle);
+    system->calc_for_newpos(walker_pre, walker_post, particle);
+    
+    std::cout << "pre: "<<1-arma::accu(walker_pre->inv*walker_pre->phi)/n_p << std::endl;
+    std::cout << "post: "<<1-arma::accu(walker_post->inv*walker_post->phi)/n_p << std::endl;
     sampling->update_necessities(walker_pre, walker_post, particle);
 
 }
 
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
-    double spatial_jast = sampling->get_spatial_ratio(walker_post, walker_pre, particle);
+    double spatial_jast = sampling->get_spatialjast_ratio(walker_post, walker_pre, particle);
     double G = sampling->get_g_ratio(walker_post, walker_pre);
 
     return spatial_jast * spatial_jast * G;
 }
 
 void QMC::calculate_energy_necessities(Walker* walker) const {
-    kinetics->calculate_energy_necessities(walker);
+    get_sampling_ptr()->calculate_energy_necessities_CF(walker);
+    get_laplsum(walker);
+    //    kinetics->calculate_energy_necessities(walker);
 }
 
 bool QMC::metropolis_test(double A) {
@@ -171,6 +175,7 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 
     walker_post->r2[particle] = walker_pre->r2[particle];
 
+    system->reset_walker(walker_pre, walker_post, particle);
     sampling->reset_walker(walker_pre, walker_post, particle);
 }
 
@@ -202,11 +207,35 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
 
     child->ressurect();
     child->set_E(parent->get_E());
-
+    system->copy_walker(parent, child);
     sampling->copy_walker(parent, child);
 
 }
 
-double QMC::calculate_local_energy(Walker* walker) const {
-    return kinetics->get_KE(walker) + system->get_potential_energy(walker);
+double QMC::get_KE(const Walker* walker) const {
+    int i, j;
+    double xterm, e_kinetic;
+
+    e_kinetic = xterm = 0;
+
+    for (i = 0; i < n_p; i++) {
+        for (j = 0; j < dim; j++) {
+            xterm += walker->jast_grad(i, j) * walker->spatial_grad(i, j);
+        }
+    }
+
+    e_kinetic = 2 * xterm + walker->lapl_sum;
+
+
+    return -0.5 * e_kinetic;
+}
+
+void QMC::get_QF(Walker* walker) const {
+    int i, j;
+
+    for (i = 0; i < n_p; i++) {
+        for (j = 0; j < dim; j++) {
+            walker->qforce(i, j) = 2 * (walker->jast_grad(i, j) + walker->spatial_grad(i, j));
+        }
+    }
 }

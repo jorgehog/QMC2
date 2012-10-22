@@ -30,7 +30,7 @@ public:
     virtual double get_spatial_wf(const Walker* walker);
 
     virtual void copy_walker(const Walker* parent, Walker* child) const;
-    virtual void reset_walker_ISCF(const Walker* walker_pre, Walker* walker_post, int particle) const;
+    virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
 
 };
 
