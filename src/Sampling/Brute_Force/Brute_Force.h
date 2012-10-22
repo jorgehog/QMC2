@@ -21,7 +21,7 @@ public:
         
     }
     
-    virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle){
+    virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const {
         
     }
 

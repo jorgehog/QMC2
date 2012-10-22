@@ -22,13 +22,13 @@ public:
     Sampling();
 
     void set_trial_pos(Walker* walker, bool load_VMC_dist = false, std::ifstream* file = NULL);
-    double get_new_pos(const Walker* walker_pre, int i, int j) const;
+    void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
 
     virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
 
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const;
     virtual void get_necessities(Walker* walker) = 0;
-    virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) = 0;
+    virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
 
     virtual void calculate_energy_necessities(Walker* walker) const = 0;
 

@@ -59,8 +59,35 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
 
 }
 
-double Sampling::get_new_pos(const Walker* walker_pre, int particle, int j) const {
-    return diffusion->get_new_pos(walker_pre, particle, j);
+void Sampling::update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const {
+
+    for (int j = 0; j < dim; j++) {
+        walker_post->r(particle, j) = walker_pre->r(particle, j)
+                + diffusion->get_new_pos(walker_pre, particle, j);
+    }
+
+    for (int j = 0; j < n_p; j++) {
+        if (j != particle) {
+            walker_post->r_rel(particle, j) = walker_post->r_rel(j, particle)
+                    = walker_post->abs_relative(particle, j);
+        }
+    }
+
+    walker_post->calc_r_i2(particle);
+    for (int j = 0; j < n2; j++) {
+        walker_post->phi(particle, j) = qmc->get_orbitals_ptr()->phi(walker_post, particle, j);
+
+        for (int k = 0; k < dim; k++) {
+            walker_post->dell_phi(particle)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker_post, particle, j, k);
+        }
+    }
+
+    qmc->get_jastrow_ptr()->get_dJ_matrix(walker_post, particle);
+    walker_post->spatial_ratio = qmc->get_system_ptr()->get_spatial_ratio(walker_pre, walker_post, particle);
+    qmc->get_system_ptr()->calc_for_newpos(walker_pre, walker_post, particle);
+
+    update_necessities(walker_pre, walker_post, particle);
+
 }
 
 double Sampling::get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {

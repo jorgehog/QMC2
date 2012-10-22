@@ -71,39 +71,6 @@ void QMC::get_wf_value(Walker* walker) const {
     walker->value = system->get_spatial_wf(walker) * jastrow->get_val(walker);
 }
 
-void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const {
-
-    for (int j = 0; j < dim; j++) {
-        walker_post->r(particle, j) = walker_pre->r(particle, j)
-                + sampling->get_new_pos(walker_pre, particle, j);
-    }
-
-    for (int j = 0; j < n_p; j++) {
-        if (j != particle) {
-            walker_post->r_rel(particle, j) = walker_post->r_rel(j, particle)
-                    = walker_post->abs_relative(particle, j);
-        }
-    }
-
-    walker_post->calc_r_i2(particle);
-    for (int j = 0; j < n2; j++) {
-        walker_post->phi(particle, j) = get_orbitals_ptr()->phi(walker_post, particle, j);
-
-        for (int k = 0; k < dim; k++) {
-            walker_post->dell_phi(particle)(k, j) = get_orbitals_ptr()->del_phi(walker_post, particle, j, k);
-        }
-    }
-
-    jastrow->get_dJ_matrix(walker_post, particle);
-    walker_post->spatial_ratio = system->get_spatial_ratio(walker_pre, walker_post, particle);
-    system->calc_for_newpos(walker_pre, walker_post, particle);
-    
-//    std::cout << "pre: "<<1-arma::accu(walker_pre->inv*walker_pre->phi)/n_p << std::endl;
-//    std::cout << "post: "<<1-arma::accu(walker_post->inv*walker_post->phi)/n_p << std::endl;
-    sampling->update_necessities(walker_pre, walker_post, particle);
-
-}
-
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
     double spatial_jast = sampling->get_spatialjast_ratio(walker_post, walker_pre, particle);
     double G = sampling->get_g_ratio(walker_post, walker_pre);
@@ -151,6 +118,7 @@ void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int parti
 
     walker_pre->r2[particle] = walker_post->r2[particle];
 
+    system->update_walker(walker_pre, walker_post, particle);
     sampling->update_walker(walker_pre, walker_post, particle);
 }
 
@@ -182,7 +150,7 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 void QMC::diffuse_walker(Walker* original, Walker* trial) {
     for (int particle = 0; particle < n_p; particle++) {
 
-        update_pos(original, trial, particle);
+        sampling->update_pos(original, trial, particle);
 
         double A = get_acceptance_ratio(original, trial, particle);
 

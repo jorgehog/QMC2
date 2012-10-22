@@ -70,8 +70,6 @@ public:
     void get_wf_value(Walker* walker) const;
     void get_laplsum(Walker* walker) const;
 
-    void update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const;
-
     double calculate_local_energy(const Walker* walker) const {
         return get_KE(walker) + system->get_potential_energy(walker);
     }
