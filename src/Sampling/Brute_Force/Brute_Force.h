@@ -25,7 +25,7 @@ public:
         
     }
 
-    virtual void calculate_energy_necessities_CF(Walker* walker) const {
+    virtual void calculate_energy_necessities(Walker* walker) const {
         qmc->get_gradients(walker);
     }
 

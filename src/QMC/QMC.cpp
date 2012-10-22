@@ -98,8 +98,8 @@ void QMC::update_pos(const Walker* walker_pre, Walker* walker_post, int particle
     walker_post->spatial_ratio = system->get_spatial_ratio(walker_pre, walker_post, particle);
     system->calc_for_newpos(walker_pre, walker_post, particle);
     
-    std::cout << "pre: "<<1-arma::accu(walker_pre->inv*walker_pre->phi)/n_p << std::endl;
-    std::cout << "post: "<<1-arma::accu(walker_post->inv*walker_post->phi)/n_p << std::endl;
+//    std::cout << "pre: "<<1-arma::accu(walker_pre->inv*walker_pre->phi)/n_p << std::endl;
+//    std::cout << "post: "<<1-arma::accu(walker_post->inv*walker_post->phi)/n_p << std::endl;
     sampling->update_necessities(walker_pre, walker_post, particle);
 
 }
@@ -112,7 +112,7 @@ double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_
 }
 
 void QMC::calculate_energy_necessities(Walker* walker) const {
-    get_sampling_ptr()->calculate_energy_necessities_CF(walker);
+    sampling->calculate_energy_necessities(walker);
     get_laplsum(walker);
     //    kinetics->calculate_energy_necessities(walker);
 }

@@ -30,8 +30,7 @@ public:
     virtual void get_necessities(Walker* walker) = 0;
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) = 0;
 
-    virtual void calculate_energy_necessities_CF(Walker* walker) const = 0;
-    //Numerical has no necessities
+    virtual void calculate_energy_necessities(Walker* walker) const = 0;
 
     virtual void copy_walker(const Walker* parent, Walker* child) const = 0;
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;

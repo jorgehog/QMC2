@@ -17,7 +17,7 @@ public:
 
     virtual void get_necessities(Walker* walker);
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle);
-    virtual void calculate_energy_necessities_CF(Walker* walker) const;
+    virtual void calculate_energy_necessities(Walker* walker) const;
 
     virtual void copy_walker(const Walker* parent, Walker* child) const;
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;

@@ -13,7 +13,7 @@ Importance::Importance(GeneralParams & gP)
 
 }
 
-void Importance::calculate_energy_necessities_CF(Walker* walker) const {
+void Importance::calculate_energy_necessities(Walker* walker) const {
     //CF IS has no spesific necessities
 }
 
