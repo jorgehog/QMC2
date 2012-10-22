@@ -40,6 +40,8 @@ public:
 
     arma::rowvec r2;
 
+
+
     void calc_r_i2(int i);
 
     void calc_r_i2() {

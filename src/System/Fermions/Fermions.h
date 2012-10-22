@@ -10,7 +10,11 @@
 
 class Fermions : public System {
 protected:
-
+    
+    //For indexing correct spin blocks
+    int start;
+    int end;
+    
     arma::rowvec I;
 
     void make_merged_inv(Walker* walker);

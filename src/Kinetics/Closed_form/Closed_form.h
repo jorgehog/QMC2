@@ -10,6 +10,9 @@
 
 class Closed_form : public Kinetics {
 public:
+    int start;
+    int end;
+    
     Closed_form();
     Closed_form(GeneralParams &);
 

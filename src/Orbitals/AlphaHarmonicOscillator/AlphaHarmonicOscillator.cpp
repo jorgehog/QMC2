@@ -112,8 +112,8 @@ void AlphaHarmonicOscillator::get_qnums() {
         n_y = shell;
 
         for (int subshell_i = 0; subshell_i <= shell; subshell_i++) {
-            qnums(q,0) = n_x;
-            qnums(q,1) = n_y;
+            qnums(q, 0) = n_x;
+            qnums(q, 1) = n_y;
 
             n_x++;
             n_y--;
@@ -157,7 +157,7 @@ double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker,
 
             H_fac = 0;
             for (int j = 0; j < dim; j++) {
-                rij = walker->r(i,j);
+                rij = walker->r(i, j);
                 nij = qnums(qnum, j);
 
                 H_fac += rij * nij * H(nij - 1, (*k) * rij) / H(nij, (*k) * rij);
@@ -165,7 +165,7 @@ double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker,
             H_fac *= sq_w_over_a;
 
 
-            dalpha += walker->inv( i, qnum)*(H_fac + exp_fac) * basis_functions[qnum]->eval(walker, i);
+            dalpha += walker->inv(i, qnum)*(H_fac + exp_fac) * basis_functions[qnum]->eval(walker, i);
         }
     }
 
