@@ -237,12 +237,12 @@ void parseCML(int argc, char** argv,
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
     minimizerParams.n_c_SGD = 100;
-    minimizerParams.alpha = zeros(1, 1) + 0.5;
-    minimizerParams.beta = zeros(1, 1) + 0.5;
+    minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
+    minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
 
     //Seting values if not flagged default (controlled by Python)
-    string def = "def";
+    std::string def = "def";
 
     if (argc == n_args) {
 
@@ -297,8 +297,8 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[37]) != 0) minimizerParams.thermalization = atoi(argv[37]);
         if (def.compare(argv[38]) != 0) minimizerParams.n_cm = atoi(argv[38]);
         if (def.compare(argv[39]) != 0) minimizerParams.n_c_SGD = atoi(argv[39]);
-        if (def.compare(argv[40]) != 0) minimizerParams.alpha = zeros(1, 1) + atof(argv[40]);
-        if (def.compare(argv[41]) != 0) minimizerParams.beta = zeros(1, 1) + atof(argv[41]);
+        if (def.compare(argv[40]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[40]);
+        if (def.compare(argv[41]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[41]);
 
         if (def.compare(argv[42]) != 0) variationalParams.alpha = atof(argv[42]);
         if (def.compare(argv[43]) != 0) variationalParams.beta = atof(argv[43]);

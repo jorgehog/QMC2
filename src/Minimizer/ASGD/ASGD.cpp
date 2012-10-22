@@ -7,10 +7,10 @@
 
 #include "../../QMCheaders.h"
 
-using namespace arma;
 
 ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
 : Minimizer(vmc, mP.alpha, mP.beta) {
+    using namespace arma;
 
     this->n_c = mP.n_cm;
     this->thermalization = mP.thermalization;
@@ -101,8 +101,8 @@ VMC* ASGD::minimize() {
     for (int sample = 1; sample <= SGDsamples; sample++) {
 
         E = 0;
-        gradient = zeros(1, Nparams);
-        gradient_local = zeros(1, Nparams);
+        gradient = arma::zeros(1, Nparams);
+        gradient_local = arma::zeros(1, Nparams);
 
         for (k = 0; k < n_walkers; k++) {
             for (int cycle = 0; cycle < n_c_SGD; cycle++) {
@@ -138,8 +138,8 @@ VMC* ASGD::minimize() {
         //        output progress
         if ((sample % 1) == 0) {
             output("cycle:", sample);
-            cout << gradient_tot << endl;
-            cout << E << endl;
+            std::cout << gradient_tot << std::endl;
+            std::cout << E << std::endl;
         }
 
 

@@ -69,9 +69,11 @@ void VMC::run_method() {
 }
 
 void VMC::user_output() const {
-    std::cout << "VMC energy: " << get_energy() << std::endl;
-    std::cout << "VMC variance: " << get_var() << std::endl;
-    std::cout << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
+    using namespace std;
+    
+    cout << "VMC energy: " << get_energy() << endl;
+    cout << "VMC variance: " << get_var() << endl;
+    cout << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
 }
 
 

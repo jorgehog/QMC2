@@ -17,13 +17,11 @@
 #include <math.h>
 #include <vector>
 
-#include "lib.h"
-
 struct DMCparams {
     int n_c, therm, n_w, n_b;
     double dt, E_T;
     bool dist_in;
-    string dist_in_path;
+    std::string dist_in_path;
 
 };
 
@@ -56,9 +54,9 @@ struct GeneralParams {
     bool use_jastrow;
     bool use_coulomb;
 
-    string system;
-    string sampling;
-    string kinetics_type;
+    std::string system;
+    std::string sampling;
+    std::string kinetics_type;
 
 };
 
@@ -82,8 +80,8 @@ struct MinimizerParams {
 struct OutputParams {
     bool dist_out;
     bool blocking_out;
-    string outputSuffix;
-    string outputPath;
+    std::string outputSuffix;
+    std::string outputPath;
 
 };
 

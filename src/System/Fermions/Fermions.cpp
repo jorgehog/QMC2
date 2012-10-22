@@ -19,6 +19,7 @@ void Fermions::initialize(Walker* walker) {
 }
 
 void Fermions::get_spatial_grad(Walker* walker, int particle) const {
+    using namespace arma;
 
     int start = n2 * (particle >= n2);
 
@@ -29,6 +30,7 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
 }
 
 void Fermions::make_merged_inv(Walker* walker) {
+    using namespace arma;
 
     int end;
     for (int start = 0; start < n_p; start += n2) {
@@ -38,6 +40,7 @@ void Fermions::make_merged_inv(Walker* walker) {
 }
 
 double Fermions::get_spatial_wf(const Walker* walker) {
+    using namespace arma;
     return arma::det(walker->phi(span(0, n2 - 1), span())) * arma::det(walker->phi(span(n2, n_p - 1), span()));
 }
 
@@ -101,6 +104,8 @@ double Fermions::get_spatial_lapl_sum(const Walker* walker) const {
 }
 
 void Fermions::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
+    using namespace arma;
+    
     int start = n2 * (particle >= n2);
     int end = start + n2 - 1;
 
@@ -114,6 +119,8 @@ void Fermions::copy_walker(const Walker* parent, Walker* child) const {
 }
 
 void Fermions::reset_walker_ISCF(const Walker* walker_pre, Walker* walker_post, int particle) const {
+    using namespace arma;
+    
     int start = n2 * (particle >= n2);
     int end = start + n2 - 1;
 

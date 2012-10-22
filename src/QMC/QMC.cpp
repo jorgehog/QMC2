@@ -142,7 +142,7 @@ void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int parti
 
     for (int i = 0; i < n2; i++) {
         walker_pre->phi(particle, i) = walker_post->phi(particle, i);
-        walker_pre->dell_phi(particle)(span(), i) = walker_post->dell_phi(particle)(span(), i);
+        walker_pre->dell_phi(particle)(arma::span(), i) = walker_post->dell_phi(particle)(arma::span(), i);
     }
 
     walker_pre->r2[particle] = walker_post->r2[particle];
@@ -166,7 +166,7 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 
     for (int i = 0; i < n2; i++) {
         walker_post->phi(particle, i) = walker_pre->phi(particle, i);
-        walker_post->dell_phi(particle)(span(), i) = walker_pre->dell_phi(particle)(span(), i);
+        walker_post->dell_phi(particle)(arma::span(), i) = walker_pre->dell_phi(particle)(arma::span(), i);
     }
 
     walker_post->r2[particle] = walker_pre->r2[particle];

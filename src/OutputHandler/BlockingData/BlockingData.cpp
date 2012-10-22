@@ -19,5 +19,5 @@ BlockingData::BlockingData(std::string filename,
 }
 
 void BlockingData::dump() {
-    file << vmc->local_E << endl;
+    file << vmc->local_E << std::endl;
 }

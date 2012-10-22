@@ -33,13 +33,13 @@ protected:
     Walker** walkers;
     Walker** trial_walkers;
 
-    rowvec parameter;
+    arma::rowvec parameter;
 
-    rowvec gradient;
-    rowvec gradient_local;
+    arma::rowvec gradient;
+    arma::rowvec gradient_local;
 
-    rowvec gradient_old;
-    rowvec gradient_tot;
+    arma::rowvec gradient_old;
+    arma::rowvec gradient_tot;
 
     double f(double x);
     void get_variational_gradients(Walker* walker, double e_local);

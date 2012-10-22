@@ -8,8 +8,6 @@
 #ifndef WALKER_H
 #define	WALKER_H
 
-using namespace arma;
-
 class Walker {
 protected:
     int n_p;
@@ -27,22 +25,20 @@ public:
     double lapl_sum;
     double E;
 
-    mat r;
-    mat r_rel;
+    arma::mat r;
+    arma::mat r_rel;
 
-    mat qforce;
+    arma::mat qforce;
 
-    mat spatial_grad;
-    mat jast_grad;
-    mat inv;
+    arma::mat spatial_grad;
+    arma::mat jast_grad;
+    arma::mat inv;
 
-    mat phi;
-    arma::field<mat> dell_phi;
-    cube dJ;
+    arma::mat phi;
+    arma::field<arma::mat> dell_phi;
+    arma::cube dJ;
 
-    rowvec r2;
-
-
+    arma::rowvec r2;
 
     void calc_r_i2(int i);
 

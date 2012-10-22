@@ -7,7 +7,7 @@
 
 #include "../QMCheaders.h"
 
-Minimizer::Minimizer(VMC* vmc, const rowvec & alpha, const rowvec & beta) {
+Minimizer::Minimizer(VMC* vmc, const arma::rowvec & alpha, const arma::rowvec & beta) {
 
     this->vmc = vmc;
 
@@ -26,6 +26,7 @@ Minimizer::Minimizer(VMC* vmc, const rowvec & alpha, const rowvec & beta) {
 }
 
 void Minimizer::output(std::string message, double number) {
+    using namespace std;
 
     if (number != -1) {
         cout << message << " " << number << endl;
@@ -36,14 +37,14 @@ void Minimizer::output(std::string message, double number) {
 
     if (Nspatial_params != 0) std::cout << "\nAlpha:\n";
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
-        cout << "\t" << vmc->get_orbitals_ptr()->get_parameter(alpha) << std::endl;
+        cout << "\t" << vmc->get_orbitals_ptr()->get_parameter(alpha) << endl;
     }
 
     if (Njastrow_params != 0) std::cout << "\nBeta:\n";
     for (int beta = 0; beta < Njastrow_params; beta++) {
-        cout << "\t" << vmc->get_jastrow_ptr()->get_parameter(beta) << std::endl;
+        cout << "\t" << vmc->get_jastrow_ptr()->get_parameter(beta) << endl;
     }
 
-    std::cout << std::endl;
+    cout << endl;
 
 }

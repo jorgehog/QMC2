@@ -21,7 +21,7 @@ protected:
 
 public:
 
-    Minimizer(VMC* vmc, const rowvec & alpha, const rowvec & beta);
+    Minimizer(VMC* vmc, const arma::rowvec & alpha, const arma::rowvec & beta);
 
     Orbitals* get_orbitals() {
         return vmc->get_orbitals_ptr();

@@ -31,7 +31,7 @@ void stdoutDMC::dump() {
     file << sumE / n << "\t";
     file << dmc->n_w << "\t";
     file << sumN / n << "\t";
-    file << dmc->E_T << endl;
+    file << dmc->E_T << std::endl;
     
 
 }

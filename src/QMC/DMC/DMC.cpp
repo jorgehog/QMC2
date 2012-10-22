@@ -39,8 +39,8 @@ void DMC::initialize() {
     //Seting trial position of active walkers
     if (dist_from_file) {
 
-        ifstream dist;
-        string name = "dist_out.dat";
+        std::ifstream dist;
+        std::string name = "dist_out.dat";
         dist.open((dist_in_path + name).c_str());
 
         for (int k = 0; k < n_w; k++) {
@@ -84,7 +84,7 @@ void DMC::initialize() {
 void DMC::user_output() const {
     printf("dmcE: %1.5f| Nw: %4d| %1.5f%%", dmc_E / cycle, n_w,
             (double) cycle / n_c * 100);
-    cout << endl;
+    std::cout << std::endl;
 }
 
 void DMC::Evolve_walker(int k, double GB) {

@@ -76,6 +76,8 @@ void Closed_form::copy_walker_IS(const Walker* parent, Walker* child) const {
 }
 
 void Closed_form::reset_walker_IS(const Walker* walker_pre, Walker* walker_post, int particle) const {
+    using namespace arma;
+    
     int start = n2 * (particle >= n2);
     int end = start + n2 - 1;
 
@@ -86,6 +88,8 @@ void Closed_form::reset_walker_IS(const Walker* walker_pre, Walker* walker_post,
 }
 
 void Closed_form::update_walker_IS(Walker* walker_pre, const Walker* walker_post, int particle) const {
+    using namespace arma;
+    
     int start = n2 * (particle >= n2);
     int end = start + n2 - 1;
 

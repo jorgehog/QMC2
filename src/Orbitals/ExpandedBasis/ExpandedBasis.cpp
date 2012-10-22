@@ -12,7 +12,7 @@ ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size
 
     this->basis = basis;
     this->basis_size = basis_size;
-    coeffs = arma::zeros<mat > (n_p, basis_size);
+    coeffs = arma::zeros<arma::mat > (n_p, basis_size);
 
     std::ifstream coeffs_file;
     coeffs_file.open(coeffPath.c_str());

@@ -27,7 +27,7 @@ void Distribution::dump() {
                     file << vmc->original_walker->r(i, j) << " ";
                 }
             }
-            file << endl;
+            file << std::endl;
         }
     }
 
