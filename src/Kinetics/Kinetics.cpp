@@ -9,7 +9,7 @@
 
 
 Kinetics::Kinetics() {
-
+    //I SHALL BE GONE
 }
 
 Kinetics::Kinetics(int n_p, int dim) {
