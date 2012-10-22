@@ -41,13 +41,15 @@ protected:
 
     double get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const;
 
-    void calculate_energy_necessities(Walker* walker) const;
+    void set_spin_state(int particle) const;
 
     bool metropolis_test(double A);
     void update_walker(Walker*walker_pre, const Walker* walker_post, int particle) const;
     void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const;
 
     void copy_walker(const Walker* parent, Walker* child) const;
+
+    void calculate_energy_necessities(Walker* walker) const;
 
 public:
 
@@ -62,13 +64,21 @@ public:
     virtual void run_method() = 0;
     virtual void user_output() const = 0;
 
+
+
     double get_KE(const Walker* walker) const;
     void get_QF(Walker* walker) const;
 
     void get_gradients(const Walker* walker_pre, Walker* walker_post, int particle) const;
     void get_gradients(Walker* walker) const;
-    void get_wf_value(Walker* walker) const;
-    void get_laplsum(Walker* walker) const;
+
+    void get_laplsum(Walker* walker) const {
+        walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
+    }
+
+    void get_wf_value(Walker* walker) const {
+        walker->value = system->get_spatial_wf(walker) * jastrow->get_val(walker);
+    }
 
     double calculate_local_energy(const Walker* walker) const {
         return get_KE(walker) + system->get_potential_energy(walker);

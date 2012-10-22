@@ -13,10 +13,6 @@ Fokker_Planck::Fokker_Planck(int n_p, int dim, double timestep, long random_seed
 
 }
 
-double Fokker_Planck::get_new_pos(const Walker* walker, int i, int j) {
-    return D * timestep * walker->qforce(i,j) + Diffusion::get_new_pos(walker, i, j);
-}
-
 double Fokker_Planck::get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
 
     double g_ratio = 0;

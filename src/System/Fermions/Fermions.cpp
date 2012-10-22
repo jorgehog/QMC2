@@ -14,14 +14,17 @@ Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
 
 }
 
-void Fermions::initialize(Walker* walker) {
-    make_merged_inv(walker);
+void Fermions::get_spatial_grad_full(Walker* walker) const {
+    using namespace arma;
+
+    for (int i = 0; i < n_p; i++) {
+        walker->spatial_grad(i, span()) = strans(walker->dell_phi(i) * walker->inv(span(), i));
+    }
+
 }
 
 void Fermions::get_spatial_grad(Walker* walker, int particle) const {
     using namespace arma;
-
-    int start = n2 * (particle >= n2);
 
     for (int i = start; i < n2 + start; i++) {
         walker->spatial_grad(i, span()) = strans(walker->dell_phi(i) * walker->inv(span(), i));
@@ -32,16 +35,11 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
 void Fermions::make_merged_inv(Walker* walker) {
     using namespace arma;
 
-    int end;
-    for (int start = 0; start < n_p; start += n2) {
-        end = n2 + start - 1;
-        walker->inv(span(0, n2 - 1), span(start, end)) = arma::inv(walker->phi(span(start, end), span(0, n2 - 1)));
+    int _end;
+    for (int _start = 0; _start < n_p; _start += n2) {
+        _end = n2 + _start - 1;
+        walker->inv(span(0, n2 - 1), span(_start, _end)) = arma::inv(walker->phi(span(_start, _end), span(0, n2 - 1)));
     }
-}
-
-double Fermions::get_spatial_wf(const Walker* walker) {
-    using namespace arma;
-    return arma::det(walker->phi(span(0, n2 - 1), span())) * arma::det(walker->phi(span(n2, n_p - 1), span()));
 }
 
 double Fermions::get_spatial_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
@@ -57,10 +55,9 @@ double Fermions::get_spatial_ratio(const Walker* walker_pre, const Walker* walke
 }
 
 void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int particle) {
-    int k, l, j, start;
+    int k, l, j;
     double sum;
 
-    start = n2 * (particle >= n2);
 
     for (j = start; j < n2 + start; j++) {
         if (j == particle) {
@@ -85,10 +82,6 @@ void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int 
     }
 }
 
-void Fermions::calc_for_newpos(const Walker* walker_old, Walker* walker_new, int particle) {
-    update_inverse(walker_old, walker_new, particle);
-}
-
 double Fermions::get_spatial_lapl_sum(const Walker* walker) const {
     int i, j;
     double sum;
@@ -101,30 +94,4 @@ double Fermions::get_spatial_lapl_sum(const Walker* walker) const {
     }
 
     return sum;
-}
-
-void Fermions::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
-    using namespace arma;
-    
-    int start = n2 * (particle >= n2);
-    int end = start + n2 - 1;
-
-    //Reseting the parts with the same spin as the moved particle
-    walker_pre->inv(span(0, n2 - 1), span(start, end)) = walker_post->inv(span(0, n2 - 1), span(start, end));
-
-}
-
-void Fermions::copy_walker(const Walker* parent, Walker* child) const {
-    child->inv = parent->inv;
-}
-
-void Fermions::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
-    using namespace arma;
-    
-    int start = n2 * (particle >= n2);
-    int end = start + n2 - 1;
-
-    //Reseting the part of the inverse with the same spin as particle i
-    walker_post->inv(span(0, n2 - 1), span(start, end)) = walker_pre->inv(span(0, n2 - 1), span(start, end));
-
 }

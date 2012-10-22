@@ -166,14 +166,6 @@ double Pade_Jastrow::get_lapl_sum(const Walker * walker) const {
     return sum1 + 2 * sum2;
 }
 
-double Pade_Jastrow::get_parameter(int n) {
-    return beta;
-}
-
-void Pade_Jastrow::set_parameter(double param, int n) {
-    beta = param;
-}
-
 double Pade_Jastrow::get_variational_derivative(const Walker* walker, int n) const {
 
     double dbeta = 0.0;

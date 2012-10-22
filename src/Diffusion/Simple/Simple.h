@@ -12,8 +12,13 @@ class Simple : public Diffusion {
 public:
     Simple(int n_p, int dim, double timestep, long random_seed, double D = 0.5);
 
-    virtual double get_new_pos(const Walker* walker, int i, int j);
-    virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const;
+    virtual double get_new_pos(const Walker* walker, int i, int j) {
+        return Diffusion::get_new_pos(walker, i, j);
+    }
+
+    virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
+        return 1;
+    }
 
 };
 

@@ -89,11 +89,3 @@ void Sampling::update_pos(const Walker* walker_pre, Walker* walker_post, int par
     update_necessities(walker_pre, walker_post, particle);
 
 }
-
-double Sampling::get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
-    return diffusion->get_g_ratio(walker_post, walker_pre);
-}
-
-double Sampling::get_branching_Gfunc(double E_x, double E_y, double E_T) const {
-    return diffusion->get_GBfunc(E_x, E_y, E_T);
-}

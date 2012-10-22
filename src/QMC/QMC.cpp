@@ -59,16 +59,7 @@ void QMC::get_gradients(const Walker* walker_pre, Walker* walker_post, int parti
 
 void QMC::get_gradients(Walker* walker) const {
     jastrow->get_grad(walker);
-    system->get_spatial_grad(walker, 0);
-    system->get_spatial_grad(walker, n2);
-}
-
-void QMC::get_laplsum(Walker* walker) const {
-    walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
-}
-
-void QMC::get_wf_value(Walker* walker) const {
-    walker->value = system->get_spatial_wf(walker) * jastrow->get_val(walker);
+    system->get_spatial_grad_full(walker);
 }
 
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
@@ -78,10 +69,11 @@ double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_
     return spatial_jast * spatial_jast * G;
 }
 
-void QMC::calculate_energy_necessities(Walker* walker) const {
-    sampling->calculate_energy_necessities(walker);
-    get_laplsum(walker);
-    //    kinetics->calculate_energy_necessities(walker);
+void QMC::set_spin_state(int particle) const {
+    int start = n2 * (particle >= n2);
+    int end = start + n2 - 1;
+    system->set_spin_state(start, end);
+    sampling->set_spin_state(start, end);
 }
 
 bool QMC::metropolis_test(double A) {
@@ -94,6 +86,11 @@ bool QMC::metropolis_test(double A) {
     } else {
         return false;
     }
+}
+
+void QMC::calculate_energy_necessities(Walker* walker) const {
+    sampling->calculate_energy_necessities(walker);
+    get_laplsum(walker);
 }
 
 void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
@@ -150,6 +147,7 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 void QMC::diffuse_walker(Walker* original, Walker* trial) {
     for (int particle = 0; particle < n_p; particle++) {
 
+        set_spin_state(particle);
         sampling->update_pos(original, trial, particle);
 
         double A = get_acceptance_ratio(original, trial, particle);
