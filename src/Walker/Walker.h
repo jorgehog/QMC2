@@ -48,7 +48,7 @@ public:
         for (int i = 0; i < n_p; i++) {
             this->calc_r_i2(i);
         }
-    };
+    }
 
     double abs_relative(int i, int j) const;
 
@@ -56,7 +56,7 @@ public:
 
     double get_r_i2(int i) const {
         return r2(i);
-    };
+    }
 
     void kill() {
         is_murdered = true;

@@ -10,7 +10,7 @@
 Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
 : System(gP.n_p, gP.dim, orbital) {
 
-    I = arma::zeros<arma::rowvec > (n2);
+    I = arma::zeros<arma::rowvec > (n_p);
 
 }
 
@@ -61,22 +61,22 @@ void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int 
 
     for (j = start; j < n2 + start; j++) {
         if (j == particle) {
-            I(j - start) = walker_new->spatial_ratio;
+            I(j) = walker_new->spatial_ratio;
         } else {
             sum = 0;
             for (l = 0; l < n2; l++) {
                 sum += walker_new->phi(particle, l) * walker_old->inv(l, j);
             }
-            I(j - start) = sum;
+            I(j) = sum;
         }
     }
-    //updating the part of the inverse with the same spin as particle i
+
     for (k = 0; k < n2; k++) {
         for (j = start; j < n2 + start; j++) {
             if (j == particle) {
                 walker_new->inv(k, j) = walker_old->inv(k, particle) / walker_new->spatial_ratio;
             } else {
-                walker_new->inv(k, j) = walker_old->inv(k, j) - walker_old->inv(k, particle) / walker_new->spatial_ratio * I(j - start);
+                walker_new->inv(k, j) = walker_old->inv(k, j) - walker_old->inv(k, particle) / walker_new->spatial_ratio * I(j);
             }
         }
     }
