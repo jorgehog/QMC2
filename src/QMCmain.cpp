@@ -312,8 +312,8 @@ void parseCML(int argc, char** argv,
     } else {
         vmcParams.dt = 0.5;
     }
-    //
 
+    //Seting dmc inpath if dist out VMC is set
     if (outputParams.dist_out) {
         dmcParams.dist_in_path = outputParams.outputPath;
     }

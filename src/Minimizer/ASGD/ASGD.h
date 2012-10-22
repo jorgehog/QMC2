@@ -41,16 +41,16 @@ protected:
     arma::rowvec gradient_old;
     arma::rowvec gradient_tot;
 
-    double f(double x);
+    double f(double x) {
+        return f_min + (f_max - f_min) / (1 - (f_max / f_min) * exp(-x / w));
+    }
+    
     void get_variational_gradients(Walker* walker, double e_local);
 
 public:
     ASGD(VMC*, MinimizerParams &);
 
     virtual VMC* minimize();
-
-    std::ofstream DEBAG;
-    long random_seed;
 
 };
 

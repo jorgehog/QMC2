@@ -42,10 +42,6 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
     t_prev = A;
 }
 
-double ASGD::f(double x) {
-    return f_min + (f_max - f_min) / (1 - (f_max / f_min) * exp(-x / w));
-}
-
 void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
@@ -71,16 +67,13 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 VMC* ASGD::minimize() {
 
 
-    /* DEBUG */
 //    ofstream file;
 //    file.open("alpha.dat");
-//    DEBAG.open("sammenliknnBF_Num.dat");
     int debug1;
     double aGrad, bGrad, sumE;
     aGrad = bGrad = sumE = 0;
     debug1 = 1;
     //
-
 
     vmc->initialize();
 
@@ -95,7 +88,6 @@ VMC* ASGD::minimize() {
         }
     }
 
-    //D:100% match this far for BF and IS. Walker copy funker for alle.
 
     int corrLength = 1;
     for (int sample = 1; sample <= SGDsamples; sample++) {
@@ -113,17 +105,14 @@ VMC* ASGD::minimize() {
                     vmc->calculate_energy_necessities(walkers[k]);
                     double e_local = vmc->calculate_local_energy(walkers[k]);
                     E += e_local;
-//                    DEBAG << E / ((cycle + 1)*(k + 1)) << endl;
                     get_variational_gradients(walkers[k], e_local);
                 }
 
             }
-//            DEBAG << "Changed Walker" << endl;
         }
 
         int scale = n_walkers * n_c_SGD / corrLength;
 
-        //        cout << E / scale << endl;
         E /= scale;
 
         gradient_tot = 2 * (gradient_local - gradient * E) / scale;
@@ -188,7 +177,6 @@ VMC* ASGD::minimize() {
 
     output("Finished minimizing. Final parameters:", -1);
 //    file.close();
-//    DEBAG.close();
     vmc->accepted = 0;
     return vmc;
 }
