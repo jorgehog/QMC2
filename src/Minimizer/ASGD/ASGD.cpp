@@ -88,7 +88,7 @@ VMC* ASGD::minimize() {
         }
     }
 
-
+    //test
     int corrLength = 1;
     for (int sample = 1; sample <= SGDsamples; sample++) {
 
