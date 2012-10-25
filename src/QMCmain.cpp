@@ -209,7 +209,7 @@ void parseCML(int argc, char** argv,
 
     //    vmcParams.n_c = 1E6;
     vmcParams.n_c = 1E4;
-
+    //test
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;
     dmcParams.n_b = 100;
