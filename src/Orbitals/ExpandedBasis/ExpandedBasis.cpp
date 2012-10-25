@@ -27,7 +27,7 @@ ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size
 
 }
 
-double ExpandedBasis::phi(const Walker* walker, int particle, int q_num) const {
+double ExpandedBasis::phi(const Walker* walker, int particle, int q_num) {
 
     double value = 0;
     for (int m = 0; m < basis_size; m++) {
@@ -38,7 +38,7 @@ double ExpandedBasis::phi(const Walker* walker, int particle, int q_num) const {
 
 }
 
-double ExpandedBasis::del_phi(const Walker* walker, int particle, int q_num, int d) const {
+double ExpandedBasis::del_phi(const Walker* walker, int particle, int q_num, int d) {
 
     double value = 0;
     for (int m = 0; m < basis_size; m++) {
@@ -49,7 +49,7 @@ double ExpandedBasis::del_phi(const Walker* walker, int particle, int q_num, int
 
 }
 
-double ExpandedBasis::lapl_phi(const Walker* walker, int particle, int q_num) const {
+double ExpandedBasis::lapl_phi(const Walker* walker, int particle, int q_num) {
 
     double value = 0;
     for (int m = 0; m < basis_size; m++) {

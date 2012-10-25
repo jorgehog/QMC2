@@ -12,7 +12,7 @@ class BasisFunctions {
 public:
     BasisFunctions();
     
-    virtual double eval(const Walker* walker, int i) const = 0;
+    virtual double eval(const Walker* walker, int i) = 0;
 };
 
 #endif	/* BASISFUNCTIONS_H */

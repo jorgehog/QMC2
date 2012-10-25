@@ -16,18 +16,32 @@ Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
 
 void Fermions::get_spatial_grad_full(Walker* walker) const {
     using namespace arma;
+    double sum;
 
     for (int i = 0; i < n_p; i++) {
-        walker->spatial_grad(i, span()) = strans(walker->dell_phi(i) * walker->inv(span(), i));
+        for (int k = 0; k < dim; k++) {
+            sum = 0;
+            for (int j = 0; j < n2; j++) {
+                sum += walker->dell_phi(i)(k, j)*walker->inv(j, i);
+            }
+            walker->spatial_grad(i, k) = sum;
+        }
     }
 
 }
 
 void Fermions::get_spatial_grad(Walker* walker, int particle) const {
     using namespace arma;
+    double sum;
 
     for (int i = start; i < n2 + start; i++) {
-        walker->spatial_grad(i, span()) = strans(walker->dell_phi(i) * walker->inv(span(), i));
+        for (int k = 0; k < dim; k++) {
+            sum = 0;
+            for (int j = 0; j < n2; j++) {
+                sum += walker->dell_phi(i)(k, j)*walker->inv(j, i);
+            }
+            walker->spatial_grad(i, k) = sum;
+        }
     }
 
 }
@@ -38,7 +52,7 @@ void Fermions::make_merged_inv(Walker* walker) {
     int _end;
     for (int _start = 0; _start < n_p; _start += n2) {
         _end = n2 + _start - 1;
-        walker->inv(span(0, n2 - 1), span(_start, _end)) = arma::inv(walker->phi(span(_start, _end), span(0, n2 - 1)));
+        walker->inv(span(), span(_start, _end)) = inv(walker->phi(span(_start, _end), span()));
     }
 }
 
@@ -80,6 +94,7 @@ void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int 
             }
         }
     }
+
 }
 
 double Fermions::get_spatial_lapl_sum(const Walker* walker) const {
@@ -88,7 +103,8 @@ double Fermions::get_spatial_lapl_sum(const Walker* walker) const {
 
     sum = 0;
     for (i = 0; i < n_p; i++) {
-        for (j = 0; j < n_p / 2; j++) {
+        orbital->set_qnum_indie_terms(walker, i);
+        for (j = 0; j < n2; j++) {
             sum += orbital->lapl_phi(walker, i, j) * walker->inv(j, i);
         }
     }

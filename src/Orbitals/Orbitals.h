@@ -25,10 +25,11 @@ protected:
 
     virtual double get_parameter(int n) = 0;
     virtual void set_parameter(double parameter, int n) = 0;
+
     virtual double get_variational_derivative(const Walker* walker, int n) const = 0;
 
-    double num_diff(const Walker* walker, int particle, int q_num, int d) const;
-    double num_ddiff(const Walker* walker, int particle, int q_num) const;
+    double num_diff(const Walker* walker, int particle, int q_num, int d);
+    double num_ddiff(const Walker* walker, int particle, int q_num);
 
     friend class Minimizer;
     friend class ASGD;
@@ -38,15 +39,34 @@ public:
     Orbitals(int n_p, int dim);
     Orbitals();
 
-    virtual double phi(const Walker* walker, int particle, int q_num) const {
+    virtual void set_qnum_indie_terms(const Walker* walker, int i) {
+    };
+
+    virtual double phi(const Walker* walker, int particle, int q_num) {
         return basis_functions[q_num]->eval(walker, particle);
     }
 
-    virtual double del_phi(const Walker* walker, int particle, int q_num, int d) const {
+    virtual double del_phi(const Walker* walker, int particle, int q_num, int d) {
+//        using namespace std;
+//        double a = dell_basis_functions[d][q_num]->eval(walker, particle);
+//        a -= num_diff(walker, particle, q_num, d);
+//        if (fabs(a) > 0.0001) {
+//            cout << "mismatch dell: " << particle << " " << q_num << " "  << d <<" " << a << endl;
+//        }
+//        set_qnum_indie_terms(walker, particle);
+        //        return num_diff(walker, particle, q_num, d);
         return dell_basis_functions[d][q_num]->eval(walker, particle);
     }
 
-    virtual double lapl_phi(const Walker* walker, int particle, int q_num) const {
+    virtual double lapl_phi(const Walker* walker, int particle, int q_num) {
+//        using namespace std;
+//        double a = lapl_basis_functions[q_num]->eval(walker, particle);
+//        a -= num_ddiff(walker, particle, q_num);
+//        if (fabs(a) > 0.0001) {
+//            cout << "mismatch lapl: " << particle << " " << q_num << " " << a << endl;
+//        }
+//        set_qnum_indie_terms(walker, particle);
+        //        return num_ddiff(walker, particle, q_num);
         return lapl_basis_functions[q_num]->eval(walker, particle);
     }
 

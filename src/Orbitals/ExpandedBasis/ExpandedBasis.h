@@ -12,9 +12,9 @@ class ExpandedBasis : public Orbitals {
 public:
     ExpandedBasis(GeneralParams & gp, Orbitals* basis, int m, std::string coeffPath);
 
-    virtual double phi(const Walker* walker, int particle, int q_num) const;
-    virtual double del_phi(const Walker* walker, int particle, int q_num, int d) const;
-    virtual double lapl_phi(const Walker* walker, int particle, int q_num) const;
+    virtual double phi(const Walker* walker, int particle, int q_num);
+    virtual double del_phi(const Walker* walker, int particle, int q_num, int d);
+    virtual double lapl_phi(const Walker* walker, int particle, int q_num);
 
 protected:
     int basis_size;

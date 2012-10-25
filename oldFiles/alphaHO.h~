@@ -15,7 +15,6 @@ protected:
     double* k2;
     double* exp_factor;
 
-    double H;
     double x2;
     double y2;
 

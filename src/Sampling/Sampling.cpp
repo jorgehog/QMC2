@@ -18,20 +18,19 @@ Sampling::Sampling() {
 }
 
 void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* file) {
-    int i, j;
 
     if (load_VMC_dist) {
 
         double pos;
-        for (i = 0; i < n_p; i++) {
-            for (j = 0; j < dim; j++) {
+        for (int i = 0; i < n_p; i++) {
+            for (int j = 0; j < dim; j++) {
                 *file >> pos;
                 walker->r(i, j) = pos;
             }
         }
     } else {
-        for (i = 0; i < n_p; i++) {
-            for (j = 0; j < dim; j++) {
+        for (int i = 0; i < n_p; i++) {
+            for (int j = 0; j < dim; j++) {
                 walker->r(i, j) = diffusion->Diffusion::get_new_pos(walker, i, j);
             }
         }
@@ -39,24 +38,29 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
 
     walker->calc_r_i2();
 
-    for (i = 0; i < n2; i++) {
-        for (j = 0; j < n2; j++) {
-
-            walker->phi(i, j) = qmc->get_orbitals_ptr()->phi(walker, i, j);
-            walker->phi(i + n2, j) = qmc->get_orbitals_ptr()->phi(walker, i + n2, j);
-
-            for (int k = 0; k < dim; k++) {
-                walker->dell_phi(i)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker, i, j, k);
-                walker->dell_phi(i + n2)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker, i + n2, j, k);
-            }
-        }
-    }
-
+    set_trial_states(walker);
     walker->make_rel_matrix();
     qmc->get_system_ptr()->initialize(walker);
     qmc->get_jastrow_ptr()->get_dJ_matrix(walker);
     get_necessities(walker);
 
+}
+
+void Sampling::set_trial_states(Walker* walker) {
+
+    for (int i = 0; i < n_p; i++) {
+
+        qmc->get_orbitals_ptr()->set_qnum_indie_terms(walker, i);
+
+        for (int j = 0; j < n2; j++) {
+            walker->phi(i, j) = qmc->get_orbitals_ptr()->phi(walker, i, j);
+        }
+        for (int j = 0; j < n2; j++) {
+            for (int k = 0; k < dim; k++) {
+                walker->dell_phi(i)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker, i, j, k);
+            }
+        }
+    }
 }
 
 void Sampling::update_pos(const Walker* walker_pre, Walker* walker_post, int particle) const {
@@ -74,9 +78,13 @@ void Sampling::update_pos(const Walker* walker_pre, Walker* walker_post, int par
     }
 
     walker_post->calc_r_i2(particle);
+    qmc->get_orbitals_ptr()->set_qnum_indie_terms(walker_post, particle);
+
     for (int j = 0; j < n2; j++) {
         walker_post->phi(particle, j) = qmc->get_orbitals_ptr()->phi(walker_post, particle, j);
-
+    }
+    
+    for (int j = 0; j < n2; j++) {
         for (int k = 0; k < dim; k++) {
             walker_post->dell_phi(particle)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker_post, particle, j, k);
         }

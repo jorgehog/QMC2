@@ -196,12 +196,6 @@ double QMC::get_KE(const Walker* walker) const {
     return -0.5 * e_kinetic;
 }
 
-void QMC::get_QF(Walker* walker) const {
-    int i, j;
-
-    for (i = 0; i < n_p; i++) {
-        for (j = 0; j < dim; j++) {
-            walker->qforce(i, j) = 2 * (walker->jast_grad(i, j) + walker->spatial_grad(i, j));
-        }
-    }
+void QMC::get_QF(Walker* walker) const { 
+    walker->qforce = 2*(walker->jast_grad + walker->spatial_grad);
 }

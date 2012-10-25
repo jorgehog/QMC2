@@ -32,17 +32,18 @@ Orbitals::Orbitals() {
 
 }
 
-double Orbitals::num_diff(const Walker* walker, int particle, int q_num, int d) const {
+double Orbitals::num_diff(const Walker* walker, int particle, int q_num, int d) {
 
     Walker* diff_walker = new Walker(n_p, dim, false);
     diff_walker->r = walker->r;
     diff_walker->r(particle, d) += h;
     diff_walker->calc_r_i2(particle);
-
+    set_qnum_indie_terms(diff_walker, particle);
     double phi_pluss = basis_functions[q_num]->eval(diff_walker, particle);
 
     diff_walker->r(particle, d) -= 2 * h;
     diff_walker->calc_r_i2(particle);
+    set_qnum_indie_terms(diff_walker, particle);
     double phi_minus = basis_functions[q_num]->eval(diff_walker, particle);
 
     delete diff_walker;
@@ -51,7 +52,7 @@ double Orbitals::num_diff(const Walker* walker, int particle, int q_num, int d) 
 
 }
 
-double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) const {
+double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) {
     Walker* diff_walker = new Walker(n_p, dim, false);
     diff_walker->r = walker->r;
 
@@ -60,10 +61,12 @@ double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) const 
 
         diff_walker->r(particle, k) += h;
         diff_walker->calc_r_i2(particle);
+        set_qnum_indie_terms(diff_walker, particle);
         ddiff += basis_functions[q_num]->eval(diff_walker, particle);
 
         diff_walker->r(particle, k) -= 2 * h;
         diff_walker->calc_r_i2(particle);
+        set_qnum_indie_terms(diff_walker, particle);
         ddiff += basis_functions[q_num]->eval(diff_walker, particle);
 
         diff_walker->r(particle, k) += h;

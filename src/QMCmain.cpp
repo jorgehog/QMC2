@@ -186,8 +186,8 @@ void parseCML(int argc, char** argv,
     //    generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
-//    generalParams.random_seed = -time(NULL);
-    generalParams.random_seed = -1234;
+    generalParams.random_seed = -time(NULL);
+//    generalParams.random_seed = -1234;
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
@@ -222,8 +222,8 @@ void parseCML(int argc, char** argv,
     if (argc == 1) {
         variationalParams.alpha = 0.78;
         variationalParams.beta = 0.85;
-        //        variationalParams.alpha = 0.987;
-        //        variationalParams.beta = 0.398;
+//        variationalParams.alpha = 0.987;
+//        variationalParams.beta = 0.398;
     }
 
     minimizerParams.max_step = 0.1;

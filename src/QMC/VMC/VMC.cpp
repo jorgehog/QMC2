@@ -40,7 +40,7 @@ void VMC::scale_values() {
 }
 
 void VMC::run_method() {
-
+    using namespace std;
     initialize();
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
@@ -53,7 +53,6 @@ void VMC::run_method() {
 
         calculate_energy_necessities(original_walker);
         calculate_energy(original_walker);
-
         dump_output();
 
     }
