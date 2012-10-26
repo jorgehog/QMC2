@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
             minimizerParams,
             outputParams,
             systemObjects);
-
+    cout << variationalParams.alpha << " " << variationalParams.beta << endl;
     if (generalParams.kinetics_type == "Num") {
         systemObjects.kinetics = new Numerical(generalParams);
     } else if (generalParams.kinetics_type == "CF") {
@@ -117,7 +117,10 @@ int main(int argc, char** argv) {
         }
 
         if (generalParams.doVMC) {
+            arma::wall_clock t;
+            t.tic();
             vmc->run_method();
+            cout << endl << t.toc() << endl;
             dmcParams.E_T = vmc->get_energy();
         }
 
@@ -175,7 +178,7 @@ void parseCML(char** argv, VMCparams & vmcParams,
     outputParams.outputSuffix = "";
     outputParams.outputPath = "/home/jorgmeister/scratch/";
 
-
+    cout << "WORKING CODE INITIALIZED" << endl;
     generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
@@ -301,4 +304,6 @@ void parseCML(char** argv, VMCparams & vmcParams,
     if (outputParams.dist_out){
         dmcParams.dist_in_path = outputParams.outputPath;
     }
+    
+    cout << "seed: " << generalParams.random_seed << endl;
 }
