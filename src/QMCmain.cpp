@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct OutputParams outputParams;
     struct SystemObjects systemObjects;
-    cout << "OPTIMIZED NON WORKING CODE INITIALIZED" << endl;
+
     parseCML(argc, argv,
             vmcParams,
             dmcParams,
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
             minimizerParams,
             outputParams,
             systemObjects);
-    cout << variationalParams.alpha << " " << variationalParams.beta << endl;
+
     //    if (generalParams.kinetics_type == "Num") {
     //        systemObjects.kinetics = new Numerical(generalParams);
     //    } else if (generalParams.kinetics_type == "CF") {
@@ -193,9 +193,9 @@ void parseCML(int argc, char** argv,
     generalParams.numprocs = 1;
     generalParams.myrank = 0;
 
-    generalParams.doMIN = true;
+    generalParams.doMIN = argc == 1;
     generalParams.doVMC = argc == 1;
-    generalParams.doDMC = true;
+    generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
