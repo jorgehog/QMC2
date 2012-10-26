@@ -306,4 +306,5 @@ void parseCML(char** argv, VMCparams & vmcParams,
     }
     
     cout << "seed: " << generalParams.random_seed << endl;
+    //test
 }
