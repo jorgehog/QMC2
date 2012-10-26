@@ -7,8 +7,8 @@ Created on Mon Oct  8 13:05:51 2012
 
 from pyLibQMC import paths
 
-validation = True
-fullruns = False
+validation = False
+fullruns = True
 test = False
 
 if test:
@@ -86,8 +86,8 @@ alpha=1
                 
 if fullruns:
     
-    wList = [1, 0.5, 0.28]
-    npList = [2, 6, 12]
+    wList = [1, 0.5]
+    npList = [2, 6, 12, 20, 30]
     
     rawFile = """general:
 n_p = __NP__
@@ -105,7 +105,7 @@ dist_out = 1
 
 MIN:
 SGDsamples=10000
-
+n_c_SGD=200
 
 """
 

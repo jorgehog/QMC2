@@ -358,6 +358,9 @@ def convertToCMLargs(arglist):
     
     return cmlArgs
     
+def sendVersion(superDir):
+    os.system("git branch -v > " + superDir + "/version.txt")
+
             
 def initRuns(CMLargs, stdoutFileFlag, dirs, superDir):
 
@@ -368,6 +371,7 @@ def initRuns(CMLargs, stdoutFileFlag, dirs, superDir):
         os.system(paths.programPath + "/" + variables.QMC2programName + " " + CMLarg + stdout)
         i+=1
     if superDir:
+        sendVersion(superDir)
         shutil.copy(paths.toolsPath + "/output2tex.py", superDir)
     
 
