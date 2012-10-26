@@ -156,7 +156,7 @@ double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker,
             H_fac *= sq_w_over_a;
 
 
-            dalpha += walker->inv(i, qnum)*(H_fac + exp_fac) * basis_functions[qnum]->eval(walker, i);
+            dalpha += walker->inv(qnum, i)*(H_fac + exp_fac) * basis_functions[qnum]->eval(walker, i);
         }
     }
 

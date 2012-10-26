@@ -4,16 +4,16 @@ import os, time
 
 class paths:
     HOME = os.path.expanduser('~')
-    CODE = HOME +  "/MASTER/QMC2"
-    IDEPath = HOME + "/NetBeansProjects/nbQMC2"
+    CODE = HOME +  "/scratch/tryfixQMC"
+    IDEPath = HOME + "/NetBeansProjects/nbQMC_debug/nbQMC2_debug"
     toolsPath = CODE + "/tools"
-    scratchPath = HOME + "/scratch"
+    scratchPath = HOME + "/scratch/debug"
     iniFilePath = CODE + "/iniFiles"
-    programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/GNU-Linux-x86"
+    programPath = HOME + "/NetBeansProjects/nbQMC_debug/nbQMC2_debug/dist/Debug/GNU-Linux-x86"
     
 
 class variables:
-    QMC2programName = "nbqmc2"
+    QMC2programName = "nbqmc2_debug"
 
 
 def add_date(filename):

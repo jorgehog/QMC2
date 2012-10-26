@@ -66,7 +66,6 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
 VMC* ASGD::minimize() {
 
-
 //    ofstream file;
 //    file.open("alpha.dat");
     int debug1;
@@ -74,9 +73,8 @@ VMC* ASGD::minimize() {
     aGrad = bGrad = sumE = 0;
     debug1 = 1;
     //
-
     vmc->initialize();
-
+    
     int k = 0;
     for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
         vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
@@ -125,7 +123,7 @@ VMC* ASGD::minimize() {
         }
 
         //        output progress
-        if ((sample % 1) == 0) {
+        if ((sample % 100) == 0) {
             output("cycle:", sample);
             std::cout << gradient_tot << std::endl;
             std::cout << E << std::endl;

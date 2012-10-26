@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct OutputParams outputParams;
     struct SystemObjects systemObjects;
-
+    cout << "OPTIMIZED NON WORKING CODE INITIALIZED" << endl;
     parseCML(argc, argv,
             vmcParams,
             dmcParams,
@@ -43,15 +43,15 @@ int main(int argc, char** argv) {
             minimizerParams,
             outputParams,
             systemObjects);
-
-//    if (generalParams.kinetics_type == "Num") {
-//        systemObjects.kinetics = new Numerical(generalParams);
-//    } else if (generalParams.kinetics_type == "CF") {
-//        systemObjects.kinetics = new Closed_form(generalParams);
-//    } else {
-//        cout << "unknown kinetics" << endl;
-//        exit(1);
-//    }
+    cout << variationalParams.alpha << " " << variationalParams.beta << endl;
+    //    if (generalParams.kinetics_type == "Num") {
+    //        systemObjects.kinetics = new Numerical(generalParams);
+    //    } else if (generalParams.kinetics_type == "CF") {
+    //        systemObjects.kinetics = new Closed_form(generalParams);
+    //    } else {
+    //        cout << "unknown kinetics" << endl;
+    //        exit(1);
+    //    }
 
     if (generalParams.sampling == "IS") {
         systemObjects.sample_method = new Importance(generalParams);
@@ -113,7 +113,6 @@ int main(int argc, char** argv) {
         if (generalParams.doMIN) {
 
             Minimizer * minimizer = new ASGD(vmc, minimizerParams);
-
             vmc = minimizer->minimize();
         }
 
@@ -121,7 +120,8 @@ int main(int argc, char** argv) {
             arma::wall_clock t;
             t.tic();
             vmc->run_method();
-            cout <<endl<< t.toc() << endl;;
+            cout << endl << t.toc() << endl;
+            ;
             dmcParams.E_T = vmc->get_energy();
         }
 
@@ -180,14 +180,12 @@ void parseCML(int argc, char** argv,
     outputParams.blocking_out = false;
     outputParams.dist_out = false;
     outputParams.outputSuffix = "";
-    outputParams.outputPath = "/home/jorgmeister/scratch/";
+    outputParams.outputPath = "/home/jorgmeister/scratch/debug";
 
-    generalParams.n_p = 30;
-    //    generalParams.n_p = 2;
+    generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
     generalParams.random_seed = -time(NULL);
-//    generalParams.random_seed = -1234;
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
@@ -195,21 +193,20 @@ void parseCML(int argc, char** argv,
     generalParams.numprocs = 1;
     generalParams.myrank = 0;
 
-    generalParams.doMIN = false;
+    generalParams.doMIN = true;
     generalParams.doVMC = argc == 1;
-    generalParams.doDMC = false;
+    generalParams.doDMC = true;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-//    generalParams.kinetics_type = "CF";
+    //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
 
-    //    vmcParams.n_c = 1E6;
-    vmcParams.n_c = 1E4;
-    //test
+    vmcParams.n_c = 1E6;
+
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;
     dmcParams.n_b = 100;
@@ -217,20 +214,20 @@ void parseCML(int argc, char** argv,
     dmcParams.n_c = 1000;
     dmcParams.therm = 1000;
     dmcParams.dist_in = outputParams.dist_out & generalParams.doVMC;
-    dmcParams.dist_in_path = "/home/jorgmeister/scratch/";
+    dmcParams.dist_in_path = "/home/jorgmeister/scratch/debug";
 
     if (argc == 1) {
-        variationalParams.alpha = 0.78;
-        variationalParams.beta = 0.85;
-//        variationalParams.alpha = 0.987;
-//        variationalParams.beta = 0.398;
+        //        variationalParams.alpha = 0.78;
+        //        variationalParams.beta = 0.85;
+        variationalParams.alpha = 0.987;
+        variationalParams.beta = 0.398;
     }
 
     minimizerParams.max_step = 0.1;
     minimizerParams.f_max = 1.0;
     minimizerParams.f_min = -0.5;
     minimizerParams.omega = 0.8;
-    minimizerParams.A = 50;
+    minimizerParams.A = 20;
     minimizerParams.a = 0.3;
     minimizerParams.SGDsamples = 2000;
     minimizerParams.n_walkers = 10;
@@ -269,7 +266,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[16]) != 0) generalParams.use_jastrow = (bool)atoi(argv[16]);
 
         if (def.compare(argv[17]) != 0) generalParams.sampling = argv[17];
-//        if (def.compare(argv[18]) != 0) generalParams.kinetics_type = argv[18];
+        //        if (def.compare(argv[18]) != 0) generalParams.kinetics_type = argv[18];
         if (def.compare(argv[19]) != 0) generalParams.system = argv[19];
 
 
@@ -317,4 +314,6 @@ void parseCML(int argc, char** argv,
     if (outputParams.dist_out) {
         dmcParams.dist_in_path = outputParams.outputPath;
     }
+    
+    std::cout << "seed: " << generalParams.random_seed << std::endl;
 }
