@@ -14,6 +14,8 @@ protected:
     int n2;
     int dim;
     int max_implemented;
+    
+    QMC* qmc;
 
     double h;
     double h2;
@@ -26,13 +28,14 @@ protected:
     virtual double get_parameter(int n) = 0;
     virtual void set_parameter(double parameter, int n) = 0;
 
-    virtual double get_variational_derivative(const Walker* walker, int n) const = 0;
+    virtual double get_variational_derivative(const Walker* walker, int n);
 
     double num_diff(const Walker* walker, int particle, int q_num, int d);
     double num_ddiff(const Walker* walker, int particle, int q_num);
 
     friend class Minimizer;
     friend class ASGD;
+    friend class stdoutASGD;
 
 public:
 
@@ -70,6 +73,10 @@ public:
         return lapl_basis_functions[q_num]->eval(walker, particle);
     }
 
+    void set_qmc_ptr(QMC* qmc){
+        this->qmc = qmc;
+    }
+    
 };
 
 

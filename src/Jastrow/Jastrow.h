@@ -18,7 +18,7 @@ protected:
 
     virtual double get_parameter(int n) = 0;
     virtual void set_parameter(double param, int n) = 0;
-    virtual double get_variational_derivative(const Walker* walker, int n) const = 0;
+    virtual double get_variational_derivative(const Walker* walker, int n);
 
 
 public:
@@ -39,6 +39,7 @@ public:
   
     friend class Minimizer;
     friend class ASGD;
+    friend class stdoutASGD;
     
 };
 

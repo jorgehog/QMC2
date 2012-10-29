@@ -13,6 +13,8 @@ protected:
     bool is_vmc;
     bool is_dmc;
     
+    bool is_ASGD;
+    
     bool parallel;
     int my_rank;
     int num_procs;
@@ -25,6 +27,8 @@ protected:
     QMC* qmc;
     DMC* dmc;
     VMC* vmc;
+    Minimizer* min;
+    ASGD* asgd;
 
 public:
 
@@ -40,6 +44,7 @@ public:
     virtual void finalize();
     
     void set_qmc_ptr(QMC* qmc);
+    void set_min_ptr(Minimizer* min);
 
 };
 

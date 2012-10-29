@@ -13,7 +13,7 @@ protected:
     double beta;
     arma::mat a;
 
-    virtual double get_variational_derivative(const Walker* walker, int n) const;
+    virtual double get_variational_derivative(const Walker* walker, int n);
 
     virtual void set_parameter(double param, int n) {
         beta = param;

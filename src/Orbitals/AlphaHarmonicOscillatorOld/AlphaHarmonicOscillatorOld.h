@@ -16,7 +16,7 @@ private:
 
     virtual double get_parameter(int n);
     virtual void set_parameter(double parameter, int n);
-    virtual double get_variational_derivative(const Walker* walker, int n) const;
+    virtual double get_variational_derivative(const Walker* walker, int n);
     
 public:
     AlphaHarmonicOscillatorOld(GeneralParams &, VariationalParams &);

@@ -31,7 +31,7 @@ protected:
 
     double w;
 
-    virtual double get_variational_derivative(const Walker* walker, int n) const;
+    virtual double get_variational_derivative(const Walker* walker, int n);
 
     void get_qnums();
     double H(int n, double x) const;

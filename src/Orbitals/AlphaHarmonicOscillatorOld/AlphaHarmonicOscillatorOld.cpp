@@ -89,7 +89,7 @@ void AlphaHarmonicOscillatorOld::set_parameter(double parameter, int n) {
     *alpha = parameter;
 }
 
-double AlphaHarmonicOscillatorOld::get_variational_derivative(const Walker* walker, int n) const {
+double AlphaHarmonicOscillatorOld::get_variational_derivative(const Walker* walker, int n){
     double dalpha = 0.0;
 
     for (int i = 0; i < n_p; i++) {

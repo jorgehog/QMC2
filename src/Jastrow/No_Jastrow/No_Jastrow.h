@@ -17,7 +17,7 @@ protected:
     
     virtual void set_parameter(double param, int n) {};
 
-    virtual double get_variational_derivative(const Walker* walker, int n) const {
+    virtual double get_variational_derivative(const Walker* walker, int n) {
         return 0;
     }
 

@@ -19,7 +19,7 @@ OutputHandler::OutputHandler(std::string filename,
 
     this->is_dmc = false;
     this->is_vmc = false;
-    
+
     this->my_rank = my_rank;
     this->num_procs = num_procs;
     this->parallel = parallel;
@@ -35,34 +35,40 @@ OutputHandler::OutputHandler(std::string filename,
 
 }
 
-void OutputHandler::set_qmc_ptr(QMC* qmc){
-    if (this->is_dmc){
-        dmc = (DMC*)qmc;
+void OutputHandler::set_qmc_ptr(QMC* qmc) {
+    if (this->is_dmc) {
+        dmc = (DMC*) qmc;
     } else if (this->is_vmc) {
-        vmc = (VMC*)qmc;
+        vmc = (VMC*) qmc;
     } else {
         this->qmc = qmc;
+    }
+}
+
+void OutputHandler::set_min_ptr(Minimizer* min){
+    if (this->is_ASGD) {
+        this->asgd = (ASGD*) min;
+    } else {
+        this->min = min;
     }
 }
 
 void OutputHandler::finalize() {
     file.close();
 
-    if (parallel) {
-        if (my_rank == 0) {
-            std::string compressorPath = "~/MASTER/QMC2/tools/compressData.sh";
+    if (parallel & (my_rank == 0)) {
+        std::string compressorPath = "~/MASTER/QMC2/tools/compressData.sh";
 
-            //Bash script "~/compressData ~/test/ blocking 4"
-            std::system(((((((((std::string)"bash " +
-                    compressorPath) +
-                    " ") +
-                    path) +
-                    " ") +
-                    filename) +
-                    " ") +
-                    boost::lexical_cast<std::string > (num_procs)).c_str()
-                    );
+        //Bash script "~/compressData ~/test/ blocking 4"
+        std::system(((((((((std::string)"bash " +
+                compressorPath) +
+                " ") +
+                path) +
+                " ") +
+                filename) +
+                " ") +
+                boost::lexical_cast<std::string > (num_procs)).c_str()
+                );
 
-        }
     }
 }

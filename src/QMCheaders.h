@@ -80,6 +80,7 @@ struct OutputParams {
     bool dist_out;
     bool blocking_out;
     bool dmc_out;
+    bool ASGD_out;
     std::string outputSuffix;
     std::string outputPath;
 
@@ -103,7 +104,9 @@ struct SystemObjects {
 #include "Walker/Walker.h"
 
 class Minimizer;
+class ASGD;
 class OutputHandler;
+class QMC;
 
 #include "BasisFunctions/BasisFunctions.h"
 #include "BasisFunctions/semiAlphaHO/semiAlphaHO.h"
@@ -141,6 +144,7 @@ class OutputHandler;
 #include "OutputHandler/Distribution/Distribution.h"
 #include "OutputHandler/BlockingData/BlockingData.h"
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
+#include "OutputHandler/stdoutASGD/stdoutASGD.h"
 
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"

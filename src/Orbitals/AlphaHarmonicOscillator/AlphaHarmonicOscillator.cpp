@@ -134,7 +134,7 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
     }
 }
 
-double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker, int n) const {
+double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker, int n) {
     double dalpha, sq_w_over_a, exp_fac, H_fac, rij;
     int nij;
 

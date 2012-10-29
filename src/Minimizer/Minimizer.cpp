@@ -48,3 +48,24 @@ void Minimizer::output(std::string message, double number) {
     cout << endl;
 
 }
+
+void Minimizer::add_output(OutputHandler* output_handler) {
+    output_handler->set_min_ptr(this);
+    this->output_handler.push_back(output_handler);
+}
+
+void Minimizer::dump_output() {
+
+    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
+        (*output_obj)->dump();
+    }
+
+}
+
+void Minimizer::finalize_output() {
+
+    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
+        (*output_obj)->finalize();
+    }
+
+}

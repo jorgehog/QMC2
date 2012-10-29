@@ -104,7 +104,14 @@ int main(int argc, char** argv) {
         if (generalParams.doMIN) {
 
             Minimizer * minimizer = new ASGD(vmc, minimizerParams);
-
+            
+            if (outputParams.ASGD_out){
+                string ASGDoutname = "ASGD_out" + outputParams.outputSuffix;
+                OutputHandler* ASGDout = new stdoutASGD(ASGDoutname, outputParams.outputPath,
+                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                minimizer->add_output(ASGDout);
+            }
+            
             t.tic();
             vmc = minimizer->minimize();
             cout << "Minimization time: " << t.toc() << endl;
@@ -161,6 +168,7 @@ void parseCML(int argc, char** argv,
     outputParams.dist_out = false;
     //NEW
     outputParams.dmc_out = false;
+    outputParams.ASGD_out = false;
     outputParams.outputSuffix = "";
     outputParams.outputPath = "/home/jorgmeister/scratch";
 

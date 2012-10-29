@@ -22,6 +22,7 @@ QMC::QMC(int n_p, int dim, int n_c,
     this->system = system;
 
     this->sampling->set_qmc_ptr(this);
+    get_orbitals_ptr()->set_qmc_ptr(this);
 
     this->accepted = 0;
 

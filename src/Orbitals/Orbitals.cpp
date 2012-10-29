@@ -11,7 +11,7 @@ Orbitals::Orbitals(int n_p, int dim) {
     this->n_p = n_p;
     this->n2 = n_p / 2;
     this->dim = dim;
-
+    
     h = 1E-4;
     h2 = 1 / (h * h);
     two_h = 1 / (2 * h);
@@ -81,3 +81,23 @@ double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) {
     return ddiff;
 }
 
+double Orbitals::get_variational_derivative(const Walker* walker, int n) {
+    
+    Walker* diff_walker = new Walker(n_p, dim);
+    diff_walker->r = walker->r;
+    diff_walker->r2 = walker->r2;
+    
+    double a = get_parameter(n);
+    set_parameter(a + h, 0);
+    
+    qmc->get_sampling_ptr()->set_trial_states(diff_walker);
+    double phip = qmc->get_system_ptr()->get_spatial_wf(diff_walker);
+    
+    set_parameter(a - h, 0);
+    qmc->get_sampling_ptr()->set_trial_states(diff_walker);
+    double phim = qmc->get_system_ptr()->get_spatial_wf(diff_walker);
+    
+    set_parameter(a, 0);
+ 
+    return  (phip - phim) / (2 * h * qmc->get_system_ptr()->get_spatial_wf(walker));
+}

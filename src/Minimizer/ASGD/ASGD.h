@@ -16,6 +16,8 @@ protected:
     int SGDsamples;
     int n_walkers;
     int thermalization;
+    
+    int sample;
 
     double t_prev;
     double t;
@@ -52,6 +54,7 @@ public:
 
     virtual VMC* minimize();
 
+    friend class stdoutASGD;
 };
 
 
