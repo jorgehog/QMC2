@@ -8,7 +8,7 @@
 #include "../../QMCheaders.h"
 
 None::None() {
-    
+    do_output = false;
 }
 
 

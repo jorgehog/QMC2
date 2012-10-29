@@ -16,7 +16,7 @@ public:
         return 0;
     }
 
-    virtual void update_data(double val, int i) {
+    virtual void update_data(double val) {
 
     }
 

@@ -27,6 +27,7 @@ protected:
     Jastrow *jastrow;
     Sampling *sampling;
     System *system;
+    ErrorEstimator* error_estimator;
 
     std::vector<OutputHandler*> output_handler;
 
@@ -50,6 +51,8 @@ protected:
     void copy_walker(const Walker* parent, Walker* child) const;
 
     void calculate_energy_necessities(Walker* walker) const;
+    
+    void estimate_error() const;
 
 public:
 
@@ -103,6 +106,10 @@ public:
 
     double get_accepted_ratio(int total_cycles) const {
         return accepted / double(total_cycles);
+    }
+    
+    void set_error_estimator(ErrorEstimator* error_estimator){
+        this->error_estimator = error_estimator;
     }
 
 };

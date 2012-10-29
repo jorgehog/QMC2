@@ -54,14 +54,16 @@ void VMC::run_method() {
 
         calculate_energy_necessities(original_walker);
         calculate_energy(original_walker);
+        
         dump_output();
+        error_estimator->update_data(local_E);
 
     }
 
     scale_values();
     user_output();
     finalize_output();
-
+    estimate_error();
 }
 
 void VMC::user_output() const {

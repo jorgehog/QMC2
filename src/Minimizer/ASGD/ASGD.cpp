@@ -118,7 +118,7 @@ VMC* ASGD::minimize() {
             t = 0;
         }
 
-        
+
         for (int param = 0; param < Nspatial_params; param++) {
 
             step = a / (t + A) * gradient_tot[param];
@@ -128,6 +128,8 @@ VMC* ASGD::minimize() {
 
             double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
             vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
+
+            error_estimators.at(param)->update_data(step);
         }
 
         for (int param = 0; param < Njastrow_params; param++) {
@@ -140,7 +142,7 @@ VMC* ASGD::minimize() {
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
             vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
 
-
+            error_estimators.at(param + Njastrow_params)->update_data(step);
         }
 
         t_prev = t;
@@ -156,6 +158,12 @@ VMC* ASGD::minimize() {
 
     output("Finished minimizing. Final parameters:");
     finalize_output();
+
+    if (error_estimators.at(0)->do_output) {
+        for (int i = 0; i < Nparams; i++) {
+            std::cout <<"Error" << i << ": "<< error_estimators.at(i)->estimate_error() << std::endl;
+        }
+    }
 
     vmc->accepted = 0;
     return vmc;

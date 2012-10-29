@@ -86,38 +86,67 @@ int main(int argc, char** argv) {
         VMC* vmc = new VMC(generalParams, vmcParams, systemObjects);
         systemObjects.sample_method->set_dt(vmcParams.dt);
 
-        if (outputParams.dist_out) {
-            string distname = "dist_out" + outputParams.outputSuffix;
-            OutputHandler* dist = new Distribution(distname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
-            vmc->add_output(dist);
 
-        }
-
-        if (outputParams.blocking_out) {
-            string blockname = "blocking_out" + outputParams.outputSuffix;
-            OutputHandler* blocking = new BlockingData(blockname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
-            vmc->add_output(blocking);
-        }
 
         if (generalParams.doMIN) {
 
             Minimizer * minimizer = new ASGD(vmc, minimizerParams);
-            
-            if (outputParams.ASGD_out){
+
+            if (outputParams.ASGD_out) {
                 string ASGDoutname = "ASGD_out" + outputParams.outputSuffix;
                 OutputHandler* ASGDout = new stdoutASGD(ASGDoutname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
                 minimizer->add_output(ASGDout);
             }
-            
+
+
+            int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
+
+            for (int i = 0; i < N; i++) {
+                if (generalParams.estimate_error) {
+                    string minBlockname = (string) "blocking_MIN_out" + outputParams.outputSuffix;
+                    minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
+                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname, 
+                            outputParams.outputPath,
+                            generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                    minimizer->add_error_estimator(blocking);
+                } else {
+                    minimizer->add_error_estimator(new None());
+                }
+            }
+
             t.tic();
             vmc = minimizer->minimize();
             cout << "Minimization time: " << t.toc() << endl;
         }
 
         if (generalParams.doVMC) {
+
+            if (outputParams.dist_out) {
+                string distname = "dist_out" + outputParams.outputSuffix;
+                OutputHandler* dist = new Distribution(distname, outputParams.outputPath,
+                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                vmc->add_output(dist);
+
+            }
+
+            if (outputParams.blocking_out) {
+                string blockname = "blocking_out" + outputParams.outputSuffix;
+                OutputHandler* blocking = new BlockingData(blockname, outputParams.outputPath,
+                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                vmc->add_output(blocking);
+            }
+
+            if (generalParams.estimate_error) {
+                string vmcBlockname = (string) "blocking_VMC_out" + outputParams.outputSuffix;
+                ErrorEstimator* blocking = new Blocking(vmcParams.n_c, vmcBlockname, outputParams.outputPath,
+                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                vmc->set_error_estimator(blocking);
+            } else {
+                vmc->set_error_estimator(new None());
+            }
+
+
             t.tic();
             vmc->run_method();
             cout << "VMC time: " << t.toc() << endl;
@@ -142,6 +171,14 @@ int main(int argc, char** argv) {
             dmc->add_output(DMCout);
         }
 
+        if (generalParams.estimate_error) {
+            string dmcBlockname = (string) "blocking_DMC_out" + outputParams.outputSuffix;
+            ErrorEstimator* blocking = new Blocking(dmcParams.n_c, dmcBlockname, outputParams.outputPath,
+                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+            dmc->set_error_estimator(blocking);
+        } else{
+            dmc->set_error_estimator(new None());
+        }
 
         t.tic();
         dmc->run_method();
@@ -191,6 +228,7 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
+    generalParams.estimate_error = false;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 

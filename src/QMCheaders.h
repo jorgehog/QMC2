@@ -50,6 +50,8 @@ struct GeneralParams {
     bool doMIN;
     bool doVMC;
     bool doDMC;
+    
+    bool estimate_error;
 
     bool use_jastrow;
     bool use_coulomb;
@@ -105,7 +107,11 @@ struct SystemObjects {
 
 class Minimizer;
 class ASGD;
+
 class OutputHandler;
+
+class ErrorEstimator;
+
 class QMC;
 
 #include "BasisFunctions/BasisFunctions.h"

@@ -10,27 +10,26 @@
 
 class ErrorEstimator {
 public:
-    
+
+    bool do_output;
+
     ErrorEstimator();
-    
+
     ErrorEstimator(int n_c, std::string filename,
             std::string path,
             bool parallel,
             int my_rank, int num_procs);
 
-    virtual void update_data(double val, int i) {
+    virtual void update_data(double val) {
         data(i) = val;
+        i++;
     }
 
     virtual double estimate_error() = 0;
 
-    void set_n_c(int n_c) {
-        this->n_c = n_c;
-    }
-
-
 protected:
     int n_c;
+    int i;
 
     bool parallel;
     int my_rank;
@@ -41,8 +40,8 @@ protected:
     std::ofstream file;
 
     arma::rowvec data;
-    
-    void finalize(){
+
+    void finalize() {
         file.close();
     }
 

@@ -18,6 +18,7 @@ protected:
     int Nparams;
 
     std::vector<OutputHandler*> output_handler;
+    std::vector<ErrorEstimator*> error_estimators;
 
     void dump_output();
     void finalize_output();
@@ -42,6 +43,9 @@ public:
 
     void output(std::string message, double number = -1);
 
+    void add_error_estimator(ErrorEstimator* error_estimator) {
+        this->error_estimators.push_back(error_estimator);
+    }
 };
 
 

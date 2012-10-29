@@ -7,8 +7,8 @@
 
 #include "../QMCheaders.h"
 
-ErrorEstimator::ErrorEstimator(){
-    
+ErrorEstimator::ErrorEstimator() {
+
 }
 
 ErrorEstimator::ErrorEstimator(int n_c,
@@ -17,6 +17,8 @@ ErrorEstimator::ErrorEstimator(int n_c,
         bool parallel,
         int my_rank, int num_procs) {
     this->n_c = n_c;
+    i = 0;
+    data = arma::zeros<arma::rowvec > (n_c);
 
     this->my_rank = my_rank;
     this->num_procs = num_procs;
@@ -30,6 +32,8 @@ ErrorEstimator::ErrorEstimator(int n_c,
     }
 
     this->file.open(((path + filename) + ".dat").c_str());
+    
+    this->do_output = true;
 }
 
 

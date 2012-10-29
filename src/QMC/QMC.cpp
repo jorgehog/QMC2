@@ -53,6 +53,13 @@ void QMC::finalize_output() {
 
 }
 
+void QMC::estimate_error() const {
+    if (error_estimator->do_output) {
+        double error = error_estimator->estimate_error();
+        std::cout << "Estimated Error: " << error << std::endl;
+    }
+}
+
 void QMC::get_gradients(const Walker* walker_pre, Walker* walker_post, int particle) const {
     jastrow->get_grad(walker_pre, walker_post, particle);
     system->get_spatial_grad(walker_post, particle);
@@ -197,6 +204,6 @@ double QMC::get_KE(const Walker* walker) const {
     return -0.5 * e_kinetic;
 }
 
-void QMC::get_QF(Walker* walker) const { 
-    walker->qforce = 2*(walker->jast_grad + walker->spatial_grad);
+void QMC::get_QF(Walker* walker) const {
+    walker->qforce = 2 * (walker->jast_grad + walker->spatial_grad);
 }

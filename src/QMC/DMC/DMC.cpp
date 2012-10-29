@@ -7,7 +7,6 @@
 
 #include "../../QMCheaders.h"
 
-
 DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
 : QMC(gP.n_p, gP.dim, dP.n_c, sO.sample_method, sO.SYSTEM, sO.jastrow) {
 
@@ -28,9 +27,8 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
 }
 
 void DMC::initialize() {
-
     jastrow->initialize();
-    
+
     //Initializing active walkers
     for (int k = 0; k < n_w; k++) {
         original_walkers[k] = new Walker(n_p, dim);
@@ -175,9 +173,12 @@ void DMC::run_method() {
         user_output();
         dump_output();
 
+        error_estimator->update_data(E / samples);
+
     }
 
     finalize_output();
+    estimate_error();
 }
 
 void DMC::bury_the_dead() {
@@ -187,7 +188,7 @@ void DMC::bury_the_dead() {
     int i = 0;
     int k = 0;
 
-    
+
     while (k < newborn && i < n_w_last) {
         if (original_walkers[i]->is_dead()) {
 
@@ -200,9 +201,9 @@ void DMC::bury_the_dead() {
         i++;
     }
 
-    
+
     if (deaths > newborn) {
-    
+
         int difference = deaths - newborn;
         int i = 0;
         int first_dead = 0;
