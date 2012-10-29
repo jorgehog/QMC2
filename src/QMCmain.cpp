@@ -5,9 +5,7 @@
  * Created on 13. april 2012, 17:04
  */
 
-//#include "mpi.h"
 #include "QMCheaders.h"
-
 #include <sys/time.h>
 
 /*
@@ -164,7 +162,7 @@ void parseCML(int argc, char** argv,
     //NEW
     outputParams.dmc_out = false;
     outputParams.outputSuffix = "";
-    outputParams.outputPath = "/home/jorgmeister/scratch/debug";
+    outputParams.outputPath = "/home/jorgmeister/scratch";
 
     generalParams.n_p = 2;
     generalParams.dim = 2;
@@ -198,7 +196,7 @@ void parseCML(int argc, char** argv,
     dmcParams.n_c = 1000;
     dmcParams.therm = 1000;
     dmcParams.dist_in = outputParams.dist_out & generalParams.doVMC;
-    dmcParams.dist_in_path = "/home/jorgmeister/scratch/debug";
+    dmcParams.dist_in_path = "/home/jorgmeister/scratch";
 
     if (argc == 1) {
         //        variationalParams.alpha = 0.78;
