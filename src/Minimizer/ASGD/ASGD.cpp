@@ -118,7 +118,7 @@ VMC* ASGD::minimize() {
             t = 0;
         }
 
-
+        //test
         for (int param = 0; param < Nspatial_params; param++) {
 
             step = a / (t + A) * gradient_tot[param];
