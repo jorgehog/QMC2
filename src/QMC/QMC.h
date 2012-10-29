@@ -76,8 +76,9 @@ public:
         walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
     }
 
-    void get_wf_value(Walker* walker) const {
+    double get_wf_value(Walker* walker) const {
         walker->value = system->get_spatial_wf(walker) * jastrow->get_val(walker);
+        return walker->value;
     }
 
     double calculate_local_energy(const Walker* walker) const {

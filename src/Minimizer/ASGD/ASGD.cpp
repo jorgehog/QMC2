@@ -7,7 +7,6 @@
 
 #include "../../QMCheaders.h"
 
-
 ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
 : Minimizer(vmc, mP.alpha, mP.beta) {
     using namespace arma;
@@ -43,10 +42,23 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
 }
 
 void ASGD::get_variational_gradients(Walker* walker, double e_local) {
-
+    using namespace std;
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
 
         double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker, alpha);
+
+//        double a = vmc->get_orbitals_ptr()->get_parameter(0);
+//        double h = 0.00001;
+//        vmc->get_orbitals_ptr()->set_parameter(a + h, 0);
+//        vmc->get_sampling_ptr()->set_trial_states(walker);
+//        double phip = vmc->get_system_ptr()->get_spatial_wf(walker);
+//        vmc->get_orbitals_ptr()->set_parameter(a - h, 0);
+//        vmc->get_sampling_ptr()->set_trial_states(walker);
+//        double phim = vmc->get_system_ptr()->get_spatial_wf(walker);
+//        vmc->get_orbitals_ptr()->set_parameter(a, 0);
+//        vmc->get_sampling_ptr()->set_trial_states(walker);
+//        double dp = (phip - phim) / (2 * h * vmc->get_system_ptr()->get_spatial_wf(walker));
+//        cout << "1?" << dp / dalpha << " " << fabs(dp - dalpha) << endl;
 
         gradient_local[alpha] += e_local * dalpha;
         gradient[alpha] += dalpha;
@@ -56,7 +68,17 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
     for (int beta = 0; beta < Njastrow_params; beta++) {
 
         double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(walker, beta);
-
+        
+//        double b = vmc->get_jastrow_ptr()->get_parameter(0);
+//        double h = 0.00001;
+//        vmc->get_jastrow_ptr()->set_parameter(b + h, 0);
+//        double phip = vmc->get_jastrow_ptr()->get_val(walker);
+//        vmc->get_jastrow_ptr()->set_parameter(b - h, 0);
+//        double phim = vmc->get_jastrow_ptr()->get_val(walker);
+//        vmc->get_jastrow_ptr()->set_parameter(b, 0);
+//        double dp = (phip - phim) / (2 * h * vmc->get_jastrow_ptr()->get_val(walker));
+//        cout << "1?" << dp / dbeta << " " << fabs(dp - dbeta) << endl;
+        
         gradient_local[Nspatial_params + beta] += e_local*dbeta;
         gradient[Nspatial_params + beta] += dbeta;
 
@@ -66,15 +88,15 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
 VMC* ASGD::minimize() {
 
-//    ofstream file;
-//    file.open("alpha.dat");
+    //    ofstream file;
+    //    file.open("alpha.dat");
     int debug1;
     double aGrad, bGrad, sumE;
     aGrad = bGrad = sumE = 0;
     debug1 = 1;
     //
     vmc->initialize();
-    
+
     int k = 0;
     for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
         vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
@@ -95,6 +117,11 @@ VMC* ASGD::minimize() {
         gradient_local = arma::zeros(1, Nparams);
 
         for (k = 0; k < n_walkers; k++) {
+            vmc->get_sampling_ptr()->set_trial_states(walkers[k]);
+            vmc->get_system_ptr()->initialize(walkers[k]);
+            vmc->get_jastrow_ptr()->get_dJ_matrix(walkers[k]);
+            vmc->get_sampling_ptr()->get_necessities(walkers[k]);
+            
             for (int cycle = 0; cycle < n_c_SGD; cycle++) {
 
                 vmc->diffuse_walker(walkers[k], trial_walkers[k]);
@@ -103,6 +130,7 @@ VMC* ASGD::minimize() {
                     vmc->calculate_energy_necessities(walkers[k]);
                     double e_local = vmc->calculate_local_energy(walkers[k]);
                     E += e_local;
+//                    std::cout << "walker" << k << std::endl;
                     get_variational_gradients(walkers[k], e_local);
                 }
 
@@ -134,7 +162,7 @@ VMC* ASGD::minimize() {
         aGrad += gradient_tot[0];
         bGrad += gradient_tot[1];
         sumE += E;
-//        file << aGrad / debug1 << "\t" << bGrad / debug1 << "\t";
+        //        file << aGrad / debug1 << "\t" << bGrad / debug1 << "\t";
         //
 
 
@@ -144,9 +172,9 @@ VMC* ASGD::minimize() {
             if (fabs(step) > max_step) {
                 step *= max_step / fabs(step);
             }
-//            file << fabs(step) << "\t";
+            //            file << fabs(step) << "\t";
             double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
-//            file << fabs(alpha - step) << "\t";
+            //            file << fabs(alpha - step) << "\t";
             vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
         }
 
@@ -158,14 +186,14 @@ VMC* ASGD::minimize() {
             }
 
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
-//            file << fabs(beta - step) << "\t";
+            //            file << fabs(beta - step) << "\t";
             vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
 
 
         }
 
-//        file << E << "\t";
-//        file << sumE / debug1 << endl;
+        //        file << E << "\t";
+        //        file << sumE / debug1 << endl;
         debug1++;
 
         t_prev = t;
@@ -174,7 +202,7 @@ VMC* ASGD::minimize() {
     }
 
     output("Finished minimizing. Final parameters:", -1);
-//    file.close();
+    //    file.close();
     vmc->accepted = 0;
     return vmc;
 }

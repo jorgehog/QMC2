@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
 
         DMC* dmc = new DMC(generalParams, dmcParams, systemObjects);
 
-        if (OutputParams.dmc_out) {
+        if (outputParams.dmc_out) {
             string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;
             OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath,
                     generalParams.parallell, generalParams.myrank, generalParams.numprocs);
