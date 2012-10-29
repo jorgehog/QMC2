@@ -27,6 +27,8 @@ void parseCML(int, char**,
 int main(int argc, char** argv) {
     using namespace std;
 
+    arma::wall_clock t;
+
     struct VMCparams vmcParams;
     struct DMCparams dmcParams;
     struct VariationalParams variationalParams;
@@ -44,14 +46,6 @@ int main(int argc, char** argv) {
             outputParams,
             systemObjects);
 
-    //    if (generalParams.kinetics_type == "Num") {
-    //        systemObjects.kinetics = new Numerical(generalParams);
-    //    } else if (generalParams.kinetics_type == "CF") {
-    //        systemObjects.kinetics = new Closed_form(generalParams);
-    //    } else {
-    //        cout << "unknown kinetics" << endl;
-    //        exit(1);
-    //    }
 
     if (generalParams.sampling == "IS") {
         systemObjects.sample_method = new Importance(generalParams);
@@ -107,38 +101,25 @@ int main(int argc, char** argv) {
             OutputHandler* blocking = new BlockingData(blockname, outputParams.outputPath,
                     generalParams.parallell, generalParams.myrank, generalParams.numprocs);
             vmc->add_output(blocking);
-
         }
 
         if (generalParams.doMIN) {
 
             Minimizer * minimizer = new ASGD(vmc, minimizerParams);
+
+            t.tic();
             vmc = minimizer->minimize();
+            cout << "Minimization time: " << t.toc() << endl;
         }
 
         if (generalParams.doVMC) {
-            arma::wall_clock t;
             t.tic();
             vmc->run_method();
-            cout << endl << t.toc() << endl;
-            ;
+            cout << "VMC time: " << t.toc() << endl;
+
             dmcParams.E_T = vmc->get_energy();
         }
 
-
-        //    cumul_e = cumul_e2 = 0;
-        //    e = vmc->get_energy();
-        //    e2 = vmc->get_e2();
-        //    
-        //    MPI_Reduce(&e, &cumul_e, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        //    MPI_Reduce(&e2, &cumul_e2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        //
-        //    if (my_rank == 0) {
-        //        vmc->set_e(e);
-        //        vmc->set_e2(e2);
-        //        
-        //        vmc->output();
-        //    }
 
     }
 
@@ -149,19 +130,20 @@ int main(int argc, char** argv) {
 
         DMC* dmc = new DMC(generalParams, dmcParams, systemObjects);
 
-        string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;
-        OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath,
-                generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+        if (OutputParams.dmc_out) {
+            string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;
+            OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath,
+                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+            dmc->add_output(DMCout);
+        }
 
-        dmc->add_output(DMCout);
 
+        t.tic();
         dmc->run_method();
-
-        cout << "DMC FIN." << endl;
+        cout << "DMC time: " << t.toc() << endl;
     }
 
-    cout << "Job fin" << endl;
-    //    MPI_Finalize();
+    cout << "QMC fin" << endl;
     return 0;
 }
 
@@ -179,6 +161,8 @@ void parseCML(int argc, char** argv,
     //Default values:
     outputParams.blocking_out = false;
     outputParams.dist_out = false;
+    //NEW
+    outputParams.dmc_out = false;
     outputParams.outputSuffix = "";
     outputParams.outputPath = "/home/jorgmeister/scratch/debug";
 
@@ -314,6 +298,6 @@ void parseCML(int argc, char** argv,
     if (outputParams.dist_out) {
         dmcParams.dist_in_path = outputParams.outputPath;
     }
-    
+
     std::cout << "seed: " << generalParams.random_seed << std::endl;
 }

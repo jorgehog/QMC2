@@ -79,6 +79,7 @@ struct MinimizerParams {
 struct OutputParams {
     bool dist_out;
     bool blocking_out;
+    bool dmc_out;
     std::string outputSuffix;
     std::string outputPath;
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#from pyLibQMC import paths
-
 import os, sys, re
 
 
@@ -32,7 +30,10 @@ def getDmcE(path):
     
     if r:
         #[0] = therm; [1] = production
-        return float(r[1])
+	if len(r) ==2:
+        	return float(r[1])
+	else:
+		return "~" + r[0]
     else:
         return "N/A"
 
