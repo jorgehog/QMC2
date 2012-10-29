@@ -40,7 +40,7 @@ public:
 
     virtual VMC* minimize() = 0;
 
-    void output(std::string message, double number);
+    void output(std::string message, double number = -1);
 
 };
 

@@ -118,13 +118,6 @@ VMC* ASGD::minimize() {
             t = 0;
         }
 
-        //        output progress
-        if ((sample % 100) == 0) {
-            output("cycle:", sample);
-            std::cout << gradient_tot << std::endl;
-            std::cout << E << std::endl;
-        }
-
 
         for (int param = 0; param < Nspatial_params; param++) {
 
@@ -154,10 +147,14 @@ VMC* ASGD::minimize() {
         gradient_old = gradient_tot;
 
         dump_output();
-
+        if ((sample % 100) == 0) {
+            output("cycle:", sample);
+            std::cout << gradient_tot << std::endl;
+            std::cout << E << std::endl;
+        }
     }
 
-    output("Finished minimizing. Final parameters:", -1);
+    output("Finished minimizing. Final parameters:");
     finalize_output();
 
     vmc->accepted = 0;
