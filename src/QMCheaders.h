@@ -140,6 +140,10 @@ class QMC;
 #include "Sampling/Brute_Force/Brute_Force.h"
 #include "Sampling/Importance/Importance.h"
 
+#include "ErrorEstimator/ErrorEstimator.h"
+#include "ErrorEstimator/Blocking/Blocking.h"
+#include "ErrorEstimator/None/None.h"
+
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"
 #include "OutputHandler/BlockingData/BlockingData.h"

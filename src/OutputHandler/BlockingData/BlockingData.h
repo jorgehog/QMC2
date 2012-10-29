@@ -5,8 +5,8 @@
  * Created on 3. sept 2012, 13:17
  */
 
-#ifndef BLOCKING_H
-#define	BLOCKING_H
+#ifndef BLOCKINGDATA_H
+#define	BLOCKINGDATA_H
 
 class BlockingData : public OutputHandler {
 public:
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif	/* BLOCKING_H */
+#endif	/* BLOCKINGDATA_H */
