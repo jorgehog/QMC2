@@ -42,13 +42,13 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
 }
 
 void ASGD::get_variational_gradients(Walker* walker, double e_local) {
-    using namespace std;
+
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
 
         double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker, alpha);
 
-        gradient_local[alpha] += e_local * dalpha;
-        gradient[alpha] += dalpha;
+        gradient_local(alpha) += e_local * dalpha;
+        gradient(alpha) += dalpha;
 
     }
 
@@ -56,8 +56,8 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
         double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(walker, beta);
 
-        gradient_local[Nspatial_params + beta] += e_local*dbeta;
-        gradient[Nspatial_params + beta] += dbeta;
+        gradient_local(Nspatial_params + beta) += e_local*dbeta;
+        gradient(Nspatial_params + beta) += dbeta;
 
     }
 
@@ -121,7 +121,7 @@ VMC* ASGD::minimize() {
 
         for (int param = 0; param < Nspatial_params; param++) {
 
-            step = a / (t + A) * gradient_tot[param];
+            step = a / (t + A) * gradient_tot(param);
             if (fabs(step) > max_step) {
                 step *= max_step / fabs(step);
             }
@@ -134,7 +134,7 @@ VMC* ASGD::minimize() {
 
         for (int param = 0; param < Njastrow_params; param++) {
 
-            step = a / (t + A) * gradient_tot[Nspatial_params + param];
+            step = a / (t + A) * gradient_tot(Nspatial_params + param);
             if (step * step > max_step * max_step) {
                 step *= max_step / fabs(step);
             }
@@ -142,7 +142,7 @@ VMC* ASGD::minimize() {
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
             vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
 
-            error_estimators.at(param + Njastrow_params)->update_data(step);
+            error_estimators.at(param + Nspatial_params)->update_data(step);
         }
 
         t_prev = t;
@@ -158,12 +158,7 @@ VMC* ASGD::minimize() {
 
     output("Finished minimizing. Final parameters:");
     finalize_output();
-
-    if (error_estimators.at(0)->do_output) {
-        for (int i = 0; i < Nparams; i++) {
-            std::cout <<"Error" << i << ": "<< error_estimators.at(i)->estimate_error() << std::endl;
-        }
-    }
+    error_output();
 
     vmc->accepted = 0;
     return vmc;

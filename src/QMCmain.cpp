@@ -111,13 +111,13 @@ int main(int argc, char** argv) {
                             generalParams.parallell, generalParams.myrank, generalParams.numprocs);
                     minimizer->add_error_estimator(blocking);
                 } else {
-                    minimizer->add_error_estimator(new None());
+                    minimizer->add_error_estimator(new SimpleVar());
                 }
             }
 
             t.tic();
             vmc = minimizer->minimize();
-            cout << "Minimization time: " << t.toc() << endl;
+            cout << "---Minimization time: " << t.toc() << " s---" << endl;
         }
 
         if (generalParams.doVMC) {
@@ -143,13 +143,13 @@ int main(int argc, char** argv) {
                         generalParams.parallell, generalParams.myrank, generalParams.numprocs);
                 vmc->set_error_estimator(blocking);
             } else {
-                vmc->set_error_estimator(new None());
+                vmc->set_error_estimator(new SimpleVar());
             }
 
 
             t.tic();
             vmc->run_method();
-            cout << "VMC time: " << t.toc() << endl;
+            cout << "---VMC time: " << t.toc()<<" s---" << endl;
 
             dmcParams.E_T = vmc->get_energy();
         }
@@ -177,15 +177,15 @@ int main(int argc, char** argv) {
                     generalParams.parallell, generalParams.myrank, generalParams.numprocs);
             dmc->set_error_estimator(blocking);
         } else{
-            dmc->set_error_estimator(new None());
+            dmc->set_error_estimator(new SimpleVar());
         }
 
         t.tic();
         dmc->run_method();
-        cout << "DMC time: " << t.toc() << endl;
+        cout << "---DMC time: " << t.toc() << " s---" << endl;
     }
 
-    cout << "QMC fin" << endl;
+    cout << "~.* QMC fin *.~" << endl;
     return 0;
 }
 
@@ -207,7 +207,7 @@ void parseCML(int argc, char** argv,
     outputParams.dmc_out = false;
     outputParams.ASGD_out = false;
     outputParams.outputSuffix = "";
-    outputParams.outputPath = "/home/jorgmeister/scratch";
+    outputParams.outputPath = (std::string)"/home/jorgmeister/scratch" + (std::string)"/";
 
     generalParams.n_p = 2;
     generalParams.dim = 2;
@@ -228,7 +228,7 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = false;
+    generalParams.estimate_error = true;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
@@ -242,7 +242,7 @@ void parseCML(int argc, char** argv,
     dmcParams.n_c = 1000;
     dmcParams.therm = 1000;
     dmcParams.dist_in = outputParams.dist_out & generalParams.doVMC;
-    dmcParams.dist_in_path = "/home/jorgmeister/scratch";
+    dmcParams.dist_in_path = (std::string)"/home/jorgmeister/scratch" + (std::string)"/";
 
     if (argc == 1) {
         //        variationalParams.alpha = 0.78;

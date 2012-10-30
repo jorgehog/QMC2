@@ -22,6 +22,7 @@ protected:
 
     void dump_output();
     void finalize_output();
+    void error_output();
 
     //virtual void get_variational_gradients(); is this a general req?
 

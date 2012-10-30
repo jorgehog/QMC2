@@ -69,3 +69,12 @@ void Minimizer::finalize_output() {
     }
 
 }
+
+void Minimizer::error_output() {
+    if (error_estimators.at(0)->do_output) {
+        for (int i = 0; i < Nparams; i++) {
+            double error = error_estimators.at(i)->estimate_error();
+            std::cout << "Error" << i << ": " << error << std::endl;
+        }
+    }
+}

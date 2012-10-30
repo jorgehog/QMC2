@@ -50,26 +50,10 @@ public:
     }
 
     virtual double del_phi(const Walker* walker, int particle, int q_num, int d) {
-//        using namespace std;
-//        double a = dell_basis_functions[d][q_num]->eval(walker, particle);
-//        a -= num_diff(walker, particle, q_num, d);
-//        if (fabs(a) > 0.0001) {
-//            cout << "mismatch dell: " << particle << " " << q_num << " "  << d <<" " << a << endl;
-//        }
-//        set_qnum_indie_terms(walker, particle);
-        //        return num_diff(walker, particle, q_num, d);
         return dell_basis_functions[d][q_num]->eval(walker, particle);
     }
 
     virtual double lapl_phi(const Walker* walker, int particle, int q_num) {
-//        using namespace std;
-//        double a = lapl_basis_functions[q_num]->eval(walker, particle);
-//        a -= num_ddiff(walker, particle, q_num);
-//        if (fabs(a) > 0.0001) {
-//            cout << "mismatch lapl: " << particle << " " << q_num << " " << a << endl;
-//        }
-//        set_qnum_indie_terms(walker, particle);
-        //        return num_ddiff(walker, particle, q_num);
         return lapl_basis_functions[q_num]->eval(walker, particle);
     }
 

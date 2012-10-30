@@ -11,7 +11,7 @@
 class VMC : public QMC {
 protected:
 
-    double vmc_E, E2;
+    double vmc_E;
 
     Walker* original_walker;
     Walker* trial_walker;
@@ -22,27 +22,16 @@ protected:
         return metropolis_test(A);
     };
 
-    void calculate_energy(Walker* walker);
-    void scale_values();
+    void scale_values() {
+        vmc_E /= n_c;
+    };
 
 public:
 
     VMC(GeneralParams &, VMCparams &, SystemObjects &);
 
-    double get_var() const {
-        return E2 - vmc_E*vmc_E;
-    }
-
-    double get_e2() const {
-        return E2;
-    }
-
     void set_e(double E) {
         vmc_E = E;
-    }
-
-    void set_e2(double E2) {
-        this->E2 = E2;
     }
 
     double get_energy() const {

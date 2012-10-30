@@ -148,7 +148,7 @@ class QMC;
 
 #include "ErrorEstimator/ErrorEstimator.h"
 #include "ErrorEstimator/Blocking/Blocking.h"
-#include "ErrorEstimator/None/None.h"
+#include "ErrorEstimator/SimpleVar/SimpleVar.h"
 
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"

@@ -42,6 +42,7 @@ protected:
     arma::rowvec data;
 
     void finalize() {
+        data.clear();
         file.close();
     }
 

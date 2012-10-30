@@ -14,25 +14,33 @@ Blocking::Blocking(int n_c,
         int my_rank,
         int num_procs)
 : ErrorEstimator(n_c, filename, path, parallel, my_rank, num_procs) {
-
+//    int step = 1;
+    n_block_samples = 100;
+    max_block_size = 10000;
+    min_block_size = 10;
+//    n_block_samples = (max_block_size - min_block_size) / step;
 }
 
 double Blocking::estimate_error() {
+    using namespace std;
+
     int block_size, block_step_length;
     double error;
 
     block_step_length = (max_block_size - min_block_size) / n_block_samples;
 
-    for (int i = 0; i < n_block_samples; i++) {
-        block_size = min_block_size + i*block_step_length;
+    cout << "Initial stddev: " << sqrt(var(data) / (data.n_elem - 1)) << endl;
+
+    for (int j = 0; j < n_block_samples; j++) {
+        block_size = min_block_size + j*block_step_length;
+
         error = block_data(block_size);
 
         file << block_size << "\t" << error << std::endl;
-
     }
 
-    data.clear();
-    
+    finalize();
+
     return error;
 }
 
@@ -48,14 +56,14 @@ double Blocking::block_data(int block_size) {
 
     mean = 0;
     mean2 = 0;
-    for (int i = 0; i < n_b; i++) {
-        block_mean = sum(data(span(i*block_size, i * block_size + block_size)));
+    for (int j = 0; j < n_b; j++) {
+        block_mean = sum(data(span(j*block_size, (j + 1) * block_size - 1))) / block_size;
         mean += block_mean;
         mean2 += block_mean*block_mean;
     }
 
-    mean2 /= block_size;
-    mean /= block_size;
+    mean2 /= (n_b);
+    mean /= (n_b);
 
     return sqrt((mean2 - mean * mean) / ((n_c / block_size) - 1.0));
 }

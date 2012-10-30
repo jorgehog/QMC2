@@ -45,7 +45,7 @@ void OutputHandler::set_qmc_ptr(QMC* qmc) {
     }
 }
 
-void OutputHandler::set_min_ptr(Minimizer* min){
+void OutputHandler::set_min_ptr(Minimizer* min) {
     if (this->is_ASGD) {
         this->asgd = (ASGD*) min;
     } else {
