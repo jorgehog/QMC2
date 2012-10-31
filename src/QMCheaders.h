@@ -152,7 +152,6 @@ class QMC;
 
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"
-#include "OutputHandler/BlockingData/BlockingData.h"
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
 #include "OutputHandler/stdoutASGD/stdoutASGD.h"
 

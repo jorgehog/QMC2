@@ -15,7 +15,7 @@ public:
             bool parallel = false,
             int my_rank = 0,
             int num_procs = 1 );
-
+    
     double estimate_error();
     
 protected:

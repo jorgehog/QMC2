@@ -7,6 +7,7 @@
 
 #include "../../QMCheaders.h"
 
+
 Blocking::Blocking(int n_c,
         std::string filename,
         std::string path,

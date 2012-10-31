@@ -92,9 +92,9 @@ if fullruns:
     rawFile = """general:
 n_p = __NP__
 w = __W__
-doMIN = 1
+doMIN = 0
 doVMC = 1
-doDMC = 1
+doDMC = 0
 
 DMC:
 dist_in = 1

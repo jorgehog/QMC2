@@ -130,12 +130,6 @@ int main(int argc, char** argv) {
 
             }
 
-            if (outputParams.blocking_out) {
-                string blockname = "blocking_out" + outputParams.outputSuffix;
-                OutputHandler* blocking = new BlockingData(blockname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
-                vmc->add_output(blocking);
-            }
 
             if (generalParams.estimate_error) {
                 string vmcBlockname = (string) "blocking_VMC_out" + outputParams.outputSuffix;
@@ -201,7 +195,7 @@ void parseCML(int argc, char** argv,
     int n_args = 44;
 
     //Default values:
-    outputParams.blocking_out = false;
+//    outputParams.blocking_out = false;
     outputParams.dist_out = false;
     //NEW
     outputParams.dmc_out = false;

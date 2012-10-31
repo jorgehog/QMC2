@@ -12,13 +12,14 @@ class ErrorEstimator {
 public:
 
     bool do_output;
+    bool to_file;
 
     ErrorEstimator();
 
     ErrorEstimator(int n_c, std::string filename,
             std::string path,
             bool parallel,
-            int my_rank, int num_procs);
+            int my_rank, int num_procs, std::string* infile = NULL);
 
     virtual void update_data(double val) {
         data(i) = val;
@@ -41,10 +42,7 @@ protected:
 
     arma::rowvec data;
 
-    void finalize() {
-        data.clear();
-        file.close();
-    }
+    void finalize();
 
 };
 
