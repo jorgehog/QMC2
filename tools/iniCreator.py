@@ -86,15 +86,15 @@ alpha=1
                 
 if fullruns:
     
-    wList = [1, 0.5]
-    npList = [2, 6, 12, 20, 30]
+    wList = [0.01, 0.1, 0.28, 0.5, 1]
+    npList = [2, 6, 12]
     
     rawFile = """general:
 n_p = __NP__
 w = __W__
-doMIN = 0
+doMIN = 1
 doVMC = 1
-doDMC = 0
+doDMC = 1
 
 DMC:
 dist_in = 1

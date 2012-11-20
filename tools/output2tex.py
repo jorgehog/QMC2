@@ -29,12 +29,16 @@ def getDmcE(path):
     r = re.findall(pattern, stdoutRaw)
     
     if r:
-        #[0] = therm; [1] = production
+        #r[0] = therm; r[1] = production
+
+	#Both thermalization and main cycles succeeded.
 	if len(r) ==2:
         	return float(r[1])
 	else:
+	#Run aborted after thermalization.
 		return "~" + r[0]
     else:
+	#Run aborted.
         return "N/A"
 
 

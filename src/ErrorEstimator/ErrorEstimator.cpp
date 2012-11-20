@@ -15,18 +15,17 @@ ErrorEstimator::ErrorEstimator(int n_c,
         std::string filename,
         std::string path,
         bool parallel,
-        int my_rank, int num_procs, std::string* infile) {
+        int my_rank, int num_procs, bool rerun) {
 
     this->n_c = n_c;
     i = 0;
 
-    if (infile != NULL) {
+    if (rerun) {
         
-        bool success = data.load((path + *infile));
+        bool success = data.load(path + (filename + "_RAWDATA.arma"));
         if (!success) exit(1);
         
-        this->n_c = data.n_rows;
-
+        this->n_c = data.n_cols;
         to_file = false;
         do_output = false;
 
@@ -52,7 +51,7 @@ ErrorEstimator::ErrorEstimator(int n_c,
 }
 
 void ErrorEstimator::finalize() {
-    if (to_file) data.save(path + (filename + "_RAWDATA.rowvec"));
+    if (to_file) data.save(path + (filename + "_RAWDATA.arma"));
     data.clear();
     file.close();
 }

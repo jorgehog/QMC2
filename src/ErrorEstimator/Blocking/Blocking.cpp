@@ -7,19 +7,22 @@
 
 #include "../../QMCheaders.h"
 
-
 Blocking::Blocking(int n_c,
         std::string filename,
         std::string path,
         bool parallel,
         int my_rank,
-        int num_procs)
-: ErrorEstimator(n_c, filename, path, parallel, my_rank, num_procs) {
-//    int step = 1;
-    n_block_samples = 100;
-    max_block_size = 10000;
-    min_block_size = 10;
-//    n_block_samples = (max_block_size - min_block_size) / step;
+        int num_procs,
+        int n_b,
+        int maxb,
+        int minb,
+        bool rerun)
+: ErrorEstimator(n_c, filename, path, parallel, my_rank, num_procs, rerun) {
+    //    int step = 1;
+    n_block_samples = n_b;
+    max_block_size = maxb;
+    min_block_size = minb;
+    //    n_block_samples = (max_block_size - min_block_size) / step;
 }
 
 double Blocking::estimate_error() {
@@ -36,7 +39,6 @@ double Blocking::estimate_error() {
         block_size = min_block_size + j*block_step_length;
 
         error = block_data(block_size);
-
         file << block_size << "\t" << error << std::endl;
     }
 
@@ -57,8 +59,10 @@ double Blocking::block_data(int block_size) {
 
     mean = 0;
     mean2 = 0;
+
     for (int j = 0; j < n_b; j++) {
         block_mean = sum(data(span(j*block_size, (j + 1) * block_size - 1))) / block_size;
+
         mean += block_mean;
         mean2 += block_mean*block_mean;
     }

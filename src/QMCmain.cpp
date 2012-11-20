@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
                 if (generalParams.estimate_error) {
                     string minBlockname = (string) "blocking_MIN_out" + outputParams.outputSuffix;
                     minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
-                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname, 
+                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname,
                             outputParams.outputPath,
                             generalParams.parallell, generalParams.myrank, generalParams.numprocs);
                     minimizer->add_error_estimator(blocking);
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
 
             t.tic();
             vmc->run_method();
-            cout << "---VMC time: " << t.toc()<<" s---" << endl;
+            cout << "---VMC time: " << t.toc() << " s---" << endl;
 
             dmcParams.E_T = vmc->get_energy();
         }
@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
             ErrorEstimator* blocking = new Blocking(dmcParams.n_c, dmcBlockname, outputParams.outputPath,
                     generalParams.parallell, generalParams.myrank, generalParams.numprocs);
             dmc->set_error_estimator(blocking);
-        } else{
+        } else {
             dmc->set_error_estimator(new SimpleVar());
         }
 
@@ -192,10 +192,32 @@ void parseCML(int argc, char** argv,
         OutputParams & outputParams,
         SystemObjects & systemObjects) {
 
+    //Test for rerunning blocking
+    //argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
+    std::string rerun_blocking = "reblock";
+    if ((argc == 7) && (rerun_blocking.compare(argv[1])==0)) {
+        ErrorEstimator* reblock = new Blocking(0, 
+                (std::string)argv[2],
+                (std::string)argv[3],
+                generalParams.parallell,
+                generalParams.numprocs,
+                generalParams.myrank,
+                atoi(argv[4]),
+                atoi(argv[5]),
+                atoi(argv[6]),
+                true);
+        double error = reblock->estimate_error();
+        std::cout << "Estimated Error: " << error << std::endl;
+        std::cout << "Finished Error Recalculation" << std::endl;
+        exit(1);
+    }
+    //
+
+
     int n_args = 44;
 
     //Default values:
-//    outputParams.blocking_out = false;
+    //    outputParams.blocking_out = false;
     outputParams.dist_out = false;
     //NEW
     outputParams.dmc_out = false;

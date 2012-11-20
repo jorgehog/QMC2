@@ -14,7 +14,11 @@ public:
             std::string path = "./",
             bool parallel = false,
             int my_rank = 0,
-            int num_procs = 1 );
+            int num_procs = 1,
+            int n_b=100,
+            int maxb=10000,
+            int minb=10,
+            bool rerun=false);
     
     double estimate_error();
     
