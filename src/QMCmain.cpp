@@ -6,7 +6,6 @@
  */
 
 #include "QMCheaders.h"
-#include <sys/time.h>
 
 /*
  * 
@@ -27,12 +26,14 @@ int main(int argc, char** argv) {
 
     int node, n_nodes;
 
-    omp_set_num_threads(10);
+#ifdef MPI_ON
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
-
-
+#endif
+    
+#ifdef OMP_ON
+    omp_set_num_threads(2);
 #pragma omp parallel
     {
         sleep(omp_get_thread_num());
@@ -42,7 +43,8 @@ int main(int argc, char** argv) {
 
     sleep(4);
     exit(1);
-
+#endif
+    
     arma::wall_clock t;
 
     struct VMCparams vmcParams;

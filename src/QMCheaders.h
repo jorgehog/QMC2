@@ -9,16 +9,24 @@
 #define	QMCHEADERS_H
 
 //#define ARMA_NO_DEBUG
+#define OMP_ON
+#define MPI_ON
+
+#ifdef OMP_ON
+#include <omp.h>
+#endif
+#ifdef MPI_ON
+#include <mpi.h>
+#endif
 
 #include <armadillo>
-#include <omp.h>
-#include <mpi.h>
 #include <boost/lexical_cast.hpp>
 #include <stdlib.h>
 #include <iostream> 
 #include <fstream>
 #include <math.h>
 #include <vector>
+#include <sys/time.h>
 
 struct DMCparams {
     int n_c, therm, n_w, n_b;
