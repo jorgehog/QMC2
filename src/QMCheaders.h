@@ -171,6 +171,9 @@ class QMC;
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"
 
+#include "Parallelizer/Parallelizer.h"
+#include "Parallelizer/NODE_COMM/MPI/MPI.h"
+#include "Parallelizer/NODE_COMM/Single/Single.h"
 
 #endif	/* QMCHEADERS_H */
 
