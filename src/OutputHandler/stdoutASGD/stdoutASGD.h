@@ -14,7 +14,7 @@ public:
             std::string path = "./",
             bool parallel = false,
             int my_rank = 0,
-            int num_procs = 1
+            int n_nodes = 1
             );
 
     virtual void dump();

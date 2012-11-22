@@ -15,7 +15,7 @@ ErrorEstimator::ErrorEstimator(int n_c,
         std::string filename,
         std::string path,
         bool parallel,
-        int my_rank, int num_procs, bool rerun) {
+        int my_rank, int n_nodes, bool rerun) {
 
     this->n_c = n_c;
     i = 0;
@@ -36,7 +36,7 @@ ErrorEstimator::ErrorEstimator(int n_c,
     }
 
     this->my_rank = my_rank;
-    this->num_procs = num_procs;
+    this->n_nodes = n_nodes;
     this->parallel = parallel;
 
     this->filename = filename;

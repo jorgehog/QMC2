@@ -17,7 +17,7 @@ protected:
     
     bool parallel;
     int my_rank;
-    int num_procs;
+    int n_nodes;
     
     std::string filename;
     std::string path;
@@ -37,7 +37,7 @@ public:
             std::string path,
             bool parallel,
             int my_rank,
-            int num_procs
+            int n_nodes
             );
 
     virtual void dump() = 0;

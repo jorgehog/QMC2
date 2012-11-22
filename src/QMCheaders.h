@@ -11,6 +11,9 @@
 //#define ARMA_NO_DEBUG
 
 #include <armadillo>
+#include <omp.h>
+#include <mpi.h>
+#include <boost/lexical_cast.hpp>
 #include <stdlib.h>
 #include <iostream> 
 #include <fstream>
@@ -36,16 +39,18 @@ struct VariationalParams {
 
 };
 
+struct ParParams {
+    bool parallel;
+    int n_nodes;
+    int node;
+};
+
 struct GeneralParams {
     int n_p, dim;
     long random_seed;
     double D;
 
     double h, w;
-
-    int numprocs, myrank;
-
-    bool parallell;
 
     bool doMIN;
     bool doVMC;

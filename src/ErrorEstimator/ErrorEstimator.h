@@ -19,7 +19,7 @@ public:
     ErrorEstimator(int n_c, std::string filename,
             std::string path,
             bool parallel,
-            int my_rank, int num_procs, bool rerun=false);
+            int my_rank, int n_nodes, bool rerun=false);
 
     virtual void update_data(double val) {
         data(i) = val;
@@ -34,7 +34,7 @@ protected:
 
     bool parallel;
     int my_rank;
-    int num_procs;
+    int n_nodes;
 
     std::string filename;
     std::string path;

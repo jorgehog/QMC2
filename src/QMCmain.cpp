@@ -19,11 +19,29 @@ void parseCML(int, char**,
         GeneralParams &,
         MinimizerParams &,
         OutputParams &,
-        SystemObjects &
+        ParParams &
         );
 
 int main(int argc, char** argv) {
     using namespace std;
+
+    int node, n_nodes;
+
+    omp_set_num_threads(10);
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
+    MPI_Comm_rank(MPI_COMM_WORLD, &node);
+
+
+#pragma omp parallel
+    {
+        sleep(omp_get_thread_num());
+        cout << "thread" << omp_get_thread_num() + 1 << "/" << omp_get_num_threads() << " proc " << node + 1 << "/" << n_nodes << endl;
+
+    }
+
+    sleep(4);
+    exit(1);
 
     arma::wall_clock t;
 
@@ -34,6 +52,9 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct OutputParams outputParams;
     struct SystemObjects systemObjects;
+    struct ParParams parParams;
+    parParams.n_nodes = n_nodes;
+    parParams.node = node;
 
     parseCML(argc, argv,
             vmcParams,
@@ -42,7 +63,7 @@ int main(int argc, char** argv) {
             generalParams,
             minimizerParams,
             outputParams,
-            systemObjects);
+            parParams);
 
 
     if (generalParams.sampling == "IS") {
@@ -95,7 +116,7 @@ int main(int argc, char** argv) {
             if (outputParams.ASGD_out) {
                 string ASGDoutname = "ASGD_out" + outputParams.outputSuffix;
                 OutputHandler* ASGDout = new stdoutASGD(ASGDoutname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                        parParams.parallel, parParams.node, parParams.n_nodes);
                 minimizer->add_output(ASGDout);
             }
 
@@ -108,7 +129,7 @@ int main(int argc, char** argv) {
                     minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
                     ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname,
                             outputParams.outputPath,
-                            generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                            parParams.parallel, parParams.node, parParams.n_nodes);
                     minimizer->add_error_estimator(blocking);
                 } else {
                     minimizer->add_error_estimator(new SimpleVar());
@@ -125,7 +146,7 @@ int main(int argc, char** argv) {
             if (outputParams.dist_out) {
                 string distname = "dist_out" + outputParams.outputSuffix;
                 OutputHandler* dist = new Distribution(distname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                        parParams.parallel, parParams.node, parParams.n_nodes);
                 vmc->add_output(dist);
 
             }
@@ -134,7 +155,7 @@ int main(int argc, char** argv) {
             if (generalParams.estimate_error) {
                 string vmcBlockname = (string) "blocking_VMC_out" + outputParams.outputSuffix;
                 ErrorEstimator* blocking = new Blocking(vmcParams.n_c, vmcBlockname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                        parParams.parallel, parParams.node, parParams.n_nodes);
                 vmc->set_error_estimator(blocking);
             } else {
                 vmc->set_error_estimator(new SimpleVar());
@@ -161,14 +182,14 @@ int main(int argc, char** argv) {
         if (outputParams.dmc_out) {
             string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;
             OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                    parParams.parallel, parParams.node, parParams.n_nodes);
             dmc->add_output(DMCout);
         }
 
         if (generalParams.estimate_error) {
             string dmcBlockname = (string) "blocking_DMC_out" + outputParams.outputSuffix;
             ErrorEstimator* blocking = new Blocking(dmcParams.n_c, dmcBlockname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                    parParams.parallel, parParams.node, parParams.n_nodes);
             dmc->set_error_estimator(blocking);
         } else {
             dmc->set_error_estimator(new SimpleVar());
@@ -190,18 +211,18 @@ void parseCML(int argc, char** argv,
         GeneralParams & generalParams,
         MinimizerParams & minimizerParams,
         OutputParams & outputParams,
-        SystemObjects & systemObjects) {
+        ParParams & parParams) {
 
     //Test for rerunning blocking
     //argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
     std::string rerun_blocking = "reblock";
-    if ((argc == 7) && (rerun_blocking.compare(argv[1])==0)) {
-        ErrorEstimator* reblock = new Blocking(0, 
+    if ((argc == 7) && (rerun_blocking.compare(argv[1]) == 0)) {
+        ErrorEstimator* reblock = new Blocking(0,
                 (std::string)argv[2],
                 (std::string)argv[3],
-                generalParams.parallell,
-                generalParams.numprocs,
-                generalParams.myrank,
+                parParams.parallel,
+                parParams.n_nodes,
+                parParams.node,
                 atoi(argv[4]),
                 atoi(argv[5]),
                 atoi(argv[6]),
@@ -231,10 +252,6 @@ void parseCML(int argc, char** argv,
     generalParams.random_seed = -time(NULL);
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
-
-    generalParams.parallell = false;
-    generalParams.numprocs = 1;
-    generalParams.myrank = 0;
 
     generalParams.doMIN = argc == 1;
     generalParams.doVMC = argc == 1;
@@ -281,6 +298,10 @@ void parseCML(int argc, char** argv,
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
+    parParams.parallel = false;
+    parParams.n_nodes = 1;
+    parParams.node = 0;
+
 
     //Seting values if not flagged default (controlled by Python)
     std::string def = "def";
@@ -300,7 +321,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[9]) != 0) generalParams.h = atof(argv[9]);
         if (def.compare(argv[10]) != 0) generalParams.D = atof(argv[10]);
 
-        if (def.compare(argv[11]) != 0) generalParams.parallell = (bool)atoi(argv[11]);
+        //        if (def.compare(argv[11]) != 0) parParams.parallel = (bool)atoi(argv[11]);
 
         if (def.compare(argv[12]) != 0) generalParams.doMIN = (bool)atoi(argv[12]);
         if (def.compare(argv[13]) != 0) generalParams.doVMC = (bool)atoi(argv[13]);

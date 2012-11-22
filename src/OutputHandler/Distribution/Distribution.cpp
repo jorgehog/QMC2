@@ -11,8 +11,8 @@ Distribution::Distribution(std::string filename,
         std::string path,
         bool parallel,
         int my_rank,
-        int num_procs)
-: OutputHandler(filename, path, parallel, my_rank, num_procs) {
+        int n_nodes)
+: OutputHandler(filename, path, parallel, my_rank, n_nodes) {
     this->is_vmc = true;
 }
 

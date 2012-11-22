@@ -12,12 +12,12 @@ Blocking::Blocking(int n_c,
         std::string path,
         bool parallel,
         int my_rank,
-        int num_procs,
+        int n_nodes,
         int n_b,
         int maxb,
         int minb,
         bool rerun)
-: ErrorEstimator(n_c, filename, path, parallel, my_rank, num_procs, rerun) {
+: ErrorEstimator(n_c, filename, path, parallel, my_rank, n_nodes, rerun) {
     //    int step = 1;
     n_block_samples = n_b;
     max_block_size = maxb;

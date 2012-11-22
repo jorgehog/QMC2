@@ -15,13 +15,13 @@ OutputHandler::OutputHandler(std::string filename,
         std::string path,
         bool parallel,
         int my_rank,
-        int num_procs) {
+        int n_nodes) {
 
     this->is_dmc = false;
     this->is_vmc = false;
 
     this->my_rank = my_rank;
-    this->num_procs = num_procs;
+    this->n_nodes = n_nodes;
     this->parallel = parallel;
 
     this->filename = filename;
@@ -67,7 +67,7 @@ void OutputHandler::finalize() {
                 " ") +
                 filename) +
                 " ") +
-                boost::lexical_cast<std::string > (num_procs)).c_str()
+                boost::lexical_cast<std::string > (n_nodes)).c_str()
                 );
 
     }
