@@ -52,7 +52,7 @@ protected:
 
 public:
 
-    DMC(GeneralParams &, DMCparams &, SystemObjects &);
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
 
     virtual void run_method();
 

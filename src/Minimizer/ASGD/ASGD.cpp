@@ -63,6 +63,14 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
 }
 
+void ASGD::node_comm() {
+#ifdef MPI_ON
+    MPI_Allreduce(MPI_IN_PLACE, gradient.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, gradient_local.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#endif
+}
+
 VMC* ASGD::minimize() {
 
     vmc->initialize();
@@ -104,13 +112,11 @@ VMC* ASGD::minimize() {
 
             }
         }
-  
+
 #ifdef MPI_ON
-        MPI_Allreduce(MPI_IN_PLACE, gradient.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, gradient_local.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        node_comm();
 #endif
-        
+
         int scale = n_walkers * n_c_SGD * n_nodes;
 
         E /= scale;

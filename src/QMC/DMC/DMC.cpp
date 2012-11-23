@@ -7,8 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
-: QMC(gP.n_p, gP.dim, dP.n_c, sO.sample_method, sO.SYSTEM, sO.jastrow) {
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
+: QMC(gP.n_p, gP.dim, dP.n_c, sO, pp) {
 
     this->dist_from_file = dP.dist_in;
     this->dist_in_path = dP.dist_in_path;

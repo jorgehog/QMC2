@@ -7,8 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO)
-: QMC(gP.n_p, gP.dim, vP.n_c, sO.sample_method, sO.SYSTEM, sO.jastrow) {
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp)
+: QMC(gP.n_p, gP.dim, vP.n_c, sO, pp) {
 
     vmc_E = 0;
 

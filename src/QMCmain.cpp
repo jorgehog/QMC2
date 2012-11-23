@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 
     if (generalParams.doVMC || generalParams.doMIN) {
 
-        VMC* vmc = new VMC(generalParams, vmcParams, systemObjects);
+        VMC* vmc = new VMC(generalParams, vmcParams, systemObjects, parParams);
         systemObjects.sample_method->set_dt(vmcParams.dt);
 
 
@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
 
         systemObjects.sample_method->set_dt(dmcParams.dt);
 
-        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects);
+        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
 
         if (outputParams.dmc_out) {
             string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;

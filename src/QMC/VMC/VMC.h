@@ -28,7 +28,7 @@ protected:
 
 public:
 
-    VMC(GeneralParams &, VMCparams &, SystemObjects &);
+    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &);
 
     void set_e(double E) {
         vmc_E = E;

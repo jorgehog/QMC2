@@ -42,6 +42,8 @@ protected:
 
     arma::rowvec gradient_old;
     arma::rowvec gradient_tot;
+    
+    virtual void node_comm();
 
     double f(double x) {
         return f_min + (f_max - f_min) / (1 - (f_max / f_min) * exp(-x / w));

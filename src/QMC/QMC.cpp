@@ -8,23 +8,31 @@
 #include "../QMCheaders.h"
 
 QMC::QMC(int n_p, int dim, int n_c,
-        Sampling *sampling,
-        System *system,
-        Jastrow *jastrow) {
+        SystemObjects & sO,
+        ParParams & pp) {
 
     this->n_p = n_p;
     this->dim = dim;
     this->n_c = n_c;
-    this->n2 = n_p / 2;
+    n2 = n_p / 2;
 
-    this->jastrow = jastrow;
-    this->sampling = sampling;
-    this->system = system;
+    jastrow = sO.jastrow;
+    sampling = sO.sample_method;
+    system = sO.SYSTEM;
 
-    this->sampling->set_qmc_ptr(this);
+    sampling->set_qmc_ptr(this);
     get_orbitals_ptr()->set_qmc_ptr(this);
 
-    this->accepted = 0;
+    accepted = 0;
+    
+    n_nodes = pp.n_nodes;
+    is_master = pp.is_master;
+    
+    if (is_master){
+        std_out = new STDOUT();
+    } else {
+        std_out = new NO_STDOUT();
+    }
 
 }
 

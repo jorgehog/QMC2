@@ -8,8 +8,17 @@
 #ifndef QMC_H
 #define	QMC_H
 
+#include "../QMCheaders.h"
+
+
 class QMC {
 protected:
+    
+    STDOUT* std_out;
+    std::stringstream s;
+    
+    bool is_master;
+    int n_nodes;
 
     int n_c;
 
@@ -57,9 +66,8 @@ protected:
 public:
 
     QMC(int n_p, int dim, int n_c,
-            Sampling *sampling,
-            System *system,
-            Jastrow *jastrow = new No_Jastrow());
+            SystemObjects &,
+            ParParams &);
     QMC();
 
     void add_output(OutputHandler* output_handler);
