@@ -44,7 +44,6 @@ int main(int argc, char** argv) {
             outputParams,
             systemObjects);
 
-
     if (generalParams.sampling == "IS") {
         systemObjects.sample_method = new Importance(generalParams);
     } else if (generalParams.sampling == "BF") {
@@ -244,7 +243,7 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = true;
+    generalParams.estimate_error = false;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 

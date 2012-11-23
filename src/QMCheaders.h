@@ -11,6 +11,7 @@
 //#define ARMA_NO_DEBUG
 
 #include <armadillo>
+#include <boost/lexical_cast.hpp>
 #include <stdlib.h>
 #include <iostream> 
 #include <fstream>
