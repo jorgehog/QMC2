@@ -7,8 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-ASGD::ASGD(VMC* vmc, MinimizerParams & mP)
-: Minimizer(vmc, mP.alpha, mP.beta) {
+ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
+: Minimizer(vmc, pp, mP.alpha, mP.beta) {
     using namespace arma;
 
     this->n_c = mP.n_cm;
@@ -151,8 +151,9 @@ VMC* ASGD::minimize() {
         dump_output();
         if ((sample % 100) == 0) {
             output("cycle:", sample);
-            std::cout << gradient_tot << std::endl;
-            std::cout << E << std::endl;
+            s << gradient_tot << std::endl;
+            s << E << std::endl;
+            std_out->cout(s);
         }
     }
 

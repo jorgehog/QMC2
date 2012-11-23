@@ -32,19 +32,6 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
 #endif
     
-#ifdef OMP_ON
-    omp_set_num_threads(2);
-#pragma omp parallel
-    {
-        sleep(omp_get_thread_num());
-        cout << "thread" << omp_get_thread_num() + 1 << "/" << omp_get_num_threads() << " proc " << node + 1 << "/" << n_nodes << endl;
-
-    }
-
-    sleep(4);
-    exit(1);
-#endif
-    
     arma::wall_clock t;
 
     struct VMCparams vmcParams;
@@ -113,7 +100,7 @@ int main(int argc, char** argv) {
 
         if (generalParams.doMIN) {
 
-            Minimizer * minimizer = new ASGD(vmc, minimizerParams);
+            Minimizer * minimizer = new ASGD(vmc, minimizerParams, parParams);
 
             if (outputParams.ASGD_out) {
                 string ASGDoutname = "ASGD_out" + outputParams.outputSuffix;
@@ -300,10 +287,6 @@ void parseCML(int argc, char** argv,
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
-    parParams.parallel = false;
-    parParams.n_nodes = 1;
-    parParams.node = 0;
-
 
     //Seting values if not flagged default (controlled by Python)
     std::string def = "def";
@@ -381,6 +364,16 @@ void parseCML(int argc, char** argv,
     if (outputParams.dist_out) {
         dmcParams.dist_in_path = outputParams.outputPath;
     }
-
-    std::cout << "seed: " << generalParams.random_seed << std::endl;
+    
+    if (parParams.n_nodes > 1){
+        parParams.parallel = true;
+        parParams.is_master = (parParams.node==0);
+    } else {
+        parParams.parallel = false;
+        parParams.node = 0;
+        parParams.n_nodes = 1;
+        parParams.is_master = true;
+    }
+    
+    if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }

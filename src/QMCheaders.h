@@ -9,7 +9,7 @@
 #define	QMCHEADERS_H
 
 //#define ARMA_NO_DEBUG
-#define OMP_ON
+//#define OMP_ON
 #define MPI_ON
 
 #ifdef OMP_ON
@@ -49,6 +49,7 @@ struct VariationalParams {
 
 struct ParParams {
     bool parallel;
+    bool is_master;
     int n_nodes;
     int node;
 };
@@ -116,6 +117,21 @@ struct SystemObjects {
 
 };
 
+class STDOUT{
+public:
+    virtual void cout(std::stringstream & a){
+        std::cout << a.str() << std::endl;
+        a.str(std::string());
+    }
+};
+
+class NO_STDOUT : public STDOUT {
+public:
+    virtual void cout(std::stringstream & a){
+        
+    }
+};
+
 #include "Walker/Walker.h"
 
 class Minimizer;
@@ -170,10 +186,6 @@ class QMC;
 
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"
-
-#include "Parallelizer/Parallelizer.h"
-#include "Parallelizer/NODE_COMM/MPI/MPI.h"
-#include "Parallelizer/NODE_COMM/Single/Single.h"
 
 #endif	/* QMCHEADERS_H */
 

@@ -13,6 +13,9 @@ protected:
 
     VMC* vmc;
 
+    STDOUT* std_out;
+    std::stringstream s;
+    
     int Nspatial_params;
     int Njastrow_params;
     int Nparams;
@@ -28,7 +31,7 @@ protected:
 
 public:
 
-    Minimizer(VMC* vmc, const arma::rowvec & alpha, const arma::rowvec & beta);
+    Minimizer(VMC* vmc, const ParParams &, const arma::rowvec & alpha, const arma::rowvec & beta);
 
     void add_output(OutputHandler* output_handler);
 
