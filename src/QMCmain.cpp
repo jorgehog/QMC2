@@ -258,7 +258,7 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = true;
+    generalParams.estimate_error = false;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
@@ -381,7 +381,7 @@ void parseCML(int argc, char** argv,
 
         if (parParams.is_master) {
             if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
-//                minimizerParams.n_c_SGD /= parParams.n_nodes;
+                std::cout << parParams.n_nodes << std::endl;
             } else {
                 std::cout << "n_c_SGD=" << parParams.n_nodes << " is too low for n_nodes=" << parParams.n_nodes << std::endl;
                 std::cout << "aborting.";
@@ -396,5 +396,6 @@ void parseCML(int argc, char** argv,
         parParams.is_master = true;
     }
 
+    minimizerParams.n_c_SGD /= parParams.n_nodes;
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }
