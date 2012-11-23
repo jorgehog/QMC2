@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
                             false, 0, 1);
                     minimizer->add_error_estimator(blocking);
                 } else if (parParams.is_master) {
-                    minimizer->add_error_estimator(new SimpleVar());
+                    minimizer->add_error_estimator(new SimpleVar(minimizerParams.SGDsamples, parParams));
                 } else {
 
                 }
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
                         parParams.parallel, parParams.node, parParams.n_nodes);
                 vmc->set_error_estimator(blocking);
             } else {
-                vmc->set_error_estimator(new SimpleVar());
+                vmc->set_error_estimator(new SimpleVar(vmcParams.n_c, parParams));
             }
 
 
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
                     parParams.parallel, parParams.node, parParams.n_nodes);
             dmc->set_error_estimator(blocking);
         } else {
-            dmc->set_error_estimator(new SimpleVar());
+            dmc->set_error_estimator(new SimpleVar(dmcParams.n_c, parParams));
         }
 
         if (parParams.is_master) t.tic();
@@ -191,11 +191,11 @@ int main(int argc, char** argv) {
     }
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
-    
+
 #ifdef MPI_ON
     MPI_Finalize();
 #endif
-    
+
     return 0;
 }
 
@@ -234,7 +234,7 @@ void parseCML(int argc, char** argv,
 
     //Default values:
     //    outputParams.blocking_out = false;
-    outputParams.dist_out = false;
+    outputParams.dist_out = true;
     //NEW
     outputParams.dmc_out = false;
     outputParams.ASGD_out = false;
@@ -249,9 +249,8 @@ void parseCML(int argc, char** argv,
     generalParams.D = 0.5;
 
     generalParams.doMIN = argc == 1;
-    generalParams.doVMC = 0;
+    generalParams.doVMC = argc == 1;
     generalParams.doDMC = 0;
-    //    generalParams.doVMC = argc == 1;
     //    generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
@@ -291,7 +290,7 @@ void parseCML(int argc, char** argv,
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 100*parParams.n_nodes;
+    minimizerParams.n_c_SGD = 100 * parParams.n_nodes;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
@@ -388,6 +387,12 @@ void parseCML(int argc, char** argv,
                 exit(1);
             }
 
+            if (outputParams.dist_out) {
+                if (dmcParams.n_w > vmcParams.n_c / (200)) {
+                    std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
+                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
+                }
+            }
         }
     } else {
         parParams.parallel = false;
@@ -397,5 +402,6 @@ void parseCML(int argc, char** argv,
     }
 
     minimizerParams.n_c_SGD /= parParams.n_nodes;
+    vmcParams.n_c /= parParams.n_nodes;
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }

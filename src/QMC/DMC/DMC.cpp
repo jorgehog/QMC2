@@ -79,7 +79,7 @@ void DMC::initialize() {
 
 }
 
-void DMC::user_output() const {
+void DMC::output() {
     printf("dmcE: %1.5f| Nw: %4d| %1.5f%%", dmc_E / cycle, n_w,
             (double) cycle / n_c * 100);
     std::cout << std::endl;
@@ -153,7 +153,7 @@ void DMC::run_method() {
         bury_the_dead();
         update_energies();
 
-        user_output();
+        output();
 
     }
 
@@ -170,7 +170,7 @@ void DMC::run_method() {
         bury_the_dead();
         update_energies();
 
-        user_output();
+        output();
         dump_output();
 
         error_estimator->update_data(E / samples);
@@ -242,4 +242,10 @@ void DMC::bury_the_dead() {
 
     n_w = n_w - deaths;
 
+}
+
+void DMC::node_comm(){
+#ifdef MPI_ON
+    
+#endif
 }

@@ -11,22 +11,28 @@ Blocking::Blocking(int n_c,
         std::string filename,
         std::string path,
         bool parallel,
-        int my_rank,
+        int node,
         int n_nodes,
         int n_b,
         int maxb,
         int minb,
         bool rerun)
-: ErrorEstimator(n_c, filename, path, parallel, my_rank, n_nodes, rerun) {
+: ErrorEstimator(n_c, filename, path, parallel, node, n_nodes, rerun) {
     //    int step = 1;
     n_block_samples = n_b;
     max_block_size = maxb;
     min_block_size = minb;
+    
+    init_file();
     //    n_block_samples = (max_block_size - min_block_size) / step;
 }
 
 double Blocking::estimate_error() {
     using namespace std;
+    
+    if (!rerun){
+        return 0;
+    }
 
     int block_size, block_step_length;
     double error;
@@ -41,8 +47,6 @@ double Blocking::estimate_error() {
         error = block_data(block_size);
         file << block_size << "\t" << error << std::endl;
     }
-
-    finalize();
 
     return error;
 }

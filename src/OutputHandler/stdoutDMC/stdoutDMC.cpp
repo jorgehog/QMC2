@@ -10,14 +10,16 @@
 stdoutDMC::stdoutDMC(std::string filename,
         std::string path,
         bool parallel,
-        int my_rank,
+        int node,
         int n_nodes)
-: OutputHandler(filename, path, parallel, my_rank, n_nodes) {
+: OutputHandler(filename, path, parallel, node, n_nodes) {
 
     this->is_dmc = true;
     sumE = 0;
     sumN = 0;
     n = 0;
+    
+    init_file();
 
 }
 

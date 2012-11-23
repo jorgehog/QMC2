@@ -10,16 +10,10 @@
 
 class SimpleVar : public ErrorEstimator {
 public:
-    SimpleVar();
-    
-    void update_data(double val){
-        E += val;
-        E2 += val*val;
-        i += 1;
-    }
+    SimpleVar(int n_c, ParParams &);
     
     double estimate_error(){
-        return (E2 - E*E/i)/i;
+        return arma::var(data);
     }
     
 protected:

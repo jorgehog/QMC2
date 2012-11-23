@@ -20,11 +20,13 @@ protected:
 
     virtual bool move_autherized(double A) {
         return metropolis_test(A);
-    };
+    }
 
     void scale_values() {
-        vmc_E /= n_c;
-    };
+        vmc_E /= (n_c*n_nodes);
+    }
+    
+    virtual void node_comm();
 
 public:
 
@@ -39,7 +41,7 @@ public:
     }
 
     virtual void run_method();
-    virtual void user_output() const;
+    virtual void output();
 
     friend class Minimizer;
     friend class ASGD;

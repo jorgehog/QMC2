@@ -19,6 +19,7 @@ protected:
     
     bool is_master;
     int n_nodes;
+    virtual void node_comm() = 0;
 
     int n_c;
 
@@ -73,7 +74,7 @@ public:
     void add_output(OutputHandler* output_handler);
 
     virtual void run_method() = 0;
-    virtual void user_output() const = 0;
+    virtual void output() = 0;
 
 
 

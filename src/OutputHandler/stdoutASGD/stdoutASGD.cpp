@@ -10,14 +10,16 @@
 stdoutASGD::stdoutASGD(std::string filename,
         std::string path,
         bool parallel,
-        int my_rank,
+        int node,
         int n_nodes)
-: OutputHandler(filename, path, parallel, my_rank, n_nodes) {
+: OutputHandler(filename, path, parallel, node, n_nodes) {
     this->is_ASGD = true;
 
     aGrad = 0;
     bGrad = 0;
     sumE = 0;
+    
+    init_file();
 }
 
 void stdoutASGD::dump() {

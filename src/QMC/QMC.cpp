@@ -24,11 +24,11 @@ QMC::QMC(int n_p, int dim, int n_c,
     get_orbitals_ptr()->set_qmc_ptr(this);
 
     accepted = 0;
-    
+
     n_nodes = pp.n_nodes;
     is_master = pp.is_master;
-    
-    if (is_master){
+
+    if (is_master) {
         std_out = new STDOUT();
     } else {
         std_out = new NO_STDOUT();
@@ -62,8 +62,9 @@ void QMC::finalize_output() {
 }
 
 void QMC::estimate_error() const {
-    if (error_estimator->do_output) {
+    if (is_master) {
         double error = error_estimator->estimate_error();
+        error_estimator->finalize();
         std::cout << "Estimated Error: " << error << std::endl;
     }
 }

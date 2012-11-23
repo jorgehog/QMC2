@@ -20,7 +20,7 @@ public:
     stdoutDMC(std::string filename = "DMC_out",
             std::string path = "./",
             bool parallel = false,
-            int my_rank = 0,
+            int node = 0,
             int n_nodes = 1
             );
 

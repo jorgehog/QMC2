@@ -13,7 +13,7 @@ public:
     Blocking(int n_c, std::string filename = "blocking_out",
             std::string path = "./",
             bool parallel = false,
-            int my_rank = 0,
+            int node = 0,
             int n_nodes = 1,
             int n_b=100,
             int maxb=10000,

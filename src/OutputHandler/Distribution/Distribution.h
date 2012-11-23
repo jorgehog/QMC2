@@ -9,12 +9,13 @@
 #define	DISTRIBUTION_H
 
 class Distribution : public OutputHandler {
+protected:
+    int i;
 public:
-
     Distribution(std::string filename = "dist_out",
             std::string path = "./",
             bool parallel = false,
-            int my_rank = 0,
+            int node = 0,
             int n_nodes = 1
             );
 

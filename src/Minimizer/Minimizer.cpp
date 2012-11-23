@@ -22,13 +22,13 @@ Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha,
     for (int i = 0; i < Njastrow_params; i++) {
         vmc->get_jastrow_ptr()->set_parameter(beta(i), i);
     }
-    
-    if (pp.is_master){
+
+    if (pp.is_master) {
         std_out = new STDOUT();
     } else {
         std_out = new NO_STDOUT();
     }
-    
+
     is_master = pp.is_master;
     n_nodes = pp.n_nodes;
 
@@ -56,7 +56,7 @@ void Minimizer::output(std::string message, double number) {
 
     s << endl;
     std_out->cout(s);
-    
+
 }
 
 void Minimizer::add_output(OutputHandler* output_handler) {
@@ -81,10 +81,12 @@ void Minimizer::finalize_output() {
 }
 
 void Minimizer::error_output() {
-    if (error_estimators.at(0)->do_output) {
-        for (int i = 0; i < Nparams; i++) {
+    for (int i = 0; i < Nparams; i++) {
+        if (is_master) {
             double error = error_estimators.at(i)->estimate_error();
-            std::cout << "Error" << i << ": " << error << std::endl;
-        }
+            error_estimators.at(i)->finalize();
+
+            if (error != 0) std::cout << "Error" << i << ": " << error << std::endl;
+        } 
     }
 }

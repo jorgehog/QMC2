@@ -113,9 +113,8 @@ VMC* ASGD::minimize() {
             }
         }
 
-#ifdef MPI_ON
+
         node_comm();
-#endif
 
         int scale = n_walkers * n_c_SGD * n_nodes;
 
@@ -174,7 +173,8 @@ VMC* ASGD::minimize() {
 
     output("Finished minimizing. Final parameters:");
     finalize_output();
-    if (is_master) error_output();
+
+    error_output();
 
     vmc->accepted = 0;
     return vmc;

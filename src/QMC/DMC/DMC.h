@@ -49,6 +49,8 @@ protected:
         n_w_last = n_w;
         E = samples = deaths = 0;
     }
+    
+    virtual void node_comm();
 
 public:
 
@@ -56,7 +58,7 @@ public:
 
     virtual void run_method();
 
-    virtual void user_output() const;
+    virtual void output();
 
     friend class stdoutDMC;
 

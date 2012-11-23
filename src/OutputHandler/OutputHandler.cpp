@@ -14,13 +14,13 @@ OutputHandler::OutputHandler() {
 OutputHandler::OutputHandler(std::string filename,
         std::string path,
         bool parallel,
-        int my_rank,
+        int node,
         int n_nodes) {
 
     this->is_dmc = false;
     this->is_vmc = false;
 
-    this->my_rank = my_rank;
+    this->node = node;
     this->n_nodes = n_nodes;
     this->parallel = parallel;
 
@@ -28,11 +28,17 @@ OutputHandler::OutputHandler(std::string filename,
     this->path = path;
 
     if (parallel) {
-        filename = filename + boost::lexical_cast<std::string > (my_rank);
+        filename = filename + boost::lexical_cast<std::string > (node);
     }
 
-    this->file.open(((path + filename) + ".dat").c_str());
+    //default:
+    use_file = false;
 
+}
+
+void OutputHandler::init_file(){
+    use_file = true;
+    this->file.open(((path + filename) + ".dat").c_str());
 }
 
 void OutputHandler::set_qmc_ptr(QMC* qmc) {
@@ -54,9 +60,12 @@ void OutputHandler::set_min_ptr(Minimizer* min) {
 }
 
 void OutputHandler::finalize() {
+    if (!use_file){
+        return;
+    }
     file.close();
 
-    if (parallel & (my_rank == 0)) {
+    if (parallel & (node == 0)) {
         std::string compressorPath = "~/MASTER/QMC2/tools/compressData.sh";
 
         //Bash script "~/compressData ~/test/ blocking 4"
