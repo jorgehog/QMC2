@@ -28,6 +28,9 @@ Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha,
     } else {
         std_out = new NO_STDOUT();
     }
+    
+    is_master = pp.is_master;
+    n_nodes = pp.n_nodes;
 
 }
 

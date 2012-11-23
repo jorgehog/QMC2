@@ -104,12 +104,21 @@ VMC* ASGD::minimize() {
 
             }
         }
-
-        int scale = n_walkers * n_c_SGD;
+  
+#ifdef MPI_ON
+        MPI_Allreduce(MPI_IN_PLACE, gradient.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, gradient_local.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#endif
+        
+        int scale = n_walkers * n_c_SGD * n_nodes;
 
         E /= scale;
-
         gradient_tot = 2 * (gradient_local - gradient * E) / scale;
+
+
+
+
 
         double x = -dot(gradient_tot, gradient_old);
 
@@ -129,7 +138,7 @@ VMC* ASGD::minimize() {
             double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
             vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
 
-            error_estimators.at(param)->update_data(step);
+            if (is_master) error_estimators.at(param)->update_data(step);
         }
 
         for (int param = 0; param < Njastrow_params; param++) {
@@ -142,7 +151,7 @@ VMC* ASGD::minimize() {
             double beta = vmc->get_jastrow_ptr()->get_parameter(param);
             vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
 
-            error_estimators.at(param + Nspatial_params)->update_data(step);
+            if (is_master) error_estimators.at(param + Nspatial_params)->update_data(step);
         }
 
         t_prev = t;
@@ -159,7 +168,7 @@ VMC* ASGD::minimize() {
 
     output("Finished minimizing. Final parameters:");
     finalize_output();
-    error_output();
+    if (is_master) error_output();
 
     vmc->accepted = 0;
     return vmc;

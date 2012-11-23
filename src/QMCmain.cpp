@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
 #endif
-    
+
     arma::wall_clock t;
 
     struct VMCparams vmcParams;
@@ -54,14 +54,13 @@ int main(int argc, char** argv) {
             outputParams,
             parParams);
 
-
     if (generalParams.sampling == "IS") {
         systemObjects.sample_method = new Importance(generalParams);
     } else if (generalParams.sampling == "BF") {
         systemObjects.sample_method = new Brute_Force(generalParams);
     } else {
-        cout << "unknown sampling method" << endl;
-        exit(1);
+        if (parParams.is_master) cout << "unknown sampling method" << endl;
+        if (parParams.is_master) exit(1);
     }
 
 
@@ -81,8 +80,8 @@ int main(int argc, char** argv) {
 
 
     } else {
-        cout << "unknown system" << endl;
-        exit(1);
+        if (parParams.is_master) cout << "unknown system" << endl;
+        if (parParams.is_master) exit(1);
     }
 
     if (generalParams.use_coulomb) {
@@ -113,21 +112,23 @@ int main(int argc, char** argv) {
             int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
 
             for (int i = 0; i < N; i++) {
-                if (generalParams.estimate_error) {
+                if (generalParams.estimate_error && parParams.is_master) {
                     string minBlockname = (string) "blocking_MIN_out" + outputParams.outputSuffix;
                     minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
                     ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname,
                             outputParams.outputPath,
-                            parParams.parallel, parParams.node, parParams.n_nodes);
+                            false, 0, 1);
                     minimizer->add_error_estimator(blocking);
-                } else {
+                } else if (parParams.is_master) {
                     minimizer->add_error_estimator(new SimpleVar());
+                } else {
+
                 }
             }
 
-            t.tic();
+            if (parParams.is_master) t.tic();
             vmc = minimizer->minimize();
-            cout << "---Minimization time: " << t.toc() << " s---" << endl;
+            if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---" << endl;
         }
 
         if (generalParams.doVMC) {
@@ -151,9 +152,9 @@ int main(int argc, char** argv) {
             }
 
 
-            t.tic();
+            if (parParams.is_master) t.tic();
             vmc->run_method();
-            cout << "---VMC time: " << t.toc() << " s---" << endl;
+            if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---" << endl;
 
             dmcParams.E_T = vmc->get_energy();
         }
@@ -184,12 +185,17 @@ int main(int argc, char** argv) {
             dmc->set_error_estimator(new SimpleVar());
         }
 
-        t.tic();
+        if (parParams.is_master) t.tic();
         dmc->run_method();
-        cout << "---DMC time: " << t.toc() << " s---" << endl;
+        if (parParams.is_master) cout << "---DMC time: " << t.toc() << " s---" << endl;
     }
 
-    cout << "~.* QMC fin *.~" << endl;
+    if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
+    
+#ifdef MPI_ON
+    MPI_Finalize();
+#endif
+    
     return 0;
 }
 
@@ -243,8 +249,10 @@ void parseCML(int argc, char** argv,
     generalParams.D = 0.5;
 
     generalParams.doMIN = argc == 1;
-    generalParams.doVMC = argc == 1;
-    generalParams.doDMC = argc == 1;
+    generalParams.doVMC = 0;
+    generalParams.doDMC = 0;
+    //    generalParams.doVMC = argc == 1;
+    //    generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
@@ -283,7 +291,7 @@ void parseCML(int argc, char** argv,
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 100;
+    minimizerParams.n_c_SGD = 100*parParams.n_nodes;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
@@ -364,16 +372,29 @@ void parseCML(int argc, char** argv,
     if (outputParams.dist_out) {
         dmcParams.dist_in_path = outputParams.outputPath;
     }
-    
-    if (parParams.n_nodes > 1){
+
+    //Check consitency in chosen cycle numbers.
+    if (parParams.n_nodes > 1) {
         parParams.parallel = true;
-        parParams.is_master = (parParams.node==0);
+        parParams.is_master = (parParams.node == 0);
+        generalParams.random_seed -= parParams.node;
+
+        if (parParams.is_master) {
+            if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
+//                minimizerParams.n_c_SGD /= parParams.n_nodes;
+            } else {
+                std::cout << "n_c_SGD=" << parParams.n_nodes << " is too low for n_nodes=" << parParams.n_nodes << std::endl;
+                std::cout << "aborting.";
+                exit(1);
+            }
+
+        }
     } else {
         parParams.parallel = false;
         parParams.node = 0;
         parParams.n_nodes = 1;
         parParams.is_master = true;
     }
-    
+
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }

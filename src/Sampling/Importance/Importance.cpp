@@ -9,6 +9,7 @@
 
 Importance::Importance(GeneralParams & gP)
 : Sampling(gP.n_p, gP.dim) {
+
     diffusion = new Fokker_Planck(n_p, dim, 0, gP.random_seed, gP.D);
 
 }

@@ -10,6 +10,9 @@
 
 class Minimizer {
 protected:
+    
+    int n_nodes;
+    bool is_master;
 
     VMC* vmc;
 
