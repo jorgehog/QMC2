@@ -28,7 +28,7 @@ public:
     virtual void update_necessities(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
     virtual void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const = 0;
 
-    void set_trial_pos(Walker* walker, bool load_VMC_dist = false, std::ifstream* file = NULL);
+    void set_trial_pos(Walker* walker, bool set_pos = true);
     void set_trial_states(Walker* walker);
     
     virtual void get_necessities(Walker* walker) = 0;

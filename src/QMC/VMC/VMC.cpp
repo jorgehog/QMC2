@@ -67,7 +67,6 @@ void VMC::output() {
 
 void VMC::node_comm() {
 #ifdef MPI_ON
-    error_estimator->node_comm();
     MPI_Allreduce(MPI_IN_PLACE, &vmc_E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif
 }

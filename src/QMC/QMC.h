@@ -18,6 +18,8 @@ protected:
     std::stringstream s;
     
     bool is_master;
+    bool parallel;
+    int node;
     int n_nodes;
     virtual void node_comm() = 0;
 

@@ -37,15 +37,16 @@ void DMC::initialize() {
     //Seting trial position of active walkers
     if (dist_from_file) {
 
-        std::ifstream dist;
-        std::string name = "dist_out.dat";
-        dist.open((dist_in_path + name).c_str());
 
         for (int k = 0; k < n_w; k++) {
-            sampling->set_trial_pos(original_walkers[k], true, &dist);
-        }
+            s << dist_in_path << "walker_positions/dist_out" << node << "_" << k << ".arma";
 
-        dist.close();
+            original_walkers[k]->r.load(s.str());
+            sampling->set_trial_pos(original_walkers[k], false);
+            
+
+            s.str(std::string());
+        }
 
     } else {
         double tmpDt = sampling->get_dt();
@@ -80,9 +81,8 @@ void DMC::initialize() {
 }
 
 void DMC::output() {
-    printf("dmcE: %1.5f| Nw: %4d| %1.5f%%", dmc_E / cycle, n_w,
-            (double) cycle / n_c * 100);
-    std::cout << std::endl;
+   s << "dmcE:" << dmc_E / cycle << "| Nw: " << n_w << "| " << (double) cycle / n_c * 100 << "%";
+   std_out->cout(s);
 }
 
 void DMC::Evolve_walker(int k, double GB) {
@@ -155,8 +155,11 @@ void DMC::run_method() {
 
         output();
 
+        node_comm();
     }
-
+    
+    cycle = 100;
+    node_comm();
 
     dmc_E = 0;
     for (cycle = 1; cycle <= n_c; cycle++) {
@@ -174,6 +177,8 @@ void DMC::run_method() {
         dump_output();
 
         error_estimator->update_data(E / samples);
+        
+        node_comm();
 
     }
 
@@ -244,8 +249,17 @@ void DMC::bury_the_dead() {
 
 }
 
-void DMC::node_comm(){
+void DMC::node_comm() {
 #ifdef MPI_ON
-    
+    if (cycle % 10 == 0){
+        MPI_Allreduce(MPI_IN_PLACE, &E_T, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        if (is_master) {
+            MPI_Reduce(MPI_IN_PLACE, &dmc_E, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+            dmc_E/= n_nodes;
+        } else {
+            MPI_Reduce(&dmc_E, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        }
+        E_T /= n_nodes;
+    } 
 #endif
 }

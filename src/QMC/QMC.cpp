@@ -26,8 +26,10 @@ QMC::QMC(int n_p, int dim, int n_c,
     accepted = 0;
 
     n_nodes = pp.n_nodes;
+    node = pp.node;
     is_master = pp.is_master;
-
+    parallel = pp.parallel;
+    
     if (is_master) {
         std_out = new STDOUT();
     } else {
@@ -62,6 +64,7 @@ void QMC::finalize_output() {
 }
 
 void QMC::estimate_error() const {
+    if (parallel) error_estimator->node_comm();
     if (is_master) {
         double error = error_estimator->estimate_error();
         if (error != 0) std::cout << "Estimated Error: " << error << std::endl;

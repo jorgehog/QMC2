@@ -246,14 +246,13 @@ void parseCML(int argc, char** argv,
 
     generalParams.doMIN = argc == 1;
     generalParams.doVMC = argc == 1;
-    generalParams.doDMC = 0;
-    //    generalParams.doDMC = argc == 1;
+    generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = true;
+    generalParams.estimate_error = false;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
@@ -373,18 +372,52 @@ void parseCML(int argc, char** argv,
         generalParams.random_seed -= parParams.node;
 
         if (parParams.is_master) {
-            if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
-                std::cout << parParams.n_nodes << std::endl;
-            } else {
-                std::cout << "n_c_SGD=" << parParams.n_nodes << " is too low for n_nodes=" << parParams.n_nodes << std::endl;
-                std::cout << "aborting.";
-                exit(1);
+            if (generalParams.doMIN) {
+                if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
+
+                } else {
+                    std::cout << "n_c_SGD=" << parParams.n_nodes << " is too low for n_nodes=" << parParams.n_nodes << std::endl;
+                    std::cout << "aborting.";
+                    exit(1);
+                }
             }
 
-            if (outputParams.dist_out) {
-                if (dmcParams.n_w > vmcParams.n_c / (200)) {
-                    std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
-                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
+            if (generalParams.doVMC && generalParams.doDMC) {
+                if (dmcParams.dist_in && outputParams.dist_out) {
+                    if (dmcParams.n_w > vmcParams.n_c / (200)) {
+                        std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
+                        std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
+                    }
+                }
+            }
+
+            if (generalParams.doDMC) {
+                if (dmcParams.n_w < parParams.n_nodes) {
+                    std::cout << "Unsufficient walkers for node structure." << std::endl;
+                }
+
+                if (dmcParams.dist_in) {
+                    arma::mat r_test;
+                    std::stringstream s;
+                    s << dmcParams.dist_in_path << "walker_positions/dist_out0_0.arma";
+                    bool dataFound = r_test.load(s.str());
+                    if (!dataFound) {
+                        std::cout << "No walker output data found in " << dmcParams.dist_in_path << "walker_positions/" << std::endl;
+                        exit(1);
+                    }
+                    s.str(std::string());
+
+                    for (int i = 0; i < parParams.n_nodes; i++) {
+                        s << dmcParams.dist_in_path << "walker_positions/dist_out" << i << "_0.arma";
+                        dataFound = r_test.load(s.str());
+                        if (!dataFound) {
+                            std::cout << "No walker output data found for node " << i << ". Data generated on less nodes?"<<std::endl;
+                            exit(1);
+                        }
+                        s.str(std::string());
+                    }
+                    r_test.clear();
+
                 }
             }
         }
@@ -397,5 +430,6 @@ void parseCML(int argc, char** argv,
 
     minimizerParams.n_c_SGD /= parParams.n_nodes;
     vmcParams.n_c /= parParams.n_nodes;
+    dmcParams.n_w /= parParams.n_nodes;
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }
