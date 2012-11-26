@@ -24,12 +24,25 @@ void parseCML(int, char**,
 int main(int argc, char** argv) {
     using namespace std;
 
-    int node, n_nodes;
+    //Setting up parallel parameters
+    struct ParParams parParams;
 
 #ifdef MPI_ON
+    int node, n_nodes;
+
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
+
+    parParams.n_nodes = n_nodes;
+    parParams.node = node;
+    parParams.parallel = (parParams.n_nodes > 1);
+    parParams.is_master = (parParams.node == 0);
+#else
+    parParams.parallel = false;
+    parParams.node = 0;
+    parParams.n_nodes = 1;
+    parParams.is_master = true;
 #endif
 
     arma::wall_clock t;
@@ -42,12 +55,7 @@ int main(int argc, char** argv) {
     struct OutputParams outputParams;
     struct SystemObjects systemObjects;
 
-    //Setting up parallel parameters
-    struct ParParams parParams;
-    parParams.n_nodes = n_nodes;
-    parParams.node = node;
-    parParams.parallel = (parParams.n_nodes > 1);
-    parParams.is_master = (parParams.node == 0);
+
 
     //Test for rerunning blocking
     //argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
@@ -285,7 +293,7 @@ void parseCML(int argc, char** argv,
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 100 * parParams.n_nodes;
+    minimizerParams.n_c_SGD = 400;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
@@ -367,11 +375,9 @@ void parseCML(int argc, char** argv,
         dmcParams.dist_in_path = outputParams.outputPath;
     }
 
-    //Check consitency in chosen cycle numbers.
-    if (parParams.n_nodes > 1) {
-        generalParams.random_seed -= parParams.node;
-
-        if (parParams.is_master) {
+    //Check consitency in chosen cycle numbers etc. given node number.
+    if (parParams.is_master) {
+        if (parParams.parallel) {
             if (generalParams.doMIN) {
                 if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
 
@@ -382,54 +388,53 @@ void parseCML(int argc, char** argv,
                 }
             }
 
-            if (generalParams.doVMC && generalParams.doDMC) {
-                if (dmcParams.dist_in && outputParams.dist_out) {
-                    if (dmcParams.n_w > vmcParams.n_c / (200)) {
-                        std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
-                        std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
-                    }
-                }
+            if (dmcParams.n_w < parParams.n_nodes) {
+                std::cout << "Unsufficient walkers for node structure." << std::endl;
             }
 
-            if (generalParams.doDMC) {
-                if (dmcParams.n_w < parParams.n_nodes) {
-                    std::cout << "Unsufficient walkers for node structure." << std::endl;
-                }
+        }
 
-                if (dmcParams.dist_in) {
-                    arma::mat r_test;
-                    std::stringstream s;
-                    s << dmcParams.dist_in_path << "walker_positions/dist_out0_0.arma";
-                    bool dataFound = r_test.load(s.str());
-                    if (!dataFound) {
-                        std::cout << "No walker output data found in " << dmcParams.dist_in_path << "walker_positions/" << std::endl;
-                        exit(1);
-                    }
-                    s.str(std::string());
-
-                    for (int i = 0; i < parParams.n_nodes; i++) {
-                        s << dmcParams.dist_in_path << "walker_positions/dist_out" << i << "_0.arma";
-                        dataFound = r_test.load(s.str());
-                        if (!dataFound) {
-                            std::cout << "No walker output data found for node " << i << ". Data generated on less nodes?"<<std::endl;
-                            exit(1);
-                        }
-                        s.str(std::string());
-                    }
-                    r_test.clear();
-
+        if (generalParams.doVMC && generalParams.doDMC) {
+            if (dmcParams.dist_in && outputParams.dist_out) {
+                if (dmcParams.n_w > vmcParams.n_c / (200)) {
+                    std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
+                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
                 }
             }
         }
-    } else {
-        parParams.parallel = false;
-        parParams.node = 0;
-        parParams.n_nodes = 1;
-        parParams.is_master = true;
+
+        if (generalParams.doDMC) {
+
+            if (dmcParams.dist_in && (!outputParams.dist_out)) {
+                arma::mat r_test;
+                std::stringstream s;
+                s << dmcParams.dist_in_path << "walker_positions/dist_out0_0.arma";
+                bool dataFound = r_test.load(s.str());
+                if (!dataFound) {
+                    std::cout << "No walker output data found in " << dmcParams.dist_in_path << "walker_positions/" << std::endl;
+                    exit(1);
+                }
+                s.str(std::string());
+
+                for (int i = 0; i < parParams.n_nodes; i++) {
+                    s << dmcParams.dist_in_path << "walker_positions/dist_out" << i << "_0.arma";
+                    dataFound = r_test.load(s.str());
+                    if (!dataFound) {
+                        std::cout << "No walker output data found for node " << i << ". Data generated on less nodes?" << std::endl;
+                        exit(1);
+                    }
+                    s.str(std::string());
+                }
+                r_test.clear();
+
+            }
+        }
     }
 
+    generalParams.random_seed -= parParams.node;
     minimizerParams.n_c_SGD /= parParams.n_nodes;
     vmcParams.n_c /= parParams.n_nodes;
     dmcParams.n_w /= parParams.n_nodes;
+
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }

@@ -109,7 +109,6 @@ VMC* ASGD::minimize() {
 
                 get_variational_gradients(walkers[k], e_local);
 
-
             }
         }
 
@@ -125,7 +124,7 @@ VMC* ASGD::minimize() {
 
 
 
-        double x = -dot(gradient_tot, gradient_old);
+        double x = -arma::dot(gradient_tot, gradient_old);
 
         t = t_prev + f(x);
         if (t < 0) {
