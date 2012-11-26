@@ -69,35 +69,26 @@ void ErrorEstimator::node_comm() {
 
     using namespace arma;
 
-    rowvec tmp_data;
     rowvec master_data;
 
 
     if (node == 0) {
         master_data = zeros<rowvec > (n * n_nodes);
-    } else {
-        tmp_data = data;
     }
-
-
-
 
 
     cout << mean(data(span(0, n - 1))) << endl;
 
 
-    MPI_Gather(tmp_data.memptr(), n, MPI_DOUBLE, master_data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Gather(data.memptr(), n, MPI_DOUBLE, master_data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    if (node == 0) cout << mean(data) << " " << data.n_elem << endl;
-
-    if (node != 0) {
-        data.clear();
-    } else {
-        data = master_data;
+    data.clear();
+    
+    if (node == 0) {
+        rowvec data(master_data.memptr(), master_data.n_elem, false, true);
+        cout << mean(data) << " " << data.n_elem << endl;
     }
-
-    tmp_data.clear();
-    master_data.clear();
+    
 
 
 #endif
