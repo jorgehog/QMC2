@@ -84,9 +84,8 @@ void Minimizer::error_output() {
     for (int i = 0; i < Nparams; i++) {
         if (is_master) {
             double error = error_estimators.at(i)->estimate_error();
-            error_estimators.at(i)->finalize();
-
             if (error != 0) std::cout << "Error" << i << ": " << error << std::endl;
-        } 
+            error_estimators.at(i)->finalize();
+        }
     }
 }

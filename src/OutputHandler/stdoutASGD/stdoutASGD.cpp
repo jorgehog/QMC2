@@ -8,11 +8,8 @@
 #include "../../QMCheaders.h"
 
 stdoutASGD::stdoutASGD(std::string filename,
-        std::string path,
-        bool parallel,
-        int node,
-        int n_nodes)
-: OutputHandler(filename, path, parallel, node, n_nodes) {
+        std::string path)
+: OutputHandler(filename, path, false, 0, 1) {
     this->is_ASGD = true;
 
     aGrad = 0;

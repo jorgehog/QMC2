@@ -7,12 +7,9 @@
 
 #include "../../QMCheaders.h"
 
-Distribution::Distribution(std::string filename,
-        std::string path,
-        bool parallel,
-        int node,
-        int n_nodes)
-: OutputHandler(filename, path, parallel, node, n_nodes) {
+Distribution::Distribution(ParParams & pp, std::string filename,
+        std::string path)
+: OutputHandler(filename, path, pp.parallel, pp.node, pp.n_nodes) {
     i = 0;
     this->is_vmc = true;
 }

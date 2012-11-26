@@ -12,12 +12,8 @@ class Distribution : public OutputHandler {
 protected:
     int i;
 public:
-    Distribution(std::string filename = "dist_out",
-            std::string path = "./",
-            bool parallel = false,
-            int node = 0,
-            int n_nodes = 1
-            );
+    Distribution(ParParams &, std::string filename = "dist_out",
+            std::string path = "./");
 
     virtual void dump();
 

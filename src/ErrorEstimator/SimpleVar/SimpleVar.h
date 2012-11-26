@@ -11,9 +11,9 @@
 class SimpleVar : public ErrorEstimator {
 public:
     SimpleVar(int n_c, ParParams &);
+    SimpleVar(int n_c);
     
     double estimate_error(){
-        std::cout << mean(data) << std::endl;
         return arma::var(data);
     }
     

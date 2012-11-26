@@ -7,24 +7,28 @@
 
 #include "../../QMCheaders.h"
 
-Blocking::Blocking(int n_c,
+Blocking::Blocking(int n_c, ParParams & pp,
         std::string filename,
         std::string path,
-        bool parallel,
-        int node,
-        int n_nodes,
         int n_b,
         int maxb,
         int minb,
         bool rerun)
-: ErrorEstimator(n_c, filename, path, parallel, node, n_nodes, rerun) {
+: ErrorEstimator(n_c, filename, path, pp.parallel, pp.node, pp.n_nodes, rerun) {
     //    int step = 1;
     n_block_samples = n_b;
     max_block_size = maxb;
     min_block_size = minb;
     
-    init_file();
+    if (rerun) init_file();
     //    n_block_samples = (max_block_size - min_block_size) / step;
+}
+
+Blocking::Blocking(int n_c, std::string filename, std::string path, int n_b, int maxb, int minb)
+:ErrorEstimator(n_c, filename, path, false, 0, 1, false){
+    n_block_samples = n_b;
+    max_block_size = maxb;
+    min_block_size = minb;
 }
 
 double Blocking::estimate_error() {

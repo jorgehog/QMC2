@@ -12,5 +12,10 @@ SimpleVar::SimpleVar(int n_c, ParParams & pp)
     data_to_file = false;
 }
 
+SimpleVar::SimpleVar(int n_c)
+: ErrorEstimator(n_c, "", "", false, 0, 1, false){
+    
+}
+
 
 

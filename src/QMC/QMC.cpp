@@ -64,8 +64,8 @@ void QMC::finalize_output() {
 void QMC::estimate_error() const {
     if (is_master) {
         double error = error_estimator->estimate_error();
+        if (error != 0) std::cout << "Estimated Error: " << error << std::endl;
         error_estimator->finalize();
-        std::cout << "Estimated Error: " << error << std::endl;
     }
 }
 
