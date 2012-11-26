@@ -43,7 +43,7 @@ void DMC::initialize() {
 
             original_walkers[k]->r.load(s.str());
             sampling->set_trial_pos(original_walkers[k], false);
-            
+
 
             s.str(std::string());
         }
@@ -81,8 +81,8 @@ void DMC::initialize() {
 }
 
 void DMC::output() {
-   s << "dmcE:" << dmc_E / cycle << "| Nw: " << n_w << "| " << (double) cycle / n_c * 100 << "%";
-   std_out->cout(s);
+    s << "dmcE:" << dmc_E / cycle << "| Nw: " << n_w << "| " << (double) cycle / n_c * 100 << "%";
+    std_out->cout(s);
 }
 
 void DMC::Evolve_walker(int k, double GB) {
@@ -157,7 +157,7 @@ void DMC::run_method() {
 
         node_comm();
     }
-    
+
     cycle = 100;
     node_comm();
 
@@ -177,7 +177,7 @@ void DMC::run_method() {
         dump_output();
 
         error_estimator->update_data(E / samples);
-        
+
         node_comm();
 
     }
@@ -251,15 +251,40 @@ void DMC::bury_the_dead() {
 
 void DMC::node_comm() {
 #ifdef MPI_ON
-    if (cycle % 10 == 0){
+    if (cycle % 1 == 0) {
         MPI_Allreduce(MPI_IN_PLACE, &E_T, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         if (is_master) {
             MPI_Reduce(MPI_IN_PLACE, &dmc_E, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-            dmc_E/= n_nodes;
+            dmc_E /= n_nodes;
         } else {
             MPI_Reduce(&dmc_E, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }
         E_T /= n_nodes;
-    } 
+
+        arma::Row<int> n_w_list;
+        if (is_master) {
+            n_w_list = arma::zeros<arma::Row<int> >(n_nodes);
+        }
+
+        MPI_Gather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, 0, MPI_COMM_WORLD);
+     
+        if (is_master){
+            std::cout << arma::accu(n_w_list) << std::endl;
+//            double avg_N = arma::accu(n_w_list)/double(n_nodes);
+//            int max_N = n_w_list.max();
+//            int min_N = n_w_list.min();
+//            double thresh = avg_N/25;
+//            
+//            if (max_N - avg_N > thresh){
+//                std::cout << "population to big on one node." << std::endl;
+//            }
+//            
+//            if (avg_N - min_N > thresh){
+//                std::cout << "population to low on one node." << std::endl;
+//            }
+            
+        }
+    }
+
 #endif
 }
