@@ -13,6 +13,7 @@ public:
     SimpleVar(int n_c, ParParams &);
     
     double estimate_error(){
+        std::cout << mean(data) << std::endl;
         return arma::var(data);
     }
     

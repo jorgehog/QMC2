@@ -43,6 +43,7 @@ protected:
     int i;
 
     bool parallel;
+    bool is_master;
     int node;
     int n_nodes;
 

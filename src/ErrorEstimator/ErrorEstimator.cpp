@@ -36,6 +36,7 @@ ErrorEstimator::ErrorEstimator(int n_c,
     this->node = node;
     this->n_nodes = n_nodes;
     this->parallel = parallel;
+    this->is_master = (node == 0);
 
     this->filename = filename;
     this->path = path;
@@ -67,29 +68,13 @@ void ErrorEstimator::node_comm() {
 
     int n = data.n_elem;
 
-    using namespace arma;
-
-    rowvec master_data;
-
-
-    if (node == 0) {
-        master_data = zeros<rowvec > (n * n_nodes);
+    if (is_master) {
+        data.resize(n * n_nodes);
+        MPI_Gather(MPI_IN_PLACE, n, MPI_DOUBLE, data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    } else {
+        MPI_Gather(data.memptr(), n, MPI_DOUBLE, NULL, 0, MPI_DATATYPE_NULL, 0, MPI_COMM_WORLD);
+        data.clear();
     }
-
-
-    cout << mean(data(span(0, n - 1))) << endl;
-
-
-    MPI_Gather(data.memptr(), n, MPI_DOUBLE, master_data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    data.clear();
-    
-    if (node == 0) {
-        rowvec data(master_data.memptr(), master_data.n_elem, false, true);
-        cout << mean(data) << " " << data.n_elem << endl;
-    }
-    
-
 
 #endif
 }
