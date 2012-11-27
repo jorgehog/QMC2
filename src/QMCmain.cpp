@@ -254,7 +254,7 @@ void parseCML(int argc, char** argv,
 
     generalParams.doMIN = argc == 1;
     generalParams.doVMC = argc == 1;
-    generalParams.doDMC = argc == 1;
+    generalParams.doDMC = argc == 3;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;

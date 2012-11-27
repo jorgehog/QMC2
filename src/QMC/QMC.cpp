@@ -29,7 +29,7 @@ QMC::QMC(int n_p, int dim, int n_c,
     node = pp.node;
     is_master = pp.is_master;
     parallel = pp.parallel;
-    
+
     if (is_master) {
         std_out = new STDOUT();
     } else {
@@ -64,12 +64,15 @@ void QMC::finalize_output() {
 }
 
 void QMC::estimate_error() const {
-    if (parallel) error_estimator->node_comm();
+
+    double error = error_estimator->estimate_error();
+
     if (is_master) {
-        double error = error_estimator->estimate_error();
         if (error != 0) std::cout << "Estimated Error: " << error << std::endl;
-        error_estimator->finalize();
     }
+
+    error_estimator->finalize();
+
 }
 
 void QMC::get_gradients(const Walker* walker_pre, Walker* walker_post, int particle) const {

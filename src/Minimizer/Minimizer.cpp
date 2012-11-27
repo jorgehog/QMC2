@@ -81,11 +81,18 @@ void Minimizer::finalize_output() {
 }
 
 void Minimizer::error_output() {
-    for (int i = 0; i < Nparams; i++) {
-        if (is_master) {
+    
+    if ((int) error_estimators.size() == Nparams) {
+        for (int i = 0; i < Nparams; i++) {
+
             double error = error_estimators.at(i)->estimate_error();
-            if (error != 0) std::cout << "Error" << i << ": " << error << std::endl;
+
+            if (is_master) {
+                if (error != 0) std::cout << "Error" << i << ": " << error << std::endl;
+            }
+
             error_estimators.at(i)->finalize();
         }
+
     }
 }

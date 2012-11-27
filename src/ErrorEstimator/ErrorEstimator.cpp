@@ -56,25 +56,64 @@ void ErrorEstimator::init_file() {
 }
 
 void ErrorEstimator::finalize() {
-    if (data_to_file) data.save(path + (filename + "_RAWDATA.arma"));
-    if (output_to_file) file.close();
+   
+    if (data_to_file && is_master) {
+        node_comm();
+        data.save(path + (filename + "_RAWDATA.arma"));
+    }
+    
+    if (output_to_file && is_master) file.close();
 
     data.clear();
 
 }
 
 void ErrorEstimator::node_comm() {
+
+
 #ifdef MPI_ON
+    if (data_to_file && parallel) {
+
+        int n = data.n_elem;
+
+        if (is_master) {
+            data.resize(n * n_nodes);
+            MPI_Gather(MPI_IN_PLACE, n, MPI_DOUBLE, data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        } else {
+            MPI_Gather(data.memptr(), n, MPI_DOUBLE, NULL, 0, MPI_DATATYPE_NULL, 0, MPI_COMM_WORLD);
+        }
+    }
+#endif
+}
+
+double ErrorEstimator::combine_variance() {
 
     int n = data.n_elem;
 
-    if (is_master) {
-        data.resize(n * n_nodes);
-        MPI_Gather(MPI_IN_PLACE, n, MPI_DOUBLE, data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    } else {
-        MPI_Gather(data.memptr(), n, MPI_DOUBLE, NULL, 0, MPI_DATATYPE_NULL, 0, MPI_COMM_WORLD);
-        data.clear();
-    }
+    double var = arma::var(data);
 
+#ifdef MPI_ON
+
+    if (parallel) {
+
+        double mean = arma::mean(data);
+        double combined_mean;
+
+        MPI_Allreduce(&mean, &combined_mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        combined_mean /= n_nodes;
+
+        double cvar = n * (mean - combined_mean)*(mean - combined_mean) + (n - 1) * var;
+
+        if (is_master) {
+            MPI_Reduce(MPI_IN_PLACE, &cvar, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+            var = cvar / (n * n_nodes - 1);
+        } else {
+            MPI_Reduce(&cvar, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        }
+
+    }
+    
 #endif
+   
+    return var;
 }

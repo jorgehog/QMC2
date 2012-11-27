@@ -13,9 +13,7 @@ public:
     SimpleVar(int n_c, ParParams &);
     SimpleVar(int n_c);
     
-    double estimate_error(){
-        return arma::var(data);
-    }
+    double estimate_error();
     
 protected:
     

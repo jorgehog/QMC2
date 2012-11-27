@@ -13,7 +13,7 @@ public:
 
     bool data_to_file;
     bool output_to_file;
-
+    
     ErrorEstimator();
 
     ErrorEstimator(int n_c, std::string filename,
@@ -21,6 +21,8 @@ public:
             bool parallel,
             int node, int n_nodes, bool rerun = false);
 
+    double combine_variance();
+    
     void finalize();
 
     void node_comm();
