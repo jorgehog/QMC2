@@ -147,16 +147,15 @@ int main(int argc, char** argv) {
             int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
 
             for (int i = 0; i < N; i++) {
-                if (generalParams.estimate_error && parParams.is_master) {
+                if (generalParams.estimate_error) {
+
                     string minBlockname = (string) "blocking_MIN_out" + outputParams.outputSuffix;
                     minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
-                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname,
-                            outputParams.outputPath);
+                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, parParams,
+                            minBlockname, outputParams.outputPath);
                     minimizer->add_error_estimator(blocking);
-                } else if (parParams.is_master) {
-                    minimizer->add_error_estimator(new SimpleVar(minimizerParams.SGDsamples));
                 } else {
-
+                    minimizer->add_error_estimator(new SimpleVar(minimizerParams.SGDsamples, parParams));
                 }
             }
 
@@ -208,12 +207,13 @@ int main(int argc, char** argv) {
             dmc->add_output(DMCout);
         }
 
+        int DMCerrorN = dmcParams.n_c * dmcParams.n_b * dmcParams.n_w * DMC::K;
         if (generalParams.estimate_error) {
             string dmcBlockname = (string) "blocking_DMC_out" + outputParams.outputSuffix;
-            ErrorEstimator* blocking = new Blocking(dmcParams.n_c, parParams, dmcBlockname, outputParams.outputPath);
+            ErrorEstimator* blocking = new Blocking(DMCerrorN, parParams, dmcBlockname, outputParams.outputPath);
             dmc->set_error_estimator(blocking);
         } else {
-            dmc->set_error_estimator(new SimpleVar(dmcParams.n_c, parParams));
+            dmc->set_error_estimator(new SimpleVar(DMCerrorN, parParams));
         }
 
         if (parParams.is_master) t.tic();
@@ -259,7 +259,7 @@ void parseCML(int argc, char** argv,
     generalParams.D = 0.5;
 
     generalParams.doMIN = argc == 1;
-    generalParams.doVMC = argc == 1;
+    generalParams.doVMC = argc == 3;
     generalParams.doDMC = argc == 3;
 
     generalParams.use_coulomb = true;
@@ -295,11 +295,11 @@ void parseCML(int argc, char** argv,
     minimizerParams.omega = 0.8;
     minimizerParams.A = 20;
     minimizerParams.a = 0.3;
-    minimizerParams.SGDsamples = 2000;
+    minimizerParams.SGDsamples = 10000;
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 400;
+    minimizerParams.n_c_SGD = 1000;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 

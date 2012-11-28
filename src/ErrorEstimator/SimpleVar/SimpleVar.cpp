@@ -21,10 +21,7 @@ double SimpleVar::estimate_error() {
     if (parallel){
         double var = arma::var(data);
         double mean = arma::mean(data);
-//        node_comm_gather_data();
-//        if (is_master) std::cout << arma::var(data) << std::endl;
-//        node_comm_scatter_data();
-
+        
         return combine_variance(var, mean);
     } else {
         return arma::var(data);

@@ -31,11 +31,10 @@ public:
     void init_file();
 
     virtual double estimate_error() = 0;
+    
+    void normalize();
 
-    virtual void update_data(double val) {
-        data(i) = val;
-        i++;
-    }
+    virtual void update_data(double val); 
     
     void clear(){
         data.clear();

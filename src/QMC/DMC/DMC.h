@@ -11,8 +11,6 @@
 class DMC : public QMC {
 protected:
 
-    int K; //Factor of empty space for walkers over initial walkers
-
     int n_w;
     int n_w_last;
 
@@ -37,7 +35,7 @@ protected:
         return metropolis_test(A)&(A > 0);
     };
 
-    void iterate_walker(int k, int n_b = 1);
+    void iterate_walker(int k, int n_b = 1, bool production = false);
 
     void Evolve_walker(int k, double GB);
 
@@ -49,10 +47,12 @@ protected:
         n_w_last = n_w;
         E = samples = deaths = 0;
     }
-    
+
     virtual void node_comm();
 
 public:
+
+    static const int K = 2; //Factor of empty space for walkers over initial walkers
 
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
 

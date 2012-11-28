@@ -64,7 +64,7 @@ struct GeneralParams {
     bool doMIN;
     bool doVMC;
     bool doDMC;
-    
+
     bool estimate_error;
 
     bool use_jastrow;
@@ -117,9 +117,10 @@ struct SystemObjects {
 
 };
 
-class STDOUT{
+class STDOUT {
 public:
-    virtual void cout(std::stringstream & a){
+
+    virtual void cout(std::stringstream & a) {
         std::cout << a.str() << std::endl;
         a.str(std::string());
     }
@@ -127,8 +128,9 @@ public:
 
 class NO_STDOUT : public STDOUT {
 public:
-    virtual void cout(std::stringstream & a){
-        
+
+    virtual void cout(std::stringstream & a) {
+
     }
 };
 

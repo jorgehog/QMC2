@@ -65,6 +65,7 @@ void QMC::finalize_output() {
 
 void QMC::estimate_error() const {
 
+    error_estimator->normalize();
     double error = error_estimator->estimate_error();
 
     if (is_master) {

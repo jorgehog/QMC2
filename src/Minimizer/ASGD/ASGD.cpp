@@ -63,28 +63,34 @@ void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
 }
 
-void ASGD::node_comm() {
+void ASGD::get_total_grad() {
+    int scale = n_walkers * n_c_SGD;
+
 #ifdef MPI_ON
-    MPI_Allreduce(MPI_IN_PLACE, gradient.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE, gradient_local.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    E /= n_nodes;
 #endif
+    E /= scale;
+
+    gradient_tot = 2 * (gradient_local - gradient * E)/scale;
+    
+    for (int i = 0; i < Nparams; i++) {
+        error_estimators.at(i)->update_data(gradient_tot(i));
+    }
+
+#ifdef MPI_ON
+    MPI_Allreduce(MPI_IN_PLACE, gradient_tot.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    gradient_tot /= n_nodes;
+#endif
+
+    
 }
 
 VMC* ASGD::minimize() {
 
     vmc->initialize();
 
-    int k = 0;
-    for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
-        vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
-
-        if ((cycle > thermalization) && (cycle % n_c) == 0) {
-            vmc->copy_walker(vmc->original_walker, walkers[k]);
-            vmc->copy_walker(vmc->trial_walker, trial_walkers[k]);
-            k++;
-        }
-    }
+    thermalize_walkers();
 
     for (sample = 1; sample <= SGDsamples; sample++) {
 
@@ -92,7 +98,7 @@ VMC* ASGD::minimize() {
         gradient = arma::zeros(1, Nparams);
         gradient_local = arma::zeros(1, Nparams);
 
-        for (k = 0; k < n_walkers; k++) {
+        for (int k = 0; k < n_walkers; k++) {
             vmc->get_sampling_ptr()->set_trial_states(walkers[k]);
             vmc->get_system_ptr()->initialize(walkers[k]);
             vmc->get_jastrow_ptr()->get_dJ_matrix(walkers[k]);
@@ -112,62 +118,14 @@ VMC* ASGD::minimize() {
             }
         }
 
+        get_total_grad();
 
-        node_comm();
-
-        int scale = n_walkers * n_c_SGD * n_nodes;
-
-        E /= scale;
-        gradient_tot = 2 * (gradient_local - gradient * E) / scale;
-
-
-
-
-
-        double x = -arma::dot(gradient_tot, gradient_old);
-
-        t = t_prev + f(x);
-        if (t < 0) {
-            t = 0;
-        }
-
-
-        for (int param = 0; param < Nspatial_params; param++) {
-
-            step = a / (t + A) * gradient_tot(param);
-            if (fabs(step) > max_step) {
-                step *= max_step / fabs(step);
-            }
-
-            double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
-            vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
-
-            if (is_master) error_estimators.at(param)->update_data(step);
-        }
-
-        for (int param = 0; param < Njastrow_params; param++) {
-
-            step = a / (t + A) * gradient_tot(Nspatial_params + param);
-            if (step * step > max_step * max_step) {
-                step *= max_step / fabs(step);
-            }
-
-            double beta = vmc->get_jastrow_ptr()->get_parameter(param);
-            vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
-
-            if (is_master) error_estimators.at(param + Nspatial_params)->update_data(step);
-        }
-
-        t_prev = t;
-        gradient_old = gradient_tot;
+        update_parameters();
 
         dump_output();
-        if ((sample % 100) == 0) {
-            output("cycle:", sample);
-            s << gradient_tot << std::endl;
-            s << E << std::endl;
-            std_out->cout(s);
-        }
+
+        output_cycle();
+
     }
 
     output("Finished minimizing. Final parameters:");
@@ -177,4 +135,64 @@ VMC* ASGD::minimize() {
 
     vmc->accepted = 0;
     return vmc;
+}
+
+void ASGD::update_parameters() {
+
+    double x = -arma::dot(gradient_tot, gradient_old);
+
+    t = t_prev + f(x);
+    if (t < 0) {
+        t = 0;
+    }
+
+
+    for (int param = 0; param < Nspatial_params; param++) {
+
+        step = a / (t + A) * gradient_tot(param);
+        if (fabs(step) > max_step) {
+            step *= max_step / fabs(step);
+        }
+
+        double alpha = vmc->get_orbitals_ptr()->get_parameter(param);
+        vmc->get_orbitals_ptr()->set_parameter(fabs(alpha - step), param);
+
+    }
+
+    for (int param = 0; param < Njastrow_params; param++) {
+
+        step = a / (t + A) * gradient_tot(Nspatial_params + param);
+        if (step * step > max_step * max_step) {
+            step *= max_step / fabs(step);
+        }
+
+        double beta = vmc->get_jastrow_ptr()->get_parameter(param);
+        vmc->get_jastrow_ptr()->set_parameter(fabs(beta - step), param);
+
+    }
+
+    t_prev = t;
+    gradient_old = gradient_tot;
+}
+
+void ASGD::output_cycle() {
+    if ((sample % 100) == 0) {
+        output("cycle:", sample);
+        s << gradient_tot << std::endl;
+        s << E << std::endl;
+        std_out->cout(s);
+    }
+}
+
+void ASGD::thermalize_walkers() {
+    int k = 0;
+    for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
+        vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
+
+        if ((cycle > thermalization) && (cycle % n_c) == 0) {
+            vmc->copy_walker(vmc->original_walker, walkers[k]);
+            vmc->copy_walker(vmc->trial_walker, trial_walkers[k]);
+            k++;
+        }
+    }
 }

@@ -28,6 +28,7 @@ public:
     double estimate_error();
     
     void get_initial_error();
+    void get_unique_blocks(arma::Row<int> & block_sizes, int & n);
 
 protected:
 

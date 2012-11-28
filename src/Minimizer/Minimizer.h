@@ -30,8 +30,7 @@ protected:
     void finalize_output();
     void error_output();
     
-    virtual void node_comm() = 0;
-
+    virtual void update_parameters() = 0;
 
     //virtual void get_variational_gradients(); is this a general req?
 

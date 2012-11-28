@@ -36,8 +36,6 @@ ErrorEstimator::ErrorEstimator(int n_c,
             bool success = data.load(path + (filename + "_RAWDATA.arma"));
             if (!success) exit(1);
 
-            this->n_c = data.n_elem / n_nodes;
-
         }
 
         data_to_file = false;
@@ -79,6 +77,17 @@ void ErrorEstimator::finalize() {
 
 }
 
+void ErrorEstimator::normalize() {
+#ifdef MPI_ON
+    arma::Row<int> sample_sizes = arma::zeros<arma::Row<int> >(n_nodes);
+
+    MPI_Allgather(&i, 1, MPI_INT, sample_sizes.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
+
+    data.resize(sample_sizes.min());
+    sample_sizes.clear();
+#endif
+}
+
 void ErrorEstimator::node_comm_gather_data() {
 #ifdef MPI_ON
     if (parallel) {
@@ -100,20 +109,29 @@ void ErrorEstimator::node_comm_scatter_data() {
     if (parallel) {
         using namespace arma;
 
-        MPI_Bcast(&(this->n_c), 1, MPI_INT, 0, MPI_COMM_WORLD);
+        int n;
+        if (is_master) {
+            n = data.n_elem / n_nodes;
+            if (n == 0) {
+                cout << "Not enough data to scatter." << endl;
+                exit(1);
+            }
+        }
+
+        MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
         rowvec raw_data;
 
         if (is_master) {
 
-            raw_data = zeros<rowvec > (this->n_c);
-            MPI_Scatter(data.memptr(), this->n_c, MPI_DOUBLE, raw_data.memptr(), this->n_c, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            raw_data = zeros<rowvec > (n);
+            MPI_Scatter(data.memptr(), n, MPI_DOUBLE, raw_data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
             data.clear();
             data = raw_data;
             raw_data.clear();
         } else {
-            data = zeros<rowvec > (this->n_c);
-            MPI_Scatter(new double(), 1, MPI_DOUBLE, data.memptr(), this->n_c, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            data = zeros<rowvec > (n);
+            MPI_Scatter(new double(), 1, MPI_DOUBLE, data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         }
     }
 #endif
@@ -146,4 +164,9 @@ double ErrorEstimator::combine_variance(double var, double mean) {
 #endif
 
     return var;
+}
+
+void ErrorEstimator::update_data(double val) {
+    data(i) = val;
+    i++;
 }

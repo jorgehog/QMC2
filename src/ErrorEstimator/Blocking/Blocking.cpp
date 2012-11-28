@@ -16,22 +16,40 @@ Blocking::Blocking(int n_c, ParParams & pp,
         bool rerun)
 : ErrorEstimator(n_c, filename, path, pp.parallel, pp.node, pp.n_nodes, rerun) {
     n_block_samples = n_b;
-    max_block_size = maxb;
-    min_block_size = minb;
+    max_block_size = maxb / n_nodes;
+    min_block_size = minb / n_nodes;
 
 
     if (rerun) {
-        if (minb < n_nodes) {
-            std::cout << "minimum block size must at least match the number of nodes used." << std::endl;
-            exit(1);
-        }
+
 
         node_comm_scatter_data();
+
+        this->n_c = data.n_elem;
+
+        if (is_master) {
+            if (max_block_size > this->n_c) {
+                std::cout << "invalid local max block size " << max_block_size << std::endl;
+                std::cout << "max block size must not be greater than " << n_nodes * this->n_c << std::endl;
+                exit(1);
+            }
+
+            if (min_block_size < 1) {
+                std::cout << "invalid local min block size " << min_block_size << std::endl;
+                std::cout << "min block size must not be lower than n_nodes=" << n_nodes << std::endl;
+                exit(1);
+            }
+        
+            if (n_block_samples > max_block_size - min_block_size){
+                std::cout << "invalid amount of block samples " << n_block_samples << std::endl;
+                std::cout << "block samples must be lower or equal " << max_block_size - min_block_size << std::endl;
+                exit(1);
+            }
+        }
 
         init_file();
 
     }
-
 
 }
 
@@ -49,16 +67,18 @@ double Blocking::estimate_error() {
         return 0;
     }
 
-    int block_size, block_step_length;
+    int block_size, n;
     double error, var, mean;
-
-    block_step_length = (max_block_size - min_block_size) / n_block_samples;
 
 
     get_initial_error();
 
-    for (int j = 0; j < n_block_samples; j++) {
-        block_size = (min_block_size + j * block_step_length) / n_nodes;
+    arma::Row<int> block_sizes = arma::zeros<arma::Row<int> >(n_block_samples);
+
+    get_unique_blocks(block_sizes, n);
+
+    for (int j = 0; j < n; j++) {
+        block_size = block_sizes(j);
 
         block_data(block_size, var, mean);
 
@@ -66,7 +86,10 @@ double Blocking::estimate_error() {
 
         if (is_master) {
             error = sqrt(var / (((n_nodes * n_c) / block_size) - 1.0));
-            file << block_size << "\t" << error << std::endl;
+            file << block_size * n_nodes << "\t" << error << std::endl;
+            if (j % 9 == 0) {
+                std::cout << "Blocking progress: " << (double) (j + 1) / n * 100 << "%" << std::endl;
+            }
         }
     }
 
@@ -84,7 +107,7 @@ void Blocking::block_data(int block_size, double &var, double &mean) {
 
     int n_b = n_c / block_size;
     for (int j = 0; j < n_b; j++) {
-        block_mean = sum(data(span(j*block_size, (j + 1) * block_size - 1))) / block_size;
+        block_mean = arma::mean(data(span(j*block_size, (j + 1) * block_size - 1)));
 
         mean += block_mean;
         mean2 += block_mean*block_mean;
@@ -101,4 +124,15 @@ void Blocking::get_initial_error() {
     double mean = arma::mean(data);
     var = combine_variance(var, mean);
     if (is_master) std::cout << "Initial stddev: " << sqrt(var / (n_nodes * n_c - 1)) << std::endl;
+}
+
+void Blocking::get_unique_blocks(arma::Row<int>& block_sizes, int& n) {
+
+    int block_step_length = (max_block_size - min_block_size) / n_block_samples;
+
+    for (int j = 0; j < n_block_samples; j++) {
+        block_sizes(j) = min_block_size + j * block_step_length;
+    }
+    block_sizes = arma::unique(block_sizes);
+    n = block_sizes.n_elem;
 }

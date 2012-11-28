@@ -43,7 +43,13 @@ protected:
     arma::rowvec gradient_old;
     arma::rowvec gradient_tot;
     
-    virtual void node_comm();
+    void get_total_grad();
+    
+    virtual void update_parameters();
+    
+    void output_cycle();
+    
+    void thermalize_walkers();
 
     double f(double x) {
         return f_min + (f_max - f_min) / (1 - (f_max / f_min) * exp(-x / w));

@@ -18,7 +18,6 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
     this->thermalization = dP.therm;
     this->E_T = dP.E_T;
 
-    K = 5;
     int max_walkers = K * n_w;
 
     original_walkers = new Walker*[max_walkers];
@@ -108,10 +107,11 @@ void DMC::Evolve_walker(int k, double GB) {
 
 void DMC::update_energies() {
     dmc_E += E / samples;
+    node_comm();
     E_T = dmc_E / cycle;
 }
 
-void DMC::iterate_walker(int k, int n_b) {
+void DMC::iterate_walker(int k, int n_b, bool production) {
 
     copy_walker(original_walkers[k], trial_walker);
 
@@ -124,7 +124,8 @@ void DMC::iterate_walker(int k, int n_b) {
         calculate_energy_necessities(original_walkers[k]);
         local_E = calculate_local_energy(original_walkers[k]);
         original_walkers[k]->set_E(local_E);
-
+        if (production) error_estimator->update_data(local_E);
+        
         double GB = sampling->get_branching_Gfunc(local_E, local_E_prev, E_T);
 
         Evolve_walker(k, GB);
@@ -147,7 +148,7 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, 1);
+            iterate_walker(k);
         }
 
         bury_the_dead();
@@ -155,11 +156,7 @@ void DMC::run_method() {
 
         output();
 
-        node_comm();
     }
-
-    cycle = 100;
-    node_comm();
 
     dmc_E = 0;
     for (cycle = 1; cycle <= n_c; cycle++) {
@@ -167,7 +164,7 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, block_size);
+            iterate_walker(k, block_size, true);
         }
 
         bury_the_dead();
@@ -175,10 +172,6 @@ void DMC::run_method() {
 
         output();
         dump_output();
-
-        error_estimator->update_data(E / samples);
-
-        node_comm();
 
     }
 
@@ -251,25 +244,19 @@ void DMC::bury_the_dead() {
 
 void DMC::node_comm() {
 #ifdef MPI_ON
-    if (cycle % 1 == 0) {
-        MPI_Allreduce(MPI_IN_PLACE, &E_T, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        if (is_master) {
-            MPI_Reduce(MPI_IN_PLACE, &dmc_E, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-            dmc_E /= n_nodes;
-        } else {
-            MPI_Reduce(&dmc_E, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        }
-        E_T /= n_nodes;
+        MPI_Allreduce(MPI_IN_PLACE, &dmc_E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        dmc_E /= n_nodes;
+        
 
-        arma::Row<int> n_w_list;
-        if (is_master) {
-            n_w_list = arma::zeros<arma::Row<int> >(n_nodes);
-        }
-
-        MPI_Gather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, 0, MPI_COMM_WORLD);
+//        arma::Row<int> n_w_list;
+//        if (is_master) {
+//            n_w_list = arma::zeros<arma::Row<int> >(n_nodes);
+//        }
+//
+//        MPI_Gather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, 0, MPI_COMM_WORLD);
      
-        if (is_master){
-            std::cout << arma::accu(n_w_list) << std::endl;
+//        if (is_master){
+//            std::cout << arma::accu(n_w_list) << std::endl;
 //            double avg_N = arma::accu(n_w_list)/double(n_nodes);
 //            int max_N = n_w_list.max();
 //            int min_N = n_w_list.min();
@@ -283,8 +270,7 @@ void DMC::node_comm() {
 //                std::cout << "population to low on one node." << std::endl;
 //            }
             
-        }
-    }
+//        }
 
 #endif
 }
