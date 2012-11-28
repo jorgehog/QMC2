@@ -15,59 +15,74 @@ Blocking::Blocking(int n_c, ParParams & pp,
         int minb,
         bool rerun)
 : ErrorEstimator(n_c, filename, path, pp.parallel, pp.node, pp.n_nodes, rerun) {
-    //    int step = 1;
     n_block_samples = n_b;
     max_block_size = maxb;
     min_block_size = minb;
-    
-    if (rerun) init_file();
-    //    n_block_samples = (max_block_size - min_block_size) / step;
+
+
+    if (rerun) {
+        if (minb < n_nodes) {
+            std::cout << "minimum block size must at least match the number of nodes used." << std::endl;
+            exit(1);
+        }
+
+        node_comm_scatter_data();
+
+        init_file();
+
+    }
+
+
 }
 
 Blocking::Blocking(int n_c, std::string filename, std::string path, int n_b, int maxb, int minb)
-:ErrorEstimator(n_c, filename, path, false, 0, 1, false){
+: ErrorEstimator(n_c, filename, path, false, 0, 1, false) {
     n_block_samples = n_b;
     max_block_size = maxb;
     min_block_size = minb;
+
 }
 
 double Blocking::estimate_error() {
-    using namespace std;
-    
-    if (!rerun){
+
+    if (!rerun) {
         return 0;
     }
 
     int block_size, block_step_length;
-    double error;
+    double error, var, mean;
 
     block_step_length = (max_block_size - min_block_size) / n_block_samples;
 
-    cout << "Initial stddev: " << sqrt(var(data) / (data.n_elem - 1)) << endl;
+
+    get_initial_error();
 
     for (int j = 0; j < n_block_samples; j++) {
-        block_size = min_block_size + j*block_step_length;
+        block_size = (min_block_size + j * block_step_length) / n_nodes;
 
-        error = block_data(block_size);
-        file << block_size << "\t" << error << std::endl;
+        block_data(block_size, var, mean);
+
+        var = combine_variance(var, mean);
+
+        if (is_master) {
+            error = sqrt(var / (((n_nodes * n_c) / block_size) - 1.0));
+            file << block_size << "\t" << error << std::endl;
+        }
     }
 
     return error;
 }
 
-double Blocking::block_data(int block_size) {
+void Blocking::block_data(int block_size, double &var, double &mean) {
     using namespace arma;
 
-    int n_b;
     double block_mean;
-    double mean;
-    double mean2;
 
-    n_b = n_c / block_size;
 
     mean = 0;
-    mean2 = 0;
+    double mean2 = 0;
 
+    int n_b = n_c / block_size;
     for (int j = 0; j < n_b; j++) {
         block_mean = sum(data(span(j*block_size, (j + 1) * block_size - 1))) / block_size;
 
@@ -78,6 +93,12 @@ double Blocking::block_data(int block_size) {
     mean2 /= (n_b);
     mean /= (n_b);
 
-    return sqrt((mean2 - mean * mean) / ((n_c / block_size) - 1.0));
+    var = mean2 - mean*mean;
 }
 
+void Blocking::get_initial_error() {
+    double var = arma::var(data);
+    double mean = arma::mean(data);
+    var = combine_variance(var, mean);
+    if (is_master) std::cout << "Initial stddev: " << sqrt(var / (n_nodes * n_c - 1)) << std::endl;
+}

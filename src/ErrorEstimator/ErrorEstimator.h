@@ -21,11 +21,12 @@ public:
             bool parallel,
             int node, int n_nodes, bool rerun = false);
 
-    double combine_variance();
+    double combine_variance(double var, double mean = 0);
     
     void finalize();
 
-    void node_comm();
+    void node_comm_gather_data();
+    void node_comm_scatter_data();
     
     void init_file();
 

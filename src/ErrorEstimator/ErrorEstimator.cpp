@@ -20,19 +20,6 @@ ErrorEstimator::ErrorEstimator(int n_c,
     this->n_c = n_c;
     i = 0;
 
-    this->rerun = rerun;
-    if (rerun) {
-
-        bool success = data.load(path + (filename + "_RAWDATA.arma"));
-        if (!success) exit(1);
-
-        this->n_c = data.n_cols;
-        data_to_file = false;
-
-    } else {
-        data = arma::zeros<arma::rowvec > (n_c);
-    }
-
     this->node = node;
     this->n_nodes = n_nodes;
     this->parallel = parallel;
@@ -40,6 +27,27 @@ ErrorEstimator::ErrorEstimator(int n_c,
 
     this->filename = filename;
     this->path = path;
+
+    this->rerun = rerun;
+    if (rerun) {
+
+        if (is_master) {
+
+            bool success = data.load(path + (filename + "_RAWDATA.arma"));
+            if (!success) exit(1);
+
+            this->n_c = data.n_elem / n_nodes;
+
+        }
+
+        data_to_file = false;
+
+    } else {
+        data = arma::zeros<arma::rowvec > (n_c);
+        data_to_file = true;
+    }
+
+
 
     if (parallel) {
         filename = filename + boost::lexical_cast<std::string > (node);
@@ -52,27 +60,28 @@ ErrorEstimator::ErrorEstimator(int n_c,
 
 void ErrorEstimator::init_file() {
     output_to_file = true;
-    if (node == 0) this->file.open(((path + filename) + ".dat").c_str());
+    if (is_master) this->file.open(((path + filename) + ".dat").c_str());
 }
 
 void ErrorEstimator::finalize() {
-   
+
+    if (data_to_file) {
+        node_comm_gather_data();
+    }
+
     if (data_to_file && is_master) {
-        node_comm();
         data.save(path + (filename + "_RAWDATA.arma"));
     }
-    
+
     if (output_to_file && is_master) file.close();
 
     data.clear();
 
 }
 
-void ErrorEstimator::node_comm() {
-
-
+void ErrorEstimator::node_comm_gather_data() {
 #ifdef MPI_ON
-    if (data_to_file && parallel) {
+    if (parallel) {
 
         int n = data.n_elem;
 
@@ -86,34 +95,55 @@ void ErrorEstimator::node_comm() {
 #endif
 }
 
-double ErrorEstimator::combine_variance() {
+void ErrorEstimator::node_comm_scatter_data() {
+#ifdef MPI_ON
+    if (parallel) {
+        using namespace arma;
+
+        MPI_Bcast(&(this->n_c), 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        rowvec raw_data;
+
+        if (is_master) {
+
+            raw_data = zeros<rowvec > (this->n_c);
+            MPI_Scatter(data.memptr(), this->n_c, MPI_DOUBLE, raw_data.memptr(), this->n_c, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            data.clear();
+            data = raw_data;
+            raw_data.clear();
+        } else {
+            data = zeros<rowvec > (this->n_c);
+            MPI_Scatter(new double(), 1, MPI_DOUBLE, data.memptr(), this->n_c, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        }
+    }
+#endif
+}
+
+double ErrorEstimator::combine_variance(double var, double mean) {
 
     int n = data.n_elem;
-
-    double var = arma::var(data);
 
 #ifdef MPI_ON
 
     if (parallel) {
 
-        double mean = arma::mean(data);
         double combined_mean;
 
         MPI_Allreduce(&mean, &combined_mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         combined_mean /= n_nodes;
 
-        double cvar = n * (mean - combined_mean)*(mean - combined_mean) + (n - 1) * var;
+        double combined_var = n * (mean - combined_mean)*(mean - combined_mean) + (n - 1) * var;
 
         if (is_master) {
-            MPI_Reduce(MPI_IN_PLACE, &cvar, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-            var = cvar / (n * n_nodes - 1);
+            MPI_Reduce(MPI_IN_PLACE, &combined_var, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+            var = combined_var / (n * n_nodes - 1);
         } else {
-            MPI_Reduce(&cvar, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+            MPI_Reduce(&combined_var, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }
 
     }
-    
+
 #endif
-   
+
     return var;
 }

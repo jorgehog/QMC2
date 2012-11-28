@@ -26,6 +26,8 @@ public:
             int minb = 10);
 
     double estimate_error();
+    
+    void get_initial_error();
 
 protected:
 
@@ -35,7 +37,7 @@ protected:
     int max_block_size;
     int n_block_samples;
 
-    double block_data(int block_size);
+    void block_data(int block_size, double &var, double &mean);
 
 };
 

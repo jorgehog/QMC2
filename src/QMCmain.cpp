@@ -69,9 +69,15 @@ int main(int argc, char** argv) {
                 atoi(argv[6]),
                 true);
         double error = reblock->estimate_error();
-        std::cout << "Estimated Error: " << error << std::endl;
-        std::cout << "Finished Error Recalculation" << std::endl;
-        exit(1);
+        if (parParams.is_master) std::cout << "Estimated Error: " << error << std::endl;
+        if (parParams.is_master) std::cout << "Finished Error Recalculation" << std::endl;
+
+        reblock->finalize();
+
+#ifdef MPI_ON
+        MPI_Finalize();
+#endif
+        return 0;
     }
     //
 
@@ -260,7 +266,7 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = false;
+    generalParams.estimate_error = true;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
