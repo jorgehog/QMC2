@@ -13,11 +13,15 @@ protected:
 
     int n_w;
     int n_w_last;
+    int n_w_tot;
+    arma::Row<int> n_w_list;
 
     int deaths;
 
     int block_size;
     int samples;
+    unsigned long tot_samples;
+    double E_tot;
 
     double dmc_E;
     double E_T;
@@ -49,6 +53,10 @@ protected:
     }
 
     virtual void node_comm();
+    
+    void switch_souls(int root, int root_id, int source, int source_id);
+    
+    void normalize_load();
 
 public:
 

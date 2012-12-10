@@ -13,13 +13,13 @@ protected:
     int n_p;
     int n2;
     int dim;
-
+    
     bool is_murdered;
 
 public:
 
     Walker(int n_p, int dim, bool do_init = true);
-
+    
     double spatial_ratio;
     double value;
     double lapl_sum;
@@ -53,6 +53,9 @@ public:
     double abs_relative(int i, int j) const;
 
     void make_rel_matrix();
+    
+    void send_soul(int source);
+    void recv_soul(int root);
 
     double get_r_i2(int i) const {
         return r2(i);

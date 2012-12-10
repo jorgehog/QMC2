@@ -254,19 +254,20 @@ void parseCML(int argc, char** argv,
     generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
-    generalParams.random_seed = -time(NULL);
+//    generalParams.random_seed = -(long)time(NULL);
+    generalParams.random_seed = -1355160055;
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
-    generalParams.doMIN = argc == 1;
-    generalParams.doVMC = argc == 3;
-    generalParams.doDMC = argc == 3;
+    generalParams.doMIN = argc == 0;
+    generalParams.doVMC = argc == 0;
+    generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = true;
+    generalParams.estimate_error = false;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
@@ -295,11 +296,11 @@ void parseCML(int argc, char** argv,
     minimizerParams.omega = 0.8;
     minimizerParams.A = 20;
     minimizerParams.a = 0.3;
-    minimizerParams.SGDsamples = 10000;
+    minimizerParams.SGDsamples = 2000;
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 1000;
+    minimizerParams.n_c_SGD = 400;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 

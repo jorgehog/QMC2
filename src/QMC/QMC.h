@@ -10,12 +10,16 @@
 
 #include "../QMCheaders.h"
 
-
+/*! \brief The QMC superduper class!
+ * 
+ * This class is so cool!
+ * 
+ */
 class QMC {
 protected:
     
     STDOUT* std_out;
-    std::stringstream s;
+    std::stringstream s; //!< This stream is awesome!
     
     bool is_master;
     bool parallel;
@@ -65,6 +69,8 @@ protected:
     void calculate_energy_necessities(Walker* walker) const;
     
     void estimate_error() const;
+    
+    void switch_souls(int root, int source);
 
 public:
 
@@ -91,8 +97,7 @@ public:
     }
 
     double get_wf_value(Walker* walker) const {
-        walker->value = system->get_spatial_wf(walker) * jastrow->get_val(walker);
-        return walker->value;
+        return system->get_spatial_wf(walker) * jastrow->get_val(walker);
     }
 
     double calculate_local_energy(const Walker* walker) const {
