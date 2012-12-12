@@ -169,7 +169,8 @@ void DMC::run_method() {
     }
 
     normalize_population();
-
+    
+    E_T = dmc_E;
     E_tot = tot_samples = dmc_E = 0;
 
     for (cycle = 1; cycle <= n_c; cycle++) {
