@@ -11,11 +11,7 @@
 class stdoutASGD : public OutputHandler {
 public:
     stdoutASGD(std::string filename = "ASGD_out",
-            std::string path = "./",
-            bool parallel = false,
-            int my_rank = 0,
-            int num_procs = 1
-            );
+            std::string path = "./");
 
     virtual void dump();
 private:

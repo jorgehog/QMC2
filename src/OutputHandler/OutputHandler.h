@@ -16,8 +16,12 @@ protected:
     bool is_ASGD;
     
     bool parallel;
-    int my_rank;
-    int num_procs;
+    int node;
+    int n_nodes;
+    
+    bool use_file;
+    
+    std::stringstream s;
     
     std::string filename;
     std::string path;
@@ -29,6 +33,8 @@ protected:
     VMC* vmc;
     Minimizer* min;
     ASGD* asgd;
+    
+    void init_file();
 
 public:
 
@@ -36,8 +42,8 @@ public:
     OutputHandler(std::string filename,
             std::string path,
             bool parallel,
-            int my_rank,
-            int num_procs
+            int node,
+            int n_nodes
             );
 
     virtual void dump() = 0;

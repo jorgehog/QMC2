@@ -9,14 +9,11 @@
 #define	DISTRIBUTION_H
 
 class Distribution : public OutputHandler {
+protected:
+    int i;
 public:
-
-    Distribution(std::string filename = "dist_out",
-            std::string path = "./",
-            bool parallel = false,
-            int my_rank = 0,
-            int num_procs = 1
-            );
+    Distribution(ParParams &, std::string filename = "dist_out",
+            std::string path = "./");
 
     virtual void dump();
 

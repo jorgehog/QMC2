@@ -10,17 +10,10 @@
 
 class SimpleVar : public ErrorEstimator {
 public:
-    SimpleVar();
+    SimpleVar(int n_c, ParParams &);
+    SimpleVar(int n_c);
     
-    void update_data(double val){
-        E += val;
-        E2 += val*val;
-        i += 1;
-    }
-    
-    double estimate_error(){
-        return (E2 - E*E/i)/i;
-    }
+    double estimate_error();
     
 protected:
     

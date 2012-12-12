@@ -12,7 +12,7 @@ for dirname in dirs:
 	os.chdir(dirname)
 
 	files = " ".join(os.listdir(os.getcwd()))
-	files = re.findall("blocking_.+?_out\d?.dat", files)
+	files = re.findall("blocking_\w+?_out\d?.dat", files)
 
 	print files
 	

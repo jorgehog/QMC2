@@ -10,27 +10,35 @@
 
 class Blocking : public ErrorEstimator {
 public:
-    Blocking(int n_c, std::string filename = "blocking_out",
+    Blocking(int n_c, ParParams & pp,
+            std::string filename = "blocking_out",
             std::string path = "./",
-            bool parallel = false,
-            int my_rank = 0,
-            int num_procs = 1,
-            int n_b=100,
-            int maxb=10000,
-            int minb=10,
-            bool rerun=false);
-    
+            int n_b = 100,
+            int maxb = 10000,
+            int minb = 10,
+            bool rerun = false);
+
+    Blocking(int n_c, 
+            std::string filename = "blocking_out",
+            std::string path = "./",
+            int n_b = 100,
+            int maxb = 10000,
+            int minb = 10);
+
     double estimate_error();
     
+    void get_initial_error();
+    void get_unique_blocks(arma::Row<int> & block_sizes, int & n);
+
 protected:
-    
+
     arma::rowvec local_block;
-    
+
     int min_block_size;
     int max_block_size;
     int n_block_samples;
-    
-    double block_data(int block_size);
+
+    void block_data(int block_size, double &var, double &mean);
 
 };
 

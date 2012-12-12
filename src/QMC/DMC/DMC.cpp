@@ -7,8 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
-: QMC(gP.n_p, gP.dim, dP.n_c, sO.sample_method, sO.SYSTEM, sO.jastrow) {
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
+: QMC(gP.n_p, gP.dim, dP.n_c, sO, pp) {
 
     this->dist_from_file = dP.dist_in;
     this->dist_in_path = dP.dist_in_path;
@@ -18,11 +18,14 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO)
     this->thermalization = dP.therm;
     this->E_T = dP.E_T;
 
-    K = 5;
     int max_walkers = K * n_w;
 
     original_walkers = new Walker*[max_walkers];
     trial_walker = new Walker(n_p, dim);
+
+    if (parallel) {
+        n_w_list = arma::zeros<arma::uvec > (n_nodes);
+    }
 
 }
 
@@ -36,16 +39,14 @@ void DMC::initialize() {
 
     //Seting trial position of active walkers
     if (dist_from_file) {
-
-        std::ifstream dist;
-        std::string name = "dist_out.dat";
-        dist.open((dist_in_path + name).c_str());
-
         for (int k = 0; k < n_w; k++) {
-            sampling->set_trial_pos(original_walkers[k], true, &dist);
-        }
+            s << dist_in_path << "walker_positions/dist_out" << node << "_" << k << ".arma";
 
-        dist.close();
+            original_walkers[k]->r.load(s.str());
+            sampling->set_trial_pos(original_walkers[k], false);
+
+            s.str(std::string());
+        }
 
     } else {
         double tmpDt = sampling->get_dt();
@@ -79,19 +80,19 @@ void DMC::initialize() {
 
 }
 
-void DMC::user_output() const {
-    printf("dmcE: %1.5f| Nw: %4d| %1.5f%%", dmc_E / cycle, n_w,
-            (double) cycle / n_c * 100);
-    std::cout << std::endl;
+void DMC::output() {
+
+    s << "dmcE:" << dmc_E << "| Nw: " << n_w_tot << "| " << (double) cycle / n_c * 100 << "%";
+    std_out->cout(s);
 }
 
 void DMC::Evolve_walker(int k, double GB) {
 
     int branch_mean = int(GB + sampling->call_RNG());
-    double dE = (original_walkers[k]->get_E() - E_T);
-    dE = dE*dE;
+    //    double dE = (original_walkers[k]->get_E() - E_T);
+    //    dE = dE*dE;
 
-    if (branch_mean == 0 || dE > 1. / sampling->get_dt()) {
+    if (branch_mean == 0) { //|| dE > 1. / sampling->get_dt()) {
         original_walkers[k]->kill();
     } else {
 
@@ -107,11 +108,18 @@ void DMC::Evolve_walker(int k, double GB) {
 }
 
 void DMC::update_energies() {
-    dmc_E += E / samples;
-    E_T = dmc_E / cycle;
+
+    node_comm();
+
+    E_tot += E;
+    tot_samples += samples;
+
+    dmc_E = E_tot / tot_samples;
+    E_T = E / samples;
+
 }
 
-void DMC::iterate_walker(int k, int n_b) {
+void DMC::iterate_walker(int k, int n_b, bool production) {
 
     copy_walker(original_walkers[k], trial_walker);
 
@@ -124,6 +132,7 @@ void DMC::iterate_walker(int k, int n_b) {
         calculate_energy_necessities(original_walkers[k]);
         local_E = calculate_local_energy(original_walkers[k]);
         original_walkers[k]->set_E(local_E);
+        if (production) error_estimator->update_data(local_E);
 
         double GB = sampling->get_branching_Gfunc(local_E, local_E_prev, E_T);
 
@@ -140,40 +149,44 @@ void DMC::iterate_walker(int k, int n_b) {
 void DMC::run_method() {
 
     initialize();
+    E_tot = tot_samples = dmc_E = 0;
 
-    dmc_E = 0;
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, 1);
+            iterate_walker(k, 10, false);
         }
 
         bury_the_dead();
         update_energies();
 
-        user_output();
+        normalize_population();
+
+        output();
 
     }
 
+    normalize_population();
 
-    dmc_E = 0;
+    E_tot = tot_samples = dmc_E = 0;
+
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, block_size);
+            iterate_walker(k, block_size, true);
         }
 
         bury_the_dead();
         update_energies();
 
-        user_output();
-        dump_output();
+        normalize_population();
 
-        error_estimator->update_data(E / samples);
+        output();
+        dump_output();
 
     }
 
@@ -242,4 +255,110 @@ void DMC::bury_the_dead() {
 
     n_w = n_w - deaths;
 
+}
+
+void DMC::node_comm() {
+#ifdef MPI_ON
+    if (parallel) {
+        MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, &samples, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+        MPI_Allgather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
+
+        n_w_tot = arma::accu(n_w_list);
+
+    }
+#else
+    n_w_tot = n_w;
+#endif
+
+}
+
+void DMC::switch_souls(int root, int root_id, int dest, int dest_id) {
+    if (node == root) {
+        original_walkers[root_id]->send_soul(dest);
+        n_w--;
+    } else if (node == dest) {
+        original_walkers[dest_id]->recv_soul(root);
+        n_w++;
+    }
+}
+
+void DMC::normalize_population() {
+#ifdef MPI_ON
+    using namespace arma;
+
+    if (!(cycle % (n_c / check_thresh) == 0) || cycle > (int) n_c * 0.9) return;
+
+    int avg = n_w_tot / n_nodes;
+    umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
+    uvec snw = sort_index(n_w_list, 1);
+
+    s << n_w_list.st() << endl;
+
+    int root = 0;
+    int dest = n_nodes - 1;
+    while (root < dest) {
+        if (n_w_list(snw(root)) > avg) {
+            if (n_w_list(snw(dest)) < avg) {
+                swap_map(snw(root), snw(dest))++;
+                n_w_list(snw(root))--;
+                n_w_list(snw(dest))++;
+            } else {
+                dest--;
+            }
+        } else {
+            root++;
+        }
+    }
+
+    uvec test = sum(swap_map, 1);
+    if (test.max() < sendcount_thresh) {
+        test.clear();
+        swap_map.clear();
+        s.str(std::string());
+        return;
+    }
+
+    s << n_w_list.st() << endl;
+    std_out->cout(s);
+
+    for (int root = 0; root < n_nodes; root++) {
+        for (int dest = 0; dest < n_nodes; dest++) {
+            if (swap_map(root, dest) != 0) {
+
+                    s << "node" << root << " sends ";
+                    s << swap_map(root, dest) << " walkers to node " << dest << endl;
+                    std_out->cout(s);
+
+                for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
+                    switch_souls(root, n_w - 1, dest, n_w);
+                }
+            }
+        }
+    }
+    
+//    if (node == 1){
+//        for (int i = 0; i < 21; i++){
+//            original_walkers[n_w + i]->print("Node 1 sends " + boost::lexical_cast<std::string>(i));
+//        }
+//    }
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    sleep(5);
+//    if (node == 2){
+//        for (int i = 0; i < 21; i++){
+//            original_walkers[n_w - i - 1]->print("Node 2 recvs " + boost::lexical_cast<std::string>(i));
+//        }
+//    }
+//    if(is_master) cout << n_w_list << endl;
+//    sleep(node);
+//    cout << n_w << endl;
+    swap_map.clear();
+    test.clear();
+    MPI_Barrier(MPI_COMM_WORLD);
+//    sleep(5);
+//    exit(1);
+
+
+#endif
 }

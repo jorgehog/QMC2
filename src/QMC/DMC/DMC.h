@@ -11,15 +11,18 @@
 class DMC : public QMC {
 protected:
 
-    int K; //Factor of empty space for walkers over initial walkers
-
     int n_w;
     int n_w_last;
-
+    
+    int n_w_tot;
+    arma::uvec n_w_list;
+    
     int deaths;
 
     int block_size;
     int samples;
+    unsigned long tot_samples;
+    double E_tot;
 
     double dmc_E;
     double E_T;
@@ -37,7 +40,7 @@ protected:
         return metropolis_test(A)&(A > 0);
     };
 
-    void iterate_walker(int k, int n_b = 1);
+    void iterate_walker(int k, int n_b = 1, bool production = false);
 
     void Evolve_walker(int k, double GB);
 
@@ -50,13 +53,23 @@ protected:
         E = samples = deaths = 0;
     }
 
+    virtual void node_comm();
+
+    void switch_souls(int root, int root_id, int dest, int dest_id);
+
+    void normalize_population();
+
 public:
 
-    DMC(GeneralParams &, DMCparams &, SystemObjects &);
+    static const int K = 2; //Factor of empty space for walkers over initial walkers
+    static const int check_thresh = 5;
+    static const int sendcount_thresh = 20;
+
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
 
     virtual void run_method();
 
-    virtual void user_output() const;
+    virtual void output();
 
     friend class stdoutDMC;
 

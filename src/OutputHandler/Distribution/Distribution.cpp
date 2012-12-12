@@ -7,28 +7,20 @@
 
 #include "../../QMCheaders.h"
 
-Distribution::Distribution(std::string filename,
-        std::string path,
-        bool parallel,
-        int my_rank,
-        int num_procs)
-: OutputHandler(filename, path, parallel, my_rank, num_procs) {
+Distribution::Distribution(ParParams & pp, std::string filename,
+        std::string path)
+: OutputHandler(filename, path, pp.parallel, pp.node, pp.n_nodes) {
+    i = 0;
     this->is_vmc = true;
 }
 
 void Distribution::dump() {
 
     if ((vmc->cycle > vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
-        for (int i = 0; i < vmc->n_p; i++) {
-            for (int j = 0; j < vmc->dim; j++) {
-                if (j == vmc->dim - 1) {
-                    file << vmc->original_walker->r(i, j);
-                } else {
-                    file << vmc->original_walker->r(i, j) << " ";
-                }
-            }
-            file << std::endl;
-        }
+        s << path << "walker_positions/" << filename << node <<"_"<< i <<".arma";
+        vmc->original_walker->r.save(s.str());
+        s.str(std::string());
+        i++;
     }
 
 }

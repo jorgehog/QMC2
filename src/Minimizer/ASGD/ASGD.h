@@ -42,6 +42,14 @@ protected:
 
     arma::rowvec gradient_old;
     arma::rowvec gradient_tot;
+    
+    void get_total_grad();
+    
+    virtual void update_parameters();
+    
+    void output_cycle();
+    
+    void thermalize_walkers();
 
     double f(double x) {
         return f_min + (f_max - f_min) / (1 - (f_max / f_min) * exp(-x / w));
@@ -50,7 +58,7 @@ protected:
     void get_variational_gradients(Walker* walker, double e_local);
 
 public:
-    ASGD(VMC*, MinimizerParams &);
+    ASGD(VMC*, MinimizerParams &, const ParParams &);
 
     virtual VMC* minimize();
 

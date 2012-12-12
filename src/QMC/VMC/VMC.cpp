@@ -7,8 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO)
-: QMC(gP.n_p, gP.dim, vP.n_c, sO.sample_method, sO.SYSTEM, sO.jastrow) {
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp)
+: QMC(gP.n_p, gP.dim, vP.n_c, sO, pp) {
 
     vmc_E = 0;
 
@@ -28,7 +28,8 @@ void VMC::initialize() {
 void VMC::run_method() {
 
     initialize();
-
+    using namespace arma;
+    
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
 
@@ -48,17 +49,26 @@ void VMC::run_method() {
 
     }
 
+    node_comm();
     scale_values();
-    user_output();
+    output();
     finalize_output();
     estimate_error();
 }
 
-void VMC::user_output() const {
+void VMC::output() {
     using namespace std;
 
-    cout << "VMC energy: " << get_energy() << endl;
-    cout << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
+    s << "VMC energy: " << get_energy() << endl;
+    s << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
+
+    std_out->cout(s);
+}
+
+void VMC::node_comm() {
+#ifdef MPI_ON
+    MPI_Allreduce(MPI_IN_PLACE, &vmc_E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#endif
 }
 
 

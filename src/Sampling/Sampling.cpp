@@ -17,25 +17,16 @@ Sampling::Sampling() {
 
 }
 
-void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* file) {
+void Sampling::set_trial_pos(Walker* walker, bool set_pos) {
 
-    if (load_VMC_dist) {
-
-        double pos;
-        for (int i = 0; i < n_p; i++) {
-            for (int j = 0; j < dim; j++) {
-                *file >> pos;
-                walker->r(i, j) = pos;
-            }
-        }
-    } else {
+    if (set_pos) {
         for (int i = 0; i < n_p; i++) {
             for (int j = 0; j < dim; j++) {
                 walker->r(i, j) = diffusion->Diffusion::get_new_pos(walker, i, j);
             }
         }
     }
-
+    
     walker->calc_r_i2();
 
     set_trial_states(walker);
@@ -46,7 +37,7 @@ void Sampling::set_trial_pos(Walker* walker, bool load_VMC_dist, std::ifstream* 
 
 }
 
-void Sampling::set_trial_states(Walker* walker) {
+void Sampling::set_trial_states(Walker * walker) {
 
     for (int i = 0; i < n_p; i++) {
 
@@ -83,7 +74,7 @@ void Sampling::update_pos(const Walker* walker_pre, Walker* walker_post, int par
     for (int j = 0; j < n2; j++) {
         walker_post->phi(particle, j) = qmc->get_orbitals_ptr()->phi(walker_post, particle, j);
     }
-    
+
     for (int j = 0; j < n2; j++) {
         for (int k = 0; k < dim; k++) {
             walker_post->dell_phi(particle)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker_post, particle, j, k);

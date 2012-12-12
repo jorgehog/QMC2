@@ -10,9 +10,15 @@
 
 class Minimizer {
 protected:
+    
+    int n_nodes;
+    bool is_master;
 
     VMC* vmc;
 
+    STDOUT* std_out;
+    std::stringstream s;
+    
     int Nspatial_params;
     int Njastrow_params;
     int Nparams;
@@ -23,12 +29,14 @@ protected:
     void dump_output();
     void finalize_output();
     void error_output();
+    
+    virtual void update_parameters() = 0;
 
     //virtual void get_variational_gradients(); is this a general req?
 
 public:
 
-    Minimizer(VMC* vmc, const arma::rowvec & alpha, const arma::rowvec & beta);
+    Minimizer(VMC* vmc, const ParParams &, const arma::rowvec & alpha, const arma::rowvec & beta);
 
     void add_output(OutputHandler* output_handler);
 

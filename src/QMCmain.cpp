@@ -6,7 +6,6 @@
  */
 
 #include "QMCheaders.h"
-#include <sys/time.h>
 
 /*
  * 
@@ -19,11 +18,32 @@ void parseCML(int, char**,
         GeneralParams &,
         MinimizerParams &,
         OutputParams &,
-        SystemObjects &
+        ParParams &
         );
 
 int main(int argc, char** argv) {
     using namespace std;
+
+    //Setting up parallel parameters
+    struct ParParams parParams;
+
+#ifdef MPI_ON
+    int node, n_nodes;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
+    MPI_Comm_rank(MPI_COMM_WORLD, &node);
+
+    parParams.n_nodes = n_nodes;
+    parParams.node = node;
+    parParams.parallel = (parParams.n_nodes > 1);
+    parParams.is_master = (parParams.node == 0);
+#else
+    parParams.parallel = false;
+    parParams.node = 0;
+    parParams.n_nodes = 1;
+    parParams.is_master = true;
+#endif
 
     arma::wall_clock t;
 
@@ -35,6 +55,32 @@ int main(int argc, char** argv) {
     struct OutputParams outputParams;
     struct SystemObjects systemObjects;
 
+
+
+    //Test for rerunning blocking
+    //argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
+    std::string rerun_blocking = "reblock";
+    if ((argc == 7) && (rerun_blocking.compare(argv[1]) == 0)) {
+        ErrorEstimator* reblock = new Blocking(0, parParams,
+                (std::string)argv[2],
+                (std::string)argv[3],
+                atoi(argv[4]),
+                atoi(argv[5]),
+                atoi(argv[6]),
+                true);
+        double error = reblock->estimate_error();
+        if (parParams.is_master) std::cout << "Estimated Error: " << error << std::endl;
+        if (parParams.is_master) std::cout << "Finished Error Recalculation" << std::endl;
+
+        reblock->finalize();
+
+#ifdef MPI_ON
+        MPI_Finalize();
+#endif
+        return 0;
+    }
+    //
+
     parseCML(argc, argv,
             vmcParams,
             dmcParams,
@@ -42,15 +88,16 @@ int main(int argc, char** argv) {
             generalParams,
             minimizerParams,
             outputParams,
-            systemObjects);
+            parParams);
+
 
     if (generalParams.sampling == "IS") {
         systemObjects.sample_method = new Importance(generalParams);
     } else if (generalParams.sampling == "BF") {
         systemObjects.sample_method = new Brute_Force(generalParams);
     } else {
-        cout << "unknown sampling method" << endl;
-        exit(1);
+        if (parParams.is_master) cout << "unknown sampling method" << endl;
+        if (parParams.is_master) exit(1);
     }
 
 
@@ -70,8 +117,8 @@ int main(int argc, char** argv) {
 
 
     } else {
-        cout << "unknown system" << endl;
-        exit(1);
+        if (parParams.is_master) cout << "unknown system" << endl;
+        if (parParams.is_master) exit(1);
     }
 
     if (generalParams.use_coulomb) {
@@ -82,19 +129,18 @@ int main(int argc, char** argv) {
 
     if (generalParams.doVMC || generalParams.doMIN) {
 
-        VMC* vmc = new VMC(generalParams, vmcParams, systemObjects);
+        VMC* vmc = new VMC(generalParams, vmcParams, systemObjects, parParams);
         systemObjects.sample_method->set_dt(vmcParams.dt);
 
 
 
         if (generalParams.doMIN) {
 
-            Minimizer * minimizer = new ASGD(vmc, minimizerParams);
+            Minimizer * minimizer = new ASGD(vmc, minimizerParams, parParams);
 
-            if (outputParams.ASGD_out) {
+            if (outputParams.ASGD_out && parParams.is_master) {
                 string ASGDoutname = "ASGD_out" + outputParams.outputSuffix;
-                OutputHandler* ASGDout = new stdoutASGD(ASGDoutname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                OutputHandler* ASGDout = new stdoutASGD(ASGDoutname, outputParams.outputPath);
                 minimizer->add_output(ASGDout);
             }
 
@@ -103,28 +149,27 @@ int main(int argc, char** argv) {
 
             for (int i = 0; i < N; i++) {
                 if (generalParams.estimate_error) {
+
                     string minBlockname = (string) "blocking_MIN_out" + outputParams.outputSuffix;
                     minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
-                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, minBlockname,
-                            outputParams.outputPath,
-                            generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, parParams,
+                            minBlockname, outputParams.outputPath);
                     minimizer->add_error_estimator(blocking);
                 } else {
-                    minimizer->add_error_estimator(new SimpleVar());
+                    minimizer->add_error_estimator(new SimpleVar(minimizerParams.SGDsamples, parParams));
                 }
             }
 
-            t.tic();
+            if (parParams.is_master) t.tic();
             vmc = minimizer->minimize();
-            cout << "---Minimization time: " << t.toc() << " s---" << endl;
+            if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
         }
 
         if (generalParams.doVMC) {
 
             if (outputParams.dist_out) {
                 string distname = "dist_out" + outputParams.outputSuffix;
-                OutputHandler* dist = new Distribution(distname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                OutputHandler* dist = new Distribution(parParams, distname, outputParams.outputPath);
                 vmc->add_output(dist);
 
             }
@@ -132,17 +177,16 @@ int main(int argc, char** argv) {
 
             if (generalParams.estimate_error) {
                 string vmcBlockname = (string) "blocking_VMC_out" + outputParams.outputSuffix;
-                ErrorEstimator* blocking = new Blocking(vmcParams.n_c, vmcBlockname, outputParams.outputPath,
-                        generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+                ErrorEstimator* blocking = new Blocking(vmcParams.n_c, parParams, vmcBlockname, outputParams.outputPath);
                 vmc->set_error_estimator(blocking);
             } else {
-                vmc->set_error_estimator(new SimpleVar());
+                vmc->set_error_estimator(new SimpleVar(vmcParams.n_c, parParams));
             }
 
 
-            t.tic();
+            if (parParams.is_master) t.tic();
             vmc->run_method();
-            cout << "---VMC time: " << t.toc() << " s---" << endl;
+            if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
 
             dmcParams.E_T = vmc->get_energy();
         }
@@ -155,30 +199,34 @@ int main(int argc, char** argv) {
 
         systemObjects.sample_method->set_dt(dmcParams.dt);
 
-        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects);
+        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
 
-        if (outputParams.dmc_out) {
+        if (outputParams.dmc_out && parParams.is_master) {
             string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;
-            OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+            OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath);
             dmc->add_output(DMCout);
         }
 
+        int DMCerrorN = dmcParams.n_c * dmcParams.n_b * dmcParams.n_w * DMC::K;
         if (generalParams.estimate_error) {
             string dmcBlockname = (string) "blocking_DMC_out" + outputParams.outputSuffix;
-            ErrorEstimator* blocking = new Blocking(dmcParams.n_c, dmcBlockname, outputParams.outputPath,
-                    generalParams.parallell, generalParams.myrank, generalParams.numprocs);
+            ErrorEstimator* blocking = new Blocking(DMCerrorN, parParams, dmcBlockname, outputParams.outputPath);
             dmc->set_error_estimator(blocking);
         } else {
-            dmc->set_error_estimator(new SimpleVar());
+            dmc->set_error_estimator(new SimpleVar(DMCerrorN, parParams));
         }
 
-        t.tic();
+        if (parParams.is_master) t.tic();
         dmc->run_method();
-        cout << "---DMC time: " << t.toc() << " s---" << endl;
+        if (parParams.is_master) cout << "---DMC time: " << t.toc() << " s---\n" << endl;
     }
 
-    cout << "~.* QMC fin *.~" << endl;
+    if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
+
+#ifdef MPI_ON
+    MPI_Finalize();
+#endif
+
     return 0;
 }
 
@@ -189,51 +237,20 @@ void parseCML(int argc, char** argv,
         GeneralParams & generalParams,
         MinimizerParams & minimizerParams,
         OutputParams & outputParams,
-        SystemObjects & systemObjects) {
-
-    //Test for rerunning blocking
-    //argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
-    std::string rerun_blocking = "reblock";
-    if ((argc == 7) && (rerun_blocking.compare(argv[1])==0)) {
-        ErrorEstimator* reblock = new Blocking(0, 
-                (std::string)argv[2],
-                (std::string)argv[3],
-                generalParams.parallell,
-                generalParams.numprocs,
-                generalParams.myrank,
-                atoi(argv[4]),
-                atoi(argv[5]),
-                atoi(argv[6]),
-                true);
-        double error = reblock->estimate_error();
-        std::cout << "Estimated Error: " << error << std::endl;
-        std::cout << "Finished Error Recalculation" << std::endl;
-        exit(1);
-    }
-    //
+        ParParams & parParams) {
 
 
     int n_args = 44;
 
     //Default values:
-    //    outputParams.blocking_out = false;
-    outputParams.dist_out = false;
-    //NEW
-    outputParams.dmc_out = false;
-    outputParams.ASGD_out = false;
-    outputParams.outputSuffix = "";
-    outputParams.outputPath = (std::string)"/home/jorgmeister/scratch" + (std::string)"/";
 
     generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
-    generalParams.random_seed = -time(NULL);
+    generalParams.random_seed = -(long)time(NULL);
+//    generalParams.random_seed = -1355160055;
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
-
-    generalParams.parallell = false;
-    generalParams.numprocs = 1;
-    generalParams.myrank = 0;
 
     generalParams.doMIN = argc == 1;
     generalParams.doVMC = argc == 1;
@@ -243,13 +260,23 @@ void parseCML(int argc, char** argv,
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = false;
+    generalParams.estimate_error = true;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
+    
+    //    outputParams.blocking_out = false;
+    outputParams.dist_out = generalParams.doDMC & generalParams.doVMC;
+    //NEW
+    outputParams.dmc_out = true;
+    outputParams.ASGD_out = true;
+    outputParams.outputSuffix = "";
+    outputParams.outputPath = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
 
+    
     vmcParams.n_c = 1E6;
 
+    
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;
     dmcParams.n_b = 100;
@@ -257,7 +284,7 @@ void parseCML(int argc, char** argv,
     dmcParams.n_c = 1000;
     dmcParams.therm = 1000;
     dmcParams.dist_in = outputParams.dist_out & generalParams.doVMC;
-    dmcParams.dist_in_path = (std::string)"/home/jorgmeister/scratch" + (std::string)"/";
+    dmcParams.dist_in_path = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
 
     if (argc == 1) {
         //        variationalParams.alpha = 0.78;
@@ -266,6 +293,7 @@ void parseCML(int argc, char** argv,
         variationalParams.beta = 0.398;
     }
 
+    
     minimizerParams.max_step = 0.1;
     minimizerParams.f_max = 1.0;
     minimizerParams.f_min = -0.5;
@@ -276,7 +304,7 @@ void parseCML(int argc, char** argv,
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 100000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 100;
+    minimizerParams.n_c_SGD = 400;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
@@ -299,7 +327,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[9]) != 0) generalParams.h = atof(argv[9]);
         if (def.compare(argv[10]) != 0) generalParams.D = atof(argv[10]);
 
-        if (def.compare(argv[11]) != 0) generalParams.parallell = (bool)atoi(argv[11]);
+        //        if (def.compare(argv[11]) != 0) parParams.parallel = (bool)atoi(argv[11]);
 
         if (def.compare(argv[12]) != 0) generalParams.doMIN = (bool)atoi(argv[12]);
         if (def.compare(argv[13]) != 0) generalParams.doVMC = (bool)atoi(argv[13]);
@@ -358,5 +386,66 @@ void parseCML(int argc, char** argv,
         dmcParams.dist_in_path = outputParams.outputPath;
     }
 
-    std::cout << "seed: " << generalParams.random_seed << std::endl;
+    //Check consitency in chosen cycle numbers etc. given node number.
+    if (parParams.is_master) {
+        if (parParams.parallel) {
+            if (generalParams.doMIN) {
+                if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
+
+                } else {
+                    std::cout << "n_c_SGD=" << parParams.n_nodes << " is too low for n_nodes=" << parParams.n_nodes << std::endl;
+                    std::cout << "aborting.";
+                    exit(1);
+                }
+            }
+
+            if (dmcParams.n_w < parParams.n_nodes) {
+                std::cout << "Unsufficient walkers for node structure." << std::endl;
+            }
+
+        }
+
+        if (generalParams.doVMC && generalParams.doDMC) {
+            if (dmcParams.dist_in && outputParams.dist_out) {
+                if (dmcParams.n_w > vmcParams.n_c / (200)) {
+                    std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
+                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
+                }
+            }
+        }
+
+        if (generalParams.doDMC) {
+
+            if (dmcParams.dist_in && (!outputParams.dist_out)) {
+                arma::mat r_test;
+                std::stringstream s;
+                s << dmcParams.dist_in_path << "walker_positions/dist_out0_0.arma";
+                bool dataFound = r_test.load(s.str());
+                if (!dataFound) {
+                    std::cout << "No walker output data found in " << dmcParams.dist_in_path << "walker_positions/" << std::endl;
+                    exit(1);
+                }
+                s.str(std::string());
+
+                for (int i = 0; i < parParams.n_nodes; i++) {
+                    s << dmcParams.dist_in_path << "walker_positions/dist_out" << i << "_0.arma";
+                    dataFound = r_test.load(s.str());
+                    if (!dataFound) {
+                        std::cout << "No walker output data found for node " << i << ". Data generated on less nodes?" << std::endl;
+                        exit(1);
+                    }
+                    s.str(std::string());
+                }
+                r_test.clear();
+
+            }
+        }
+    }
+
+    generalParams.random_seed -= parParams.node;
+    minimizerParams.n_c_SGD /= parParams.n_nodes;
+    vmcParams.n_c /= parParams.n_nodes;
+    dmcParams.n_w /= parParams.n_nodes;
+
+    if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 }

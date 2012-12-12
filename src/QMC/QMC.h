@@ -8,8 +8,24 @@
 #ifndef QMC_H
 #define	QMC_H
 
+#include "../QMCheaders.h"
+
+/*! \brief The QMC superduper class!
+ * 
+ * This class is so cool!
+ * 
+ */
 class QMC {
 protected:
+    
+    STDOUT* std_out;
+    std::stringstream s; //!< This stream is awesome!
+    
+    bool is_master;
+    bool parallel;
+    int node;
+    int n_nodes;
+    virtual void node_comm() = 0;
 
     int n_c;
 
@@ -53,19 +69,20 @@ protected:
     void calculate_energy_necessities(Walker* walker) const;
     
     void estimate_error() const;
+    
+    void switch_souls(int root, int source);
 
 public:
 
     QMC(int n_p, int dim, int n_c,
-            Sampling *sampling,
-            System *system,
-            Jastrow *jastrow = new No_Jastrow());
+            SystemObjects &,
+            ParParams &);
     QMC();
 
     void add_output(OutputHandler* output_handler);
 
     virtual void run_method() = 0;
-    virtual void user_output() const = 0;
+    virtual void output() = 0;
 
 
 
@@ -80,8 +97,7 @@ public:
     }
 
     double get_wf_value(Walker* walker) const {
-        walker->value = system->get_spatial_wf(walker) * jastrow->get_val(walker);
-        return walker->value;
+        return system->get_spatial_wf(walker) * jastrow->get_val(walker);
     }
 
     double calculate_local_energy(const Walker* walker) const {

@@ -7,7 +7,7 @@
 
 #include "../QMCheaders.h"
 
-Minimizer::Minimizer(VMC* vmc, const arma::rowvec & alpha, const arma::rowvec & beta) {
+Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha, const arma::rowvec & beta) {
 
     this->vmc = vmc;
 
@@ -23,29 +23,39 @@ Minimizer::Minimizer(VMC* vmc, const arma::rowvec & alpha, const arma::rowvec & 
         vmc->get_jastrow_ptr()->set_parameter(beta(i), i);
     }
 
+    if (pp.is_master) {
+        std_out = new STDOUT();
+    } else {
+        std_out = new NO_STDOUT();
+    }
+
+    is_master = pp.is_master;
+    n_nodes = pp.n_nodes;
+
 }
 
 void Minimizer::output(std::string message, double number) {
     using namespace std;
 
     if (number != -1) {
-        cout << message << " " << number << endl;
+        s << message << " " << number << endl;
     } else {
-        cout << message << endl;
+        s << message << endl;
     }
 
 
-    if (Nspatial_params != 0) std::cout << "\nAlpha:\n";
+    if (Nspatial_params != 0) s << "\nAlpha:\n";
     for (int alpha = 0; alpha < Nspatial_params; alpha++) {
-        cout << "\t" << vmc->get_orbitals_ptr()->get_parameter(alpha) << endl;
+        s << "\t" << vmc->get_orbitals_ptr()->get_parameter(alpha) << endl;
     }
 
-    if (Njastrow_params != 0) std::cout << "\nBeta:\n";
+    if (Njastrow_params != 0) s << "\nBeta:\n";
     for (int beta = 0; beta < Njastrow_params; beta++) {
-        cout << "\t" << vmc->get_jastrow_ptr()->get_parameter(beta) << endl;
+        s << "\t" << vmc->get_jastrow_ptr()->get_parameter(beta) << endl;
     }
 
-    cout << endl;
+    s << endl;
+    std_out->cout(s);
 
 }
 
@@ -71,10 +81,16 @@ void Minimizer::finalize_output() {
 }
 
 void Minimizer::error_output() {
-    if (error_estimators.at(0)->do_output) {
-        for (int i = 0; i < Nparams; i++) {
-            double error = error_estimators.at(i)->estimate_error();
-            std::cout << "Error" << i << ": " << error << std::endl;
+
+    for (int i = 0; i < Nparams; i++) {
+
+        double error = error_estimators.at(i)->estimate_error();
+
+        if (is_master) {
+            if (error != 0) std::cout << "Error" << i << ": " << error << std::endl;
         }
+
+        error_estimators.at(i)->finalize();
     }
+
 }

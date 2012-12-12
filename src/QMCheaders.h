@@ -9,6 +9,15 @@
 #define	QMCHEADERS_H
 
 //#define ARMA_NO_DEBUG
+//#define OMP_ON
+#define MPI_ON
+
+#ifdef OMP_ON
+#include <omp.h>
+#endif
+#ifdef MPI_ON
+#include <mpi.h>
+#endif
 
 #include <armadillo>
 #include <boost/lexical_cast.hpp>
@@ -17,6 +26,7 @@
 #include <fstream>
 #include <math.h>
 #include <vector>
+#include <sys/time.h>
 
 struct DMCparams {
     int n_c, therm, n_w, n_b;
@@ -37,6 +47,13 @@ struct VariationalParams {
 
 };
 
+struct ParParams {
+    bool parallel;
+    bool is_master;
+    int n_nodes;
+    int node;
+};
+
 struct GeneralParams {
     int n_p, dim;
     long random_seed;
@@ -44,14 +61,10 @@ struct GeneralParams {
 
     double h, w;
 
-    int numprocs, myrank;
-
-    bool parallell;
-
     bool doMIN;
     bool doVMC;
     bool doDMC;
-    
+
     bool estimate_error;
 
     bool use_jastrow;
@@ -102,6 +115,23 @@ struct SystemObjects {
     Sampling* sample_method;
     Jastrow* jastrow;
 
+};
+
+class STDOUT {
+public:
+
+    virtual void cout(std::stringstream & a) {
+        std::cout << a.str() << std::endl;
+        a.str(std::string());
+    }
+};
+
+class NO_STDOUT : public STDOUT {
+public:
+
+    virtual void cout(std::stringstream & a) {
+
+    }
 };
 
 #include "Walker/Walker.h"
@@ -158,7 +188,6 @@ class QMC;
 
 #include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"
-
 
 #endif	/* QMCHEADERS_H */
 

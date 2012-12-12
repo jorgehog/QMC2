@@ -8,30 +8,28 @@
 #include "../../QMCheaders.h"
 
 stdoutDMC::stdoutDMC(std::string filename,
-        std::string path,
-        bool parallel,
-        int my_rank,
-        int num_procs)
-: OutputHandler(filename, path, parallel, my_rank, num_procs) {
+        std::string path)
+: OutputHandler(filename, path, false, 0, 1) {
 
     this->is_dmc = true;
     sumE = 0;
     sumN = 0;
     n = 0;
+    
+    init_file();
 
 }
 
 void stdoutDMC::dump() {
     
     sumE += dmc->dmc_E / dmc->cycle;
-    sumN += dmc->n_w;
+    sumN += dmc->n_w_tot;
     n++;
 
-    file << dmc->dmc_E / dmc->cycle << "\t";
+    file << dmc->dmc_E << "\t";
     file << sumE / n << "\t";
-    file << dmc->n_w << "\t";
+    file << dmc->n_w_tot << "\t";
     file << sumN / n << "\t";
     file << dmc->E_T << std::endl;
-    
 
 }

@@ -8,23 +8,33 @@
 #include "../QMCheaders.h"
 
 QMC::QMC(int n_p, int dim, int n_c,
-        Sampling *sampling,
-        System *system,
-        Jastrow *jastrow) {
+        SystemObjects & sO,
+        ParParams & pp) {
 
     this->n_p = n_p;
     this->dim = dim;
     this->n_c = n_c;
-    this->n2 = n_p / 2;
+    n2 = n_p / 2;
 
-    this->jastrow = jastrow;
-    this->sampling = sampling;
-    this->system = system;
+    jastrow = sO.jastrow;
+    sampling = sO.sample_method;
+    system = sO.SYSTEM;
 
-    this->sampling->set_qmc_ptr(this);
+    sampling->set_qmc_ptr(this);
     get_orbitals_ptr()->set_qmc_ptr(this);
 
-    this->accepted = 0;
+    accepted = 0;
+
+    n_nodes = pp.n_nodes;
+    node = pp.node;
+    is_master = pp.is_master;
+    parallel = pp.parallel;
+
+    if (is_master) {
+        std_out = new STDOUT();
+    } else {
+        std_out = new NO_STDOUT();
+    }
 
 }
 
@@ -54,10 +64,16 @@ void QMC::finalize_output() {
 }
 
 void QMC::estimate_error() const {
-    if (error_estimator->do_output) {
-        double error = error_estimator->estimate_error();
-        std::cout << "Estimated Error: " << error << std::endl;
+
+    error_estimator->normalize();
+    double error = error_estimator->estimate_error();
+
+    if (is_master) {
+        if (error != 0) std::cout << "Estimated Error: " << error << std::endl;
     }
+
+    error_estimator->finalize();
+
 }
 
 void QMC::get_gradients(const Walker* walker_pre, Walker* walker_post, int particle) const {

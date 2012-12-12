@@ -8,16 +8,15 @@
 #include "../../QMCheaders.h"
 
 stdoutASGD::stdoutASGD(std::string filename,
-        std::string path,
-        bool parallel,
-        int my_rank,
-        int num_procs)
-: OutputHandler(filename, path, parallel, my_rank, num_procs) {
+        std::string path)
+: OutputHandler(filename, path, false, 0, 1) {
     this->is_ASGD = true;
 
     aGrad = 0;
     bGrad = 0;
     sumE = 0;
+    
+    init_file();
 }
 
 void stdoutASGD::dump() {
