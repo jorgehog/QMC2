@@ -200,10 +200,9 @@ int main(int argc, char** argv) {
 
         DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
 
-        if (outputParams.dmc_out) {
+        if (outputParams.dmc_out && parParams.is_master) {
             string dmcOutname = (string) "DMC_out" + outputParams.outputSuffix;
-            OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath,
-                    parParams.parallel, parParams.node, parParams.n_nodes);
+            OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath);
             dmc->add_output(DMCout);
         }
 
@@ -246,8 +245,8 @@ void parseCML(int argc, char** argv,
     //    outputParams.blocking_out = false;
     outputParams.dist_out = true;
     //NEW
-    outputParams.dmc_out = false;
-    outputParams.ASGD_out = false;
+    outputParams.dmc_out = true;
+    outputParams.ASGD_out = true;
     outputParams.outputSuffix = "";
     outputParams.outputPath = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
 
@@ -259,15 +258,15 @@ void parseCML(int argc, char** argv,
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
-    generalParams.doMIN = argc == 0;
-    generalParams.doVMC = argc == 0;
+    generalParams.doMIN = argc == 1;
+    generalParams.doVMC = argc == 1;
     generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = false;
+    generalParams.estimate_error = true;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 

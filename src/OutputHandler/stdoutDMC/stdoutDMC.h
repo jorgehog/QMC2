@@ -18,11 +18,7 @@ protected:
 public:
 
     stdoutDMC(std::string filename = "DMC_out",
-            std::string path = "./",
-            bool parallel = false,
-            int node = 0,
-            int n_nodes = 1
-            );
+            std::string path = "./");
 
     virtual void dump();
 

@@ -355,7 +355,7 @@ void DMC::normalize_population() {
     swap_map.clear();
     test.clear();
     MPI_Barrier(MPI_COMM_WORLD);
-    sleep(5);
+//    sleep(5);
 //    exit(1);
 
 
