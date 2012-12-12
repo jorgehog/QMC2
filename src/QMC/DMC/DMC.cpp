@@ -23,7 +23,9 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
     original_walkers = new Walker*[max_walkers];
     trial_walker = new Walker(n_p, dim);
 
-    if (parallel && is_master) n_w_list = arma::zeros<arma::Row<int> >(n_nodes);
+    if (parallel) {
+        n_w_list = arma::zeros<arma::uvec > (n_nodes);
+    }
 
 }
 
@@ -106,9 +108,15 @@ void DMC::Evolve_walker(int k, double GB) {
 }
 
 void DMC::update_energies() {
+
     node_comm();
+
+    E_tot += E;
+    tot_samples += samples;
+
     dmc_E = E_tot / tot_samples;
     E_T = E / samples;
+
 }
 
 void DMC::iterate_walker(int k, int n_b, bool production) {
@@ -141,39 +149,7 @@ void DMC::iterate_walker(int k, int n_b, bool production) {
 void DMC::run_method() {
 
     initialize();
-    E_tot = 0;
-    tot_samples = 0;
-    dmc_E = 0;
-    //    using namespace std;
-    //    if (node == 1) {
-    //        cout << "node1 pre" << endl;
-    //        original_walkers[12]->print();
-    //        //        cout << "send "<<&original_walkers[12]->E << endl;
-    //        //        MPI_Send(&original_walkers[12]->E, 1, MPI_DOUBLE, 3, 0, MPI_COMM_WORLD);
-    //    } else if (node == 3) {
-    //        sleep(1);
-    //        cout << "node3 pre" << endl;
-    //        //        cout << "recv " <<&original_walkers[n_w]->E << endl;
-    //        original_walkers[250]->print();
-    //        //        MPI_Recv(&original_walkers[n_w]->E, 1, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    //    }
-    //
-    //    MPI_Barrier(MPI_COMM_WORLD);
-    //    switch_souls(1, 12, 3, 250);
-    //
-    //    if (node == 1) {
-    //        cout << "node1 after" << endl;
-    //        original_walkers[12]->print();
-    //    } else if (node == 3) {
-    //        sleep(1);
-    //        cout << "node3 after" << endl;
-    //        original_walkers[250]->print();
-    //    }
-    //
-    //    MPI_Barrier(MPI_COMM_WORLD);
-    //    MPI_Finalize();
-    //    sleep(1);
-    //    exit(1);
+    E_tot = tot_samples = dmc_E = 0;
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
@@ -186,13 +162,16 @@ void DMC::run_method() {
         bury_the_dead();
         update_energies();
 
+        normalize_population();
+
         output();
 
     }
 
-    E_tot = 0;
-    tot_samples = 0;
-    dmc_E = 0;
+    normalize_population();
+
+    E_tot = tot_samples = dmc_E = 0;
+
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         reset_parameters();
@@ -203,6 +182,8 @@ void DMC::run_method() {
 
         bury_the_dead();
         update_energies();
+
+        normalize_population();
 
         output();
         dump_output();
@@ -282,46 +263,100 @@ void DMC::node_comm() {
         MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         MPI_Allreduce(MPI_IN_PLACE, &samples, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-        MPI_Gather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, 0, MPI_COMM_WORLD);
-        n_w_tot = arma::accu(n_w_list);
-        if (is_master) std::cout << n_w_list << std::endl;
+        MPI_Allgather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
 
-        if (is_master) normalize_load();
-        if (is_master) std::cout << n_w_list << std::endl;
-        MPI_Barrier(MPI_COMM_WORLD);
+        n_w_tot = arma::accu(n_w_list);
+
     }
 #else
     n_w_tot = n_w;
 #endif
 
-    E_tot += E;
-    tot_samples += samples;
-
-
-
-
 }
 
-void DMC::switch_souls(int root, int root_id, int source, int source_id) {
+void DMC::switch_souls(int root, int root_id, int dest, int dest_id) {
     if (node == root) {
-        original_walkers[root_id]->send_soul(source);
+        original_walkers[root_id]->send_soul(dest);
         n_w--;
-    } else if (node == source) {
-        original_walkers[source_id]->recv_soul(root);
+    } else if (node == dest) {
+        original_walkers[dest_id]->recv_soul(root);
         n_w++;
     }
 }
 
-void DMC::normalize_load() {
+void DMC::normalize_population() {
 #ifdef MPI_ON
+    using namespace arma;
 
-    arma::uword max, min;
-    int max_N = n_w_list.max(max);
-    int min_N = n_w_list.min(min);
+    if (!(cycle % (n_c / check_thresh) == 0) || cycle > (int) n_c * 0.9) return;
 
-    if (max_N - min_N > n_w_tot / (10 * n_nodes)) {
-        std::cout << "population to big on " << max << "and population to low on " << min << std::endl;
+    int avg = n_w_tot / n_nodes;
+    umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
+    uvec snw = sort_index(n_w_list, 1);
+
+    if (is_master) cout << n_w_list.st() << endl;
+
+    int root = 0;
+    int dest = n_nodes - 1;
+    while (root < dest) {
+        if (n_w_list(snw(root)) > avg) {
+            if (n_w_list(snw(dest)) < avg) {
+                swap_map(snw(root), snw(dest))++;
+                n_w_list(snw(root))--;
+                n_w_list(snw(dest))++;
+            } else {
+                dest--;
+            }
+        } else {
+            root++;
+        }
     }
+
+    uvec test = sum(swap_map, 1);
+    if (test.max() < sendcount_thresh) {
+        test.clear();
+        swap_map.clear();
+        return;
+    }
+
+    if (is_master) cout << n_w_list.st() << endl;
+
+    for (int root = 0; root < n_nodes; root++) {
+        for (int dest = 0; dest < n_nodes; dest++) {
+            if (swap_map(root, dest) != 0) {
+
+                if (is_master) {
+                    cout << "node" << root << " sends ";
+                    cout << swap_map(root, dest) << " walkers to node " << dest << endl;
+                }
+
+                for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
+                    switch_souls(root, n_w - 1, dest, n_w);
+                }
+            }
+        }
+    }
+    
+//    if (node == 1){
+//        for (int i = 0; i < 21; i++){
+//            original_walkers[n_w + i]->print("Node 1 sends " + boost::lexical_cast<std::string>(i));
+//        }
+//    }
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    sleep(5);
+//    if (node == 2){
+//        for (int i = 0; i < 21; i++){
+//            original_walkers[n_w - i - 1]->print("Node 2 recvs " + boost::lexical_cast<std::string>(i));
+//        }
+//    }
+//    if(is_master) cout << n_w_list << endl;
+//    sleep(node);
+//    cout << n_w << endl;
+    swap_map.clear();
+    test.clear();
+    MPI_Barrier(MPI_COMM_WORLD);
+    sleep(5);
+//    exit(1);
 
 
 #endif

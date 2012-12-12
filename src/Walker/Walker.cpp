@@ -24,9 +24,9 @@ Walker::Walker(int n_p, int dim, bool alive) {
 
     r2 = zeros(1, n_p);
 
-    value = 0;
     lapl_sum = 0;
     spatial_ratio = 0;
+    E = 0;
     inv = zeros<mat > (n2, n_p);
 
     phi = zeros<mat > (n_p, n2);
@@ -84,15 +84,31 @@ void Walker::print(std::string header) {
     cout << "r\n" << this->r << endl;
     cout << "r_rel\n" << this->r_rel << endl;
     cout << "r2\n" << this->r2 << endl;
-
     cout << "S grad\n" << this->spatial_grad << endl;
+
     cout << "J grad\n" << this->jast_grad << endl;
+    cout << "J derivs\n" << this->dJ << endl;
 
     cout << "Qforce\n" << this->qforce << endl;
     cout << "inv\n" << this->inv << endl;
 
-    cout << "Lapl_sum\t" << this->lapl_sum << endl;
-    cout << "S ratio\t" << this->spatial_ratio << endl;
+    cout << "Phi\n" << this->phi << endl;
+    cout << "DellPhi\n" << this->dell_phi << endl;
+
+    cout << "Lapl_sum|S ratio|E\t" << this->lapl_sum << "|";
+    cout << this->spatial_ratio << "|";
+    cout << this->E << endl;
+
+    cout << "n_p|dim|n2\t" << this->n_p << "|";
+    cout << this->dim << "|";
+    cout << this->n2 << endl;
+
+    cout << "Walker is currently ";
+    if (is_murdered) {
+        cout << "dead." << endl;
+    } else {
+        cout << "alive." << endl;
+    }
 
     cout << "---- ---- ---- ---- ---- ---- ----" << endl;
     cout << endl;
@@ -100,7 +116,7 @@ void Walker::print(std::string header) {
 
 void Walker::send_soul(int source) {
 #ifdef MPI_ON
-    std::cout << "send " <<&E << std::endl;
+
     MPI_Send(&E, 1, MPI_DOUBLE, source, 0, MPI_COMM_WORLD);
     MPI_Send(r.memptr(), r.n_elem, MPI_DOUBLE, source, 1, MPI_COMM_WORLD);
     MPI_Send(r_rel.memptr(), r_rel.n_elem, MPI_DOUBLE, source, 2, MPI_COMM_WORLD);
@@ -129,7 +145,7 @@ void Walker::send_soul(int source) {
 
 void Walker::recv_soul(int root) {
 #ifdef MPI_ON
-    std::cout << "recv " <<&E << std::endl;
+
     MPI_Recv(&E, 1, MPI_DOUBLE, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Recv(r.memptr(), r.n_elem, MPI_DOUBLE, root, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     MPI_Recv(r_rel.memptr(), r_rel.n_elem, MPI_DOUBLE, root, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);

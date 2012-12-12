@@ -13,9 +13,10 @@ protected:
 
     int n_w;
     int n_w_last;
+    
     int n_w_tot;
-    arma::Row<int> n_w_list;
-
+    arma::uvec n_w_list;
+    
     int deaths;
 
     int block_size;
@@ -53,14 +54,16 @@ protected:
     }
 
     virtual void node_comm();
-    
-    void switch_souls(int root, int root_id, int source, int source_id);
-    
-    void normalize_load();
+
+    void switch_souls(int root, int root_id, int dest, int dest_id);
+
+    void normalize_population();
 
 public:
 
     static const int K = 2; //Factor of empty space for walkers over initial walkers
+    static const int check_thresh = 5;
+    static const int sendcount_thresh = 20;
 
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
 
