@@ -242,19 +242,12 @@ void parseCML(int argc, char** argv,
     int n_args = 44;
 
     //Default values:
-    //    outputParams.blocking_out = false;
-    outputParams.dist_out = true;
-    //NEW
-    outputParams.dmc_out = true;
-    outputParams.ASGD_out = true;
-    outputParams.outputSuffix = "";
-    outputParams.outputPath = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
 
     generalParams.n_p = 2;
     generalParams.dim = 2;
     generalParams.w = 1;
-//    generalParams.random_seed = -(long)time(NULL);
-    generalParams.random_seed = -1355160055;
+    generalParams.random_seed = -(long)time(NULL);
+//    generalParams.random_seed = -1355160055;
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
@@ -270,9 +263,19 @@ void parseCML(int argc, char** argv,
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
+    
+    //    outputParams.blocking_out = false;
+    outputParams.dist_out = generalParams.doDMC & generalParams.doVMC;
+    //NEW
+    outputParams.dmc_out = false;
+    outputParams.ASGD_out = false;
+    outputParams.outputSuffix = "";
+    outputParams.outputPath = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
 
+    
     vmcParams.n_c = 1E6;
 
+    
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;
     dmcParams.n_b = 100;
@@ -289,6 +292,7 @@ void parseCML(int argc, char** argv,
         variationalParams.beta = 0.398;
     }
 
+    
     minimizerParams.max_step = 0.1;
     minimizerParams.f_max = 1.0;
     minimizerParams.f_min = -0.5;

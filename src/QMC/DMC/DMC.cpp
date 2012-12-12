@@ -294,7 +294,7 @@ void DMC::normalize_population() {
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
     uvec snw = sort_index(n_w_list, 1);
 
-    if (is_master) cout << n_w_list.st() << endl;
+    s << n_w_list.st() << endl;
 
     int root = 0;
     int dest = n_nodes - 1;
@@ -316,19 +316,20 @@ void DMC::normalize_population() {
     if (test.max() < sendcount_thresh) {
         test.clear();
         swap_map.clear();
+        s.str(std::string());
         return;
     }
 
-    if (is_master) cout << n_w_list.st() << endl;
+    s << n_w_list.st() << endl;
+    std_out->cout(s);
 
     for (int root = 0; root < n_nodes; root++) {
         for (int dest = 0; dest < n_nodes; dest++) {
             if (swap_map(root, dest) != 0) {
 
-                if (is_master) {
-                    cout << "node" << root << " sends ";
-                    cout << swap_map(root, dest) << " walkers to node " << dest << endl;
-                }
+                    s << "node" << root << " sends ";
+                    s << swap_map(root, dest) << " walkers to node " << dest << endl;
+                    std_out->cout(s);
 
                 for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
                     switch_souls(root, n_w - 1, dest, n_w);
