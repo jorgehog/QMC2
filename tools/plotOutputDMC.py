@@ -1,81 +1,144 @@
-from scitools.std import *
-from pyLibQMC import paths
+import numpy
+import time, sys, re
+
+import mayavi.mlab as mlab
+import matplotlib.pylab as plab
+from matplotlib import rc
+
+from pyLibQMC import paths, plot_tools
+
+rc('text', usetex=True)
+rc('font', family='serif')
+
+#~ 
+#~  
+#~ 
 
 fileName = "DMC_out.dat"
-filePath = paths.IDEPath + "/" + fileName
+path = paths.scratchPath+ "/QMC_SCRATCH/"
 
-dynamicAxis = False
+class DMC_OUT(plot_tools):
+	def __init__(self, filename, path, dt = 0.001, dynamic=False):
+		plot_tools.__init__(self, filename, path, dynamic)
+		
+		self.fig = plab.figure()
+		self.iFig = self.add_figure(self.fig)
+		
+		self.E_plot = self.fig.add_subplot(2,1,2)
+		self.N_plot = self.fig.add_subplot(2,1,1)
+		
+		self.add_subfigure(self.E_plot, self.iFig)
+		self.add_subfigure(self.N_plot, self.iFig)
+		
+		self.dt = dt
+	
+	def plot(self, data):
+		
+		E, Eavg, N, Navg, ET = data
+		
+		#~ data manip
+		#~ ET = numpy.cumsum(ET)/numpy.cumsum(numpy.ones(ET.shape))
+		#~ E *= numpy.random.uniform(0.9999,1.0001, E.shape)
+		#~ N *= numpy.random.uniform(0.99,1.01, N.shape)
+		#~ 
+		
+		t = numpy.linspace(0, dt*(len(E) - 1), len(E))
+		fig, N_plot, E_plot = self.fig, self.N_plot, self.E_plot
+		
+		
+		#~ E PLOTS
+		E_plot.plot(t, E, 'b', label="dmc E")
+		E_plot.plot(t, ET, 'r', label="trial E")
+		
+		E_plot.legend(loc=4)
+		E_plot.set_title('Energy convergeance')
+		E_plot.set_xlabel(r'$\tau = n*\delta \tau$ [s]')
+		E_plot.set_ylabel(r'E [Ha]')
+		E_plot.ticklabel_format(useOffset=False, axis='y')
+		
+		#~ N PLOTS
+		N_plot.plot(t, N, 'b')
+		N_plot.plot(t, Navg, 'r')
+		
+		N_plot.set_ylabel(r"N_W($\tau$)")
+		N_plot.axes.get_xaxis().set_visible(False)
+		N_plot.set_title('Walker population')
+		N_plot.ticklabel_format(useOffset=False, axis='y')
+		
+		
+		
+dt = 0.001
+dynamic = True
+
+plot_tool = DMC_OUT(fileName, path, dt, dynamic)
+plot_tool.mainloop()
+
+
+
+"""
+t = numpy.linspace(0, 2*numpy.pi, 1000)
+x = numpy.cos(t)
+y = numpy.sin(t)
+z = numpy.linspace(0, 10, 1000)
+	
+mlab.plot3d(x,y,z)
+	
+		
+mlab.show()
+"""
+
+"""
+rerunMode = False
 
 cmd = ""
 
-if len(sys.argv) > 1:
-	exactE = float(sys.argv[1])
-else:
-	exactE = 0;
+fig = plab.figure()	
+E_plot = fig.add_subplot(1,1,1)
+#~ N_plot = fig.add_subplot(2,2,1)
+
+
+
 
 while (cmd != "q"):
-
-	DMCout = open(filePath , "r")
-
-	E = []
-	Eavg = []
-	N = []
-	Navg = []
-	ET = []
-
-	for line in DMCout:
-		raw = line.split()
-		E.append(float(raw[0]))
-		Eavg.append(float(raw[1]))
-		N.append(float(raw[2]))
-		Navg.append(float(raw[3]))
-		ET.append(float(raw[4]))
-
-	DMCout.close()
-
-	#n= int(len(E)*(9./10))
-	#k = 10
-	#tmpEavg = sum(E[-n:])/n
-	#dE = abs(max(E[-n:]) - tmpEavg) 
-	#tmpAxis = [n,len(E), tmpEavg - k*dE, tmpEavg + k*dE] 
+	
+	E, Eavg, N, Navg, ET = plot_tool.get_data()
+	
+	E *= numpy.random.uniform(0.99999,1.00001, E.shape)
 
 	if len(E) == len(Eavg) == len(N) == len(Navg) == len(ET):
 
-		figure(1)
-		plot(E, 'r')
-		hold("on")
-
-		plot(Eavg, 'b')
-		title("E")
-		xlabel("cycle")
-		ylabel("E")
-		legend(["E", "Eavg"])
-		if (exactE != 0):
-			plot(zeros(len(E)) + exactE, 'g')
+		dt_array = numpy.linspace(0,dt*len(E), len(E) +1)
+		print dt_array[:5]
 		
-		#if dynamicAxis:
-	#		axis(tmpAxis)
+		E_plot.plot(E)
+		#~ E_plot.plot(
+		E_plot.ticklabel_format(useOffset=False, axis='y')
+		fig.canvas.draw()
+		fig.show()
 		
-
-		figure(2)
-		plot(N, 'r')
-		hold("on")
-
-		plot(Navg, 'b')
-		title("N/N_0")
-		xlabel("cycle")
-		ylabel("N/N_0")
-		legend(["N", "Navg"])
-
-		figure(3)
-		plot(ET, 'b')
-		title("E_t")
-		xlabel("cycle")
-		ylabel("Et")
-		if (exactE != 0):
-			hold("on")
-			plot(zeros(len(E)) + exactE, 'g')
-
-		cmd = raw_input("press Enter to plot again or 'q' to end")
+		
+		
+		if rerunMode:
+			try:
+				print "replotting in 5 sec.."
+				time.sleep(5)
+				E_plot.clear()
+			except KeyboardInterrupt:
+				fig.close()
+				break
+		else:
+			raw_input("Press any key to exit")
+			cmd = "q"
 	else:
-		cmd = "rerun"
+		print "Unequal data set loaded. Loaded during filewrite? Reloading in 1 sec..."
+		try:
+			time.sleep(1)
+		except KeyboardInterrupt:
+			print "Exiting.."
+			break
+
+	
+	
+print "closing"
+plot_tool.close()
+"""

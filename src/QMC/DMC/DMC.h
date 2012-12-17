@@ -25,6 +25,7 @@ protected:
     double E_tot;
 
     double dmc_E;
+    double dmc_E_unscaled;
     double E_T;
     double E;
 

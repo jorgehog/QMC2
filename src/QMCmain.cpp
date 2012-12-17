@@ -252,15 +252,15 @@ void parseCML(int argc, char** argv,
     generalParams.h = 0.0001;
     generalParams.D = 0.5;
 
-    generalParams.doMIN = argc == 1;
-    generalParams.doVMC = argc == 1;
+    generalParams.doMIN = argc == 0;
+    generalParams.doVMC = argc == 0;
     generalParams.doDMC = argc == 1;
 
     generalParams.use_coulomb = true;
     generalParams.use_jastrow = true;
 
     generalParams.sampling = "IS";
-    generalParams.estimate_error = true;
+    generalParams.estimate_error = false;
     //    generalParams.kinetics_type = "CF";
     generalParams.system = "QDots";
 
@@ -269,7 +269,7 @@ void parseCML(int argc, char** argv,
     outputParams.dist_out = generalParams.doDMC & generalParams.doVMC;
     //NEW
     outputParams.dmc_out = true;
-    outputParams.ASGD_out = true;
+    outputParams.ASGD_out = false;
     outputParams.outputSuffix = "";
     outputParams.outputPath = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
 
@@ -302,9 +302,9 @@ void parseCML(int argc, char** argv,
     minimizerParams.a = 0.3;
     minimizerParams.SGDsamples = 2000;
     minimizerParams.n_walkers = 10;
-    minimizerParams.thermalization = 100000;
+    minimizerParams.thermalization = 10000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 400;
+    minimizerParams.n_c_SGD = 200;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 

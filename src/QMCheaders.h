@@ -130,7 +130,7 @@ class NO_STDOUT : public STDOUT {
 public:
 
     virtual void cout(std::stringstream & a) {
-
+        a.str(std::string());
     }
 };
 

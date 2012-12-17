@@ -115,7 +115,8 @@ void DMC::update_energies() {
     tot_samples += samples;
 
     dmc_E = E_tot / tot_samples;
-    E_T = E / samples;
+    dmc_E_unscaled += dmc_E;
+    E_T = dmc_E_unscaled / cycle;
 
 }
 
@@ -149,7 +150,7 @@ void DMC::iterate_walker(int k, int n_b, bool production) {
 void DMC::run_method() {
 
     initialize();
-    E_tot = tot_samples = dmc_E = 0;
+    E_tot = tot_samples = dmc_E = dmc_E_unscaled = 0;
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
@@ -169,9 +170,9 @@ void DMC::run_method() {
     }
 
     normalize_population();
-    
+
     E_T = dmc_E;
-    E_tot = tot_samples = dmc_E = 0;
+    E_tot = tot_samples = dmc_E = dmc_E_unscaled = 0;
 
     for (cycle = 1; cycle <= n_c; cycle++) {
 
@@ -328,9 +329,9 @@ void DMC::normalize_population() {
         for (int dest = 0; dest < n_nodes; dest++) {
             if (swap_map(root, dest) != 0) {
 
-                    s << "node" << root << " sends ";
-                    s << swap_map(root, dest) << " walkers to node " << dest << endl;
-                    std_out->cout(s);
+                s << "node" << root << " sends ";
+                s << swap_map(root, dest) << " walkers to node " << dest << endl;
+                std_out->cout(s);
 
                 for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
                     switch_souls(root, n_w - 1, dest, n_w);
@@ -338,28 +339,10 @@ void DMC::normalize_population() {
             }
         }
     }
-    
-//    if (node == 1){
-//        for (int i = 0; i < 21; i++){
-//            original_walkers[n_w + i]->print("Node 1 sends " + boost::lexical_cast<std::string>(i));
-//        }
-//    }
-//    MPI_Barrier(MPI_COMM_WORLD);
-//    sleep(5);
-//    if (node == 2){
-//        for (int i = 0; i < 21; i++){
-//            original_walkers[n_w - i - 1]->print("Node 2 recvs " + boost::lexical_cast<std::string>(i));
-//        }
-//    }
-//    if(is_master) cout << n_w_list << endl;
-//    sleep(node);
-//    cout << n_w << endl;
+
     swap_map.clear();
     test.clear();
     MPI_Barrier(MPI_COMM_WORLD);
-//    sleep(5);
-//    exit(1);
-
 
 #endif
 }

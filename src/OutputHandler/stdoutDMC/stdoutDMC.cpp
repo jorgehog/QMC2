@@ -22,7 +22,7 @@ stdoutDMC::stdoutDMC(std::string filename,
 
 void stdoutDMC::dump() {
     
-    sumE += dmc->dmc_E / dmc->cycle;
+    sumE += dmc->dmc_E;
     sumN += dmc->n_w_tot;
     n++;
 
