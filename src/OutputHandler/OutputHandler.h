@@ -12,17 +12,17 @@ class OutputHandler {
 protected:
     bool is_vmc;
     bool is_dmc;
-    
+
     bool is_ASGD;
-    
+
     bool parallel;
     int node;
     int n_nodes;
-    
+
     bool use_file;
-    
+
     std::stringstream s;
-    
+
     std::string filename;
     std::string path;
 
@@ -33,8 +33,11 @@ protected:
     VMC* vmc;
     Minimizer* min;
     ASGD* asgd;
-    
+
     void init_file();
+
+    virtual void post_pointer_init() {
+    };
 
 public:
 
@@ -48,7 +51,7 @@ public:
 
     virtual void dump() = 0;
     virtual void finalize();
-    
+
     void set_qmc_ptr(QMC* qmc);
     void set_min_ptr(Minimizer* min);
 

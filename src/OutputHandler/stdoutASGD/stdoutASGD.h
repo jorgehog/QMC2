@@ -14,9 +14,13 @@ public:
             std::string path = "./");
 
     virtual void dump();
+    
+    virtual void post_pointer_init(){
+        grad = arma::zeros(asgd->Nparams);
+    }
+    
 private:
-    double aGrad;
-    double bGrad;
+    arma::vec grad;
     double sumE;
 };
 

@@ -41,10 +41,9 @@ class plot_tools:
 	
 		
 		self.reload()
-		
+	
 		data = numpy.array(self.rx.findall(self.file.read()), numpy.float)
-		
-		
+
 		self.file.close()
 		
 		output = []
@@ -65,7 +64,9 @@ class plot_tools:
 			light = self.load_sample()
 			if light == 'red':
 				sys.exit(1)
-				
+		
+		self.set_figures()
+		
 		while (True):
 	
 			data = self.get_data()
@@ -74,19 +75,21 @@ class plot_tools:
 			self.show()
 		
 			if self.dynamic:
-				try:
-					print "replotting in %d s..." % self.delay
-					for i in range(int(self.delay)):
-						time.sleep(1)
+				
+					#~ print "replotting in %d s..." % self.delay
+					#~ for i in range(int(self.delay)):
+						#~ time.sleep(1)
+
+				ans = raw_input("press return to plot again. (q to break)")
 						
-					self.clear()
-				except KeyboardInterrupt:
-					self.clear()
+				self.clear()
+					
+				if ans == "q":
+					print "Ending session..."
 					self.close()
 					break
 			else:
 				raw_input("Press any key to exit")
-			
 				
 				self.close()
 			
@@ -102,7 +105,8 @@ class plot_tools:
 			return "red"
 		
 		self.N = len(sample.split())
-		self.rx = re.compile(r'(\d+\.?\d*)\s+'*(self.N-1) + r'(\d+\.?\d*)[\n$]')	
+		anyNumber = r'[\+\-]?\d+\.?\d*[eE]?[\+\-]?\d*'
+		self.rx = re.compile((r'(%s)\s+' % anyNumber)*(self.N-1) + r'(%s)[\n$]' % anyNumber)	
 		
 		return "green"
 	
@@ -136,10 +140,16 @@ class plot_tools:
 		
 		self.clear()
 		
+		for fig in self.figures:
+			fig[0].clf()
+		
 		if not self.file.closed:
 			self.file.close()
 		
 	def plot(self, data):
+		"I am virtual"
+	
+	def set_figures(self):
 		"I am virtual"
 		
 
@@ -160,6 +170,7 @@ def add_date(filename):
 
     return originalFilename + date + fileEnding;
     
+
 
 def main():
     spacing = 20

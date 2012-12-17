@@ -137,7 +137,7 @@ public:
 #include "Walker/Walker.h"
 
 class Minimizer;
-class ASGD;
+//class stdoutASGD;
 
 class OutputHandler;
 
@@ -181,13 +181,13 @@ class QMC;
 #include "ErrorEstimator/Blocking/Blocking.h"
 #include "ErrorEstimator/SimpleVar/SimpleVar.h"
 
+#include "Minimizer/Minimizer.h"
+#include "Minimizer/ASGD/ASGD.h"
+
 #include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/Distribution/Distribution.h"
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
 #include "OutputHandler/stdoutASGD/stdoutASGD.h"
-
-#include "Minimizer/Minimizer.h"
-#include "Minimizer/ASGD/ASGD.h"
 
 #endif	/* QMCHEADERS_H */
 
