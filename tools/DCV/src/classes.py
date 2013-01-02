@@ -19,10 +19,9 @@ rc('text', usetex=True)
 rc('font', family='serif')
 
 
-
 class DMC_OUT(dcv_plotter):
 	
-	nametag = "dmc_out.dat"
+	nametag = "DMC_out.dat"
 	figMap = {"Fig": ["N_plot", "E_plot"]}
 	dt = 0.001
 		
@@ -34,7 +33,7 @@ class DMC_OUT(dcv_plotter):
 		t = numpy.linspace(0, self.dt*(len(E) - 1), len(E))
 		N_plot, E_plot = self.N_plot, self.E_plot
 		
-		print "called"
+		
 		# E PLOTS
 		E_plot.plot(t, E, 'b', label="dmc E")
 		E_plot.plot(t, ET, 'r', label="trial E")

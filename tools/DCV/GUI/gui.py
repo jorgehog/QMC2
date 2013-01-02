@@ -6,23 +6,29 @@ import tkFileDialog
 
 import sys, os, re, threading, time
 
-from classfile import *
+from pyLibQMC import paths
+
+sys.path.append(os.path.join(paths.toolsPath, "DCV", "src"))
+
+from classes import *
+
+
+masterdir = ""
+if len(sys.argv) > 1:
+    masterDir = sys.argv[1]
+else:
+    masterDir = paths.scratchPath
 
 class spawned_thread(threading.Thread):
     def __init__(self, mode):
         threading.Thread.__init__(self)
-        
         self.mode = mode
-        self._stop = threading.Event()
         
     def run(self):
-        self.mode.mainloop(self._stop)
+        self.mode.mainloop()
             
     def stop(self):
-        self._stop.set()
-
-    def stopped(self):
-        return self._stop.isSet()
+        self.mode._stop.set()
         
 
 
@@ -81,7 +87,7 @@ class QMCGUI:
         self.mode.set("No data...")
         self.modeMap = {"" : "No data..."}
         self.modeSelector = OptionMenu(root, self.mode, *self.modeMap.values())
-        self.modeSelector.config()
+        self.modeSelector.config(width=9)
         self.modeMap = {}
         #::::::::::::::::::::::::::::::::::::::::::::::::::
         
@@ -118,6 +124,7 @@ class QMCGUI:
         self.active_mode.dynamic = self.dynamic.get()
         if self.active_mode.dynamic:
             self.start_button.configure(image=self.img["stop"], command=self.stop, relief=FLAT)
+            self.modeSelector['state'] = DISABLED
             
         self.job = spawned_thread(self.active_mode)
         self.job.setDaemon(True)
@@ -143,11 +150,11 @@ class QMCGUI:
             print "BUG THREAD: This should never happen..."
             
         self.start_button.configure(image=self.img["play"], command=self.start, state=ACTIVE, relief=FLAT)
-
+        self.modeSelector['state'] = ACTIVE
 
     def openfile(self):
         
-        filename = tkFileDialog.askopenfilename(title="Choose file to display")
+        filename = tkFileDialog.askopenfilename(title="Choose file to display", initialdir=masterDir)
 
         if not filename:
             return
@@ -157,7 +164,7 @@ class QMCGUI:
         
     def setpath(self):
 
-        self.path = tkFileDialog.askdirectory(title="Choose path ...")
+        self.path = tkFileDialog.askdirectory(title="Choose path ...", initialdir=masterDir)
     
         if not self.path:
             return
@@ -179,8 +186,8 @@ class QMCGUI:
                                           (filename.split("/")[-1].center(s), \
                                                self.unique_modes_names[self.unique_modes.index(mode)].center(s)))
                 
-                args = [0]
-                mode = mode(*args)
+                args = [filename]
+                mode = mode(*args, useGUI=True)
                 mode.filepath = filename
                 
                 if self.check_consistency_fail(mode):
@@ -193,28 +200,34 @@ class QMCGUI:
     def check_consistency_fail(self, mode):
         return str(mode) in self.modeMap.keys()
 
-    def load_ext(self):
+    def load_ext(self, onlyConfig=False):
 
         config = open("config.txt", 'r')
         self.config = config.read()
         config.close()
-
-        self.autodetect_modes()
 
         self.refresh_dt_raw = re.findall(r"dynamic refresh interval \[seconds\]\s*=\s*(\d+\.?\d*)", self.config)[0]
         self.refresh_dt_config = float(self.refresh_dt_raw)
         self.terminal_silence = not bool(int(re.findall("terminal tracker\s*=\s*([01])", self.config)[0]))
         self.warning_silence = not bool(int(re.findall("warnings on\s*=\s*([01])", self.config)[0]))
 
+        if not onlyConfig: 
+            self.autodetect_modes()
+            
+
         #Static overriding
         for mode in self.unique_modes:
-            mode.refresh_dt = self.refresh_dt_config
+            mode.delay = self.refresh_dt_config
+        
+        
+        
+
 
     def update_dt(self, event):
 
         new_dt = self.refresh_dt.get()
-        if float(new_dt) <= 0.5:
-            self.raiseWarning("Illeagal refresh interval. Choose one > 0.5")
+        if float(new_dt) < 0:
+            self.raiseWarning("Illeagal refresh interval. Choose one > 1")
             return
 
         config = open("config.txt", 'w')
@@ -222,24 +235,27 @@ class QMCGUI:
             if line.startswith("dynamic refresh interval [seconds]"):
                 config.write(self.config.replace(line, line.replace(self.refresh_dt_raw, new_dt)))
                 config.close()
-                self.load_ext()
+                self.load_ext(onlyConfig=True)
                 return
 
         
 
     def autodetect_modes(self):
-        classfile = open('classfile.py', 'r')
+        classfile = open('../src/classes.py', 'r')
         raw = classfile.read()
         classfile.close()
 
-        self.unique_modes_names = re.findall('^class (\w+)\(dummy\):', raw, re.MULTILINE)
+        self.unique_modes_names = re.findall('^class (\w+)\(dcv_plotter\):', raw, re.MULTILINE)
         self.unique_modes = [eval(subclass) for subclass in self.unique_modes_names]
+        
+        self.terminal_tracker("Detector", "Found subclasses %s" \
+                                % str(self.unique_modes_names).strip("]").strip("["))
         
         if not self.unique_modes_names:
             self.raiseWarning("No subclass implementations found.")
 
         for mode in self.unique_modes:
-            instance = mode(0)
+            instance = mode()
             try:
                 nametag = instance.nametag
             except:

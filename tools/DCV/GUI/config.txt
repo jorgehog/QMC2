@@ -1,0 +1,3 @@
+dynamic refresh interval [seconds] = 213213
+terminal tracker = 1
+warnings on = 1
