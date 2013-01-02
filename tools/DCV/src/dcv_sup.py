@@ -1,26 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import os, time, sys, re, numpy
+import re, numpy, time, sys
+import mayavi.mlab as mlab
+import matplotlib.pylab as plab
 
-class paths:
-    HOME = os.path.expanduser('~')
-    CODE = HOME +  "/MASTER/QMC2"
-    IDEPath = HOME + "/NetBeansProjects/nbQMC2"
-    toolsPath = CODE + "/tools"
-    scratchPath = HOME + "/scratch"
-    iniFilePath = CODE + "/iniFiles"
-    programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/GNU-Linux-x86"
-    
-
-class misc:
-    QMC2programName = "nbqmc2"
-    
-
-class plot_tools:
+class dcv_plotter:
 	
-	def __init__(self, filename, path, dynamic=False):
+	figMap = {}
+	
+	def __init__(self, filepath, dynamic=False):
 		self.dynamic = dynamic
-		self.filepath = path + filename 
+		self.filepath = filepath 
 		self.file = open(self.filepath , "r")
 		
 		self.set_delay(5)
@@ -52,6 +42,24 @@ class plot_tools:
 		
 		return tuple(output)
 		
+	def set_figures(self):
+		
+		s = ""
+		i = 0
+		for fig in self.figMap.keys():
+			s += "self.%s = plab.figure(%d); " % (fig, self.i)
+			s += "self.i%s = self.add_figure(self.%s); " % (fig, fig)
+		
+			subFigs = self.figMap[fig]
+			nFigs = len(subFigs)
+			
+			for j in range(nFigs):
+				s += "self.%s = self.%s.add_subplot(%d, 1, %d); " % (subFigs[j], fig, nFigs, j+1)
+				s += "self.add_subfigure(self.%s, self.i%s); " % (subFigs[j], fig)
+			
+			i += 1
+		exec(s)
+		#print s.replace("; ", "\n")				
 
 	def mainloop(self):
 		
@@ -72,7 +80,11 @@ class plot_tools:
 			data = self.get_data()
 	
 			self.plot(data)
-			self.show()
+			try:
+				self.show()
+			except:
+				print "Windows closed prematurely. Ending..."
+				sys.exit(1)
 		
 			if self.dynamic:
 				
@@ -141,7 +153,7 @@ class plot_tools:
 		self.clear()
 		
 		for fig in self.figures:
-			fig[0].clf()
+			plab.close(fig[0])
 		
 		if not self.file.closed:
 			self.file.close()
@@ -149,57 +161,4 @@ class plot_tools:
 	def plot(self, data):
 		"I am virtual"
 	
-	def set_figures(self):
-		"I am virtual"
-		
-
-
-def add_date(filename):
-
-    #in case the file has e.g. a .txt, we want to sandwitch the date and not
-    #append it directly
-    fileEnding = ""
-    if len(filename.split('.')) > 1:   
-        fileEnding += "." + ".".join(filename.split('.')[1:])
-    
-    #asctime converts 'raw local time' to a more refined format.
-    date = time.asctime(time.localtime()).replace(' ','_')
-
-    originalFilename = filename.split('.')[0]
-
-
-    return originalFilename + date + fileEnding;
-    
-
-
-def main():
-    spacing = 20
-    print """
-#===========================================
-#Paths:
-#===========================================
-"""   
-    print "HOME:".ljust(spacing) + "%s" % paths.HOME 
-    print "CODE:".ljust(spacing) + "%s" % paths.CODE
-    print "IDEPath:".ljust(spacing) + "%s" % paths.IDEPath
-    print "toolsPath:".ljust(spacing) + "%s" % paths.toolsPath
-    print "scratchPath:".ljust(spacing) + "%s" % paths.scratchPath
-    print "iniFiles:".ljust(spacing) + "%s" % paths.iniFilePath
-    print "ProgramPath:".ljust(spacing) + "%s" % paths.programPath
-    
-    print """
-#==========================================
-# Misc:
-#==========================================
-"""
-    print "QMC2programName:".ljust(spacing) + "%s" % misc.QMC2programName
-    
-
-if __name__ == "__main__":   
-
-    if len(sys.argv) == 2:
-        if sys.argv[1] == "-set_tool_path":
-            sys.path.append(paths.toolsPath)
-            print "path set successfully"
-            
-    main()
+	
