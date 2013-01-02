@@ -144,17 +144,17 @@ dynamic = True
 #~ setting = "MIN"
 setting = "ALL"
 
+if setting == "MIN" or setting == "ALL":
+	fileName = "ASGD_out.dat"
+	plot_tool = MIN_OUT(fileName, path, dynamic)
+	
+	if setting == "ALL":
+		plot_tool.mainloop()
+
 if setting == "DMC" or setting == "ALL":
 	dt = 0.001
 	fileName = "DMC_out.dat"
 	plot_tool = DMC_OUT(fileName, path, dt, dynamic)
-	
-	if setting == "ALL":
-		plot_tool.mainloop()
-	
-if setting == "MIN" or setting == "ALL":
-	fileName = "ASGD_out.dat"
-	plot_tool = MIN_OUT(fileName, path, dynamic)
 	
 	if setting == "ALL":
 		plot_tool.mainloop()

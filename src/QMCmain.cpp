@@ -268,7 +268,7 @@ void parseCML(int argc, char** argv,
     //    outputParams.blocking_out = false;
     outputParams.dist_out = generalParams.doDMC & generalParams.doVMC;
     //NEW
-    outputParams.dmc_out = false;
+    outputParams.dmc_out = true;
     outputParams.ASGD_out = true;
     outputParams.outputSuffix = "";
     outputParams.outputPath = (std::string)"/home/jorgmeister/scratch/QMC_SCRATCH" + (std::string)"/";
@@ -304,7 +304,7 @@ void parseCML(int argc, char** argv,
     minimizerParams.n_walkers = 10;
     minimizerParams.thermalization = 10000;
     minimizerParams.n_cm = 1000;
-    minimizerParams.n_c_SGD = 10000;
+    minimizerParams.n_c_SGD = 5000;
     minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
     minimizerParams.beta = arma::zeros(1, 1) + 0.5;
 
