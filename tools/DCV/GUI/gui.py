@@ -26,6 +26,8 @@ else:
 class ThreadComm(QObject):
     stopSignal = Signal()
     plotSignal = Signal()
+    setFigureSignal = Signal()
+    beginSignal = Signal()
 
 class jobThread(QThread):
     def __init__(self, mode, parent=None):
@@ -35,14 +37,18 @@ class jobThread(QThread):
         
         self.comm = ThreadComm()
         self.comm.stopSignal.connect(self.stop)
+        self.comm.beginSignal.connect(self.begin)
         
     def run(self):
+        self.mode.canStart = False
         self.mode.stopped = False
         self.mode.mainloop()
             
     def stop(self):
         self.mode.stopped = True
-        
+    def begin(self):
+        self.mode.canStart = True
+    
 
 
 class DCVizPlotWindow(QMainWindow):
@@ -50,18 +56,41 @@ class DCVizPlotWindow(QMainWindow):
     def __init__(self, activeMode, parent = None):
         super(DCVizPlotWindow, self).__init__()
         
+        self.comm = ThreadComm()
+        self.comm.plotSignal.connect(self.displayPlots)
+        self.comm.setFigureSignal.connect(self.setFigures)
+        
         self.parent = parent
         self.activeMode = activeMode
         self.callStop = True
         self.setAttribute(Qt.WA_DeleteOnClose)
+
+    def displayPlots(self):
+  
+        for k in range(len(self.activeMode.figures)):
+            fig = self.activeMode.figures[k]
+            canvas = FigureCanvas(fig[0])
+            dockWidget = QDockWidget(self)
+            dockWidget.setWidget(canvas)
+         
+            self.addDockWidget(Qt.DockWidgetArea(1), dockWidget)
+
+        self.show()
+
+    def setFigures(self):
+        
+        self.activeMode.set_figures()
+        self.parent.job.comm.beginSignal.emit()
+        
+        
     
     def closeEvent(self, event):
    
         if self.activeMode.dynamic and self.parent is not None:
             if self.callStop:
                 self.parent.stop()
-        else:
-            self.activeMode.close()
+        
+        self.activeMode.close()
             
         QMainWindow.closeEvent(self, event)
 
@@ -73,7 +102,6 @@ class DCVizGUI(QMainWindow):
         super(DCVizGUI, self).__init__()
         
         self.comm = ThreadComm()
-        self.comm.plotSignal.connect(self.displayPlots)
         
         self.loadDefaults()
 
@@ -85,7 +113,9 @@ class DCVizGUI(QMainWindow):
         self.loadImages()
         
         self.activeMode = None
+        self.plotWin = None
         self.job = None
+        
         self.dynamic = False
         self.started = False
         
@@ -233,25 +263,15 @@ class DCVizGUI(QMainWindow):
             self.start()
             
     def resetPlotWindow(self):
-        try:
+        
+        if self.plotWin is not None:
             self.plotWin.close()
-        except:
-            pass
+        
 
         self.plotWin = DCVizPlotWindow(self.activeMode, self)
         self.plotWin.setWindowTitle("DCViz plots")
         
-    def displayPlots(self):
-  
-        for k in range(len(self.activeMode.figures)):
-            fig = self.activeMode.figures[k]
-            canvas = FigureCanvas(fig[0])
-            dockWidget = QDockWidget(self)
-            dockWidget.setWidget(canvas)
-         
-            self.plotWin.addDockWidget(Qt.DockWidgetArea(1), dockWidget)
-
-        self.plotWin.show()
+    
         
     def start(self):
             
@@ -261,20 +281,21 @@ class DCVizGUI(QMainWindow):
             self.raiseWarning("Select a data set.")
             return
         
+        
         if self.dynamic:
             self.startStopButton.setIcon(self.img["stop"])
             self.started = True
         
         self.activeMode.dynamic = self.dynamic
         self.activeMode.plotted = False
-            
-        self.job = jobThread(self.activeMode, self)
+        
+        self.resetPlotWindow()
+        self.job = jobThread(self.activeMode, self.plotWin)
             
         if not self.job.isRunning():
             self.terminalTracker("Job", "Starting.")
-            self.resetPlotWindow()
             self.job.start()
-            
+           
         else:
             print "BUG THREAD: This should never happen..."
     
@@ -297,9 +318,7 @@ class DCVizGUI(QMainWindow):
                 if i > 500:
                     print "TIMEOUT: Job didn't exit."
                     sys.exit(1)
-                    
-            
-            self.plotWin.close()
+                
             self.terminalTracker("Job", "Stopped.")
 
         else:

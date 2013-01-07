@@ -11,6 +11,8 @@ class DCVizPlotter:
     delay = 3
     parent = None
     
+    canStart = False
+    
     def __init__(self, filepath=None, dynamic=False, useGUI=False):
         self.dynamic = dynamic
         self.useGUI = useGUI
@@ -19,6 +21,8 @@ class DCVizPlotter:
         self.stopped = False
         self.SIGINT_CAPTURED = False
             
+        self.figures = []
+    
         self.filepath = filepath
         self.file = None
         
@@ -53,7 +57,9 @@ class DCVizPlotter:
             output.append(data[:,i])
         
         return tuple(output)
-        
+    
+    
+    
     def set_figures(self):
         
         s = ""
@@ -87,19 +93,33 @@ class DCVizPlotter:
                 sys.exit(1)
 
 
-        self.set_figures()
-        
+        if not self.useGUI:
+            self.set_figures()
+        else:
+            
+            self.parent.comm.setFigureSignal.emit()
+            
+            i = 0
+            while not self.canStart:
+                time.sleep(0.01)
+                i+=1
+                if i > 500:
+                    print "TIMEOUT: Figures wasn't set."
+                    sys.exit(1)
+
+                
         while (not self.stopped and not self.SIGINT_CAPTURED):
 
+            self.clear()
+
             if self.plotted:
-                self.clear()
                 print "Replotting..."
            
             data = self.get_data()
-    
             self.plot(data)
             
             if not self.useGUI:
+                
                 self.show()
             else:
                 if self.plotted and self.dynamic:
@@ -130,6 +150,7 @@ class DCVizPlotter:
         
         if not self.useGUI:
             self.close()
+        
             
             
     def load_sample(self):
@@ -172,6 +193,7 @@ class DCVizPlotter:
         for fig in self.figures:
             for subfig in fig[1:]:
                 subfig.clear()
+                subfig.axes.clear()
                 subfig.axes.legend_ = None
         
     def close(self):
@@ -180,8 +202,9 @@ class DCVizPlotter:
         for fig in self.figures:
             plab.close(fig[0])
         
-        if not self.file.closed:
-            self.file.close()
+        if self.file is not None:
+            if not self.file.closed:
+                self.file.close()
         
     def plot(self, data):
         "I am virtual"
