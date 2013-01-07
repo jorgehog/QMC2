@@ -1,39 +1,34 @@
 # -*- coding: utf-8 -*-
 
-import re, numpy, time, sys, threading, signal
+import re, numpy, time, sys, signal, os
 import mayavi.mlab as mlab
 import matplotlib.pylab as plab
 
-class dcv_plotter:
+
+class DCVizPlotter:
     
     figMap = {}
-    _stop = threading.Event()
-    delay = 5
+    delay = 3
+    parent = None
     
     def __init__(self, filepath=None, dynamic=False, useGUI=False):
         self.dynamic = dynamic
         self.useGUI = useGUI
         
-        self.figures = []
-        
-        #If run through GUI, run on separate thread
-        if not useGUI:
-            self.stopped = lambda : False
-        else:
-            self.stopped = lambda : self._stop.isSet()
+        self.plotted = False
+        self.stopped = False
+        self.SIGINT_CAPTURED = False
             
         self.filepath = filepath
         self.file = None
         
         signal.signal(signal.SIGINT, self.signal_handler)
     
+    
     def signal_handler(self, signal, frame):
-		print "Ending session..."
-		
-		if self.useGUI:
-			self._stop.set()
-		else:
-			self.stopped = lambda : True
+        print "Ending session..."
+        self.SIGINT_CAPTURED = True
+        
         
     def set_delay(self, t):
         if int(t) < 1:
@@ -43,7 +38,7 @@ class dcv_plotter:
         self.delay = t
     
     def __str__(self):
-        return ".".join(self.filepath.split("/")[-1].split(".")[0:-1])
+        return ".".join(os.path.split(self.filepath)[-1].split(".")[0:-1])
         
     def get_data(self):
     
@@ -63,6 +58,7 @@ class dcv_plotter:
         
         s = ""
         i = 0
+        self.figures = []
         for fig in self.figMap.keys():
             s += "self.%s = plab.figure(%d); " % (fig, i)
             s += "self.i%s = self.add_figure(self.%s); " % (fig, fig)
@@ -89,40 +85,51 @@ class dcv_plotter:
             light = self.load_sample()
             if light == 'red':
                 sys.exit(1)
-        
+
+
         self.set_figures()
         
-        while (not self.stopped()):
-            
+        while (not self.stopped and not self.SIGINT_CAPTURED):
+
+            if self.plotted:
+                self.clear()
+                print "Replotting..."
+           
             data = self.get_data()
     
-            try:
-                self.plot(data)
+            self.plot(data)
+            
+            if not self.useGUI:
                 self.show()
-            except:
-                self.figures = []
-                self.set_figures()
-                self.plot(data)
-                self.show()
-        
+            else:
+                if self.plotted and self.dynamic:
+                    try:
+                        self.show(drawOnly=True)
+                    except:
+                        #Exception needed in order for the thread to survive being closed by GUI
+                        pass
+                if not self.plotted:
+                    self.parent.comm.plotSignal.emit()
+                 
+                    
+            self.plotted = True
+                
             if self.dynamic:
                 for i in range(int(self.delay)):
                     time.sleep(1)
-                    if self.stopped():
+                    if self.stopped or self.SIGINT_CAPTURED:
                         break
 
                 time.sleep(self.delay - int(self.delay))
-                        
-                self.clear()
-                   
-                if not self.stopped():
-                    print "Replotting..."
                 
             else:
-                raw_input("Press any key to exit")
+                if not self.useGUI:
+                    raw_input("Press any key to exit")
                 break
                 
-        self.close()
+        
+        if not self.useGUI:
+            self.close()
             
             
     def load_sample(self):
@@ -155,18 +162,19 @@ class dcv_plotter:
         self.figures[i].append(subfig)
         return len(self.figures[i]) - 1
         
-    def show(self):
+    def show(self, drawOnly=False):
         for fig in self.figures:
             fig[0].canvas.draw()
-            fig[0].show()
+            if not drawOnly:
+                fig[0].show()
         
     def clear(self):
         for fig in self.figures:
             for subfig in fig[1:]:
                 subfig.clear()
+                subfig.axes.legend_ = None
         
     def close(self):
-        
         self.clear()
         
         for fig in self.figures:

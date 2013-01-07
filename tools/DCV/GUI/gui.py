@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from Tkinter import *
-import tkMessageBox
-import tkFileDialog
+from PySide.QtCore import *
+from PySide.QtGui import *
 
-import sys, os, re, threading, time
+import matplotlib
+matplotlib.use('Qt4Agg')
+matplotlib.rcParams['backend.qt4']='PySide'
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
+import sys, os, re, time
 
 from pyLibQMC import paths
 
@@ -19,340 +23,477 @@ if len(sys.argv) > 1:
 else:
     masterDir = paths.scratchPath
 
-class spawned_thread(threading.Thread):
-    def __init__(self, mode):
-        threading.Thread.__init__(self)
+class ThreadComm(QObject):
+    stopSignal = Signal()
+    plotSignal = Signal()
+
+class jobThread(QThread):
+    def __init__(self, mode, parent=None):
+        QThread.__init__(self, parent)
         self.mode = mode
+        self.mode.parent = parent
+        
+        self.comm = ThreadComm()
+        self.comm.stopSignal.connect(self.stop)
         
     def run(self):
+        self.mode.stopped = False
         self.mode.mainloop()
             
     def stop(self):
-        self.mode._stop.set()
+        self.mode.stopped = True
         
 
 
-
-class QMCGUI:
-
-    def __init__(self, root):
+class DCVizPlotWindow(QMainWindow):
+    
+    def __init__(self, activeMode, parent = None):
+        super(DCVizPlotWindow, self).__init__()
         
-        self.root = root
+        self.parent = parent
+        self.activeMode = activeMode
+        self.callStop = True
+        self.setAttribute(Qt.WA_DeleteOnClose)
+    
+    def closeEvent(self, event):
+   
+        if self.activeMode.dynamic and self.parent is not None:
+            if self.callStop:
+                self.parent.stop()
+        else:
+            self.activeMode.close()
+            
+        QMainWindow.closeEvent(self, event)
+
+
+class DCVizGUI(QMainWindow):
+
+    def __init__(self):
+        
+        super(DCVizGUI, self).__init__()
+        
+        self.comm = ThreadComm()
+        self.comm.plotSignal.connect(self.displayPlots)
+        
+        self.loadDefaults()
+
+        self.setupUI()
+        
+    def loadDefaults(self):
+         
         self.path = os.getcwd()
-        self.load_images()
+        self.loadImages()
         
-        self.active_mode = None
+        self.activeMode = None
         self.job = None
+        self.dynamic = False
+        self.started = False
         
         #Initial terminal output flag
-        self.hide_source = False
-        self.terminal_silence = False
-        self.warning_silence = False
-
-        self.load_ext()
+        self.hideSource = False
         
-        #~ Menu :::::::::::::::::::::::::::::::::::::::::::
-        menu = Menu(root)
-        root.config(menu=menu)
+        self.terminalSilence = False
+        self.warningSilence = False
 
-        filemenu = Menu(root)
-        optmenu = Menu(root)
-        menu.add_cascade(label="File", menu=filemenu)
-        menu.add_cascade(label="Options", menu=optmenu)
+        self.loadExtern()
+       
+    def setupUI(self):
+        
+        menubar = self.menuBar()
 
         #File menu
-        filemenu.add_command(label="Open...", command=self.openfile)
-        filemenu.add_command(label="Open path...", command=self.setpath)
-        filemenu.add_separator()
-        filemenu.add_command(label="Clear data", command=self.clean_modeselector)
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=root.destroy)
+        filemenu = menubar.addMenu('&File')
+
+        openAction = QAction('&Open', self)
+        openAction.setShortcut('Ctrl+O')
+        openAction.setStatusTip('Open single file')
+        openAction.triggered.connect(self.openfile)
+        filemenu.addAction(openAction)
+
+        pathAction = QAction('&Open path', self)
+        pathAction.setShortcut('Ctrl+S')
+        pathAction.setStatusTip('Open folder')
+        pathAction.triggered.connect(self.setpath)
+        filemenu.addAction(pathAction)
+
+        filemenu.addSeparator()
+
+        cleanAction = QAction("&Reset", self)
+        cleanAction.triggered.connect(self.resetModeSelector)
+        filemenu.addAction(cleanAction)
+        
+        filemenu.addSeparator()
+        
+        exitAction = QAction('&Exit', self)
+        exitAction.setShortcut('Esc')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(self.close)
+        filemenu.addAction(exitAction)
+
         
         #Options menu
-        optmenu.add_command(label="Display config", command=lambda : self.showInfo("Config", self.config))
-        optmenu.add_command(label="Reload config", command=self.load_ext)
+        optmenu = menubar.addMenu('&Options')
+
+        showConfigAction = QAction('&Display Config', self)
+        showConfigAction.setShortcut('Ctrl+C')
+        showConfigAction.triggered.connect(lambda : self.showInfo("Config", self.config))
+        optmenu.addAction(showConfigAction)
+
+        reloadConfigAction = QAction('&Reload Config', self)
+        reloadConfigAction.setShortcut('Ctrl+R')
+        reloadConfigAction.triggered.connect(self.loadExtern)
+        optmenu.addAction(reloadConfigAction)
         #::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        #  StartButton ::::::::::::::::::::::::::::::::::::
+        self.startStopButton = QPushButton(self)
+        self.startStopButton.setIcon(self.img["play"])
+        self.startStopButton.clicked.connect(self.startOrStop)
+        self.startStopButton.setFlat(True)
+        #::::::::::::::::::::::::::::::::::::::::::::::::::
+    
+        #  DynamicCheckBox ::::::::::::::::::::::::::::::::
+        self.dynamicCheckBox = QCheckBox("Real-time", self)
+        self.dynamicCheckBox.stateChanged.connect(self.flipDynamic)
+        #::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+        #  Mode selection dropdown menu :::::::::::::::::::
+        self.modeSelector = QComboBox(self)
+        self.resetModeSelector()
+        #::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+        #  Refresh timer ::::::::::::::::::::::::::::::::::
+        self.dtSlider = QSlider(Qt.Horizontal, self)
+        self.dtSlider.setMinimum(0) 
+        self.dtSlider.setMaximum(100)
+        self.dtSlider.valueChanged.connect(lambda : self.updateDt(False))
+        self.dtSlider.sliderReleased.connect(lambda : self.updateDt(True))
+       
         
-        #~ StartButton ::::::::::::::::::::::::::::::::::::
-        self.start_button = Button(root, image=self.img["play"], command=self.start, relief=FLAT, height=50, width=50)
-        #::::::::::::::::::::::::::::::::::::::::::::::::::
+        self.sliderUnit = QLabel("<font size=4>[s]</font>", self)
         
-        #~ DynamicCheckBox ::::::::::::::::::::::::::::::::
-        self.dynamic = BooleanVar()
-        self.dynamicCheckBox = Checkbutton(root, text="Dynamic", variable=self.dynamic, command=self.change_dynamic_state)
+        self.sliderDisplay = QLineEdit(self)
+        self.sliderDisplay.setReadOnly(True)
+
+        #Init values
+        self.dtSlider.setValue(self.refreshDtConfig*10)
+        if (int(self.refreshDtConfig) - self.refreshDtConfig) == 0:
+            initVal = str(int(self.refreshDtConfig))
+        else:
+            initVal = str(self.refreshDtConfig)
+
+        #init as disabled
+        self.dtSlider.setEnabled(False)
+        self.sliderDisplay.setEnabled(False)
+        self.sliderUnit.setEnabled(False)
         #::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+        #  GUI Setup ::::::::::::::::::::::::::::::::::::::
+        initPos = (300, 300)
+        size = (300, 150)
+        buttonSize = QSize(50,50)
         
-        #~ Mode selection dropdown menu :::::::::::::::::::
-        self.mode = StringVar()
-        self.mode.set("No data...")
-        self.modeMap = {"" : "No data..."}
-        self.modeSelector = OptionMenu(root, self.mode, *self.modeMap.values())
-        self.modeSelector.config(width=9)
-        self.modeMap = {}
-        #::::::::::::::::::::::::::::::::::::::::::::::::::
+        self.setGeometry(*(initPos+size))
+ 
         
-        #~ Refresh timer ::::::::::::::::::::::::::::::::::
-        self.timer_text = Label(root, text="Refresh dt [s]:")
-        self.refresh_dt = StringVar(value=str(self.refresh_dt_config))
-        self.timer_field = Entry(root, textvariable=self.refresh_dt, width=10)
-        self.timer_field.bind("<Return>", self.update_dt)
-        #::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        self.startStopButton.resize(buttonSize)
+        self.startStopButton.setIconSize(buttonSize)
+        self.startStopButton.move(30,40)
+
+
+        self.modeSelector.resize(QSize(165,25))
+        self.modeSelector.move(110,53)
+
+
+        self.dynamicCheckBox.move(20, size[1] - 50)
+
+
+        self.dtSlider.resize(QSize(size[0]-50, 20))
+        self.dtSlider.move(0, size[1]-20)
         
-        #~ grid Setup :::::::::::::::::::::::::::::::::::::
-        self.start_button.grid(row=0, column=0, sticky=E + W + N + S)
-        self.dynamicCheckBox.grid(row=1,column=0, sticky=E)
-        self.modeSelector.grid(row=0, column=1, columnspan=3, sticky = E + W)
-        self.timer_text.grid(row=2, column=0, sticky=W)
-        self.timer_field.grid(row=2, column=2, sticky = W)
-        #::::::::::::::::::::::::::::::::::::::::::::::::::
+        self.sliderDisplay.resize(QSize(25, 20))
+        self.sliderDisplay.move(size[0]-45, size[1]-20)
         
-        #~ Initial states :::::::::::::::::::::::::::::::::
-        self.start_button['state'] = DISABLED
-        self.modeSelector['state'] = DISABLED
-        self.timer_text['state'] = DISABLED
-        self.timer_field['state'] = DISABLED
-        #::::::::::::::::::::::::::::::::::::::::::::::::::
+        self.sliderUnit.resize(QSize(20, 15))
+        self.sliderUnit.move(size[0]-18, size[1]-19)
+
+        self.show()
+        #::::::::::::::::::::::::::::::::::::::::::::::::::   
+        
+    def startOrStop(self):
+        
+        if self.started:
+            self.stop()
+        else:
+            self.start()
+            
+    def resetPlotWindow(self):
+        try:
+            self.plotWin.close()
+        except:
+            pass
+
+        self.plotWin = DCVizPlotWindow(self.activeMode, self)
+        self.plotWin.setWindowTitle("DCViz plots")
+        
+    def displayPlots(self):
+  
+        for k in range(len(self.activeMode.figures)):
+            fig = self.activeMode.figures[k]
+            canvas = FigureCanvas(fig[0])
+            dockWidget = QDockWidget(self)
+            dockWidget.setWidget(canvas)
+         
+            self.plotWin.addDockWidget(Qt.DockWidgetArea(1), dockWidget)
+
+        self.plotWin.show()
         
     def start(self):
             
         try:
-            self.active_mode = self.modeMap[self.mode.get()]
+            self.activeMode = self.modeMap[self.modeSelector.currentText()]
         except:
             self.raiseWarning("Select a data set.")
             return
         
-        self.active_mode.dynamic = self.dynamic.get()
-        if self.active_mode.dynamic:
-            self.start_button.configure(image=self.img["stop"], command=self.stop, relief=FLAT)
-            self.modeSelector['state'] = DISABLED
+        if self.dynamic:
+            self.startStopButton.setIcon(self.img["stop"])
+            self.started = True
+        
+        self.activeMode.dynamic = self.dynamic
+        self.activeMode.plotted = False
             
-        self.job = spawned_thread(self.active_mode)
-        self.job.setDaemon(True)
+        self.job = jobThread(self.activeMode, self)
             
-        if not self.job.is_alive():
-            self.terminal_tracker("Job", "Starting.")
+        if not self.job.isRunning():
+            self.terminalTracker("Job", "Starting.")
+            self.resetPlotWindow()
             self.job.start()
+            
         else:
             print "BUG THREAD: This should never happen..."
     
         
     def stop(self):
         
-        if self.job.is_alive():
-
-            self.terminal_tracker("Job", "Stoping... ", hold="on")
-            self.job.stop()
-            self.job.join()
+        self.startStopButton.setIcon(self.img["play"])
+        self.started = False
+        
+        if self.job.isRunning():
+        
+            self.terminalTracker("Job", "Stoping... ", hold="on")
+            self.job.comm.stopSignal.emit()
+            self.plotWin.callStop = False
             
-            self.terminal_tracker("Job", "Stopped.")
+            i=0
+            while self.job.isRunning():
+                time.sleep(0.01)
+                i+=1
+                if i > 500:
+                    print "TIMEOUT: Job didn't exit."
+                    sys.exit(1)
+                    
+            
+            self.plotWin.close()
+            self.terminalTracker("Job", "Stopped.")
 
         else:
             print "BUG THREAD: This should never happen..."
-            
-        self.start_button.configure(image=self.img["play"], command=self.start, state=ACTIVE, relief=FLAT)
-        self.modeSelector['state'] = ACTIVE
+
 
     def openfile(self):
         
-        filename = tkFileDialog.askopenfilename(title="Choose file to display", initialdir=masterDir)
+        filename, _ = QFileDialog.getOpenFileName(self, \
+                                    'Choose file to display', masterDir)
 
         if not filename:
             return
         
-        self.detect_modetype(filename)
-        self.update_modeselector()
+        self.detectModetype(filename)
+        self.updateModeSelector()
         
     def setpath(self):
 
-        self.path = tkFileDialog.askdirectory(title="Choose path ...", initialdir=masterDir)
-    
+        self.path = QFileDialog.getExistingDirectory(self, \
+                                    'Choose path...', masterDir)
         if not self.path:
             return
         
-        for content in os.listdir(self.path):
-            filename = self.path + "/" + content
-            self.detect_modetype(filename)
+        for content in [os.path.join(self.path, filename) for filename in os.listdir(self.path)]:
+            if os.path.isfile(content):
+                self.detectModetype(content)
 
-        self.update_modeselector()
+        self.updateModeSelector()
         
-    def detect_modetype(self, filename):
+    def detectModetype(self, filename):
 
         s = 20
 
-        for mode in self.unique_modes:
+        for mode in self.uniqueModes:
             if re.findall(mode.nametag, filename):
                 
-                self.terminal_tracker("Detector", "matched [%s] with [%s]" %  \
-                                          (filename.split("/")[-1].center(s), \
-                                               self.unique_modes_names[self.unique_modes.index(mode)].center(s)))
-                
+                self.terminalTracker("Detector", "matched [%s] with [%s]" %  \
+                          (os.path.split(filename)[-1].center(s), \
+                            self.uniqueModesNames[self.uniqueModes.index(mode)].center(s)))
+                            
                 args = [filename]
                 mode = mode(*args, useGUI=True)
-                mode.filepath = filename
                 
-                if self.check_consistency_fail(mode):
+                if self.checkConsistency(mode):
                     self.raiseWarning("Similar dataset previously selected: " + str(mode))
-                    break
+                    return
                 
                 self.modeMap[str(mode)] = mode
-                break
+                return
+                
+        self.terminalTracker("Detector", "Unable to fetch data from %s" % os.path.split(filename)[-1])
 
-    def check_consistency_fail(self, mode):
+    def checkConsistency(self, mode):
         return str(mode) in self.modeMap.keys()
 
-    def load_ext(self, onlyConfig=False):
+    def loadExtern(self, onlyConfig=False):
 
         config = open("config.txt", 'r')
         self.config = config.read()
         config.close()
 
-        self.refresh_dt_raw = re.findall(r"dynamic refresh interval \[seconds\]\s*=\s*(\d+\.?\d*)", self.config)[0]
-        self.refresh_dt_config = float(self.refresh_dt_raw)
-        self.terminal_silence = not bool(int(re.findall("terminal tracker\s*=\s*([01])", self.config)[0]))
-        self.warning_silence = not bool(int(re.findall("warnings on\s*=\s*([01])", self.config)[0]))
+        self.refreshedDt = re.findall(r"dynamic refresh interval \[seconds\]\s*=\s*(\d+\.?\d*)", self.config)[0]
+        self.refreshDtConfig = float(self.refreshedDt)
+        self.terminalSilence = not bool(int(re.findall("terminal tracker\s*=\s*([01])", self.config)[0]))
+        self.warningSilence = not bool(int(re.findall("warnings on\s*=\s*([01])", self.config)[0]))
 
         if not onlyConfig: 
-            self.autodetect_modes()
+            self.autodetectModes()
             
-
         #Static overriding
-        for mode in self.unique_modes:
-            mode.delay = self.refresh_dt_config
+        for mode in self.uniqueModes:
+            mode.delay = self.refreshDtConfig
         
         
+    def flipDynamic(self):
+        self.dynamic = not self.dynamic
+        self.dtSlider.setEnabled(self.dynamic)
+        self.sliderDisplay.setEnabled(self.dynamic)
+        self.sliderUnit.setEnabled(self.dynamic)  
+
+
+    def updateDt(self, updateConfig):
+
+        newDt = self.dtSlider.value()/10.
+        self.sliderDisplay.clear()
         
-
-
-    def update_dt(self, event):
-
-        new_dt = self.refresh_dt.get()
-        if float(new_dt) < 0:
-            self.raiseWarning("Illeagal refresh interval. Choose one > 1")
+        if (int(newDt) - newDt) == 0:
+            newDt = int(newDt)
+            
+        self.sliderDisplay.insert(str(newDt))
+  
+        
+        if not updateConfig:
             return
-
+        
         config = open("config.txt", 'w')
         for line in self.config.split("\n"):
             if line.startswith("dynamic refresh interval [seconds]"):
-                config.write(self.config.replace(line, line.replace(self.refresh_dt_raw, new_dt)))
+                config.write(self.config.replace(line, line.replace(self.refreshedDt, str(newDt))))
                 config.close()
-                self.load_ext(onlyConfig=True)
+                self.loadExtern(True)
                 return
-
         
 
-    def autodetect_modes(self):
+    def autodetectModes(self):
         classfile = open('../src/classes.py', 'r')
         raw = classfile.read()
         classfile.close()
 
-        self.unique_modes_names = re.findall('^class (\w+)\(dcv_plotter\):', raw, re.MULTILINE)
-        self.unique_modes = [eval(subclass) for subclass in self.unique_modes_names]
+        self.uniqueModesNames = re.findall('^class (\w+)\(DCVizPlotter\):', raw, re.MULTILINE)
+        self.uniqueModes = [eval(subclass) for subclass in self.uniqueModesNames]
         
-        self.terminal_tracker("Detector", "Found subclasses %s" \
-                                % str(self.unique_modes_names).strip("]").strip("["))
+        self.terminalTracker("Detector", "Found subclasses %s" \
+                                % str(self.uniqueModesNames).strip("]").strip("["))
         
-        if not self.unique_modes_names:
+        if not self.uniqueModesNames:
             self.raiseWarning("No subclass implementations found.")
 
-        for mode in self.unique_modes:
+        for mode in self.uniqueModes:
             instance = mode()
             try:
                 nametag = instance.nametag
             except:
                 self.raiseWarning("Subclass %s has no attribute 'nametag' (output filename identifier)." % \
-                                  self.unique_modes_names[self.unique_modes.index(mode)])
+                                  self.uniqueModesNames[self.uniqueModes.index(mode)])
         
     
-    def update_modeselector(self, silent=False):
-
-        self.modeSelector['menu'].delete(0,END)
+    def updateModeSelector(self, silent=False):
 
         if not self.modeMap:
-
-            if not silent:
-                self.raiseWarning("Unable to fetch seleceted data")
-            self.mode.set("No data...")
-            self.start_button['state'] = DISABLED
-            self.modeSelector['state'] = DISABLED
-
             return
-
-
-        for key in self.modeMap.keys():
-            self.modeSelector['menu'].add_command(label=key, \
-                                                  command=lambda temp = self.modeMap[key]: \
-                                                  self.modeSelector.setvar(self.modeSelector.cget("textvariable"), \
-                                                                           value = temp))
         
-        self.start_button['state'] = ACTIVE
-        self.modeSelector['state'] = ACTIVE
-        self.mode.set("Select data...")
+        self.modeSelector.clear()
+        self.modeSelector.addItems(["Select data..."] + self.modeMap.keys())
+        self.modeSelector.model().setData(self.modeSelector.model().index(0,0), Qt.NoItemFlags, Qt.UserRole - 1)
+        self.modeSelector.setEnabled(True)
+        
 
-    def clean_modeselector(self):
-        self.modeMap = {}
-        self.update_modeselector(silent=True)
-        self.terminal_tracker("GUI", "Cleaned loaded data.")
+    def resetModeSelector(self):
+        self.modeMap = {}   
+        self.modeSelector.clear()
+        self.terminalTracker("GUI", "Data reset.")
+        self.modeSelector.addItem("No data")
+        self.modeSelector.setEnabled(False)
 
-    def change_dynamic_state(self):
-
-        if self.dynamic.get():
-            self.timer_text['state'] = ACTIVE
-            self.timer_field['state'] = NORMAL
-        else:
-            self.timer_text['state'] = DISABLED
-            self.timer_field['state'] = DISABLED
 
     def raiseWarning(self, s):
 
-        self.terminal_tracker("Warning", s)
+        self.terminalTracker("Warning", s)
         
-        if self.warning_silence:
+        if self.warningSilence:
             return
         
-        tkMessageBox.showwarning(
-                    "QMC GUI",
-                    s
-        )
+        QMessageBox.warning(None, "DCViz GUI", s, QMessageBox.Ok)
 
     def showInfo(self, h, s):
-        tkMessageBox.showinfo(h, s)
+        self.terminalTracker("Info(%s)" % h, "\n" + s + "\n")
+        QMessageBox.information(None, h, s, QMessageBox.Ok)
         
         
-    def terminal_tracker(self, source, message, hold='off'):
-        if self.terminal_silence:
+    def terminalTracker(self, source, message, hold='off'):
+        if self.terminalSilence:
             return
 
         s = 10
 
         if hold=='on':
-            self.hide_source = True
+            self.hideSource = True
             print "[%s]:  %s" % (source.center(s), message),
         elif hold=='off':
-            if not self.hide_source:
+            if not self.hideSource:
                 print "[%s]: " % source.center(s),
             print message
-            self.hide_source = False
+            self.hideSource = False
         else:
             print "Error: hold=%s is not a leagal value." % hold
         
-    def load_images(self):
-        
-        play = PhotoImage(file='Images/play.gif')
-        stop = PhotoImage(file='Images/stop.gif')
-        
+    def loadImages(self):
         self.img = {}
-        self.img['play'] = play
-        self.img['stop'] = stop
+        self.img['play'] = QIcon('Images/play.gif')
+        self.img['stop'] = QIcon('Images/stop.gif')
 
 def main():
-    
-    root = Tk()
-    root.title(string="QMC GUI")
-    root.wm_iconbitmap('@Images/QMC.xbm')
-    
-    master = QMCGUI(root)
+    "python gui.py 2> /dev/null"
 
-    root.mainloop()
+    app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create("Cleanlooks"))
+    #app.setWindowIcon(QIcon("Images/QMC.ico"))
+                            
+    win = DCVizGUI()
+    win.setWindowTitle('DCViz GUI')
+    
+    sys.exit(app.exec_())
 
 
 
