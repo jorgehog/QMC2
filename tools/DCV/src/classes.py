@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import numpy
+try:
+    import numpy
+except:
+    print "\n"
+    print "You need numpy in order to run this library!"
+    print "sudo apt-get install python-numpy-dev"
+    print "\n" 
+    sys.exit(1)
+
 import time, sys, re, os, inspect
 
 

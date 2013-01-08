@@ -8,27 +8,33 @@ It is designed to work, not be pretty. And speaking of which, this is how it wor
              after the given time.
 --not real time: Data is plotted!
 
+### Example
+    An example is located in the Example folder! Simply run 'Example.py' to generate 3 testcases and load the GUI.
+    Press 'ctrl+s' and open the folder that pops up (the example folder). Choose a case from the dropdown and press play.
+
 ### Usage
 
--I have a file containing columndata called 'OUT2.dat', and I want to plot it!
+First of all, check the example
 
-Howto: create a subclass 'dcv_sup', with nametag set as 'OUT\d\.dat' (regex) and it will be recognized, so:
+-I have a file containing columndata called 'testcase2.dat', and I want to plot it!
+
+Howto: create a subclass 'DCvizPlotter', with nametag set as 'testcase\d\.dat' (regex) and it will be recognized, so:
 
        def myNewClass(dcv_sup):
-           nametag = 'OUT\d\.dat'
+           nametag = 'testcase\d\.dat'
 
-       set a 'figureMap', a python dictionary, on how you want figures and subfigures set up, e.g.
+       set a 'figMap', a python dictionary, on how you want figures and subfigures set up, e.g.
        
        def myNewClass(dcv_sup):
            nametag = 'OUT\d\.dat'
-           figureMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
+           figMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
            
        
        you will then have access to 'self.fig1', self.subfig1 etc. when you implement the virtual 
        plot function:
        
        def myNewClass(dcv_sup):
-           nametag = 'OUT\d\.dat'
+           nametag = 'testcase\d\.dat'
            figureMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
            
            

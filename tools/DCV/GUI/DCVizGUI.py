@@ -1,14 +1,28 @@
 # -*- coding: utf-8 -*-
 
-from PySide.QtCore import *
-from PySide.QtGui import *
+import sys, os, re, time, inspect
 
-import matplotlib
+try:
+    from PySide.QtCore import *
+    from PySide.QtGui import *
+except:
+    print "\n"
+    print "You need pyside in order to run the GUI!"
+    print "sudo apt-get install pyside-tools"
+    print "\n"
+    sys.exit(1)
+try:
+    import matplotlib
+except:
+    print "\n"
+    print "You need matplotlib in order to run this library!"
+    print "sudo apt-get install python-matplotlib"
+    print "\n" 
+    sys.exit(1)
+
 matplotlib.use('Qt4Agg')
 matplotlib.rcParams['backend.qt4']='PySide'
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
-import sys, os, re, time, inspect
 
 #Adding the srcDir to the local pythonpath in order to avoid global pythonpath sets
 thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -202,7 +216,7 @@ class DCVizGUI(QMainWindow):
         self.dtSlider.sliderReleased.connect(lambda : self.updateDt(True))
        
         
-        self.sliderUnit = QLabel("<font size=4>[s]</font>", self)
+        self.sliderUnit = QLabel("<font size=3>s</font>", self)
         
         self.sliderDisplay = QLineEdit(self)
         self.sliderDisplay.setReadOnly(True)
@@ -213,7 +227,9 @@ class DCVizGUI(QMainWindow):
             initVal = str(int(self.refreshDtConfig))
         else:
             initVal = str(self.refreshDtConfig)
+        self.sliderDisplay.clear()
 	self.sliderDisplay.insert(str(initVal))
+
         #init as disabled
         self.dtSlider.setEnabled(False)
         self.sliderDisplay.setEnabled(False)
@@ -242,14 +258,14 @@ class DCVizGUI(QMainWindow):
         self.dynamicCheckBox.move(20, size[1] - 50)
 
 
-        self.dtSlider.resize(QSize(size[0]-50, 20))
+        self.dtSlider.resize(QSize(size[0]-55, 20))
         self.dtSlider.move(0, size[1]-20)
         
-        self.sliderDisplay.resize(QSize(25, 20))
-        self.sliderDisplay.move(size[0]-45, size[1]-20)
+        self.sliderDisplay.resize(QSize(30, 20))
+        self.sliderDisplay.move(size[0]-52, size[1]-20)
         
         self.sliderUnit.resize(QSize(20, 15))
-        self.sliderUnit.move(size[0]-18, size[1]-19)
+        self.sliderUnit.move(size[0]-20, size[1]-18)
 
         self.show()
         #::::::::::::::::::::::::::::::::::::::::::::::::::   

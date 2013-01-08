@@ -1,3 +1,3 @@
-dynamic refresh interval [seconds] = 0
+dynamic refresh interval [seconds] = 2.4
 terminal tracker = 1
 warnings on = 1
