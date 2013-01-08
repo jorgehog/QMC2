@@ -213,7 +213,7 @@ class DCVizGUI(QMainWindow):
             initVal = str(int(self.refreshDtConfig))
         else:
             initVal = str(self.refreshDtConfig)
-
+	self.sliderDisplay.insert(str(initVal))
         #init as disabled
         self.dtSlider.setEnabled(False)
         self.sliderDisplay.setEnabled(False)
@@ -376,7 +376,7 @@ class DCVizGUI(QMainWindow):
         return str(mode) in self.modeMap.keys()
 
     def loadExtern(self, onlyConfig=False):
-        print thisDir
+        
         config = open(os.path.join(thisDir,"config.txt"), 'r')
         self.config = config.read()
         config.close()
@@ -388,8 +388,6 @@ class DCVizGUI(QMainWindow):
 
         if not onlyConfig: 
             self.autodetectModes()
-        else:
-            self.dtSlider.setValue(self.refreshDtConfig*10)
             
         #Static overriding
         for mode in self.uniqueModes:
@@ -417,7 +415,7 @@ class DCVizGUI(QMainWindow):
         if not updateConfig:
             return
         
-        config = open("config.txt", 'w')
+        config = open(os.path.join(thisDir,"config.txt"), 'w')
         for line in self.config.split("\n"):
             if line.startswith("dynamic refresh interval [seconds]"):
                 config.write(self.config.replace(line, line.replace(self.refreshedDt, str(newDt))))

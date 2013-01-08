@@ -3,6 +3,9 @@
 import numpy
 import time, sys, re, os, inspect
 
+
+from random import choice
+
 import matplotlib.pylab as plab
 from matplotlib import rc
 
@@ -16,6 +19,25 @@ from dcv_sup import DCVizPlotter
 rc('text', usetex=True)
 rc('font', family='serif')
 
+
+class myTestClass(DCVizPlotter):
+	nametag =  'testcase\d\.dat' #filename with regex support
+	
+	#1 figure with 2 subfigures and another figure with only one.
+	figMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3']}
+	
+	def plot(self, data):
+		
+		column1, column2, column3 = data
+		fig1, subfig1, subfig2, fig2, subfig3 = \
+				self.fig1, self.subfig1, self.subfig2, self.fig2, self.subfig3
+		
+		c = ['r', 'g', 'b']
+		subfig1.plot(column1, choice(c))
+		subfig2.plot(column2, choice(c))
+		subfig3.plot(column3, choice(c))
+		subfig3.set_title('I have $\LaTeX$ support!')
+		
 
 class DMC_OUT(DCVizPlotter):
     

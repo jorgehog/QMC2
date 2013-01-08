@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import re, numpy, time, sys, signal, os
-import mayavi.mlab as mlab
 import matplotlib.pylab as plab
 
 
