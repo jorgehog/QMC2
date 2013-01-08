@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import numpy
-import time, sys, re, os
+import time, sys, re, os, inspect
 
 import matplotlib.pylab as plab
 from matplotlib import rc
 
 #~ Paths include
-from pyLibQMC import paths
-
-sys.path.append(os.path.join(paths.toolsPath, "DCV", "src"))
+classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+sys.path.append(classes_thisDir)
 
 from dcv_sup import DCVizPlotter
 
@@ -20,7 +19,7 @@ rc('font', family='serif')
 
 class DMC_OUT(DCVizPlotter):
     
-    nametag = "DMC_out.dat"
+    nametag = "DMC_out\.dat"
     figMap = {"Fig": ["N_plot", "E_plot"]}
     dt = 0.001
         
@@ -55,7 +54,7 @@ class DMC_OUT(DCVizPlotter):
         
 class MIN_OUT(DCVizPlotter):
     
-    nametag = "ASGD_out.dat"
+    nametag = "ASGD_out\.dat"
     figMap = {"E_fig"    : ["E_plot"], 
               "step_fig" : ["step_plot"],
               "param_fig": ["param_plot", "grad_plot"]}
@@ -106,8 +105,9 @@ class MIN_OUT(DCVizPlotter):
             
             
         
-def testbed(dynamic):
+def testbedJorgen(dynamic):
     
+    from pyLibQMC import paths
     path = os.path.join(paths.scratchPath, "QMC_SCRATCH")
 
     setting = "ALL"
@@ -135,6 +135,6 @@ def testbed(dynamic):
         
 if __name__ == "__main__":
     print "Dynamic = FALSE"
-    testbed(False)
+    testbedJorgen(False)
     print "Dynamic = TRUE"
-    testbed(True)
+    testbedJorgen(True)
