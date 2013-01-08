@@ -91,6 +91,7 @@ class DCVizPlotWindow(QMainWindow):
                 self.parent.stop()
         
         self.activeMode.close()
+        self.parent.plotWinClosed = True
             
         QMainWindow.closeEvent(self, event)
 
@@ -118,6 +119,7 @@ class DCVizGUI(QMainWindow):
         
         self.dynamic = False
         self.started = False
+        self.plotWinClosed = True
         
         #Initial terminal output flag
         self.hideSource = False
@@ -264,12 +266,13 @@ class DCVizGUI(QMainWindow):
             
     def resetPlotWindow(self):
         
-        if self.plotWin is not None:
+        if not self.plotWinClosed:
             self.plotWin.close()
         
 
         self.plotWin = DCVizPlotWindow(self.activeMode, self)
         self.plotWin.setWindowTitle("DCViz plots")
+        self.plotWinClosed = False
         
     
         

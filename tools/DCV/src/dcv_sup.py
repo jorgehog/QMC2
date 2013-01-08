@@ -113,7 +113,10 @@ class DCVizPlotter:
             self.clear()
 
             if self.plotted:
-                print "Replotting..."
+                if self.useGUI:
+                    self.parent.parent.terminalTracker("DCViz", "Replotting...")
+                else:
+                    print "Replotting..."
            
             data = self.get_data()
             self.plot(data)
