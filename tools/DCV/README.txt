@@ -32,24 +32,24 @@ Howto: create a subclass 'dcv_sup', with nametag set as 'OUT\d\.dat' (regex) and
            figureMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
            
            
-		   def plot(self):
-		       
-		       fig1, subfig1 = self.fig1, self.subfig1
-		       
-		       #Do all the plotting in the world to make your plots look nice.
-		       
-		This function should work without a GUI, so simply test it by running
-		
-		c = myNewClass(somePathToTheFile, dynamic = True/False) #OUT2.dat file
-		c.mainloop() #If dynamic is set true, you interrupt the loop with ctrl+c
-		
-		
-		
-		
+           def plot(self):
+               
+               fig1, subfig1 = self.fig1, self.subfig1
+               
+               #Do all the plotting in the world to make your plots look nice.
+               
+        This function should work without a GUI, so simply test it by running
+        
+        c = myNewClass(somePathToTheFile, dynamic = True/False) #OUT2.dat file
+        c.mainloop() #If dynamic is set true, you interrupt the loop with ctrl+c
+        
+        
+        
+        
 Ok I have done so, now I want to use the GUI!
 
 
-	Allright, you can start the DCVizGUI.main(masterDir) function with a chosen masterDir
+    Allright, you can start the DCVizGUI.main(masterDir) function with a chosen masterDir
     (the place all your open dialoges windows will 'look first'. Typically you run folder)
     
     hotkeys (also aviable from file/options menu):
@@ -71,13 +71,13 @@ Ok I have done so, now I want to use the GUI!
      
 Ok I loaded some files, what now?
 
-	The dropdown menu should be selectable; choose your file and press play!
-	The rest should be intuitive!
-	
+    The dropdown menu should be selectable; choose your file and press play!
+    The rest should be intuitive!
+    
 
 Cheers!
     
-		
-		
+        
+        
        
 
