@@ -1,11 +1,10 @@
 ### DCViz (with lazers) ###
 
-... is a library developed by the wizard jorgen, written in horrible Python.
+... is a library developed by the wizard jorgen, written in Python using matplotlib and pyside (Qt).
 It is designed to work, not be pretty. And speaking of which, this is how it works:
 
--Plots column data in matplotlib either
---real time: Given a delay interval [0,10], data is replotted in the same windows
-             after the given time.
+-Plots column data either
+--real time: Updates the plotwindow after a set refresh interval
 --not real time: Data is plotted!
 
 ### Example
@@ -14,39 +13,40 @@ It is designed to work, not be pretty. And speaking of which, this is how it wor
 
 ### Usage
 
-First of all, check the example
+First of all, check the examplefiles
 
 -I have a file containing columndata called 'testcase2.dat', and I want to plot it!
 
-Howto: create a subclass 'DCvizPlotter', with nametag set as 'testcase\d\.dat' (regex) and it will be recognized, so:
+Howto: create a subclass of 'DCvizPlotter', with nametag set as 'testcase\d\.dat' (regex). Opened files will be set as instances of classes with a matching nametag, so:
 
-       def myNewClass(dcv_sup):
-           nametag = 'testcase\d\.dat'
+           def myNewClass(dcv_sup):
+               nametag = 'testcase\d\.dat'
 
-       set a 'figMap', a python dictionary, on how you want figures and subfigures set up, e.g.
+       set a 'figMap' dictionary, representing how you want figures and subfigures set up, e.g.
        
-       def myNewClass(dcv_sup):
-           nametag = 'OUT\d\.dat'
-           figMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
+           def myNewClass(dcv_sup):
+               nametag = 'testcase\d\.dat'
+               figMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
            
        
        you will then have access to 'self.fig1', self.subfig1 etc. when you implement the virtual 
        plot function:
        
-       def myNewClass(dcv_sup):
-           nametag = 'testcase\d\.dat'
-           figureMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
+           def myNewClass(dcv_sup):
+               nametag = 'testcase\d\.dat'
+               figureMap = {'fig1': ['subfig1', 'subfig2'], 'fig2': ['subfig3'] ....}
            
            
-           def plot(self):
+               def plot(self):
+                
+                   fig1, subfig1, ... = self.fig1, self.subfig1, ...
                
-               fig1, subfig1 = self.fig1, self.subfig1
+                   #Do all the plotting in the world to make your plots look nice.
                
-               #Do all the plotting in the world to make your plots look nice.
-               
+
         This function should work without a GUI, so simply test it by running
         
-        c = myNewClass(somePathToTheFile, dynamic = True/False) #OUT2.dat file
+        c = myNewClass(somePathToTheFile, dynamic = True/False) #testcase2.dat file
         c.mainloop() #If dynamic is set true, you interrupt the loop with ctrl+c
         
         
@@ -55,10 +55,10 @@ Howto: create a subclass 'DCvizPlotter', with nametag set as 'testcase\d\.dat' (
 Ok I have done so, now I want to use the GUI!
 
 
-    Allright, you can start the DCVizGUI.main(masterDir) function with a chosen masterDir
-    (the place all your open dialoges windows will 'look first'. Typically you run folder)
+    Allright, then simply start the DCVizGUI.main(masterDir) function with a chosen masterDir
+    (the place all your open dialoges windows will 'look first'. Typically your run/scratch folder)
     
-    hotkeys (also aviable from file/options menu):
+    Aviable hotkeys (also aviable from file/options menu):
     -ctrl+s : opens a dialogue window to set the path (and load files in this path)
               File detection is based on the nametag. It will be matched with a subclass of dcv_sup
               (see prev section)
