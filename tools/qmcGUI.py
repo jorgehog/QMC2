@@ -3,7 +3,7 @@
 import sys, os
 from pyLibQMC import paths
 
-sys.path.append(os.path.join(paths.toolsPath, "DCV", "GUI"))
+sys.path.append(os.path.join(paths.toolsPath, "DCViz", "GUI"))
 
 import DCVizGUI
 
