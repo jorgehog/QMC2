@@ -1,5 +1,5 @@
 
-import sys, os
+import sys, os, re
 
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -23,9 +23,10 @@ def selectFile():
     dialog.setFileMode(QFileDialog.ExistingFile)
         
     if dialog.exec_():          
-        return dialog.selectedFile()
+        return dialog.selectedFiles()
 
 def main():
+    
     global stdoutToFile, mpiFlag, openGUI, n_cores
     
     #Checking flags
@@ -50,9 +51,19 @@ def main():
     active = True
     while active:
         blockFile = selectFile()
-        print blockFile
+        
+        if not blockFile:
+            print "No file selected. Breaking..."
+            break
+        
+        
+            
 
 
 
 
     app.exit()        
+
+
+if __name__ == "__main__":
+    main()
