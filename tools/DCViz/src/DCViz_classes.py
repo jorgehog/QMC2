@@ -47,6 +47,29 @@ class myTestClass(DCVizPlotter):
 		subfig3.set_title('I have $\LaTeX$ support!')
 		
 
+class Blocking(DCVizPlotter):
+    
+    nametag = "blocking_\w+_out\d*\.dat"
+    figMap = {"Fig": ["blockFig"]}
+    
+    nameMap = {"0": r"\alpha", "1": r"\beta", "": ""}
+    
+    def plot(self, data):
+        
+        Fig, blockFig = self.Fig, self.blockFig
+        blockSize, error = data
+        
+        fileName = os.path.basename(self.filepath)
+        title = "Blocking data %s" % (fileName.split("_")[1] + " %s" % \
+              (self.nameMap[re.findall("blocking_\w+_out(\d*)\.dat")[0]]))
+        
+        blockFig.plot(blockSize, error)  
+        
+        blockFig.set_title(title)
+        blockFig.set_xlabel(r'Block size')
+        blockFig.set_ylabel(r'\sigma')
+        
+
 class DMC_OUT(DCVizPlotter):
     
     nametag = "DMC_out\.dat"
