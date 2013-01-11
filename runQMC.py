@@ -28,52 +28,54 @@ class guiThread(threading.Thread):
                                     self.masterDir, \
                                     os.path.join(self.masterDir, "GUI_out.txt")))
 
-cmlMAPo = {"dist_out":      0,
-           "outputPath":    1,
-           "dmc_out":       2,
-           "ASGD_out":      3}    
-    
-cmlMAPg = {"n_p":           4,
-           "dim":           5,
-           "systemConstant":6,
-           "random_seed":   7,
-           "h":             8,
-           "doMIN":         9,
-           "doVMC":         10,
-           "doDMC":         11,
-           "use_coulomb":   12,
-           "use_jastrow":   13,
-           "sampling":      14,
-           "system":        15}
-    
-cmlMAPv = {"n_c":           16,
-           "dt":            17}
+            
+cmlMAPo = {"dist_out"      : 0,
+           "outputPath"    : 1,
+           "dmc_out"       : 2,
+           "ASGD_out"      : 3}
 
-cmlMAPd = {"dt":            18,
-           "E_T":           19,
-           "n_b":           20,
-           "n_w":           21,
-           "n_c":           22,
-           "therm":         23,
-           "dist_in":       24,
-           "dist_in_path":  25}
-           
-cmlMAPm = {"max_step":      26,
-           "f_max":         27,
-           "f_min":         28,
-           "omega":         29,
-           "A":             30,
-           "a":             31,
-           "SGDsamples":    32,
-           "n_w":           33,
-           "therm":         34,
-           "n_c":           35,
-           "n_c_SGD":       36,
-           "alpha":         37,
-           "beta":          38}
-           
-cmlMAPvp = {"alpha":        39,
-            "beta":         40}
+cmlMAPg = {"n_p"           : 4,
+           "dim"           : 5,
+           "systemConstant" : 6,
+           "random_seed"   : 7,
+           "h"             : 8,
+           "doMIN"         : 9,
+           "doVMC"         : 10,
+           "doDMC"         : 11,
+           "use_coulomb"   : 12,
+           "use_jastrow"   : 13,
+           "sampling"      : 14,
+           "system"        : 15,
+           "do_blocking"   : 16}
+
+cmlMAPv = {"n_c"           : 17,
+           "dt"            : 18}
+
+cmlMAPd = {"dt"            : 19,
+           "E_T"           : 20,
+           "n_b"           : 21,
+           "n_w"           : 22,
+           "n_c"           : 23,
+           "therm"         : 24,
+           "dist_in"       : 25,
+           "dist_in_path"  : 26}
+
+cmlMAPm = {"max_step"      : 27,
+           "f_max"         : 28,
+           "f_min"         : 29,
+           "omega"         : 30,
+           "A"             : 31,
+           "a"             : 32,
+           "SGDsamples"    : 33,
+           "n_w"           : 34,
+           "therm"         : 35,
+           "n_c"           : 36,
+           "n_c_SGD"       : 37,
+           "alpha"         : 38,
+           "beta"          : 39}
+
+cmlMAPvp = {"alpha"         : 40,
+            "beta"          : 41}
 
 
 def dumpStrList(aList):
@@ -538,7 +540,7 @@ def main():
         CMLargs, dirs, superDir = parseFiles()
     else:
         CMLargs = [convertToCMLargs(sys.argv[1:])]
-        dirs = [paths.scratchPath]
+        dirs = [os.path.join(paths.scratchPath, "QMC_SCRATCH")]
         superDir = None
     
     initRuns(CMLargs, dirs, superDir)

@@ -239,7 +239,7 @@ void parseCML(int argc, char** argv,
         ParParams & parParams) {
 
 
-    int n_args = 42;
+    int n_args = 43;
 
     //Default values:
 
@@ -318,58 +318,70 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[3]) != 0) outputParams.dmc_out = argv[3];
         if (def.compare(argv[4]) != 0) outputParams.ASGD_out = argv[4];
 
+
         if (def.compare(argv[5]) != 0) generalParams.n_p = atoi(argv[5]);
         if (def.compare(argv[6]) != 0) generalParams.dim = atoi(argv[6]);
         if (def.compare(argv[7]) != 0) generalParams.systemConstant = atof(argv[7]);
 
+
         if (def.compare(argv[8]) != 0) generalParams.random_seed = atoi(argv[8]);
         if (def.compare(argv[9]) != 0) generalParams.h = atof(argv[9]);
+
 
         if (def.compare(argv[10]) != 0) generalParams.doMIN = (bool)atoi(argv[10]);
         if (def.compare(argv[11]) != 0) generalParams.doVMC = (bool)atoi(argv[11]);
         if (def.compare(argv[12]) != 0) generalParams.doDMC = (bool)atoi(argv[12]);
 
+
         if (def.compare(argv[13]) != 0) generalParams.use_coulomb = (bool)atoi(argv[13]);
         if (def.compare(argv[14]) != 0) generalParams.use_jastrow = (bool)atoi(argv[14]);
 
+
         if (def.compare(argv[15]) != 0) generalParams.sampling = argv[15];
         if (def.compare(argv[16]) != 0) generalParams.system = argv[16];
+        if (def.compare(argv[17]) != 0) generalParams.do_blocking = (bool)atoi(argv[17]);
 
 
-        if (def.compare(argv[17]) != 0) vmcParams.n_c = atoi(argv[17]);
-        if (def.compare(argv[18]) != 0) vmcParams.dt = atof(argv[18]);
+
+        if (def.compare(argv[18]) != 0) vmcParams.n_c = atoi(argv[18]);
+        if (def.compare(argv[19]) != 0) vmcParams.dt = atof(argv[19]);
 
 
-        if (def.compare(argv[19]) != 0) dmcParams.dt = atof(argv[19]);
-        if (def.compare(argv[20]) != 0) dmcParams.E_T = atof(argv[20]);
-        if (def.compare(argv[21]) != 0) dmcParams.n_b = atoi(argv[21]);
-        if (def.compare(argv[22]) != 0) dmcParams.n_w = atoi(argv[22]);
-        if (def.compare(argv[23]) != 0) dmcParams.n_c = atoi(argv[23]);
-        if (def.compare(argv[24]) != 0) dmcParams.therm = atoi(argv[24]);
-        if (def.compare(argv[25]) != 0) dmcParams.dist_in = (bool)atoi(argv[25]);
-        if (def.compare(argv[26]) != 0) dmcParams.dist_in_path = (bool)atoi(argv[26]);
+
+        if (def.compare(argv[20]) != 0) dmcParams.dt = atof(argv[20]);
+        if (def.compare(argv[21]) != 0) dmcParams.E_T = atof(argv[21]);
+        if (def.compare(argv[22]) != 0) dmcParams.n_b = atoi(argv[22]);
+        if (def.compare(argv[23]) != 0) dmcParams.n_w = atoi(argv[23]);
+        if (def.compare(argv[24]) != 0) dmcParams.n_c = atoi(argv[24]);
+        if (def.compare(argv[25]) != 0) dmcParams.therm = atoi(argv[25]);
+        if (def.compare(argv[26]) != 0) dmcParams.dist_in = (bool)atoi(argv[26]);
+        if (def.compare(argv[27]) != 0) dmcParams.dist_in_path = (bool)atoi(argv[27]);
 
 
-        if (def.compare(argv[27]) != 0) minimizerParams.max_step = atof(argv[27]);
-        if (def.compare(argv[28]) != 0) minimizerParams.f_max = atof(argv[28]);
-        if (def.compare(argv[29]) != 0) minimizerParams.f_min = atof(argv[29]);
-        if (def.compare(argv[30]) != 0) minimizerParams.omega = atof(argv[30]);
-        if (def.compare(argv[31]) != 0) minimizerParams.A = atof(argv[31]);
-        if (def.compare(argv[32]) != 0) minimizerParams.a = atof(argv[32]);
-        if (def.compare(argv[33]) != 0) minimizerParams.SGDsamples = atoi(argv[33]);
-        if (def.compare(argv[34]) != 0) minimizerParams.n_w = atoi(argv[34]);
-        if (def.compare(argv[35]) != 0) minimizerParams.therm = atoi(argv[35]);
-        if (def.compare(argv[36]) != 0) minimizerParams.n_c = atoi(argv[36]);
-        if (def.compare(argv[37]) != 0) minimizerParams.n_c_SGD = atoi(argv[37]);
-        if (def.compare(argv[38]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[38]);
-        if (def.compare(argv[39]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[39]);
-
-        if (def.compare(argv[40]) != 0) variationalParams.alpha = atof(argv[40]);
-        if (def.compare(argv[41]) != 0) variationalParams.beta = atof(argv[41]);
+        if (def.compare(argv[28]) != 0) minimizerParams.max_step = atof(argv[28]);
+        if (def.compare(argv[29]) != 0) minimizerParams.f_max = atof(argv[29]);
+        if (def.compare(argv[30]) != 0) minimizerParams.f_min = atof(argv[30]);
+        if (def.compare(argv[31]) != 0) minimizerParams.omega = atof(argv[31]);
+        if (def.compare(argv[32]) != 0) minimizerParams.A = atof(argv[32]);
+        if (def.compare(argv[33]) != 0) minimizerParams.a = atof(argv[33]);
+        if (def.compare(argv[34]) != 0) minimizerParams.SGDsamples = atoi(argv[34]);
+        if (def.compare(argv[35]) != 0) minimizerParams.n_w = atoi(argv[35]);
+        if (def.compare(argv[36]) != 0) minimizerParams.therm = atoi(argv[36]);
+        if (def.compare(argv[37]) != 0) minimizerParams.n_c = atoi(argv[37]);
+        if (def.compare(argv[38]) != 0) minimizerParams.n_c_SGD = atoi(argv[38]);
+        if (def.compare(argv[39]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[39]);
+        if (def.compare(argv[40]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[40]);
 
 
-        //18 = vmc timestep
-        if (def.compare(argv[18]) == 0) {
+        if (def.compare(argv[41]) != 0) variationalParams.alpha = atof(argv[41]);
+        if (def.compare(argv[42]) != 0) variationalParams.beta = atof(argv[42]);
+
+
+	int vmc_dt_loc = 19;
+	int dist_in_loc = 27;
+	int dist_out_loc = 1;
+
+        if (def.compare(argv[vmc_dt_loc]) == 0) {
             if (generalParams.sampling == "IS") {
                 vmcParams.dt = 0.01;
             } else {
@@ -377,13 +389,11 @@ void parseCML(int argc, char** argv,
             }
         }
 
-        //1 = dist_out
-        if (def.compare(argv[1]) == 0) {
+        if (def.compare(argv[dist_out_loc]) == 0) {
             outputParams.dist_out = generalParams.doDMC & generalParams.doVMC;
         }
 
-        //25 = dist_in
-        if (def.compare(argv[25]) == 0) {
+        if (def.compare(argv[dist_in_loc]) == 0) {
             dmcParams.dist_in = generalParams.doDMC & generalParams.doVMC;
         }
         
