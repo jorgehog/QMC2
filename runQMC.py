@@ -426,16 +426,20 @@ def initRuns(CMLargs, dirs, superDir):
     for CMLarg in CMLargs:
         print "Running job ", dirs[i]
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
-        MPIrun = ("mpiexec -n %d ")*mpiFlag        
+        MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
         os.system(MPIrun + os.path.join(paths.programPath, misc.QMC2programName) \
                     + " " + CMLarg + stdout)
+    
         i+=1
+
+    print "All queued jobs finished."        
+        
     if superDir:
         sendVersion(superDir)
         shutil.copy(os.path.join(paths.toolsPath, "output2tex.py"), superDir)
-        if openGUI:
-            job.join()
+    if openGUI:
+        job.join()
         
     
 def getTupleString(pre, suff):

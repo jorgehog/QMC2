@@ -269,6 +269,8 @@ void DMC::node_comm() {
 
         n_w_tot = arma::accu(n_w_list);
 
+    } else {
+        n_w_tot = n_w;
     }
 #else
     n_w_tot = n_w;
