@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, time
 
 class paths:
     HOME = os.path.expanduser('~')
@@ -9,7 +9,8 @@ class paths:
     toolsPath = CODE + "/tools"
     scratchPath = HOME + "/scratch"
     iniFilePath = CODE + "/iniFiles"
-    programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/GNU-Linux-x86"
+    programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/MPI-Linux-x86"
+    #programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/GNU-Linux-x86"
     
 
 class misc:

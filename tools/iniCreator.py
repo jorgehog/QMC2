@@ -17,7 +17,7 @@ if test:
     
     rawFile = """general:
 n_p = __NP__
-w = __W__
+systemConstant = __W__
 use_coulomb = 0
 doDMC = 1
 
@@ -48,7 +48,7 @@ if validation:
 
     rawFile = """general:
 n_p = __NP__
-w = __W__
+systemConstant = __W__
 use_coulomb = 0
 doVMC = 1
 doDMC = 1
@@ -91,7 +91,7 @@ if fullruns:
     
     rawFile = """general:
 n_p = __NP__
-w = __W__
+systemConstant = __W__
 doMIN = 1
 doVMC = 1
 doDMC = 1

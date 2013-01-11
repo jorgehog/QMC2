@@ -5,12 +5,75 @@ Created on Fri Oct  5 16:29:12 2012
 @author: jorgehog
 """
 
-import sys, os, re, shutil
+import sys, os, re, shutil, threading
 
-sys.path.append(os.getcwd() + "/tools")
+from pyLibQMC import paths, misc, add_date
 
-from pyLibQMC import paths, variables, add_date
+from PySide.QtCore import *
+from PySide.QtGui import *
 
+openGUI = True
+stdoutToFile = False
+mpiFlag = True
+n_cores = 4
+
+class guiThread(threading.Thread):
+    def __init__(self, masterDir):
+        super(guiThread, self).__init__()
+        self.masterDir = masterDir
+        
+    def run(self):
+        
+        os.system("python %s %s > %s" % (os.path.join(paths.toolsPath, 'qmcGUI.py'),\
+                                    self.masterDir, \
+                                    os.path.join(self.masterDir, "GUI_out.txt")))
+
+cmlMAPo = {"dist_out":      0,
+           "outputPath":    1,
+           "dmc_out":       2,
+           "ASGD_out":      3}    
+    
+cmlMAPg = {"n_p":           4,
+           "dim":           5,
+           "systemConstant":6,
+           "random_seed":   7,
+           "h":             8,
+           "doMIN":         9,
+           "doVMC":         10,
+           "doDMC":         11,
+           "use_coulomb":   12,
+           "use_jastrow":   13,
+           "sampling":      14,
+           "system":        15}
+    
+cmlMAPv = {"n_c":           16,
+           "dt":            17}
+
+cmlMAPd = {"dt":            18,
+           "E_T":           19,
+           "n_b":           20,
+           "n_w":           21,
+           "n_c":           22,
+           "therm":         23,
+           "dist_in":       24,
+           "dist_in_path":  25}
+           
+cmlMAPm = {"max_step":      26,
+           "f_max":         27,
+           "f_min":         28,
+           "omega":         29,
+           "A":             30,
+           "a":             31,
+           "SGDsamples":    32,
+           "n_w":           33,
+           "therm":         34,
+           "n_c":           35,
+           "n_c_SGD":       36,
+           "alpha":         37,
+           "beta":          38}
+           
+cmlMAPvp = {"alpha":        39,
+            "beta":         40}
 
 
 def dumpStrList(aList):
@@ -19,9 +82,22 @@ def dumpStrList(aList):
         print "[%d] %s" % (i, element)
         i+=1
 
-def selectFiles(Files):
+def selectFilesRaw():
+    
+    iniDirContent = os.listdir(paths.iniFilePath)
+    iniFiles = []
+    
+    for content in iniDirContent:
+        if (re.findall("(.+).ini$", content)):
+            iniFiles.append(content)
+
+    if len(iniFiles) == 0:
+        print "No iniFiles found in %s" % paths.iniFilePath
+    else:
+        print "Found iniFile(s):\n-----------------------------"    
+    
     while True:
-        dumpStrList(Files)
+        dumpStrList(iniFiles)
     
         action = raw_input("type 'display/run 0' to view content of / run first file:") 
 #        action = "run 0 1"
@@ -29,9 +105,14 @@ def selectFiles(Files):
         if action.split()[0] == "run" or action.split()[0] == "display":
 
             if action.split()[1] == "all":
-                fileIDs = range(len(Files))
+                fileIDs = range(len(iniFiles))
             else:
-                fileIDs = [int(ID) for ID in action.split()[1:]]
+                try:
+                    fileIDs = [int(ID) for ID in action.split()[1:]]
+                except:
+                     print "Invalid file", ID
+                     legal = False
+                     continue
             
 
             legal = len(fileIDs) > 0
@@ -39,32 +120,43 @@ def selectFiles(Files):
                 if fileIDs.count(ID) > 1:
                     print "Several instances of file#", ID
                     legal = False
+                    break
                 
                 
             for ID in fileIDs:
-                if ID >= len(Files) or ID < 0:
+                if ID >= len(iniFiles) or ID < 0:
                     print "Invalid file", ID
                     legal = False
+    
 
             if legal:
                 
                 
                 if action.split()[0] == "run":
-                    return [Files[ID] for ID in fileIDs]
+                    return [iniFiles[ID] for ID in fileIDs]
                     
                 else:
                     for ID in fileIDs:
-                        print "----------------------\n" + Files[ID] + ":\n"
-                        os.system("cat %s" % paths.iniFilePath + "/" + Files[ID])
+                        print "----------------------\n" + iniFiles[ID] + ":\n"
+                        os.system("cat %s" % paths.iniFilePath + "/" + iniFiles[ID])
                         print "----------------------\n"
-                    
-                    
-                
-        
-        
+         
         else:
             print "Invalid option"
 
+
+def selectFilesGUI():
+
+    dialog = QFileDialog()
+    dialog.setDirectory(paths.iniFilePath)
+    dialog.setNameFilter("All ini files (*.ini)")
+    dialog.setFileMode(QFileDialog.ExistingFiles)
+        
+    if dialog.exec_():          
+        return [os.path.basename(file_) for file_ in dialog.selectedFiles()]
+    
+    
+    
 def setTag(arglist, line):
    
    if line.startswith('general'):
@@ -99,7 +191,7 @@ def initializeDir(path, filename, date=True):
     if date:
         dirName = add_date(dirName) 
     
-    PATH = path + "/" + dirName
+    PATH = os.path.join(path, dirName)
 
     os.mkdir(PATH)
 
@@ -107,56 +199,62 @@ def initializeDir(path, filename, date=True):
     
 
 def parseFiles():
-    iniDirContent = os.listdir(paths.iniFilePath)
-    iniFiles = []
     
-    for content in iniDirContent:
-        if (re.findall("(.+).ini$", content)):
-            iniFiles.append(content)
-
-    if len(iniFiles) == 0:
-        print "No iniFiles found in %s" % paths.iniFilePath
+    
+    if openGUI:
+        fileNames = None
+        app = QApplication(sys.argv)
+        while fileNames is None:
+            fileNames = selectFilesGUI()
+            if fileNames is None:
+                print "No files chosen."
+        app.exit()
+        
     else:
-        print "Found iniFile(s):\n-----------------------------"
-    
-    fileNames = selectFiles(iniFiles)
+        fileNames = selectFilesRaw()
 
+    #The master directory of runs are set to the scratchPath variable
     superDir = initializeDir(paths.scratchPath, "QMCrun")
     
     dirs = []
     parsedFiles = []
+    
     for fileName in fileNames:
+        
         #Initialize a new directory for the run
         dirPath = initializeDir(superDir, fileName, date=False)
         dirs.append(dirPath)
-        filePath = paths.iniFilePath + "/" + fileName        
         
-        #Copy the iniFile to the runDir
-        os.system("cp %s %s" % (filePath, dirPath + "/" + fileName))
+        #Original ini-file
+        filePath = os.path.join(paths.iniFilePath, fileName)        
+        
+        #Copy the original iniFile to the runDir
+        shutil.copy(filePath, os.path.join(dirPath, fileName))
         iniFile = open(filePath, 'r')
     
         #Read the iniFile
         arglist = []        
-        outPathSet = False
+
         for line in iniFile:
 
             setTag(arglist, line)
             raw = re.findall(".+\s*=\s*.+", line)
-        
-            if not outPathSet:
-                if arglist[-1] == "-o":
-                    arglist.append("outputPath=%s/" % dirPath)
-                    outPathSet = True
-        
+      
             if raw:
                 arglist.append(raw[0].replace(" ", ""))
     
-        if not outPathSet:
+        #In case the ini file contains no output flags
+        try:
+            arglist.insert(arglist.index("-o") + 1, "outputPath=%s/" % dirPath)
+        except ValueError:
             arglist.append("-o")
             arglist.append("outputPath=%s/" % dirPath)
-            
+        
+        if "dist_out=0" not in arglist:
+            initializeDir(dirPath, "walker_positions", date=False)
+        
         parsedFiles.append(convertToCMLargs(arglist))
-    
+
     return parsedFiles, dirs, superDir
 
 def valConvert(val):
@@ -170,9 +268,12 @@ def valConvert(val):
         
         
 
-def varParameterMap(n_p, dim, w, system):
+def varParameterMap(n_p, dim, systemConstant, system):
     
     if dim == 2 and system == "QDots":
+        
+        w = systemConstant
+        
         alpha = 0
         beta = 0
         
@@ -249,39 +350,37 @@ def varParameterMap(n_p, dim, w, system):
 
 
 def consistencyCheck(cmlArgs):
-    
-
-    
+  
     #no minimization initialized -> get param set
-    if (cmlArgs[11]=="0" or cmlArgs[11]=="def"):
+    if (cmlArgs[cmlMAPg['doMIN']]=="0" or cmlArgs[cmlMAPg['doMIN']]=="def"):
 
-        n_p = 2;
-        dim = 2;
-        w = 1;
+        n_p = 2
+        dim = 2
+        systemConstant = 1
         system = "QDots"
 
-        if (cmlArgs[4] != "def"):
-            n_p = int(cmlArgs[4]);
-        if (cmlArgs[5] != "def"):
-            dim = int(cmlArgs[5]);
-        if (cmlArgs[6] != "def"):
-            w = float(cmlArgs[6])
-        if (cmlArgs[18] != "def"):
-            system = cmlArgs[18]
+        if (cmlArgs[cmlMapg['n_p']] != "def"):
+            n_p = int(cmlArgs[cmlMAPg['n_p']])
+        if (cmlArgs[cmlMAPg['dim']] != "def"):
+            dim = int(cmlArgs[cmlMAPg['dim']])
+        if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
+            systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
+        if (cmlArgs[cmlMAPg['system']] != "def"):
+            system = cmlArgs[cmlMAPg['system']]
             
         
-        alpha, beta = varParameterMap(n_p, dim, w, system);
+        alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
 
-        if cmlArgs[41] == "def":
-            cmlArgs[41] = str(alpha);
-        if cmlArgs[42] == "def":
-            cmlArgs[42] = str(beta);
+        if cmlArgs[cmlMAPg['alpha']] == "def":
+            cmlArgs[cmlMAPg['alpha']] = str(alpha)
+        if cmlArgs[cmlMAPg['beta']] == "def":
+            cmlArgs[cmlMAPg['beta']] = str(beta)
             
-            
+     
     #No col -> no jast, alpha=1
-    if (cmlArgs[14] == "0"):
-        cmlArgs[15] = "0";
-        cmlArgs[41] = "1";
+    if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
+        cmlArgs[cmlMAPg['use_jastrow']] = "0"
+        cmlArgs[cmlMAPvp['alpha']] = "1"
         
     return cmlArgs
             
@@ -289,64 +388,19 @@ def consistencyCheck(cmlArgs):
 
 
 def convertToCMLargs(arglist):
-    nInputs = 43;
+    nInputs = len(cmlMAPo) + len(cmlMAPg) + len(cmlMAPv) \
+            + len(cmlMAPd) + len(cmlMAPm) + len(cmlMAPvp) 
+
     cmlArgs = ["def"]*nInputs
-    
-    cmlMAPo = {"blocking_out":  0,
-               "dist_out":      1,
-               "outputSuffix":  2,
-               "outputPath":    3}    
-    
-    cmlMAPg = {"n_p":           4,
-               "dim":           5,
-               "w":             6,
-               "random_seed":   7,
-               "h":             8,
-               "D":             9,
-               "parallell":     10,
-               "doMIN":         11,
-               "doVMC":         12,
-               "doDMC":         13,
-               "use_coulomb":   14,
-               "use_jastrow":   15,
-               "sampling":      16,
-               "kinetics":      17,
-               "system":        18}
-    
-    cmlMAPv = {"n_c":           19,
-               "dt":            20}
-    
-    cmlMAPd = {"dt":            21,
-               "E_T":           22,
-               "n_b":           23,
-               "n_w":           24,
-               "n_c":           25,
-               "therm":         26,
-               "dist_in":       27}
-               
-    cmlMAPm = {"max_step":      28,
-               "f_max":         29,
-               "f_min":         30,
-               "omega":         31,
-               "A":             32,
-               "a":             33,
-               "SGDsamples":    34,
-               "n_w":           35,
-               "therm":         36,
-               "n_c":           37,
-               "n_c_SGD":       38,
-               "alpha":         39,
-               "beta":          40}
-               
-    cmlMAPvp = {"alpha":        41,
-                "beta":         42}
-               
-    
-    key = ""
 
     for arg in arglist:
+        
+        #Get the correct key
         if arg.startswith("-"):
-            key = arg[1:];
+            key = arg[1:]
+        
+        #Key is always obtained first. Then we retrieve the correct value
+        #from the correct dictionary cmlMAP__key__[name]
         else:
             name, val = arg.split("=");
             index = eval("cmlMAP" + key + "[name]")
@@ -359,28 +413,119 @@ def convertToCMLargs(arglist):
     return cmlArgs
     
 def sendVersion(superDir):
-    os.system("git branch -v > " + superDir + "/version.txt")
+    os.system("git branch -v > " + os.path.join(superDir, "version.txt"))
 
             
-def initRuns(CMLargs, stdoutFileFlag, dirs, superDir):
+def initRuns(CMLargs, dirs, superDir):
+
+    if openGUI:
+        job = guiThread(superDir)
+        job.start()
 
     i = 0
     for CMLarg in CMLargs:
         print "Running job ", dirs[i]
-        stdout = (" > %s/stdout.txt" % dirs[i])*stdoutFileFlag
-        os.system(paths.programPath + "/" + variables.QMC2programName + " " + CMLarg + stdout)
+        stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
+        MPIrun = ("mpiexec -n %d ")*mpiFlag        
+        
+        os.system(MPIrun + os.path.join(paths.programPath, misc.QMC2programName) \
+                    + " " + CMLarg + stdout)
         i+=1
     if superDir:
         sendVersion(superDir)
-        shutil.copy(paths.toolsPath + "/output2tex.py", superDir)
+        shutil.copy(os.path.join(paths.toolsPath, "output2tex.py"), superDir)
+        if openGUI:
+            job.join()
+        
     
+def getTupleString(pre, suff):
+        if pre.startswith('var'):
+    	      pre = 'vp'
+        else:
+            pre = pre[0]
+        return '("-%s", "%s")' % (pre, suff)
+
+def getCppMap(raw):
+    
+    printCppMap = False
+
+    p = "^\s*if \(def\.compare\(argv\[\d+\]\) != 0\) (.+) = "
+    vars_ = re.findall(p, raw, re.MULTILINE)
+    s = "cppNameMap = {"
+    l = len(s)
+    i = 0
+    for var in vars_:
+        s += ''.ljust(l)*(i!=0) + ('"%s"' % var).ljust(32) + " : " \
+            + getTupleString(*var.split(".")) + ","*(i!=len(vars_)-1) \
+            + "}"*(i==len(vars_)-1) + "\n"
+            
+        i+=1
+    
+    exec(s)
+    
+    if printCppMap:
+        for key in cppNameMap.keys():
+            print "%s : %s" % (key.ljust(32), cppNameMap[key])
+        
+    return cppNameMap    
+    
+def consistentMap():
+    
+    mainCPPFile = open(os.path.join(paths.CODE, 'src', 'QMCmain.cpp'), 'r')
+    p = "^\s*if \(def\.compare\(argv\[(\d+)\]\) != 0\) (.+) = "
+
+    raw = mainCPPFile.read()  
+    
+    cppOrder = re.findall(p, raw, re.MULTILINE)
+    mainCPPFile.close()
+    
+    cppNameMap = getCppMap(raw)
+    
+    consistent = True
+    for (indexCpp, variable) in cppOrder:
+        indexCpp = int(indexCpp)
+        key, pyvar = cppNameMap[variable]
+        indexPy = eval("cmlMAP" + key[1:] + "[pyvar]") + 1
+        
+        if indexCpp != indexPy:
+            print "---------------------------------------"
+            print indexCpp, indexPy
+            s = len(str(variable))
+            print "MISMATCH: [cpp]    '%s' (index %s) with" % (variable, indexCpp)
+            print "          [python] %s   (index %s / %s in code) " % \
+            (("'" + key + " " + pyvar + "'").ljust(s) , indexPy, indexPy-1)
+            
+            consistent = False
+    
+    return consistent
+      
 
 def main():
-    stdoutFileFlag = False
+    
+    global stdoutToFile, mpiFlag, openGUI, n_cores
+    
+    if not consistentMap():
+        print "The map is inconsistent with the C++ reader."
+        sys.exit(1)
+    else:
+        print "Map consistent"
+    
+    #Checking flags
     if "stdoutToFile" in sys.argv:
-        stdoutFileFlag = True
+        stdoutToFile = True
         sys.argv.remove("stdoutToFile")
+    if "noMPI" in sys.argv:
+        mpiFlag = False
+        sys.argv.remove("noMPI")
+    if "noGUI" in sys.argv:
+        openGUI = False
+        sys.argv.remove("noGUI")
+    if re.findall("\-n \d+", " ".join(sys.argv)):
+        n_cores = int(re.findall("\-n (\d+)", " ".join(sys.argv))[0])
+        sys.argv.remove("-n")
+        sys.argv.remove(str(n_cores))
 
+    print "MPI nodes: ", n_cores
     
     if len(sys.argv) == 1:
         CMLargs, dirs, superDir = parseFiles()
@@ -389,7 +534,7 @@ def main():
         dirs = [paths.scratchPath]
         superDir = None
     
-
-    initRuns(CMLargs, stdoutFileFlag, dirs, superDir)
-    
-main()
+    initRuns(CMLargs, dirs, superDir)
+  
+if __name__ == "__main__":  
+    main()

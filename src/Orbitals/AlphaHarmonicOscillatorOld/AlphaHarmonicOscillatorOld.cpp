@@ -12,7 +12,7 @@ AlphaHarmonicOscillatorOld::AlphaHarmonicOscillatorOld(GeneralParams & gP, Varia
 
     this->alpha = new double();
 
-    this->w = gP.w;
+    this->w = gP.systemConstant;
     set_parameter(vP.alpha, 0);
 
     basis_functions[0] = new HO_1(this->alpha, w);

@@ -57,15 +57,14 @@ struct ParParams {
 struct GeneralParams {
     int n_p, dim;
     long random_seed;
-    double D;
 
-    double h, w;
+    double h, systemConstant;
 
     bool doMIN;
     bool doVMC;
     bool doDMC;
 
-    bool estimate_error;
+    bool do_blocking;
 
     bool use_jastrow;
     bool use_coulomb;
@@ -83,9 +82,9 @@ struct MinimizerParams {
     double A;
     double a;
     int SGDsamples;
-    int n_walkers;
-    int thermalization;
-    int n_cm;
+    int n_w;
+    int therm;
+    int n_c;
     int n_c_SGD;
     arma::rowvec alpha;
     arma::rowvec beta;
@@ -94,10 +93,8 @@ struct MinimizerParams {
 
 struct OutputParams {
     bool dist_out;
-    bool blocking_out;
     bool dmc_out;
     bool ASGD_out;
-    std::string outputSuffix;
     std::string outputPath;
 
 };

@@ -21,7 +21,7 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     this->k2 = new double();
     this->exp_factor = new double();
 
-    this->w = gP.w;
+    this->w = gP.systemConstant;
     set_parameter(vP.alpha, 0);
     get_qnums();
 

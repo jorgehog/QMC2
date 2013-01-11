@@ -10,6 +10,6 @@
 
 Brute_Force::Brute_Force(GeneralParams & gP)
 : Sampling(gP.n_p, gP.dim) {
-    diffusion = new Simple(n_p, dim, 0, gP.random_seed, gP.D);
+    diffusion = new Simple(n_p, dim, 0, gP.random_seed);
 
 }

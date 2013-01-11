@@ -11,11 +11,11 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
 : Minimizer(vmc, pp, mP.alpha, mP.beta) {
     using namespace arma;
 
-    this->n_c = mP.n_cm;
-    this->thermalization = mP.thermalization;
+    this->n_c = mP.n_c;
+    this->thermalization = mP.therm;
     this->n_c_SGD = mP.n_c_SGD;
     this->SGDsamples = mP.SGDsamples;
-    this->n_walkers = mP.n_walkers;
+    this->n_walkers = mP.n_w;
 
     this->a = mP.a;
     this->A = mP.A;
