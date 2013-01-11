@@ -359,7 +359,7 @@ def consistencyCheck(cmlArgs):
         systemConstant = 1
         system = "QDots"
 
-        if (cmlArgs[cmlMapg['n_p']] != "def"):
+        if (cmlArgs[cmlMAPg['n_p']] != "def"):
             n_p = int(cmlArgs[cmlMAPg['n_p']])
         if (cmlArgs[cmlMAPg['dim']] != "def"):
             dim = int(cmlArgs[cmlMAPg['dim']])
@@ -371,10 +371,10 @@ def consistencyCheck(cmlArgs):
         
         alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
 
-        if cmlArgs[cmlMAPg['alpha']] == "def":
-            cmlArgs[cmlMAPg['alpha']] = str(alpha)
-        if cmlArgs[cmlMAPg['beta']] == "def":
-            cmlArgs[cmlMAPg['beta']] = str(beta)
+        if cmlArgs[cmlMAPvp['alpha']] == "def":
+            cmlArgs[cmlMAPvp['alpha']] = str(alpha)
+        if cmlArgs[cmlMAPvp['beta']] == "def":
+            cmlArgs[cmlMAPvp['beta']] = str(beta)
             
      
     #No col -> no jast, alpha=1
@@ -419,7 +419,10 @@ def sendVersion(superDir):
 def initRuns(CMLargs, dirs, superDir):
 
     if openGUI:
-        job = guiThread(superDir)
+        if superDir is None:
+            job = guiThread(paths.scratchPath)
+        else:            
+            job = guiThread(superDir)
         job.start()
 
     i = 0
