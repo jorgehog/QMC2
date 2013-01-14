@@ -228,7 +228,7 @@ class DCVizGUI(QMainWindow):
         else:
             initVal = str(self.refreshDtConfig)
         self.sliderDisplay.clear()
-	self.sliderDisplay.insert(str(initVal))
+        self.sliderDisplay.insert(str(initVal))
 
         #init as disabled
         self.dtSlider.setEnabled(False)

@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time
+import os, time, re
+from os.path import join as pjoin
 
 class paths:
     HOME = os.path.expanduser('~')
-    CODE = HOME +  "/MASTER/QMC2"
-    IDEPath = HOME + "/NetBeansProjects/nbQMC2"
-    toolsPath = CODE + "/tools"
-    scratchPath = HOME + "/scratch"
-    iniFilePath = CODE + "/iniFiles"
-    programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/MPI-Linux-x86"
+    CODE = pjoin(HOME ,"MASTER/QMC2")
+    IDEPath = pjoin(HOME ,"NetBeansProjects/nbQMC2")
+    toolsPath = pjoin(CODE ,"tools")
+    scratchPath = pjoin(HOME ,"scratch")
+    iniFilePath = pjoin(CODE ,"iniFiles")
+    programPath =pjoin(HOME ,"NetBeansProjects/nbQMC2/dist/Debug/MPI-Linux-x86")
     #programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/GNU-Linux-x86"
     
 
@@ -33,7 +34,38 @@ def add_date(filename):
 
     return originalFilename + date + fileEnding;
     
+def parseCML(argv):
+    
+    #Checking flags
+    if "stdoutToFile" in argv:
+        stdoutToFile = True
+        argv.remove("stdoutToFile")
+    else:
+        stdoutToFile = False
+        
+    if "noMPI" in argv:
+        mpiFlag = False
+        argv.remove("noMPI")
+    else:
+        mpiFlag = True
+        
+    if "noGUI" in argv:
+        openGUI = False
+        argv.remove("noGUI")
+    else:
+        openGUI = True
+        
+    if re.findall("\-n \d+", " ".join(argv)):
+        n_cores = int(re.findall("\-n (\d+)", " ".join(argv))[0])
+        argv.remove("-n")
+        argv.remove(str(n_cores))
+    else:
+        n_cores = 4
 
+    if mpiFlag is False:
+        n_cores = 1
+    
+    return stdoutToFile, mpiFlag, openGUI, n_cores
 
 def main():
     spacing = 20
@@ -58,11 +90,5 @@ def main():
     print "QMC2programName:".ljust(spacing) + "%s" % misc.QMC2programName
     
 
-if __name__ == "__main__":   
-
-    if len(sys.argv) == 2:
-        if sys.argv[1] == "-set_tool_path":
-            sys.path.append(paths.toolsPath)
-            print "path set successfully"
-            
+if __name__ == "__main__":               
     main()

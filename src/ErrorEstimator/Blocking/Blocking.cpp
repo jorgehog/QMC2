@@ -22,15 +22,16 @@ Blocking::Blocking(int n_c, ParParams & pp,
 
     if (rerun) {
 
-
-        node_comm_scatter_data();
+        if (parallel) {
+            node_comm_scatter_data();
+        }
 
         this->n_c = data.n_elem;
 
         if (is_master) {
-            if (max_block_size > this->n_c) {
+            if (max_block_size > this->n_c/2) {
                 std::cout << "invalid local max block size " << max_block_size << std::endl;
-                std::cout << "max block size must not be greater than " << n_nodes * this->n_c << std::endl;
+                std::cout << "max block size must not be greater than " << n_nodes * this->n_c/2 << std::endl;
                 exit(1);
             }
 
@@ -39,8 +40,8 @@ Blocking::Blocking(int n_c, ParParams & pp,
                 std::cout << "min block size must not be lower than n_nodes=" << n_nodes << std::endl;
                 exit(1);
             }
-        
-            if (n_block_samples > max_block_size - min_block_size){
+
+            if (n_block_samples > max_block_size - min_block_size) {
                 std::cout << "invalid amount of block samples " << n_block_samples << std::endl;
                 std::cout << "block samples must be lower or equal " << max_block_size - min_block_size << std::endl;
                 exit(1);
@@ -85,7 +86,8 @@ double Blocking::estimate_error() {
         var = combine_variance(var, mean);
 
         if (is_master) {
-            error = sqrt(var / (((n_nodes * n_c) / block_size) - 1.0));
+            error = sqrt(var / ((n_nodes * n_c) / block_size - 1.0));
+            
             file << block_size * n_nodes << "\t" << error << std::endl;
             if (j % 9 == 0) {
                 std::cout << "Blocking progress: " << (double) (j + 1) / n * 100 << "%" << std::endl;
@@ -128,11 +130,12 @@ void Blocking::get_initial_error() {
 
 void Blocking::get_unique_blocks(arma::Row<int>& block_sizes, int& n) {
 
-    int block_step_length = (max_block_size - min_block_size) / n_block_samples;
+    int block_step_length = (max_block_size - min_block_size) / (n_block_samples-1);
 
     for (int j = 0; j < n_block_samples; j++) {
         block_sizes(j) = min_block_size + j * block_step_length;
     }
     block_sizes = arma::unique(block_sizes);
+    
     n = block_sizes.n_elem;
 }

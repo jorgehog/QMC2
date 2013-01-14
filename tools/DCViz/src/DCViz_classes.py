@@ -52,7 +52,7 @@ class Blocking(DCVizPlotter):
     nametag = "blocking_\w+_out\d*\.dat"
     figMap = {"Fig": ["blockFig"]}
     
-    nameMap = {"0": r"\alpha", "1": r"\beta", "": ""}
+    nameMap = {"0": r"$\alpha$", "1": r"$\beta$", "": ""}
     
     def plot(self, data):
         
@@ -61,13 +61,13 @@ class Blocking(DCVizPlotter):
         
         fileName = os.path.basename(self.filepath)
         title = "Blocking data %s" % (fileName.split("_")[1] + " %s" % \
-              (self.nameMap[re.findall("blocking_\w+_out(\d*)\.dat")[0]]))
+              (self.nameMap[re.findall("blocking_\w+_out(\d*)\.dat", self.filepath)[0]]))
         
-        blockFig.plot(blockSize, error)  
+        blockFig.plot(blockSize, error, 'b+')  
         
         blockFig.set_title(title)
         blockFig.set_xlabel(r'Block size')
-        blockFig.set_ylabel(r'\sigma')
+        blockFig.set_ylabel(r'$\sigma$')
         
 
 class DMC_OUT(DCVizPlotter):
@@ -147,7 +147,7 @@ class MIN_OUT(DCVizPlotter):
             param_plot.plot(data[3 + i], self.c[i/2],label=r'$%s$' % self.indexmap[i/2])    
             grad_plot.plot(data[4 + i], self.c[i/2])
         
-        param_plot.set_ylabel(r'\alpha_i')
+        param_plot.set_ylabel(r'$\alpha_i$')
         param_plot.set_title('Variational parameters')
         param_plot.axes.get_xaxis().set_visible(False)
         param_plot.legend()

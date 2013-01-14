@@ -5,18 +5,14 @@ Created on Fri Oct  5 16:29:12 2012
 @author: jorgehog
 """
 
-import sys, os, re, shutil, threading
+import sys, os, re, shutil, subprocess
+from os.path import join as pjoin
 
-from pyLibQMC import paths, misc, add_date
+from pyLibQMC import paths, misc, add_date, parseCML
 
 from PySide.QtCore import *
 from PySide.QtGui import *
-
-openGUI = True
-stdoutToFile = False
-mpiFlag = True
-n_cores = 4
-
+"""
 class guiThread(threading.Thread):
     def __init__(self, masterDir):
         super(guiThread, self).__init__()
@@ -27,8 +23,7 @@ class guiThread(threading.Thread):
         os.system("python %s %s > %s" % (os.path.join(paths.toolsPath, 'qmcGUI.py'),\
                                     self.masterDir, \
                                     os.path.join(self.masterDir, "GUI_out.txt")))
-
-            
+"""       
 cmlMAPo = {"dist_out"      : 0,
            "outputPath"    : 1,
            "dmc_out"       : 2,
@@ -193,14 +188,14 @@ def initializeDir(path, filename, date=True):
     if date:
         dirName = add_date(dirName) 
     
-    PATH = os.path.join(path, dirName)
+    PATH = pjoin(path, dirName)
 
     os.mkdir(PATH)
 
     return PATH    
     
 
-def parseFiles():
+def parseFiles(openGUI):
     
     
     if openGUI:
@@ -228,10 +223,10 @@ def parseFiles():
         dirs.append(dirPath)
         
         #Original ini-file
-        filePath = os.path.join(paths.iniFilePath, fileName)        
+        filePath = pjoin(paths.iniFilePath, fileName)        
         
         #Copy the original iniFile to the runDir
-        shutil.copy(filePath, os.path.join(dirPath, fileName))
+        shutil.copy(filePath, pjoin(dirPath, fileName))
         iniFile = open(filePath, 'r')
     
         #Read the iniFile
@@ -415,17 +410,17 @@ def convertToCMLargs(arglist):
     return cmlArgs
     
 def sendVersion(superDir):
-    os.system("git branch -v > " + os.path.join(superDir, "version.txt"))
+    os.system("git branch -v > " + pjoin(superDir, "version.txt"))
 
             
-def initRuns(CMLargs, dirs, superDir):
+def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
 
     if openGUI:
         if superDir is None:
-            job = guiThread(paths.scratchPath)
+            jobDir = paths.scratchPath
         else:            
-            job = guiThread(superDir)
-        job.start()
+            jobDir = superDir
+        subprocess.Popen(["python", pjoin(paths.toolsPath, 'qmcGUI.py'), jobDir, ">", pjoin(jobDir, "GUI_out.txt")])
 
     i = 0
     for CMLarg in CMLargs:
@@ -433,7 +428,7 @@ def initRuns(CMLargs, dirs, superDir):
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
         MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
-        os.system(MPIrun + os.path.join(paths.programPath, misc.QMC2programName) \
+        os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
                     + " " + CMLarg + stdout)
     
         i+=1
@@ -442,9 +437,7 @@ def initRuns(CMLargs, dirs, superDir):
         
     if superDir:
         sendVersion(superDir)
-        shutil.copy(os.path.join(paths.toolsPath, "output2tex.py"), superDir)
-    if openGUI:
-        job.join()
+        shutil.copy(pjoin(paths.toolsPath, "output2tex.py"), superDir)
         
     
 def getTupleString(pre, suff):
@@ -480,7 +473,7 @@ def getCppMap(raw):
     
 def consistentMap():
     
-    mainCPPFile = open(os.path.join(paths.CODE, 'src', 'QMCmain.cpp'), 'r')
+    mainCPPFile = open(pjoin(paths.CODE, 'src', 'QMCmain.cpp'), 'r')
     p = "^\s*if \(def\.compare\(argv\[(\d+)\]\) != 0\) (.+) = "
 
     raw = mainCPPFile.read()  
@@ -511,39 +504,25 @@ def consistentMap():
 
 def main():
     
-    global stdoutToFile, mpiFlag, openGUI, n_cores
-    
     if not consistentMap():
         print "The map is inconsistent with the C++ reader."
         sys.exit(1)
     else:
         print "Map consistent"
     
-    #Checking flags
-    if "stdoutToFile" in sys.argv:
-        stdoutToFile = True
-        sys.argv.remove("stdoutToFile")
-    if "noMPI" in sys.argv:
-        mpiFlag = False
-        sys.argv.remove("noMPI")
-    if "noGUI" in sys.argv:
-        openGUI = False
-        sys.argv.remove("noGUI")
-    if re.findall("\-n \d+", " ".join(sys.argv)):
-        n_cores = int(re.findall("\-n (\d+)", " ".join(sys.argv))[0])
-        sys.argv.remove("-n")
-        sys.argv.remove(str(n_cores))
+    stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
 
     print "MPI nodes: ", n_cores
     
     if len(sys.argv) == 1:
-        CMLargs, dirs, superDir = parseFiles()
+        CMLargs, dirs, superDir = parseFiles(openGUI)
     else:
         CMLargs = [convertToCMLargs(sys.argv[1:])]
-        dirs = [os.path.join(paths.scratchPath, "QMC_SCRATCH")]
+        dirs = [pjoin(paths.scratchPath, "QMC_SCRATCH")]
         superDir = None
     
-    initRuns(CMLargs, dirs, superDir)
+    initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores)
   
 if __name__ == "__main__":  
     main()
+    
