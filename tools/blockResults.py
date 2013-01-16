@@ -22,9 +22,45 @@ def selectFile():
         return dialog.selectedFiles()
 
 
+class runAgainForm(QDialog):
+    def __init__(self, Q, parent=None):
+        super(runAgainForm, self).__init__(parent)
+
+        self.setWindowTitle(Q)
+        self.answeredYes = None
+        
+        self.yes = QPushButton("Yes", self)
+        self.yes.clicked.connect(lambda : self.answer(True))
+        self.no = QPushButton("No", self)
+        self.no.clicked.connect(lambda : self.answer(False))
+        
+               
+        
+        layout = QHBoxLayout()
+        layout.addWidget(self.yes)
+        layout.addWidget(self.no)
+        self.setLayout(layout)
+        self.resize(300, 50)
+        self.show()
+        
+    def closeEvent(self, event):
+        
+        if self.answeredYes is None:
+            self.answeredYes = False
+        
+        QDialog.closeEvent(self, event)
+        
+    def answer(self, ans):
+        self.answeredYes = ans
+        self.close()
+        
+
+                
+        
+
 class paramForm(QDialog):
     
-    def __init__(self, blockFile, n_cores, parent=None):
+    def __init__(self, blockFile, n_cores, lastParams, parent=None):
         super(paramForm, self).__init__(parent)
         
         self.n_cores = n_cores        
@@ -43,14 +79,23 @@ class paramForm(QDialog):
         self.labelMax = QLabel("<font>Max size:</font>", self)
         self.labelMin = QLabel("<font>Min size:</font>", self)
         
-        self.editNb = QLineEdit(str(int(self.size)/1000), self)
-        self.labelNb.setBuddy(self.editNb)
         
-        self.editMax = QLineEdit(str(int(self.size)/2), self)
+        if lastParams is None:
+            self.editNb = QLineEdit(str(int(self.size)/1000), self)
+            self.editMax = QLineEdit(str(int(self.size)/2), self)
+            self.editMin = QLineEdit(str(n_cores), self)
+        else:
+            self.editNb = QLineEdit(str(lastParams[0]), self)
+            self.editMax = QLineEdit(str(lastParams[1]), self)
+            self.editMin = QLineEdit(str(lastParams[2]), self)
+        
+        
+        self.labelNb.setBuddy(self.editNb)
         self.labelMax.setBuddy(self.editMax)
+        self.labelMin.setBuddy(self.editMin) 
 
-        self.editMin = QLineEdit(str(n_cores), self)
-        self.labelMin.setBuddy(self.editMin)        
+       
+              
         
         
         layout = QVBoxLayout()
@@ -76,7 +121,7 @@ class paramForm(QDialog):
         
         self.runButton.clicked.connect(self.applyAndRun)
         
-        
+    
         
         
     def applyAndRun(self):
@@ -160,9 +205,12 @@ def main():
 
     print "MPI nodes: ", n_cores
     
+       
+    
     app = QApplication(sys.argv)
     
     active = True
+    GUIopened = False
     while active:
         blockFile = selectFile()
         
@@ -174,34 +222,47 @@ def main():
         
         path, fileName = os.path.split(blockFile)
         
-        form = paramForm(blockFile, n_cores)
-        form.show()
+        if openGUI and not GUIopened:
+            subprocess.Popen(["python", pjoin(paths.toolsPath, 'qmcGUI.py'),\
+                path, ">", pjoin(path, "GUI_out.txt")]) 
+            GUIopened = True
         
-        #Has returncode 0 = Success
-        if not form.exec_():
-            try:
-                nBlocks, maxBlockSize, minBlockSize = form.Nb, form.Max, form.Min
-            except:
-                print "No sizes set. Breaking..."   
-                break                 
+        localSatisfaction = False
+        lastParams = None
+    
+        while not localSatisfaction:
+            
+            form = paramForm(blockFile, n_cores, lastParams)
+            form.show()
+            
+            #Has returncode 0 = Success
+            if not form.exec_():
+                try:
+                    nBlocks, maxBlockSize, minBlockSize = form.Nb, form.Max, form.Min
+                    lastParams = [nBlocks, maxBlockSize, minBlockSize]
+                except:
+                    print "No sizes set. Breaking..."   
+                    break                 
+            
+            mpirun = ""
+            if mpiFlag:
+                mpirun = "mpiexec -n %d" % n_cores
+            
+            args = mpirun.split() + [pjoin(paths.programPath, misc.QMC2programName), 
+                    'reblock', fileName.strip("_RAWDATA.arma"), 
+                    path + "/", str(nBlocks), str(maxBlockSize), str(minBlockSize)]
+            
+            subprocess.call(args)
+            
+            dialog = runAgainForm("Satisfied with result?")
         
-        mpirun = ""
-        if mpiFlag:
-            mpirun = "mpiexec -n %d" % n_cores
+            if not dialog.exec_():
+                localSatisfaction = dialog.answeredYes
             
         
-        args = mpirun.split() + [pjoin(paths.programPath, misc.QMC2programName), 
-                'reblock', fileName.strip("_RAWDATA.arma"), 
-                path + "/", str(nBlocks), str(maxBlockSize), str(minBlockSize)]
-        
-   
-        
-        if openGUI:
-            subprocess.Popen(["python", pjoin(paths.toolsPath, 'qmcGUI.py'),\
-            path, ">", pjoin(path, "GUI_out.txt")])
-        
-        subprocess.call(args)
-        active = False
+        dialog = runAgainForm("View more files?")
+        if not dialog.exec_():
+            active = dialog.answeredYes
         
 
 
