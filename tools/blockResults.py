@@ -11,10 +11,10 @@ sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
 
 import DCVizGUI
 
-def selectFile():
+def selectFile(mainDir):
 
     dialog = QFileDialog()
-    dialog.setDirectory(pjoin(paths.scratchPath, "QMC_SCRATCH"))
+    dialog.setDirectory(mainDir)
     dialog.setNameFilter("All arma files (*.arma)")
     dialog.setFileMode(QFileDialog.ExistingFile)
         
@@ -205,14 +205,18 @@ def main():
 
     print "MPI nodes: ", n_cores
     
-       
+    if len(sys.argv) > 1:
+        mainDir = sys.argv[1]
+    else:
+        mainDir = pjoin(paths.scratchPath, "QMC_SCRATCH")
     
     app = QApplication(sys.argv)
     
     active = True
     GUIopened = False
     while active:
-        blockFile = selectFile()
+        
+        blockFile = selectFile(mainDir)
         
         if not blockFile:
             print "No file selected. Breaking..."

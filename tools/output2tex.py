@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, re
+from os.path import join as pjoin
 
 
 
 def getVmcE(path):
-    stdout = open(path + "/stdout.txt", 'r')
-    stdoutRaw = "\n".join(stdout.readlines())
+    stdout = open(pjoin(path, "stdout.txt"), 'r')
+    stdoutRaw = stdout.read()
     stdout.close()
     
     pattern = "VMC energy: (\d+\.?\d*)"
@@ -20,8 +21,8 @@ def getVmcE(path):
 
 
 def getDmcE(path):
-    stdout = open(path + "/stdout.txt", 'r')
-    stdoutRaw = "\n".join(stdout.readlines())
+    stdout = open(pjoin(path, "stdout.txt"), 'r')
+    stdoutRaw = stdout.read()
     stdout.close()
     
     pattern = "dmcE:\s*(\d+\.?\d*)\s*\|\s*Nw:\s*\d+\|\s*100\.?[0]*%"
@@ -43,8 +44,8 @@ def getDmcE(path):
 
 
 def getAlpha(path):
-    stdout = open(path + "/stdout.txt", 'r')
-    stdoutRaw = "\n".join(stdout.readlines())
+    stdout = open(pjoin(path, "stdout.txt"), 'r')
+    stdoutRaw = stdout.read()
     stdout.close()
     
     pattern = "Finished minimizing. Final parameters:"+\
@@ -59,8 +60,8 @@ def getAlpha(path):
 
 
 def getBeta(path):
-    stdout = open(path + "/stdout.txt", 'r')
-    stdoutRaw = "\n".join(stdout.readlines())
+    stdout = open(pjoin(path, "stdout.txt"), 'r')
+    stdoutRaw = stdout.read()
     stdout.close()
     
     pattern = "Finished minimizing. Final parameters:"+\
@@ -74,24 +75,43 @@ def getBeta(path):
         return "N/A"
 
 
+def getSystem(path):
+    for filename in os.listdir(path):
+        if not os.path.isdir(pjoin(path, filename)):
+            if filename.split(".")[1] == "ini":
+                ininame = filename
+    
+    ini = open(pjoin(path, ininame), 'r')
+    iniRaw = ini.read()
+    ini.close()
+    
+    system = "QDots"
+    if re.findall("system\s*=\s*(\w+)[\n$]", iniRaw):
+        system = re.findall("system\s*=\s*(\w+)[\n$]", iniRaw)[0]
+        
+    return system
+    
+    
+
 def setGenPar(path, param):
     
     for filename in os.listdir(path):
-        if filename.split(".")[1] == "ini":
-            ininame = filename
+        if not os.path.isdir(pjoin(path, filename)):
+            if filename.split(".")[1] == "ini":
+                ininame = filename
     
-    ini = open(path + "/" + ininame, 'r')
-    iniRaw = "\n".join(ini.readlines())
+    ini = open(pjoin(path, ininame), 'r')
+    iniRaw = ini.read()
     ini.close()
 
     npp = "n_p\s*=\s*(\d+)"
-    wp = "w\s*=\s*(\d+\.?\d*)"
+    scp = "systemConstant\s*=\s*(\d+\.?\d*)"
     if re.findall(npp, iniRaw):
         np = int(re.findall(npp, iniRaw)[0])
         param['n_p'] = np
-    if re.findall(wp, iniRaw):
-        w = float(re.findall(wp, iniRaw)[0])
-        param['w'] = w
+    if re.findall(scp, iniRaw):
+        sc = float(re.findall(scp, iniRaw)[0])
+        param['sc'] = sc
     
 
 def dumpData(runparams):
@@ -129,7 +149,7 @@ def zeros(x,y):
         matrix.append(tmp)
     return matrix
     
-def generateTex(table, mapping):
+def generateTex(table, mapping, system):
     raw = r"""\begin{table}
 \begin{center}
 \label{}
@@ -142,6 +162,7 @@ __TABLE__
 \end{center}
 \end{table}
 """
+
     
     spacing = 8 
     
@@ -154,7 +175,8 @@ __TABLE__
         key = key.replace("alpha", r"$\alpha$")
         key = key.replace("beta", r"$\beta$")
         key = key.replace("n_p", "N")
-        key = key.replace("w", r"$\omega$")
+        if system == "QDots":
+            key = key.replace("sc", r"$\omega$")
         key = key.replace("E_DMC", "$\mathrm{E_{DMC}}$")
         key = key.replace("E_VMC", "$\mathrm{E_{VMC}}$")
         
@@ -176,7 +198,7 @@ __TABLE__
     return texcode
     
     
-def get_map(runpaths):
+def getMap(runpath):
 
     mapVarPar = False
     mapBeta = False
@@ -188,13 +210,16 @@ def get_map(runpaths):
     mapVMCPattern = "doVMC\s*=\s*1"
     mapDMCPattern = "doDMC\s*=\s*1"
     
-    mapping = ['n_p', 'w']
-    for runpath in runpaths:
-        for filename in os.listdir(runpath):
+    mapping = ['n_p', 'sc']
+   
+         
+        
+    for filename in os.listdir(runpath):
+        if not os.path.isdir(pjoin(runpath, filename)):
             if filename.split(".")[1] == "ini":
                 ininame = filename
-                ini = open(runpath + "/" + ininame, 'r')
-                iniRaw = "\n".join(ini.readlines())
+                ini = open(pjoin(runpath, ininame), 'r')
+                iniRaw = ini.read()
                 ini.close()
                 
                 if re.findall(mapVarPattern, iniRaw):
@@ -205,37 +230,46 @@ def get_map(runpaths):
                     mapDMC = True
                 if not re.findall(notMapBetaPattern, iniRaw):
                     mapBeta = True
+
+                if mapVMC:
+                    mapping.append('E_VMC')
+                if mapDMC:
+                    mapping.append('E_DMC')
+                if mapVarPar:
+                    mapping.append('alpha')
+                    if mapBeta:
+                        mapping.append('beta')   
+                        
     
-    if mapVMC:
-        mapping.append('E_VMC')
-    if mapDMC:
-        mapping.append('E_DMC')
-    if mapVarPar:
-        mapping.append('alpha')
-        if mapBeta:
-            mapping.append('beta')            
-                
-                
     return mapping
 
     
+    
 def main():
     
-    dirCont = [os.getcwd() + "/" + i for i in os.listdir(os.getcwd())] 
+    if len(sys.argv) == 1:
+        print "Path must be set as cmlarg"
+        sys.exit(1)
+    else:
+        mainDir = sys.argv[1]
+    
+    dirCont = [pjoin(mainDir, dir_) for dir_ in os.listdir(mainDir) \
+                if os.path.isdir(pjoin(mainDir, dir_))] 
 
     runpaths = []
     for thing in dirCont:
-        if os.path.isdir(thing):
-            endings = [name.split(".")[1] for name in os.listdir(thing)]
-            if "ini" in endings:
-                runpaths.append(thing)
+  
+        endings = [name.split(".")[1] for name in os.listdir(thing) \
+                    if not os.path.isdir(pjoin(thing, name))]
+
+        if "ini" in endings:
+            runpaths.append(thing)
         
         
     if not runpaths:
        print "Found no runs"
        sys.exit(1) 
-              
-    mapping = get_map(runpaths)           
+                        
     
     runparams = []
     for i in range(len(runpaths)):
@@ -243,7 +277,7 @@ def main():
                 
     for runparam in runparams:
         runparam['n_p'] = 2
-        runparam['w'] = 1.
+        runparam['sc'] = 1.
 
 
     for i in range(len(runpaths)):
@@ -255,22 +289,35 @@ def main():
         runparam['E_DMC'] = getDmcE(runpath)
         runparam['alpha'] = getAlpha(runpath)
         runparam['beta'] = getBeta(runpath)
+        runparam['system'] = getSystem(runpath)
+        runparam['mapping'] = getMap(runpath) 
   
     
+    systems = {}
+    for runparam in runparams:
+        if runparam["system"] not in systems.keys():
+            systems[runparam["system"]] = [runparam]
+        else:
+            systems[runparam["system"]].append(runparam)
     
-    tableParams = zeros(len(runparams), len(mapping))
+    print systems
+    for runparam in runparams:
+        print runparam['mapping']
+    
+    tableParams = zeros(len(runparams), len(runparams[0]["mapping"]))
 
     for i in range(len(runparams)):
-        for key in mapping:
-            tableParams[i][mapping.index(key)] = runparams[i][key]
+        for key in runparams[0]["mapping"]:
+            tableParams[i][runparams[0]["mapping"].index(key)] = runparams[i][key]
 
     tableParams.sort()
  
     compressData(tableParams)
-
-    texString = generateTex(tableParams, mapping)
     
-    ofile = open(os.getcwd() + "/texTable.tex", 'w')
+
+    texString = generateTex(tableParams, runparams[0]["mapping"], None)
+    
+    ofile = open(pjoin(mainDir, "texTable.tex"), 'w')
     ofile.write(texString)
     ofile.close()
             

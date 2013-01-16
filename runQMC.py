@@ -215,7 +215,7 @@ def parseFiles(openGUI):
     
     dirs = []
     parsedFiles = []
-    
+    print fileNames
     for fileName in fileNames:
         
         #Initialize a new directory for the run
@@ -437,7 +437,11 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
         
     if superDir:
         sendVersion(superDir)
-        shutil.copy(pjoin(paths.toolsPath, "output2tex.py"), superDir)
+        
+        if stdoutToFile:
+            subprocess.call(["python", pjoin(paths.toolsPath, "output2tex.py"), superDir])
+
+        #shutil.copy(pjoin(paths.toolsPath, "output2tex.py"), superDir)
         
     
 def getTupleString(pre, suff):
