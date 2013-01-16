@@ -199,7 +199,7 @@ int main(int argc, char** argv) {
         systemObjects.sample_method->set_dt(dmcParams.dt);
 
         DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
-
+        
         if (outputParams.dmc_out && parParams.is_master) {
             string dmcOutname = (string) "DMC_out";
             OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath);
