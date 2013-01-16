@@ -177,6 +177,8 @@ __TABLE__
         key = key.replace("n_p", "N")
         if system == "QDots":
             key = key.replace("sc", r"$\omega$")
+        elif system == "Atoms":
+            key = key.replace("sc", r"$\mathrm{Z}$")
         key = key.replace("E_DMC", "$\mathrm{E_{DMC}}$")
         key = key.replace("E_VMC", "$\mathrm{E_{VMC}}$")
         
@@ -300,25 +302,39 @@ def main():
         else:
             systems[runparam["system"]].append(runparam)
     
-    print systems
-    for runparam in runparams:
-        print runparam['mapping']
+    texFile = ""
     
-    tableParams = zeros(len(runparams), len(runparams[0]["mapping"]))
+    #Initially loop and make a table for each system type
+    for system in systems.keys():
 
-    for i in range(len(runparams)):
-        for key in runparams[0]["mapping"]:
-            tableParams[i][runparams[0]["mapping"].index(key)] = runparams[i][key]
+        #Extract all different 'run-styles' from each system type
+        maps = {}
+        for runparam in systems[system]:
+          
+            if str(runparam['mapping']) not in maps.keys():
+                maps[str(runparam['mapping'])] = [runparam]
+            else:
+                maps[str(runparam['mapping'])].append(runparam)
 
-    tableParams.sort()
+        #Loop and make table for each system types run style        
+        for mapping in maps.keys():
+            tableParams = zeros(len(maps[mapping]), len(eval(mapping)))
+
+            for i in range(len(maps[mapping])):
+                for key in eval(mapping):
+                    tableParams[i][eval(mapping).index(key)] = maps[mapping][i][key]
+
+            tableParams.sort()
  
-    compressData(tableParams)
-    
+            compressData(tableParams)
+        
 
-    texString = generateTex(tableParams, runparams[0]["mapping"], None)
+            texString = generateTex(tableParams, eval(mapping), system)
+        
+            texFile += "%s : %s\n\n" % (system, mapping) + texString + "\n\n"
     
     ofile = open(pjoin(mainDir, "texTable.tex"), 'w')
-    ofile.write(texString)
+    ofile.write(texFile)
     ofile.close()
             
     
