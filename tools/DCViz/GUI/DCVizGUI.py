@@ -530,10 +530,14 @@ def main(masterDir = None):
     win = DCVizGUI(masterDir)
     win.setWindowTitle('DCViz GUI')
     
-    sys.exit(app.exec_())
+    return app.exec_()
 
 
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        path = sys.argv[1]
+    except:
+        path = None
+    sys.exit(main(path))

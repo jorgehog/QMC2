@@ -241,8 +241,8 @@ class DCVizPlotter:
         if nLast != len(sampleList[-2]):
             nLast = len(sampleList[-2])
             i -= 1
-
-        while len(sampleList[i]) == nLast:
+        
+        while len(sampleList[i]) == nLast and i >= 0:
             i -= 1
 
         #(nRows to skip = i+1, nCols = nLast)
