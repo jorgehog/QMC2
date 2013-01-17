@@ -109,18 +109,52 @@ class DMC_OUT(DCVizPlotter):
         N_plot.set_title('Walker population')
         N_plot.ticklabel_format(useOffset=False, axis='y')
 
-class armaMat(DCVizPlotter):
+class dist_out(DCVizPlotter):
     
-    nametag = "\w+\.arma"
+    nametag = "dist.+\.arma"
     figMap = {"fig": ["subfig"]}
 
     armaBin = True
+    
+    isFamilyMember = True
+    familyName = "Dist"
 
+#    def plot(self, data):
+#        
+#        n_p = len(data[0][0])
+#        n = len(data)
+#        print "n_p=", n_p
+#        print "n=", n
+#        X = numpy.zeros(n_p)
+#        Y = numpy.zeros(n_p)
+#        for rMat in data:
+#            x, y = rMat;
+#            self.subfig.plot(x,y, 'r*')
+#            X += x;
+#            Y += y;
+#        
+#        X /= n
+#        Y /= n
+#
+#        self.subfig.plot(X, Y, '*')     
     def plot(self, data):
-        x, y = data
-
-        self.subfig.plot(x, y, '*')        
         
+        
+        n_p = len(data[0][0])        
+        n = len(data)
+        scale = n/100
+
+
+        r = numpy.zeros(n)
+        
+        for i in range(n):
+            x, y = data[i];
+            r[i] = numpy.sqrt(x**2 + y**2).sum()
+        r /= n_p
+        Y, X = numpy.histogram(r, bins=numpy.linspace(0, r.max(), n/scale))
+
+        self.subfig.plot(X[:-1], Y, '*')
+       
     
         
 class MIN_OUT(DCVizPlotter):

@@ -73,6 +73,7 @@ class DCVizPlotWindow(QMainWindow):
         self.activeMode = activeMode
         self.callStop = True
         self.setAttribute(Qt.WA_DeleteOnClose)
+        
 
     def displayPlots(self):
   
@@ -131,6 +132,7 @@ class DCVizGUI(QMainWindow):
         self.dynamic = False
         self.started = False
         self.plotWinClosed = True
+        self.plotWins = []
         
         #Initial terminal output flag
         self.hideSource = False
@@ -277,14 +279,15 @@ class DCVizGUI(QMainWindow):
         else:
             self.start()
             
-    def resetPlotWindow(self):
+    def makePlotWindow(self):
         
-        if not self.plotWinClosed:
-            self.plotWin.close()
+        #if not self.plotWinClosed:
+        #    self.plotWin.close()
         
 
-        self.plotWin = DCVizPlotWindow(self.activeMode, self)
-        self.plotWin.setWindowTitle("DCViz plots")
+#        self.plotWin = DCVizPlotWindow(self.activeMode, self)
+        self.plotWins.append(DCVizPlotWindow(self.activeMode, self))
+        self.plotWins[-1].setWindowTitle("DCViz plots")
         self.plotWinClosed = False
         
     
@@ -305,8 +308,8 @@ class DCVizGUI(QMainWindow):
         self.activeMode.dynamic = self.dynamic
         self.activeMode.plotted = False
         
-        self.resetPlotWindow()
-        self.job = jobThread(self.activeMode, self.plotWin)
+        self.makePlotWindow()
+        self.job = jobThread(self.activeMode, self.plotWins[-1])
             
         if not self.job.isRunning():
             self.terminalTracker("Job", "Starting.")
@@ -325,7 +328,9 @@ class DCVizGUI(QMainWindow):
         
             self.terminalTracker("Job", "Stoping... ", hold="on")
             self.job.comm.stopSignal.emit()
-            self.plotWin.callStop = False
+            #self.plotWin.callStop = False
+            
+            self.plotWins[-1].callStop = False
             
             i=0
             while self.job.isRunning():
@@ -366,30 +371,36 @@ class DCVizGUI(QMainWindow):
         self.updateModeSelector()
         
     def detectModetype(self, filename):
-
-        s = 20
-
+  
+        s = 15
         for mode in self.uniqueModes:
             if re.findall(mode.nametag, filename):
+         
+                args = [filename]
+                modeInstance = mode(*args, useGUI=True)
+        
+                if self.checkConsistency(modeInstance):
+                    if self.checkConsistenctFamily(modeInstance):
+                        return
+                        
+                    self.raiseWarning("Similar dataset previously selected: " + str(modeInstance))
+        
                 
                 self.terminalTracker("Detector", "matched [%s] with [%s]" %  \
                           (os.path.split(filename)[-1].center(s), \
                             self.uniqueModesNames[self.uniqueModes.index(mode)].center(s)))
-                            
-                args = [filename]
-                mode = mode(*args, useGUI=True)
                 
-                if self.checkConsistency(mode):
-                    self.raiseWarning("Similar dataset previously selected: " + str(mode))
-                    return
-                
-                self.modeMap[str(mode)] = mode
+                self.modeMap[str(modeInstance)] = modeInstance
                 return
                 
-        self.terminalTracker("Detector", "Unable to fetch data from %s" % os.path.split(filename)[-1])
+        self.terminalTracker("Detector", "'%s' does not match any DCViz class" % os.path.split(filename)[-1])
 
-    def checkConsistency(self, mode):
-        return str(mode) in self.modeMap.keys()
+    def checkConsistency(self, modeInstance):
+        return str(modeInstance) in self.modeMap.keys()
+        
+    def checkConsistenctFamily(self, modeInstance):
+        return modeInstance.isFamilyMember and os.path.split(modeInstance.filepath)[0]\
+                    == os.path.split(self.modeMap[str(modeInstance)].filepath)[0]
 
     def loadExtern(self, onlyConfig=False):
         

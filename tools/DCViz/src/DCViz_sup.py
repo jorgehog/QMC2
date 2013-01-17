@@ -2,6 +2,7 @@
 
 import re, numpy, time, sys, signal, os, struct
 import matplotlib.pylab as plab
+from os.path import join as pjoin
 
 
 class DCVizPlotter:
@@ -9,6 +10,10 @@ class DCVizPlotter:
     figMap = {}
 
     armaBin = False
+    
+    isFamilyMember = False
+    familyName = "unnamed"
+    familyFileNames = []
 
     skippedRows = []
     skipRows = None
@@ -41,11 +46,39 @@ class DCVizPlotter:
         self.SIGINT_CAPTURED = True
     
     def __str__(self):
+        
+        if self.isFamilyMember:
+            return self.familyName + " (family)"
         return ".".join(os.path.split(self.filepath)[-1].split(".")[0:-1])
 
         
-    def get_data(self):
+    def get_data(self, setUpFamily):
     
+        if setUpFamily:
+            
+            familyHome, myName = os.path.split(self.filepath)
+            familyNames = [name for name in os.listdir(familyHome)\
+                            if name != myName and re.findall(self.nametag, name)]
+            
+            familyMembers = [os.path.join(familyHome, name) for name in familyNames]
+            
+            data = [0]*(len(familyMembers) + 1)
+            self.familyFileNames = [0]*len(data)     
+            
+            self.familyFileNames[0] = myName
+            data[0] = self.get_data(setUpFamily=False)
+            
+            for i in range(len(familyMembers)):
+             
+                self.file = None
+                self.filepath = familyMembers[i]
+                
+                self.familyFileNames[i+1] = os.path.split(familyMembers[i])[1]
+                data[i+1] = self.get_data(setUpFamily=False)
+                
+            self.file.close()
+            return data
+            
         self.reload()
         
         if self.armaBin:
@@ -183,7 +216,7 @@ class DCVizPlotter:
        
             self.clear()
            
-            data = self.get_data()
+            data = self.get_data(setUpFamily = self.isFamilyMember)
           
             self.plot(data)  
             self.showFigures()
@@ -255,6 +288,10 @@ class DCVizPlotter:
                 self.file.close()
             
         self.file = open(self.filepath , "r")
+
+        if not self.armaBin and self.skipRows is not None:        
+            for i in range(self.skipRows):
+                self.file.readline()
         
         
         
