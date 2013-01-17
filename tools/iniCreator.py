@@ -7,7 +7,7 @@ Created on Mon Oct  8 13:05:51 2012
 
 from pyLibQMC import paths
 
-validation = False
+validation = True
 fullruns = True
 test = False
 
@@ -95,6 +95,7 @@ systemConstant = __W__
 doMIN = 1
 doVMC = 1
 doDMC = 1
+do_blocking=1
 
 DMC:
 dist_in = 1

@@ -215,7 +215,7 @@ def parseFiles(openGUI):
     
     dirs = []
     parsedFiles = []
-    print fileNames
+
     for fileName in fileNames:
         
         #Initialize a new directory for the run
@@ -420,7 +420,7 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
             jobDir = paths.scratchPath
         else:            
             jobDir = superDir
-        subprocess.Popen(["python", pjoin(paths.toolsPath, 'qmcGUI.py'), jobDir, ">", pjoin(jobDir, "GUI_out.txt")])
+        subprocess.Popen(["python", pjoin(paths.toolsPath, 'qmcGUI.py'), jobDir, "> " + pjoin(jobDir, "GUI_out.txt")])
 
     i = 0
     for CMLarg in CMLargs:

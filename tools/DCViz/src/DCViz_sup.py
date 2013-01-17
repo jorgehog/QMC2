@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import re, numpy, time, sys, signal, os
+import re, numpy, time, sys, signal, os, struct
 import matplotlib.pylab as plab
 
 
 class DCVizPlotter:
     
     figMap = {}
+
+    armaBin = False
+
+    skippedRows = []
+    skipRows = None
+
     delay = 3
+
     parent = None
+    
     
     canStart = False
     
@@ -31,33 +39,46 @@ class DCVizPlotter:
     def signal_handler(self, signal, frame):
         print "Ending session..."
         self.SIGINT_CAPTURED = True
-        
-        
-    def set_delay(self, t):
-        if int(t) < 1:
-            print "invalid delay time. Delay set to 1s."
-            t = 1
-        
-        self.delay = t
     
     def __str__(self):
         return ".".join(os.path.split(self.filepath)[-1].split(".")[0:-1])
+
         
     def get_data(self):
     
         self.reload()
-    
-        data = numpy.array(self.rx.findall(self.file.read()), numpy.float)
+        
+        if self.armaBin:
+            data = self.unpackArmaMatBin(self.file)            
+        else:
+            data = numpy.array(self.rx.findall(self.file.read()), numpy.float)
 
         self.file.close()
         
-        output = []
+        output = [0]*data.shape[1]
         for i in range(data.shape[1]):
-            output.append(data[:,i])
+            output[i] = data[:,i]
         
         return tuple(output)
     
+    def unpackArmaMatBin(self, armaFile):   
+
+        unpacker = struct.Struct("d")
     
+        armaFormat = armaFile.readline().strip()
+        size = int(armaFormat[-1])
+        
+        n, m = armaFile.readline().strip().split()
+        n = int(n)       
+        m = int(m)
+        
+        data = numpy.zeros(shape=(n, m))
+        
+        for i in range(n):
+            for j in range(m):                
+                data[i][j] = unpacker.unpack(armaFile.read(size))[0]
+            
+        return data
     
     def set_figures(self):
         
@@ -77,21 +98,9 @@ class DCVizPlotter:
             
             i += 1
         exec(s)
-        #print s.replace("; ", "\n")                
-
-    def mainloop(self):
-        
-        if self.dynamic:
-            light = 'red'
-            while light == 'red':
-                light = self.load_sample()
-                time.sleep(1)
-        else:
-            light = self.load_sample()
-            if light == 'red':
-                sys.exit(1)
-
-
+      
+      
+    def manageFigures(self):
         if not self.useGUI:
             self.set_figures()
         else:
@@ -103,53 +112,91 @@ class DCVizPlotter:
                 time.sleep(0.01)
                 i+=1
                 if i > 500:
-                    print "TIMEOUT: Figures wasn't set."
-                    sys.exit(1)
+                    self.Error("TIMEOUT: Figures wasn't set...")
+                    return          
 
+
+    def Error(self, s):
+        if self.useGUI:
+            self.parent.parent.terminalTracker("DCViz", s)
+        else:
+            print s
+
+
+    def waitForGreenLight(self):
+
+        if self.dynamic:
+            light = 'red'
+            while light == 'red':
                 
-        while (not self.stopped and not self.SIGINT_CAPTURED):
+                if self.stopped or self.SIGINT_CAPTURED:
+                    return True
+                    
+                light = self.load_sample()
+                time.sleep(1)
+        else:
+            light = self.load_sample()
+            if light == 'red':
+                return True
+        
+        return False
+                
+    def shouldReplot(self):
+        return not self.stopped and not self.SIGINT_CAPTURED
+    def shouldBreak(self):
+        return self.stopped or self.SIGINT_CAPTURED
 
+    def showFigures(self):
+        
+        if not self.useGUI:       
+            self.show()
+        else:
+            if self.plotted and self.dynamic:
+                try:
+                    self.show(drawOnly=True)
+                except:
+                    #Exception needed in order for 
+                    #the thread to survive being closed by GUI
+                    pass
+            if not self.plotted:
+                self.parent.comm.plotSignal.emit()
+
+    def sleep(self):
+        for i in range(int(self.delay)):
+            time.sleep(1)
+            if self.shouldBreak():
+                break
+
+        time.sleep(self.delay - int(self.delay))
+
+    def mainloop(self):
+        
+        if not self.armaBin:
+            breakMe = self.waitForGreenLight()
+            
+            if breakMe:
+                return
+
+        self.manageFigures()
+
+        while (self.shouldReplot()):
+       
             self.clear()
-
-            if self.plotted:
-                if self.useGUI:
-                    self.parent.parent.terminalTracker("DCViz", "Replotting...")
-                else:
-                    print "Replotting..."
            
             data = self.get_data()
-            self.plot(data)
-            
-            if not self.useGUI:
-                
-                self.show()
-            else:
-                if self.plotted and self.dynamic:
-                    try:
-                        self.show(drawOnly=True)
-                    except:
-                        #Exception needed in order for the thread to survive being closed by GUI
-                        pass
-                if not self.plotted:
-                    self.parent.comm.plotSignal.emit()
-                 
-                    
+          
+            self.plot(data)  
+            self.showFigures()
             self.plotted = True
+
                 
             if self.dynamic:
-                for i in range(int(self.delay)):
-                    time.sleep(1)
-                    if self.stopped or self.SIGINT_CAPTURED:
-                        break
-
-                time.sleep(self.delay - int(self.delay))
-                
+                self.sleep()     
             else:
                 if not self.useGUI:
                     raw_input("Press any key to exit")
                 break
                 
-        
         if not self.useGUI:
             self.close()
         
@@ -158,16 +205,48 @@ class DCVizPlotter:
     def load_sample(self):
         
         self.reload()
-        sample = self.file.readline()
-        if not sample:
-            print "No data in file"
-            return "red"
+  
+        sample = self.file.read()
         
-        self.N = len(sample.split())
+        if not sample:
+            self.Error("No data in file...")
+            return "red"
+            
+        skipRows, self.N = self.sniffer(sample)
+
+        self.file.seek(0)
+        
+        self.skippedRows = []
+        for i in range(skipRows):
+            self.skippedRows.append(self.file.readline().strip())
+        
         anyNumber = r'[\+\-]?\d+\.?\d*[eE]?[\+\-]?\d*'
         self.rx = re.compile((r'(%s)\s+' % anyNumber)*(self.N-1) + r'(%s)[\n$]' % anyNumber)    
         
         return "green"
+        
+    
+    def sniffer(self, sample):
+        
+        sampleList = [row.split() for row in sample.split("\n")]
+
+        #If user has specified the number of rows to skip
+        if self.skipRows is not None:
+            print "skipped rows is given."
+            return self.skipRows, len(sampleList[self.skipRows])
+
+        nLast = len(sampleList[-1])
+        i = len(sampleList) - 1
+
+        if nLast != len(sampleList[-2]):
+            nLast = len(sampleList[-2])
+            i -= 1
+
+        while len(sampleList[i]) == nLast:
+            i -= 1
+
+        #(nRows to skip = i+1, nCols = nLast)
+        return i+1, nLast    
     
     def reload(self):
     
@@ -176,6 +255,10 @@ class DCVizPlotter:
                 self.file.close()
             
         self.file = open(self.filepath , "r")
+        
+        
+        
+        
             
     def add_figure(self, fig):
         self.figures.append([fig])

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import sys, re, os, inspect
+
 try:
     import numpy
 except:
@@ -9,12 +11,8 @@ except:
     print "\n" 
     sys.exit(1)
 
-import time, sys, re, os, inspect
-
-
 from random import choice
 
-import matplotlib.pylab as plab
 from matplotlib import rc
 
 #~ Paths include
@@ -103,7 +101,20 @@ class DMC_OUT(DCVizPlotter):
         N_plot.axes.get_xaxis().set_visible(False)
         N_plot.set_title('Walker population')
         N_plot.ticklabel_format(useOffset=False, axis='y')
+
+class armaMat(DCVizPlotter):
+    
+    nametag = "\w+\.arma"
+    figMap = {"fig": ["subfig"]}
+
+    armaBin = True
+
+    def plot(self, data):
+        x, y = data
+
+        self.subfig.plot(x, y, '*')        
         
+    
         
 class MIN_OUT(DCVizPlotter):
     
@@ -113,11 +124,10 @@ class MIN_OUT(DCVizPlotter):
               "param_fig": ["param_plot", "grad_plot"]}
     
     indexmap = {0: r"\alpha", 1: r"\beta"}
-    c = ['b', 'g']
-    
+    c = ['b', 'g']    
     
     def plot(self, data):
-        
+
         n_params = (self.N - 3)/2
         
         E, Eavg, step = data[:3]
