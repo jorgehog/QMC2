@@ -153,7 +153,10 @@ class dist_out(DCVizPlotter):
         r /= n_p
         Y, X = numpy.histogram(r, bins=numpy.linspace(0, r.max(), n/scale))
 
-        self.subfig.plot(X[:-1], Y, '*')
+        #w = float(re.findall("np\d+_w(.+)/walker_positions", self.filepath)[0])
+        #print w
+
+        self.subfig.plot(X[:-1], Y/Y.sum(), '*')
        
     
         
