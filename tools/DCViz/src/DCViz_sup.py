@@ -17,6 +17,8 @@ class DCVizPlotter:
 
     skippedRows = []
     skipRows = None
+    
+    nFig = 0
 
     delay = 3
 
@@ -53,15 +55,16 @@ class DCVizPlotter:
 
         
     def get_data(self, setUpFamily):
-    
+        ##CLEANUP THIS MESS
         if setUpFamily:
-            
-            familyHome, myName = os.path.split(self.filepath)
+            self.reload()
+            rootPath = self.filepath
+            familyHome, myName = os.path.split(rootPath)
             familyNames = [name for name in os.listdir(familyHome)\
                             if name != myName and re.findall(self.nametag, name)]
             
-            familyMembers = [os.path.join(familyHome, name) for name in familyNames]
-            
+            familyMembers = sorted([os.path.join(familyHome, name) for name in familyNames])
+            self.familySkippedRows = []
             data = [0]*(len(familyMembers) + 1)
             self.familyFileNames = [0]*len(data)     
             
@@ -75,20 +78,35 @@ class DCVizPlotter:
                 
                 self.familyFileNames[i+1] = os.path.split(familyMembers[i])[1]
                 data[i+1] = self.get_data(setUpFamily=False)
-                
+                self.familySkippedRows.append(self.skippedRows)
             self.file.close()
+            self.filepath = rootPath
             return data
             
-        self.reload()
+        data = []
         
-        if self.armaBin:
-            data = self.unpackArmaMatBin(self.file)            
-        else:
-            data = numpy.array(self.rx.findall(self.file.read()), numpy.float)
-
+        #attempt to reload file untill data is found.
+        t0 = time.time()
+        while len(data) == 0:
+            self.reload()
+            
+            if self.armaBin:
+                data = self.unpackArmaMatBin(self.file)            
+            else:
+                data = numpy.array(self.rx.findall(self.file.read()), numpy.float)
+                
+            if time.time() - t0 > 10.0:
+               self.Error("TIMEOUT: File was empty for too long...")
+               self.file.close()
+               return
+               
         self.file.close()
         
-        output = [0]*data.shape[1]
+        if len(data.shape) > 1:
+            output = [0]*data.shape[1]
+        else:
+            return data
+            
         for i in range(data.shape[1]):
             output[i] = data[:,i]
         
@@ -119,7 +137,7 @@ class DCVizPlotter:
         i = 0
         self.figures = []
         for fig in self.figMap.keys():
-            s += "self.%s = plab.figure(%d); " % (fig, i)
+            s += "self.%s = plab.figure(); " % fig
             s += "self.i%s = self.add_figure(self.%s); " % (fig, fig)
         
             subFigs = self.figMap[fig]
@@ -181,16 +199,19 @@ class DCVizPlotter:
 
     def showFigures(self):
         
-        if not self.useGUI:       
-            self.show()
+        if not self.useGUI:
+            if not self.plotted:
+                self.show()
+            else:
+                self.show(drawOnly=True)
         else:
-            if self.plotted and self.dynamic:
-                try:
-                    self.show(drawOnly=True)
-                except:
-                    #Exception needed in order for 
-                    #the thread to survive being closed by GUI
-                    pass
+            try:
+                self.show(drawOnly=True)
+            except:
+                #Exception needed in order for 
+                #the thread to survive being closed by GUI
+                pass
+            
             if not self.plotted:
                 self.parent.comm.plotSignal.emit()
 
@@ -211,13 +232,13 @@ class DCVizPlotter:
                 return
 
         self.manageFigures()
+        
 
         while (self.shouldReplot()):
-       
             self.clear()
            
             data = self.get_data(setUpFamily = self.isFamilyMember)
-          
+            
             self.plot(data)  
             self.showFigures()
             self.plotted = True
@@ -265,7 +286,6 @@ class DCVizPlotter:
 
         #If user has specified the number of rows to skip
         if self.skipRows is not None:
-            print "skipped rows is given."
             return self.skipRows, len(sampleList[self.skipRows])
 
         nLast = len(sampleList[-1])
@@ -286,19 +306,21 @@ class DCVizPlotter:
         if self.file:
             if not self.file.closed: 
                 self.file.close()
-            
+        
         self.file = open(self.filepath , "r")
-
+   
+        self.skippedRows = []
         if not self.armaBin and self.skipRows is not None:        
             for i in range(self.skipRows):
-                self.file.readline()
-        
+                self.skippedRows.append(self.file.readline().strip())
+              
         
         
         
             
     def add_figure(self, fig):
         self.figures.append([fig])
+        self.nFig += 1
         return len(self.figures) - 1
         
     def add_subfigure(self, subfig, i):
