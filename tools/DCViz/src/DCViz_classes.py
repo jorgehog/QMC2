@@ -147,7 +147,6 @@ class dist_out(DCVizPlotter):
         n_p = len(data[0][0])        
         n = len(data)
 
-
         nBins = 100
         
 
@@ -175,7 +174,19 @@ class dist_out(DCVizPlotter):
 
         #self.subfig.plot(X[:-1], Y, '*')
        
+class testBinFile(DCVizPlotter):
     
+    nametag = "testBin.+\.arma"
+    figMap = {"fig": ["subfig"]}
+
+    fileBin = True
+    Ncols = 2
+    
+    skipRows = 2    
+
+    def plot(self, data):
+        x, y = data
+        self.subfig.plot(x, y, '*')
         
 class MIN_OUT(DCVizPlotter):
     

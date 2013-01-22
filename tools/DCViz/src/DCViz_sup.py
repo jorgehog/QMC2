@@ -10,6 +10,8 @@ class DCVizPlotter:
     figMap = {}
 
     armaBin = False
+    fileBin = False
+    Ncols = None
     
     isFamilyMember = False
     familyName = "unnamed"
@@ -41,6 +43,10 @@ class DCVizPlotter:
         self.file = None
         
         signal.signal(signal.SIGINT, self.signal_handler)
+        
+        if self.Ncols is None and self.fileBin:
+            self.Error("You need to specify the number of cols 'Ncols' in order to read a binary file.")
+            
     
     
     def signal_handler(self, signal, frame):
@@ -88,7 +94,9 @@ class DCVizPlotter:
             self.reload()
             
             if self.armaBin:
-                data = self.unpackArmaMatBin(self.file)            
+                data = self.unpackArmaMatBin(self.file)      
+            elif self.fileBin:
+                data = self.unpackBinFile(self.file)
             else:
                 data = numpy.array(self.rx.findall(self.file.read()), numpy.float)
                 
@@ -109,23 +117,29 @@ class DCVizPlotter:
         
         return tuple(output)
     
+    def unpackBinFile(self, binFile):
+ 
+        data = numpy.fromfile(binFile, dtype=numpy.float64)
+  
+        m = self.Ncols
+        n = int(data.size/m)
+        
+        data.resize(n, m)
+        
+        return data
+            
+    
     def unpackArmaMatBin(self, armaFile):   
-
-        unpacker = struct.Struct("d")
     
         armaFormat = armaFile.readline().strip()
-        size = int(armaFormat[-1])
         
         n, m = armaFile.readline().strip().split()
         n = int(n)       
         m = int(m)
         
-        data = numpy.zeros(shape=(n, m))
+        data = numpy.fromfile(armaFile, dtype=numpy.float64)
+        data.resize((n,m))
         
-        for i in range(n):
-            for j in range(m):                
-                data[i][j] = unpacker.unpack(armaFile.read(size))[0]
-            
         return data
     
     def set_figures(self):
@@ -263,7 +277,10 @@ class DCVizPlotter:
             self.Error("No data in file...")
             return "red"
             
-        skipRows, self.N = self.sniffer(sample)
+        if self.fileBin:
+            return "green"
+            
+        skipRows, self.Ncols = self.sniffer(sample)
 
         self.file.seek(0)
         
@@ -272,7 +289,7 @@ class DCVizPlotter:
             self.skippedRows.append(self.file.readline().strip())
         
         anyNumber = r'[\+\-]?\d+\.?\d*[eE]?[\+\-]?\d*'
-        self.rx = re.compile((r'(%s)\s+' % anyNumber)*(self.N-1) + r'(%s)[\n$]' % anyNumber)    
+        self.rx = re.compile((r'(%s)\s+' % anyNumber)*(self.Ncols-1) + r'(%s)[\n$]' % anyNumber)    
         
         return "green"
         
