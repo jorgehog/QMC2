@@ -55,32 +55,29 @@ class DCVizPlotter:
 
         
     def get_data(self, setUpFamily):
-        ##CLEANUP THIS MESS
+
         if setUpFamily:
-            self.reload()
-            rootPath = self.filepath
-            familyHome, myName = os.path.split(rootPath)
+
+            familyHome, _ = os.path.split(self.filepath)
             familyNames = [name for name in os.listdir(familyHome)\
-                            if name != myName and re.findall(self.nametag, name)]
-            
-            familyMembers = sorted([os.path.join(familyHome, name) for name in familyNames])
+                            if re.findall(self.nametag, name) and "tmp" not in name]
+           
+            familyMembers = sorted([pjoin(familyHome, name) for name in familyNames])
             self.familySkippedRows = []
-            data = [0]*(len(familyMembers) + 1)
+            data = [0]*len(familyMembers)
             self.familyFileNames = [0]*len(data)     
-            
-            self.familyFileNames[0] = myName
-            data[0] = self.get_data(setUpFamily=False)
             
             for i in range(len(familyMembers)):
              
                 self.file = None
                 self.filepath = familyMembers[i]
+            
+                self.familyFileNames[i] = os.path.basename(familyMembers[i])
                 
-                self.familyFileNames[i+1] = os.path.split(familyMembers[i])[1]
-                data[i+1] = self.get_data(setUpFamily=False)
+                data[i] = self.get_data(setUpFamily=False)
                 self.familySkippedRows.append(self.skippedRows)
+                
             self.file.close()
-            self.filepath = rootPath
             return data
             
         data = []

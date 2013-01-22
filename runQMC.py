@@ -193,7 +193,14 @@ def initializeDir(path, filename, date=True):
     os.mkdir(PATH)
 
     return PATH    
-    
+
+def setOutPath(arglist, dirPath):
+    #In case the ini file contains no output flags
+    try:
+        arglist.insert(arglist.index("-o") + 1, "outputPath=%s/" % dirPath)
+    except ValueError:
+        arglist.append("-o")
+        arglist.append("outputPath=%s/" % dirPath)
 
 def parseFiles(openGUI):
     
@@ -240,15 +247,8 @@ def parseFiles(openGUI):
             if raw:
                 arglist.append(raw[0].replace(" ", ""))
     
-        #In case the ini file contains no output flags
-        try:
-            arglist.insert(arglist.index("-o") + 1, "outputPath=%s/" % dirPath)
-        except ValueError:
-            arglist.append("-o")
-            arglist.append("outputPath=%s/" % dirPath)
         
-        if "dist_out=0" not in arglist:
-            initializeDir(dirPath, "walker_positions", date=False)
+        setOutPath(arglist, dirPath)
         
         parsedFiles.append(convertToCMLargs(arglist))
 
@@ -412,6 +412,15 @@ def convertToCMLargs(arglist):
 def sendVersion(superDir):
     os.system("git branch -v > " + pjoin(superDir, "version.txt"))
 
+def createDistFolder(dirPath):
+    
+    if dirPath == "def":
+        print "Something's wrong... path should never be default."
+        return
+        
+    if not os.path.exists(pjoin(dirPath, "walker_positions")):
+        print "making folder %s" % pjoin(dirPath, "walker_positions")
+        initializeDir(dirPath, "walker_positions", date=False)
             
 def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
 
@@ -427,6 +436,9 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
         print "Running job ", dirs[i]
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
         MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
+        
+        if "dist_out=0" not in CMLarg:
+            createDistFolder(CMLarg.split()[cmlMAPo["outputPath"]])        
         
         os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
                     + " " + CMLarg + stdout)
@@ -521,8 +533,10 @@ def main():
     if len(sys.argv) == 1:
         CMLargs, dirs, superDir = parseFiles(openGUI)
     else:
-        CMLargs = [convertToCMLargs(sys.argv[1:])]
         dirs = [pjoin(paths.scratchPath, "QMC_SCRATCH")]
+        setOutPath(sys.argv, dirs[0])
+        CMLargs = [convertToCMLargs(sys.argv[1:])]
+        
         superDir = None
     
     initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores)

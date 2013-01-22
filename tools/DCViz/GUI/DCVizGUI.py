@@ -71,7 +71,8 @@ class DCVizPlotWindow(QMainWindow):
         
         self.parent = parent
         self.activeMode = activeMode
-        self.callStop = True
+        self.callStop = activeMode.dynamic
+        
         self.setAttribute(Qt.WA_DeleteOnClose)
         
 
@@ -101,7 +102,6 @@ class DCVizPlotWindow(QMainWindow):
                 self.parent.stop()
         
         self.activeMode.close()
-        self.parent.plotWinClosed = True
             
         QMainWindow.closeEvent(self, event)
 
@@ -131,7 +131,6 @@ class DCVizGUI(QMainWindow):
         
         self.dynamic = False
         self.started = False
-        self.plotWinClosed = True
         self.plotWins = []
         
         #Initial terminal output flag
@@ -281,14 +280,9 @@ class DCVizGUI(QMainWindow):
             
     def makePlotWindow(self):
         
-        #if not self.plotWinClosed:
-        #    self.plotWin.close()
-        
-
-#        self.plotWin = DCVizPlotWindow(self.activeMode, self)
         self.plotWins.append(DCVizPlotWindow(self.activeMode, self))
         self.plotWins[-1].setWindowTitle("DCViz plots")
-        self.plotWinClosed = False
+  
         
     
         
@@ -328,7 +322,6 @@ class DCVizGUI(QMainWindow):
         
             self.terminalTracker("Job", "Stoping... ", hold="on")
             self.job.comm.stopSignal.emit()
-            #self.plotWin.callStop = False
             
             self.plotWins[-1].callStop = False
             
