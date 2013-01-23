@@ -25,8 +25,8 @@ double SimpleVar::estimate_error() {
     double mean = f/i;
     double var = f2/(i-1) - i*mean*mean/(i-1);
     
-    
     return combine_variance(var, mean, i);
+     
 }
 
 

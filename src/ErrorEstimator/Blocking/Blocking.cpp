@@ -77,7 +77,7 @@ double Blocking::estimate_error() {
     arma::Row<int> block_sizes = arma::zeros<arma::Row<int> >(n_block_samples);
 
     get_unique_blocks(block_sizes, n);
-
+    
     for (int j = 0; j < n; j++) {
         block_size = block_sizes(j);
 
@@ -90,11 +90,13 @@ double Blocking::estimate_error() {
             
             file << block_size * n_nodes << "\t" << error << std::endl;
             if (j % 9 == 0) {
-                std::cout << "Blocking progress: " << (double) (j + 1) / n * 100 << "%" << std::endl;
+                std::cout << "\rBlocking progress: " << (double) (j + 1) / n * 100 << "%";
+                std::cout.flush();
             }
         }
     }
-
+    
+    if (is_master) std::cout << " Done." << std::endl;
     return error;
 }
 
@@ -115,12 +117,9 @@ void Blocking::block_data(int block_size, double &var, double &mean) {
         mean2 += block_mean*block_mean;
     }
 
-//    mean2 /= (n_b);
-//    mean /= (n_b);
-//
-//    var = mean2 - mean*mean;
+    mean /= n_b;
     
-    var = mean2/(n_b-1) - mean*mean/(n_b*(n_b-1));
+    var = mean2/(n_b-1) - n_b*mean*mean/(n_b-1);
 }
 
 void Blocking::get_initial_error() {
