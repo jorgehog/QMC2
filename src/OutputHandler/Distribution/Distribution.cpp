@@ -16,7 +16,7 @@ Distribution::Distribution(ParParams & pp, std::string filename,
 
 void Distribution::dump() {
 
-    if ((vmc->cycle > vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
+    if ((vmc->cycle >= vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
         s << path << "walker_positions/" << filename << node <<"_"<< i <<".arma";
         vmc->original_walker->r.save(s.str());
         s.str(std::string());

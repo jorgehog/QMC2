@@ -137,24 +137,43 @@ void ErrorEstimator::node_comm_scatter_data() {
 #endif
 }
 
-double ErrorEstimator::combine_variance(double var, double mean) {
+double ErrorEstimator::combine_mean(double mean, int n, int n_tot){
+    
+#ifdef MPI_ON
+    
+    mean *= n;
+    
+    MPI_Allreduce(MPI_IN_PLACE, &mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    
+    mean /= n_tot;
+    
+#endif   
+ 
+    return mean;
+    
+}
 
-    int n = data.n_elem;
 
+double ErrorEstimator::combine_variance(double var, double mean, int n) {
+
+    if (n == 0) {
+        n = data.n_elem;
+    }
+    
 #ifdef MPI_ON
 
     if (parallel) {
 
-        double combined_mean;
-
-        MPI_Allreduce(&mean, &combined_mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        combined_mean /= n_nodes;
-
+        int n_tot;
+        MPI_Allreduce(&n, &n_tot, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   
+        
+        double combined_mean = combine_mean(mean, n, n_tot);
         double combined_var = n * (mean - combined_mean)*(mean - combined_mean) + (n - 1) * var;
 
         if (is_master) {
             MPI_Reduce(MPI_IN_PLACE, &combined_var, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-            var = combined_var / (n * n_nodes - 1);
+            var = combined_var / (n_tot - 1);
         } else {
             MPI_Reduce(&combined_var, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }

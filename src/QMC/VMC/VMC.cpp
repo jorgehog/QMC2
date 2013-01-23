@@ -21,7 +21,9 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp)
 
 void VMC::initialize() {
     jastrow->initialize();
+ 
     sampling->set_trial_pos(original_walker);
+   
     copy_walker(original_walker, trial_walker);
 }
 

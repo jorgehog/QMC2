@@ -9,5 +9,6 @@
 
 
 No_Jastrow::No_Jastrow() {
+    n_p = 0;
     active = false;
 }

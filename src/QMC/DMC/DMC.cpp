@@ -193,6 +193,8 @@ void DMC::run_method() {
     }
 
     finalize_output();
+    
+    error_estimator->normalize();
     estimate_error();
 }
 

@@ -419,7 +419,7 @@ def createDistFolder(dirPath):
         return
         
     if not os.path.exists(pjoin(dirPath, "walker_positions")):
-        print "making folder %s" % pjoin(dirPath, "walker_positions")
+        #print "making folder %s" % pjoin(dirPath, "walker_positions")
         initializeDir(dirPath, "walker_positions", date=False)
             
 def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
@@ -437,7 +437,7 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
         MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
-        if "dist_out=0" not in CMLarg:
+        if CMLarg.split()[cmlMAPo["dist_out"]] != "0":
             createDistFolder(CMLarg.split()[cmlMAPo["outputPath"]])        
         
         os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
@@ -452,7 +452,7 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
         
         if stdoutToFile:
             subprocess.call(["python", pjoin(paths.toolsPath, "output2tex.py"), superDir])
-
+            os.system('cat %s' % pjoin(superDir, 'texTable.tex'))
         #shutil.copy(pjoin(paths.toolsPath, "output2tex.py"), superDir)
         
     

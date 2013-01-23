@@ -295,9 +295,9 @@ class DCVizPlotter:
         
     
     def sniffer(self, sample):
-        
-        sampleList = [row.split() for row in sample.split("\n")]
 
+        sampleList = [row.split() for row in sample.split("\n")]
+ 
         #If user has specified the number of rows to skip
         if self.skipRows is not None:
             return self.skipRows, len(sampleList[self.skipRows])

@@ -200,7 +200,7 @@ class MIN_OUT(DCVizPlotter):
     
     def plot(self, data):
 
-        n_params = (self.N - 3)/2
+        n_params = (self.Ncols - 3)/2
         
         E, Eavg, step = data[:3]
         

@@ -394,7 +394,7 @@ void parseCML(int argc, char** argv,
         }
 
         if (def.compare(argv[dist_in_loc]) == 0) {
-            dmcParams.dist_in = generalParams.doDMC & generalParams.doVMC;
+            dmcParams.dist_in = outputParams.dist_out;
         }
         
     }
@@ -428,7 +428,8 @@ void parseCML(int argc, char** argv,
             if (dmcParams.dist_in && outputParams.dist_out) {
                 if (dmcParams.n_w > vmcParams.n_c / (200)) {
                     std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
-                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << vmcParams.n_c / (200) << std::endl;
+                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << dmcParams.n_w*200 << std::endl;
+                    exit(1);
                 }
             }
         }

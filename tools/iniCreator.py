@@ -53,23 +53,22 @@ use_coulomb = 0
 doVMC = 1
 doDMC = 1
 doMIN = 1
-sampling=BF
 
 VMC:
-n_c = 1E3
+n_c = 1E6
 
 DMC:
-n_b=1
-therm=10
-n_c=10
+n_b=50
+therm=100
+n_c=100
 
 
 MIN:
-SGDsamples=10
-n_c_SGD=10
-therm=0
-n_c=1
-alpha=1
+SGDsamples=2000
+n_c_SGD=400
+therm=10000
+n_c=100
+
 
 """
 
@@ -95,18 +94,19 @@ systemConstant = __W__
 doMIN = 1
 doVMC = 1
 doDMC = 1
-do_blocking=1
 
 DMC:
 dist_in = 1
 therm=5000
+n_c=5000
+n_w=1000
 
 output:
 dist_out = 1
 
 MIN:
 SGDsamples=10000
-n_c_SGD=200
+n_c_SGD=1000
 
 """
 

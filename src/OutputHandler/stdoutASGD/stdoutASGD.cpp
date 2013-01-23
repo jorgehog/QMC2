@@ -25,18 +25,19 @@ void stdoutASGD::dump() {
     file << sumE / asgd->sample << "\t";
 
     
-    file << fabs(asgd->step) << "\t";
+    file << fabs(asgd->step);
     
     for (int i = 0; i < asgd->Nspatial_params; i++) {
-        file << asgd->vmc->get_orbitals_ptr()->get_parameter(i) << "\t";
+        file << "\t" << asgd->vmc->get_orbitals_ptr()->get_parameter(i) << "\t";
         grad(i) += asgd->gradient_tot(i);
-        file << grad(i)/ asgd->sample << "\t";
+        file << grad(i)/ asgd->sample;
     }
     for (int i = 0; i < asgd->Njastrow_params; i++){
-        file << asgd->vmc->get_jastrow_ptr()->get_parameter(i) << "\t";
+        file << "\t" <<asgd->vmc->get_jastrow_ptr()->get_parameter(i) << "\t";
         grad(i + asgd->Nspatial_params) += asgd->gradient_tot(i + asgd->Nspatial_params);
-        file << grad(i + asgd->Nspatial_params) / asgd->sample << std::endl;
+        file << grad(i + asgd->Nspatial_params) / asgd->sample;
     }
+    file << std::endl;
 
     
 }

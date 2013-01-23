@@ -21,7 +21,8 @@ public:
             bool parallel,
             int node, int n_nodes, bool rerun = false);
 
-    double combine_variance(double var, double mean = 0);
+    double combine_mean(double mean, int n, int n_tot);
+    double combine_variance(double var, double mean = 0, int n = 0);
     
     void finalize();
 
@@ -35,10 +36,7 @@ public:
     void normalize();
 
     virtual void update_data(double val); 
-    
-    void clear(){
-        data.clear();
-    }
+
 
 protected:
     int n_c;

@@ -115,10 +115,12 @@ void Blocking::block_data(int block_size, double &var, double &mean) {
         mean2 += block_mean*block_mean;
     }
 
-    mean2 /= (n_b);
-    mean /= (n_b);
-
-    var = mean2 - mean*mean;
+//    mean2 /= (n_b);
+//    mean /= (n_b);
+//
+//    var = mean2 - mean*mean;
+    
+    var = mean2/(n_b-1) - mean*mean/(n_b*(n_b-1));
 }
 
 void Blocking::get_initial_error() {

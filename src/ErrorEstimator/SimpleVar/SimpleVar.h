@@ -14,11 +14,12 @@ public:
     SimpleVar(int n_c);
     
     double estimate_error();
+    virtual void update_data(double val);
     
 protected:
     
-    double E;
-    double E2;
+    double f;
+    double f2;
     
     
 };

@@ -89,11 +89,10 @@ void ASGD::get_total_grad() {
 VMC* ASGD::minimize() {
 
     vmc->initialize();
-
     thermalize_walkers();
-
+    
     for (sample = 1; sample <= SGDsamples; sample++) {
-
+    
         E = 0;
         gradient = arma::zeros(1, Nparams);
         gradient_local = arma::zeros(1, Nparams);
@@ -105,9 +104,8 @@ VMC* ASGD::minimize() {
             vmc->get_sampling_ptr()->get_necessities(walkers[k]);
 
             for (int cycle = 0; cycle < n_c_SGD; cycle++) {
-
+                
                 vmc->diffuse_walker(walkers[k], trial_walkers[k]);
-
 
                 vmc->calculate_energy_necessities(walkers[k]);
                 double e_local = vmc->calculate_local_energy(walkers[k]);
