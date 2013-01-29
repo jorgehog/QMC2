@@ -30,3 +30,7 @@ void SimpleVar::update_data(double val) {
     f += val;
     i++;
 }
+
+void normalize(){
+    
+}

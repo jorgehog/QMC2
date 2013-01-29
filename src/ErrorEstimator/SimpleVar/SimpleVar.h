@@ -14,7 +14,7 @@ public:
     
     double estimate_error();
     virtual void update_data(double val);
-    
+    virtual void normalize();
 protected:
     
     double f;
