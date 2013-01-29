@@ -114,9 +114,17 @@ void DMC::update_energies() {
     E_tot += E;
     tot_samples += samples;
 
-    dmc_E = E_tot / tot_samples;
-    dmc_E_unscaled += dmc_E;
-    E_T = dmc_E_unscaled / cycle;
+    //    dmc_E = E_tot / tot_samples;
+    //    dmc_E_unscaled += dmc_E;
+    //    E_T = dmc_E_unscaled / cycle;
+
+    //    E_T = E_tot / tot_samples;
+    //    dmc_E_unscaled += E_T;
+    //    dmc_E = dmc_E_unscaled / cycle;
+
+    E_T = E / samples;
+    dmc_E_unscaled += E_T;
+    dmc_E = dmc_E_unscaled / cycle;
 
 }
 
@@ -193,7 +201,7 @@ void DMC::run_method() {
     }
 
     finalize_output();
-    
+
     error_estimator->normalize();
     estimate_error();
 }
