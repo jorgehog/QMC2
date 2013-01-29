@@ -19,7 +19,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
     this->E_T = dP.E_T;
 
     int max_walkers = K * n_w;
-
+   
     original_walkers = new Walker*[max_walkers];
     trial_walker = new Walker(n_p, dim);
 
@@ -30,13 +30,14 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
 }
 
 void DMC::initialize() {
-    jastrow->initialize();
 
+    jastrow->initialize();
+    
     //Initializing active walkers
     for (int k = 0; k < n_w; k++) {
         original_walkers[k] = new Walker(n_p, dim);
     }
-
+    
     //Seting trial position of active walkers
     if (dist_from_file) {
         for (int k = 0; k < n_w; k++) {

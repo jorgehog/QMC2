@@ -99,7 +99,8 @@ DMC:
 dist_in = 1
 therm=5000
 n_c=5000
-n_w=1000
+n_w=2000
+dt=0.0005
 
 output:
 dist_out = 1

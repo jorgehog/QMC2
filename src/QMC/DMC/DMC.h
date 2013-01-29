@@ -63,7 +63,7 @@ protected:
 public:
 
     static const int K = 2; //Factor of empty space for walkers over initial walkers
-    static const int check_thresh = 5;
+    static const int check_thresh = 20;
     static const int sendcount_thresh = 20;
 
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);

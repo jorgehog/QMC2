@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
                             minBlockname, outputParams.outputPath);
                     minimizer->add_error_estimator(blocking);
                 } else {
-                    minimizer->add_error_estimator(new SimpleVar(minimizerParams.SGDsamples, parParams));
+                    minimizer->add_error_estimator(new SimpleVar(parParams));
                 }
             }
 
@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
                 ErrorEstimator* blocking = new Blocking(vmcParams.n_c, parParams, vmcBlockname, outputParams.outputPath);
                 vmc->set_error_estimator(blocking);
             } else {
-                vmc->set_error_estimator(new SimpleVar(vmcParams.n_c, parParams));
+                vmc->set_error_estimator(new SimpleVar(parParams));
             }
 
 
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
 
 
         systemObjects.sample_method->set_dt(dmcParams.dt);
-
+        
         DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
         
         if (outputParams.dmc_out && parParams.is_master) {
@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
             ErrorEstimator* blocking = new Blocking(DMCerrorN, parParams, dmcBlockname, outputParams.outputPath);
             dmc->set_error_estimator(blocking);
         } else {
-            dmc->set_error_estimator(new SimpleVar(DMCerrorN, parParams));
+            dmc->set_error_estimator(new SimpleVar(parParams));
         }
 
         if (parParams.is_master) t.tic();

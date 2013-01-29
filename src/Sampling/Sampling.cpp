@@ -68,7 +68,7 @@ void Sampling::update_pos(const Walker* walker_pre, Walker* walker_post, int par
     for (int j = 0; j < n_p; j++) {
         if (j != particle) {
             walker_post->r_rel(particle, j) = walker_post->r_rel(j, particle)
-                    = walker_post->abs_relative(particle, j);
+                    = walker_post->calc_r_rel(particle, j);
         }
     }
 

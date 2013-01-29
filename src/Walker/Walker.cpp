@@ -7,6 +7,12 @@
 
 #include "../QMCheaders.h"
 
+Walker::Walker(){
+    
+    std::cout << "called" << std::endl;
+    
+}
+
 Walker::Walker(int n_p, int dim, bool alive) {
     using namespace arma;
 
@@ -47,7 +53,7 @@ void Walker::calc_r_i2(int i) {
         r2i += r(i, j) * r(i, j);
     }
 
-    r2[i] = r2i;
+    r2(i) = r2i;
 
 }
 
@@ -56,17 +62,16 @@ void Walker::make_rel_matrix() {
 
     for (i = 0; i < n_p - 1; i++) {
         for (j = i + 1; j < n_p; j++) {
-            r_rel(i, j) = r_rel(j, i) = abs_relative(i, j);
+            r_rel(i, j) = r_rel(j, i) = calc_r_rel(i, j);
         }
     }
 }
 
-double Walker::abs_relative(int i, int j) const {
-    int k;
+double Walker::calc_r_rel(int i, int j) const {
     double r_ij, tmp;
 
     r_ij = 0;
-    for (k = 0; k < dim; k++) {
+    for (int k = 0; k < dim; k++) {
         tmp = (r(i, k) - r(j, k));
         r_ij += tmp*tmp;
     }

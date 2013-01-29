@@ -18,6 +18,7 @@ protected:
 
 public:
 
+    Walker();
     Walker(int n_p, int dim, bool do_init = true);
     
     double spatial_ratio;
@@ -49,7 +50,7 @@ public:
         }
     }
 
-    double abs_relative(int i, int j) const;
+    double calc_r_rel(int i, int j) const;
 
     void make_rel_matrix();
     

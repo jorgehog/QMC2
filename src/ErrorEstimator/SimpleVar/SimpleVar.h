@@ -10,8 +10,7 @@
 
 class SimpleVar : public ErrorEstimator {
 public:
-    SimpleVar(int n_c, ParParams &);
-    SimpleVar(int n_c);
+    SimpleVar(ParParams &);
     
     double estimate_error();
     virtual void update_data(double val);

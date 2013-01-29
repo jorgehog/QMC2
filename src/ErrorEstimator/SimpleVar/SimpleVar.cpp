@@ -7,16 +7,11 @@
 
 #include "../../QMCheaders.h"
 
-SimpleVar::SimpleVar(int n_c, ParParams & pp)
-: ErrorEstimator(n_c, "", "", pp.parallel, pp.node, pp.n_nodes, false) {
+SimpleVar::SimpleVar(ParParams & pp)
+: ErrorEstimator(0, "", "", pp.parallel, pp.node, pp.n_nodes, false) {
     data_to_file = false;
     f = 0;
     f2 = 0;
-}
-
-SimpleVar::SimpleVar(int n_c)
-: ErrorEstimator(n_c, "", "", false, 0, 1, false) {
-    data_to_file = false;
 }
 
 double SimpleVar::estimate_error() {
