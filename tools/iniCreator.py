@@ -86,7 +86,7 @@ n_c=100
 if fullruns:
     
     wList = [0.01, 0.1, 0.28, 0.5, 1]
-    npList = [2, 6, 12]
+    npList = [2, 6, 12, 20, 30]
     
     rawFile = """general:
 n_p = __NP__
