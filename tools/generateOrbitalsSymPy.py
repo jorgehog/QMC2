@@ -15,6 +15,11 @@ r2d = sqrt(r2_2d)
 r2_3d = r2_2d + z**2
 r3d = sqrt(r2_3d)
 
+r = Symbol('r')
+r2 = Symbol('r2')
+
+k = Symbol('k')
+
 class orbitalGenerator(object):
     
     def __init__(self):
@@ -25,6 +30,44 @@ class orbitalGenerator(object):
         self.makeStateMap()
         self.setupOrbitals()
         self.getGradientsAndLaplacians()
+        self.simplify()
+        
+    def simplify(self, stop = False):
+        for i in range(len(self.orbitals)):
+            if self.dim == 3:
+                self.orbitals[i] = self.orbitals[i].subs('(x**2 + y**2 + z**2)**(1/2)', r)
+                self.orbitals[i] = self.orbitals[i].subs('x**2 + y**2 + z**2', r2)
+                self.orbitals[i] = self.orbitals[i].factor(r2_2d)
+            else:
+                self.orbitals[i] = self.orbitals[i].subs('(x**2 + y**2)**(1/2)', r)
+                self.orbitals[i] = self.orbitals[i].subs('1.0*k**2*x**2 + 1.0*k**2*y**2', k**2*r2)
+                self.orbitals[i] = self.orbitals[i].factor(r2_3d)
+                
+        for i in range(len(self.gradients)):
+            for j in range(self.dim):
+                
+                if self.dim == 3:
+                    self.gradients[i][j] = self.gradients[i][j].subs('(x**2 + y**2 + z**2)**(1/2)', r)
+                    self.gradients[i][j] = self.gradients[i][j].subs('x**2 + y**2 + z**2', r2)
+                    self.gradients[i][j] = self.gradients[i][j].factor(r2_2d)
+                else:
+                    self.gradients[i][j] = self.gradients[i][j].subs('(x**2 + y**2)**(1/2)', r)
+                    self.gradients[i][j] = self.gradients[i][j].subs('1.0*k**2*x**2 + 1.0*k**2*y**2', k**2*r2)
+                    self.gradients[i][j] = self.gradients[i][j].factor(r2_3d)
+        
+        for i in range(len(self.Laplacians)):
+             
+            if self.dim == 3:
+                self.Laplacians[i] = self.Laplacians[i].subs('(x**2 + y**2 + z**2)**(1/2)', r)
+                self.Laplacians[i] = self.Laplacians[i].subs('x**2 + y**2 + z**2', r2)
+                self.Laplacians[i] = self.Laplacians[i].factor(r2_2d)
+            else:
+                self.Laplacians[i] = self.Laplacians[i].subs('(x**2 + y**2)**(1/2)', r)
+                self.Laplacians[i] = self.Laplacians[i].subs('1.0*k**2*x**2 + 1.0*k**2*y**2', k**2*r2)
+                self.Laplacians[i] = self.Laplacians[i].factor(r2_3d)
+
+        if not stop:
+            self.simplify(True)
 
     def getGradientsAndLaplacians(self):
         self.Laplacians = []
@@ -76,7 +119,6 @@ class orbitalGenerator(object):
         return s.strip("\n")
 
 class HOOrbitals(orbitalGenerator):
-    k = Symbol('k')
     dim = 2
     
     def __init__(self):
@@ -87,8 +129,8 @@ class HOOrbitals(orbitalGenerator):
         
         self.nShells = int(0.5*(sqrt(1 + 4*self.maxImplemented) - 1))
         for i in range(self.nShells):
-            self.Hx.append(hermite(i, self.k*x))
-            self.Hy.append(hermite(i, self.k*y))
+            self.Hx.append(hermite(i, k*x))
+            self.Hy.append(hermite(i, k*y))
             
         
         super(HOOrbitals, self).__init__()
@@ -105,7 +147,7 @@ class HOOrbitals(orbitalGenerator):
     
     def setupOrbitals(self):
   
-        expFactor = exp(-0.5*self.k*self.k*r2_2d)
+        expFactor = exp(-0.5*k*k*r2_2d)
         
         for i, stateMap in self.stateMap.items():
     
@@ -132,10 +174,8 @@ class HOOrbitals(orbitalGenerator):
 class hydrogenicOrbitals(orbitalGenerator):
     dim = 3
     
-    Z = Symbol('Z')
-    
     def __init__(self):
-        self.setMax(2)
+        self.setMax(10)
         
         nShells = 0
         while nShells*(nShells+1)*(2*nShells+1)/6 < self.maxImplemented/2:
@@ -196,10 +236,10 @@ class hydrogenicOrbitals(orbitalGenerator):
 
 
 def main():        
-    #qdots = HOOrbitals()
-    #print qdots
-    atoms = hydrogenicOrbitals()
-    print atoms
+    qdots = HOOrbitals()
+    print qdots
+    #atoms = hydrogenicOrbitals()
+    #print atoms
     
 
 if __name__ == "__main__":
