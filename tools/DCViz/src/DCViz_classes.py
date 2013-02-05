@@ -135,7 +135,7 @@ class DMC_OUT(DCVizPlotter):
 class dist_out(DCVizPlotter):
     
     nametag = "dist.+\.arma"
-    figMap = {"fig": ["subfig"]}
+    figMap = {"fig1" : ["subfigMeanPos", "subfigRadii"], "fig2": ["subfigHist2d", "subfigDist1d"]}
 
     armaBin = True
     
@@ -149,31 +149,43 @@ class dist_out(DCVizPlotter):
 
         nBins = 100
         
-
-        r = numpy.zeros(n*n_p)
-        #X = numpy.zeros(n*n_p)
-        #Y = numpy.zeros(n*n_p)
+        X = numpy.zeros([n, n_p])
+        Y = numpy.zeros([n, n_p])  
         
-        for i in range(n):
-            x, y = data[i];
+        for i in xrange(n):
+            x, y = data[i]
+            X[i] = x
+            Y[i] = y
             
-            #X[i*n_p: (i+1)*n_p] = x[:]
-            #Y[i*n_p: (i+1)*n_p] = y[:]
             
-            r[i*n_p: (i+1)*n_p] = numpy.sqrt(x**2 + y**2)
-       
-        #self.subfig.hexbin(X, Y, cmap=pylab.cm.YlOrRd_r)
-       
-        self.subfig.hist(r, nBins, normed=1, facecolor='green', histtype='stepfilled')
-       
+        Xavg = X.sum(0)/n
+        Yavg = Y.sum(0)/n
+
         
-        #Y, X = numpy.histogram(r, bins=numpy.linspace(0, r.max(), nBins))
+        rMean = numpy.sqrt(Xavg**2 + Yavg**2)
+        
+        rMean.sort()
 
-        #w = float(re.findall("np\d+_w(.+)/walker_positions", self.filepath)[0])
-        #print w
+        X.resize(n*n_p)
+        Y.resize(n*n_p)
+        
+        R = numpy.sqrt(X**2 + Y**2)        
+        
+        self.subfigHist2d.hexbin(X, Y)
+        self.subfigHist2d.set_xlabel(r'x')
+        self.subfigHist2d.set_ylabel(r'y')
+        
+        self.subfigDist1d.hist(R, nBins, facecolor='green', histtype='stepfilled')
+        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2}$')
 
-        #self.subfig.plot(X[:-1], Y, '*')
-       
+        self.subfigMeanPos.plot(Xavg, Yavg, 'ro')
+        self.subfigMeanPos.set_xlabel(r'$\langle x\rangle$')
+        self.subfigMeanPos.set_ylabel(r'$\langle y\rangle$')
+
+        self.subfigRadii.plot(rMean, 'b*')
+        self.subfigRadii.set_xlabel(r'Particle')
+        self.subfigRadii.set_ylabel(r'$\langle r \rangle$')
+        
 class testBinFile(DCVizPlotter):
     
     nametag = "testBin.+\.arma"

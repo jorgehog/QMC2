@@ -1,13 +1,16 @@
-from sympy import hermite, Symbol, sqrt, diff, exp, Ylm, laguerre_l as laguerre, re, im
-from sympy import cos, sin
+from sympy import hermite, Symbol, sqrt, diff, exp, Ylm, laguerre_l as laguerre, re, im, collect
+from sympy import cos, sin, latex, I, pi, sympify
 from math import ceil
+import re as regxp
+import sympy.galgebra.latex_ex as tex
 
-x = Symbol('x')
-y = Symbol('y')
-z = Symbol('z')
 
-theta = Symbol('theta')
-phi = Symbol('phi')
+x = Symbol('x', real=True)
+y = Symbol('y', real=True)
+z = Symbol('z', real=True)
+
+theta = Symbol('theta', real=True)
+phi = Symbol('phi', real=True)
 
 r2_2d = x**2 + y**2
 r2d = sqrt(r2_2d)
@@ -15,10 +18,11 @@ r2d = sqrt(r2_2d)
 r2_3d = r2_2d + z**2
 r3d = sqrt(r2_3d)
 
-r = Symbol('r')
-r2 = Symbol('r2')
+r = Symbol('r', real=True)
+r2 = Symbol('r2', real=True)
+r_2d = Symbol('r_2d', real=True)
 
-k = Symbol('k')
+k = Symbol('k', real=True)
 
 class orbitalGenerator(object):
     
@@ -32,42 +36,16 @@ class orbitalGenerator(object):
         self.getGradientsAndLaplacians()
         self.simplify()
         
-    def simplify(self, stop = False):
+    def simplify(self):
         for i in range(len(self.orbitals)):
-            if self.dim == 3:
-                self.orbitals[i] = self.orbitals[i].subs('(x**2 + y**2 + z**2)**(1/2)', r)
-                self.orbitals[i] = self.orbitals[i].subs('x**2 + y**2 + z**2', r2)
-                self.orbitals[i] = self.orbitals[i].factor(r2_2d)
-            else:
-                self.orbitals[i] = self.orbitals[i].subs('(x**2 + y**2)**(1/2)', r)
-                self.orbitals[i] = self.orbitals[i].subs('1.0*k**2*x**2 + 1.0*k**2*y**2', k**2*r2)
-                self.orbitals[i] = self.orbitals[i].factor(r2_3d)
-                
-        for i in range(len(self.gradients)):
-            for j in range(self.dim):
-                
-                if self.dim == 3:
-                    self.gradients[i][j] = self.gradients[i][j].subs('(x**2 + y**2 + z**2)**(1/2)', r)
-                    self.gradients[i][j] = self.gradients[i][j].subs('x**2 + y**2 + z**2', r2)
-                    self.gradients[i][j] = self.gradients[i][j].factor(r2_2d)
-                else:
-                    self.gradients[i][j] = self.gradients[i][j].subs('(x**2 + y**2)**(1/2)', r)
-                    self.gradients[i][j] = self.gradients[i][j].subs('1.0*k**2*x**2 + 1.0*k**2*y**2', k**2*r2)
-                    self.gradients[i][j] = self.gradients[i][j].factor(r2_3d)
-        
-        for i in range(len(self.Laplacians)):
-             
-            if self.dim == 3:
-                self.Laplacians[i] = self.Laplacians[i].subs('(x**2 + y**2 + z**2)**(1/2)', r)
-                self.Laplacians[i] = self.Laplacians[i].subs('x**2 + y**2 + z**2', r2)
-                self.Laplacians[i] = self.Laplacians[i].factor(r2_2d)
-            else:
-                self.Laplacians[i] = self.Laplacians[i].subs('(x**2 + y**2)**(1/2)', r)
-                self.Laplacians[i] = self.Laplacians[i].subs('1.0*k**2*x**2 + 1.0*k**2*y**2', k**2*r2)
-                self.Laplacians[i] = self.Laplacians[i].factor(r2_3d)
-
-        if not stop:
-            self.simplify(True)
+                   
+            self.orbitals[i] = self.simplifyLocal(self.orbitals[i])
+            
+            for j in range(self.dim): 
+                self.gradients[i][j] = self.simplifyLocal(self.gradients[i][j])
+       
+            self.Laplacians[i] = self.simplifyLocal(self.Laplacians[i])
+           
 
     def getGradientsAndLaplacians(self):
         self.Laplacians = []
@@ -90,11 +68,14 @@ class orbitalGenerator(object):
                 gradient.append(dz)
                 Laplace += ddz
      
-            self.gradients.append([dx.simplify() for dx in gradient])
-            self.Laplacians.append(Laplace.simplify())
+            self.gradients.append(gradient)
+            self.Laplacians.append(Laplace)
             
     def setMax(self, M):
         self.maxImplemented = M
+
+    def simplifyLocal(self, expr):
+        return expr
 
     def __str__(self):
         
@@ -102,21 +83,22 @@ class orbitalGenerator(object):
         xi = ['x', 'y', 'z']
         
         for key in sorted(self.stateMap.keys()):
-            s += "%2d -> " % key
+            s += "END"
+            s += "%d : " % key
             for n in self.stateMap[key]:
                 s += "%d " % n
-            s += "--------------------------\n"
-            s += "Orbital = %s\n" % self.orbitals[key]
+            s += "\n"
+            s += "Orbital = %s\n" % latex(self.orbitals[key])
             s += "Gradient:\n"
          
             for i in range(self.dim):
-                s+= "%s: %s\n" % (xi[i], self.gradients[key][i])
+                s+= "%s: %s\n" % (xi[i], latex(self.gradients[key][i]))
            
                 
-            s += "Laplace = %s\n\n" % (self.Laplacians[key])
+            s += "Laplace = %s\n" % latex(self.Laplacians[key])
     
             
-        return s.strip("\n")
+        return s
 
 class HOOrbitals(orbitalGenerator):
     dim = 2
@@ -135,7 +117,11 @@ class HOOrbitals(orbitalGenerator):
         
         super(HOOrbitals, self).__init__()
         
-        
+    def simplifyLocal(self, expr):
+        expr = (expr.collect(self.expFactor)/self.expFactor).expand().collect(k)
+        expr = expr.factor(k).subs(1.0*x, x).subs(1.0*y, y)
+        return (expr*self.expFactor).subs(x**2 + y**2, r2)
+    
     def makeStateMap(self):
 
         i = 0
@@ -147,25 +133,23 @@ class HOOrbitals(orbitalGenerator):
     
     def setupOrbitals(self):
   
-        expFactor = exp(-0.5*k*k*r2_2d)
+        self.expFactor = exp(-0.5*k**2*(x**2 + y**2))
         
         for i, stateMap in self.stateMap.items():
     
             nx, ny = stateMap
             
-            self.orbitals[i] = self.Hx[nx]*self.Hy[ny]*expFactor
+            self.orbitals[i] = self.Hx[nx]*self.Hy[ny]*self.expFactor
         
             
     def __str__(self):
         
         s = ""
         for i, h in enumerate(self.Hx):
-            s += "H%d(kx) = %s\n" % (i, h)
-        s += "\n"
+            s += "H%d(kx) = %s\n" % (i, latex(h))
         
         for i, h in enumerate(self.Hy):
-            s+= "H%d(ky) = %s\n" % (i, h)
-        s += "\n"
+            s+= "H%d(ky) = %s\n" % (i, latex(h))
     
         
         return s + orbitalGenerator.__str__(self)
@@ -196,7 +180,7 @@ class hydrogenicOrbitals(orbitalGenerator):
    
         super(hydrogenicOrbitals, self).__init__()
         
-        
+    
     def getRadialFunc(self, n, l):
         return laguerre(n - l - 1, 2*l + 1, 2*r3d/n)*exp(-r3d/n)
     
@@ -206,7 +190,10 @@ class hydrogenicOrbitals(orbitalGenerator):
         return func
     
     def getSphericalFunc(self, l, m):
-        return self.sphere2Cart(re(Ylm(l, m, theta, phi)))
+        return self.sphere2Cart(self.get_real(Ylm(l, m, theta, phi)))
+        
+    def simplifyLocal(self, expr):
+        return expr.subs(str(r2d), r_2d).subs("(x**2 + y**2 + z**2)**(1/2)", r).subs(r2_3d, r2)
     
     def makeStateMap(self):
                 
@@ -224,6 +211,27 @@ class hydrogenicOrbitals(orbitalGenerator):
                      self.stateMap[i] = [n, l, m]
                      i += 1
         
+    def get_real(self, expr):
+        
+        s = str(expr.factor(exp(x)))
+
+
+        print s
+        if not "I" in s:
+            print "nothing"
+            return expr
+        else:
+            if regxp.findall('exp\((.+)\)', s):
+                arguments = regxp.findall('exp\((.+?)\)', s)
+                for argument in arguments:
+                    if not "I" in argument:
+                        continue
+                    print argument
+                    s = s.replace('exp(%s)' % (argument), 'cos(%s)' % argument.replace("I*", "")).replace("I", "")
+        print "after:"
+        print sympify(s.replace('cos()', 'cos(1)'))
+        return sympify(s.replace('cos()', 'cos(1)'))
+                    
         
     def setupOrbitals(self):
         
@@ -235,11 +243,52 @@ class hydrogenicOrbitals(orbitalGenerator):
         
 
 
-def main():        
-    qdots = HOOrbitals()
-    print qdots
+def latexInit():
+    s = r"""\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{equation*}
+\begin{split}
+"""
+    return s
+    
+def latexEnd():
+    s = r"""\end{split}
+\end{equation*}
+
+
+\end{document}
+"""
+    return s
+
+def newEq():
+    return "\end{split}\n\end{equation*}\n\\begin{equation*}\n\\begin{split}\n"
+
+def main():
+    obj = HOOrbitals()
+#    obj = hydrogenicOrbitals()
+    
+    with open('/home/jorgmeister/scratch/orbitals.tex', 'w') as f:        
+        f.write(latexInit())
+        f.write(str(obj).replace("\n", r"\\" + "\n").replace("END", newEq()))
+        f.write(latexEnd())
+        f.close()
+    
+
+       
+    
     #atoms = hydrogenicOrbitals()
     #print atoms
+
     
 
 if __name__ == "__main__":
