@@ -3,6 +3,14 @@ from math import ceil
 import re as regxp
 import sympy.galgebra.latex_ex as tex
 
+cycle = lambda a: [a[-1]] + a[:-1]
+def copyList2(a):
+    
+    b = [[]]*len(a)
+    for i in range(len(a)):
+        b[i] = a[i][:]
+        
+    return b
 
 x = Symbol('x', real=True)
 y = Symbol('y', real=True)
@@ -23,11 +31,18 @@ r_2d = Symbol('r_2d', real=True, positive = True)
 
 k = Symbol('k', real=True, positive = True)
 
+x2, y2, z2 = symbols('x2 y2 z2', real=True, positive=True)
+
+
 class orbitalGenerator(object):
     
     genericFactor = sympify(1)    
+    xi = ['x', 'y', 'z']
+    xi2 = ['x2', 'y2', 'z2']
     
-    def __init__(self):
+    def __init__(self, doInit=True):
+        if not doInit:
+            return
     
         self.stateMap = {}
         self.orbitals = [0]*int(ceil(self.maxImplemented/2.))
@@ -185,9 +200,9 @@ class orbitalGenerator(object):
 class HOOrbitals(orbitalGenerator):
     dim = 2
     
-    def __init__(self):
+    def __init__(self, M, doInit=True):
         
-        self.setMax(30)
+        self.setMax(M)
         self.Hx = []        
         self.Hy = []        
         
@@ -198,7 +213,7 @@ class HOOrbitals(orbitalGenerator):
           
         self.expFactor = exp(-Rational(1,2)*k**2*(x**2 + y**2))
         
-        super(HOOrbitals, self).__init__()
+        super(HOOrbitals, self).__init__(doInit)
         
     def simplifyLocal(self, expr, qNums):
         expr = (expr.collect(self.expFactor)/self.expFactor).expand().collect(k)
@@ -254,8 +269,8 @@ where $k = \omega\alpha$ is the scaled oscillator frequency.
 class hydrogenicOrbitals(orbitalGenerator):
     dim = 3
     
-    def __init__(self):
-        self.setMax(10)
+    def __init__(self, M, doInit=True):
+        self.setMax(M)
         
         nShells = 0
         while nShells*(nShells+1)*(2*nShells+1)/6 < self.maxImplemented/2:
@@ -277,8 +292,17 @@ class hydrogenicOrbitals(orbitalGenerator):
         self.expFactor = exp(-r3d)
 
         
-        super(hydrogenicOrbitals, self).__init__()
-        
+        super(hydrogenicOrbitals, self).__init__(doInit)
+
+    def texOrbitalEq(self):
+        return r"""
+Orbitals are constructed in the following fashion:
+\begin{equation*}
+\phi(\vec r)_{n, l, m} = L_{n - l - 1}^{2l + 1}(2r/n)S_{l}^{m}(\vec r)e^{-\frac{r}{n}}
+\end{equation*}   
+
+where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 1, ..., l$.  
+"""      
         
     
     def getRadialFunc(self, n, l):
@@ -286,10 +310,15 @@ class hydrogenicOrbitals(orbitalGenerator):
     
     def sphere2Cart(self, func):
 
+        func = func.subs(sin(2*phi), sympify(2)*z*r2d/r3d**2)
+        func = func.subs(cos(2*phi), (z**2-r2d**2)/r3d**2)
+
         func = func.subs(cos(theta), x/r2d)
         func = func.subs(sin(theta), y/r2d)
         func = func.subs(cos(phi), z/r3d)
         func = func.subs(sin(phi), r2d/(r3d))
+        
+        
 
         return func
     
@@ -303,94 +332,320 @@ class hydrogenicOrbitals(orbitalGenerator):
             S = self.get_imag(Y)
             
         return self.sphere2Cart(S)*r2_3d**l
+
+     
  
-#   def simplifyLocal(self, expr):
-#        expr = (expr.collect(self.expFactor)/self.expFactor).expand().collect(k)
-#        expr = expr.factor(k).subs(1.0*x, x).subs(1.0*y, y)
-#        return (expr*self.expFactor).subs(x**2 + y**2, r2)
-
-    def factorCore(self, hit, dim, s, newS, xi):
-        if hit:
-            factors = []
-            lowest = 100
-            for i in range(dim):
-                if int(hit[i][1]) < lowest:
-                    lowest = int(hit[i][1])
-                print hit[i], 
-             
-            print
-            print lowest
-            
-            for i in range(dim):
-                orig = hit[i][0] + "*" +xi[i] + "**" + hit[i][1] + hit[i][2]
-                s = s.replace(orig, "")
-                factors.append(hit[i][0] + (int(hit[i][1]) - lowest)*("*" + xi[i]) + hit[i][2])
-            print "---factors---"
-            print factors
-            print "-------------"
-            if len(set(factors)) == 1:
-                newS += " + " + factors[0] + "*(x**2 + y**2" + " + z**2"*(dim==3) + ")**(%d/2)" % lowest
-    
-            else:
-                print "MISMATCH IN FACTORS"
-                
-        return s, newS
-
-    def factorRadiiFunc(self, expr, dim):
-
-        s = str(expr).replace("- ", "-")
-        xi = ['x', 'y', 'z']
-        
-        hits = []
-        for i in range(dim):
-            hits.append(regxp.findall("([^\s]+?)\*%s\*\*(\d+)(\*?[^\s]*)" % xi[i], s))
-        
-        print "\n------%dD------GOT EXPRESSION---------------" % dim
+    def factorRadiiTerms(self, expr):
+   
+        print "\n------------GOT EXPRESSION---------------"
         print expr
-
-        print "---hits---"
-        print hits
-        print "----------"
-        newS = ""
-        for hit in zip(*hits):
-            s, newS = self.factorCore(hit, dim, s, newS, xi)
-
-        if len(hits) == 3:
-            if len(hits[0]) == 1:
-                s, newS = self.factorCore(hits[0], dim, s, newS)
         
-        if newS:
+ 
+        raw = str(expr).replace("- ", "-").replace("+ ", "+")
+        raw = regxp.sub("\((\w)", "(+\g<1>", raw)
+        raw = regxp.sub("^(\w)", "+\g<1>", raw)
+        s = raw        
+        print s
+  
+        hits, totalScore = self.getOptimizedHits(raw)
+
+        #Nothing can be done        
+        if totalScore == 0:
+            print "Nothing to do."
+            return expr
+
+        for hit in zip(*hits):
+            s = self.factorCore(hit, s)
+#        return expr
+
+        if s != raw:
             print "----------CONCATINATED RADII TERMS----------"
-            s = "+".join(s.replace("+  +", "").split())
-            print newS
+  
+            print s
             
-            expr = sympify(r"%s" % (newS + " + " + s))
+            expr = sympify(s)
             expr = eval(str(expr))
             print expr
+     
         
         print "-------------------END FACTORIZATION-----------\n"        
         return expr
-     
-                
-    def factorRadiiTerms(self, expr):
-        expr = self.factorRadiiFunc(expr, dim=3)
 
-        expr = expr.subs(r2d, r_2d)
-        expr = expr.subs(r3d, r)
-        expr = expr.subs(r2_3d, r*r)
-        expr = expr.subs(r2_2d, r_2d*r_2d)
+    def getExp(self, hit, i):
+        "Input I: xi^I match. No match means a 1 exponent."
 
-        expr = self.factorRadiiFunc(expr, dim=2)
-#        
-        expr = expr.subs(r2d, r_2d)
-        expr = expr.subs(r3d, r)
-        expr = expr.subs(r2_3d, r*r) 
-        expr = expr.subs(r2_2d, r_2d*r_2d)
+        thisExp = hit[i][1]
+
+        if not thisExp:
+            thisExp = 1
+        else:
+            thisExp = int(thisExp)
+            
+        return thisExp
         
-        return expr
+
+    def getLowestExp(self, hit):
+        """Finds the lowest exponent in the match, and splits up expressions
+        so that ax^4 + ax^2y^2 -> ax^2x^2 + ax^2y^2 -> ax^2(x^2 + y^2)
+        """
+        
+        lowest = 100
+        for i in range(self.dim):
+            
+            #Placein None to optimize factorization
+            if hit[i] is None:
+                continue            
+
+            thisExp = self.getExp(hit, i)
+            
+            if thisExp < lowest:
+                lowest = thisExp
+                
+        return lowest
+
+    def getFactors(self, hit):
+        
+        factors = [0,0,0]
+        for i in range(self.dim):
+                
+            #Placein None to optimize factorization
+            if hit[i] is None:
+                factors[i] = None
+                continue                
+            
+            #First: Collects the exponent from the expression.
+            #Compresses it so it's FACTOR*xi^2 only (which means x2^1).
+            thisExp = self.getExp(hit, i)
+            pre = hit[i][0]
+
+            if not pre and type(pre) is str:
+                pre = "+"
+            
+            xiTerms = self.xi2[i] + ("**%d" % (thisExp - 1))*(thisExp - 1)
+            suff = hit[i][2]
+            factors[i] = "%s*%s"
+            
+        return factors
+
+    def markReplacements(self, hit, s):
+        
+        orig = ["SHOULD NEVER APPEAR", 
+                "SHOULD NEVER APPEAR", 
+                "SHOULD NEVER APPEAR"]
+        
+        for i in range(self.dim):
+            
+            #Placein None to optimize factorization
+            if hit[i] is None:
+                continue             
+            
+            #The original expression
+            orig[i] = hit[i][0] + "*"*(hit[i][0] not in ["+", "-"]) + (self.xi2[i]  + "**" + hit[i][1]).strip("*") + hit[i][2]
+        
+            #Set a trigger for where to insert the new expression
+            #Adding fake ( or lineshift to not disturb other factors
+            s = s.replace("(" + orig[i], "(__%s__" % self.xi2[i])
+            s = s.replace(" " + orig[i], " __%s__" % self.xi2[i])
+
+        return s, orig
+            
+    def checkFactors(self, factors):
+       
+       strippedPlus = []
+       for factor in factors:
+           if factor:
+               if factor[0] not in ["+", "-"]:
+                   strippedPlus.append("+" + factor)
+               else:
+                   strippedPlus.append(factor)
+           else:
+               #This will match an empty string
+               if type(factor) is str:
+                   factor = "+"
+               strippedPlus.append(factor)
+       
+       return len(set(strippedPlus)) == 1
+       
+
+    def factorCore(self, hit, s):
+
+#        lowest = self.getLowestExp(hit)
+           
+        factors = self.getFactors(hit)
+        
+        s, orig = self.markReplacements(hit, s)
+            
+        print "-------factors-------"
+        for fac in factors:
+            print fac
+        print "---------------------"
+            
+    
+        print
+        print lowest
+
+        
+        #If all the factors match it means we got a x^2 y^2 z^2 term
+        if self.checkFactors(factors):
+            newS = factors[1] + "*"*(factors[1] not in ["+", "-"]) + "r**%d" % (2*lowest)
+            print factors[1]
+            print newS
+            print s
+            print orig
+         
+            #Insert the new factor over the prev x expression
+            s = s.replace("__x2__", newS)
+                
+            #Remove y and z expressions
+            for i in range(1, self.dim):
+                s = s.replace("__%s__" % self.xi2[i], "")
+            
+        #as above, only a match for 2d only
+        elif self.checkFactors(factors[:2]) and factors.count(None) != 2:
+            newS = factors[1] + "*r_2d**%d" % (2*lowest)
+            
+            print newS
+            print s
+            print orig
+            
+            #overwrite the x-expression
+            s = s.replace("__x2__", newS)
+            
+            #delete the y-expression
+            s = s.replace("__y2__", "")
+            
+            #Reinsert the z-expression
+            s = s.replace("__z2__", orig[2])
+            
+        
+            
+        else:
+            for i in range(self.dim):
+                s = s.replace("__%s__" % self.xi2[i], orig[i])
+                
+                
+        print "NEW S: ", s
+        print "---------------------------------------------------------"
+                
+                
+        return s
+
+        
+    def getFactorScore(self, *xyzFactors):
+
+        score = 0        
+
+        lowest = self.getLowestExp(xyzFactors)
+                
+        factors = self.getFactors(xyzFactors, lowest)
+
+           
+        #If all the factors match it means we got a x^2 y^2 z^2 term 
+        if self.checkFactors(factors): 
+            score += 3
+        
+        #as above, only a match for 2d only
+        elif self.checkFactors(factors[:2]):
+            score += 2
+        
+        return score        
+        
+    def getOptimizedHits(self, raw):
+        
+        hits = []
+        maxLen = 0
+        for i in range(self.dim):
+            hits.append(regxp.findall("([^\s\(]*?)\*?%s\*?\*?(\d*)(\*?[^\s\)]*)" % self.xi2[i], raw))
+            if len(hits[-1]) > maxLen:
+                maxLen = len(hits[-1])
+                
+        print "---hits---"
+        
+
+        for hit in hits:
+            print hit
+
+        print "----------"
+        
+                
+        print "GOT MAXLEN: ", maxLen
+        
+        for i in range(self.dim):
+            if len(hits[i]) != maxLen:
+                for k in range(maxLen - len(hits[i])):
+                    hits[i].append(None)
+           
+
+
+        goodHits = []
+        totalScore = 0
+        for i, xFac in enumerate(hits[0]):
+            
+            maxScore = 0
+            localOptimal = []
+            jM = i
+            kM = i
+            
+            for j, yFac in enumerate(hits[1]):
+                for k, zFac in enumerate(hits[2]):
+                    
+                    score = self.getFactorScore(xFac, yFac, zFac)
+                    
+                    if score > maxScore:
+
+                        localOptimal = [xFac, yFac, zFac]
+                        maxScore = score
+                        
+                        jM = j
+                        kM = k
+                        
+            
+            totalScore += maxScore
+            if localOptimal:
+                
+                print maxScore
+                print localOptimal
+                print "------------------------_"
+                
+                for hit in hits:
+                    print hit
+        
+                print "----------"            
+                
+                raw_input()
+                
+                
+            
+                        
+                if maxScore == 2:
+                    hits[1].pop(jM)
+                    goodHits.append(localOptimal[:2] + [None])
+                    
+                elif maxScore == 3:
+                    hits[1].pop(jM)
+                    hits[2].pop(kM)
+                    goodHits.append(localOptimal[:])
+            
+        #Transpose
+        goodHits = zip(*goodHits)
+        
+        print "GOT MAXSCORE ", totalScore
+        print "AT CONFIG "
+        for hit in goodHits:
+            print hit
+            
+        if goodHits:
+            raw_input()
+        
+        return goodHits, totalScore
+        
+
         
 
     def simplifyLocal(self, expr, qNums):
+        if qNums != [2, 1, 0]:
+            return expr
+        print expr
         generic = exp(-r3d/qNums[0])
         expr = expr.collect(generic)/generic
         
@@ -400,32 +655,57 @@ class hydrogenicOrbitals(orbitalGenerator):
         expr = expr.subs(r2_2d, r_2d*r_2d)
         
         expr = ratsimp(expr)
+        expr = expr.factor(pi)   
         
         numer, denom = expr.as_numer_denom()
+        
+        numer = numer.subs(x*x, x2)
+        numer = numer.subs(y*y, y2)
+        numer = numer.subs(z*z, z2)
 
-        print "---------START---%s----" % str(qNums).strip("[").strip("]")
+        print "\n\n\n\n---------START---%s----" % str(qNums).strip("[").strip("]")
         print numer
-        
+        print "-----------------"
+        print denom
 
-        recursionDepth = 2
-        for i in range(recursionDepth):
-            numer = self.factorRadiiTerms(numer)
-        
-        numer = numer.factor(pi)
-        numer = self.factorRadiiTerms(numer)
-        
+        numer = numer.factor(r)
+        ###TEST####
+        numer = x2**4 + y2**4
+        ####
+        numer = self.factorRadiiTerms(numer)     
+        import sys        
+        sys.exit(1)
         if r_2d in numer:
             numer = numer.factor(r_2d)
         else:
-            numer = numer.factor(r)
-        print "-------------------------"
-        print numer
-        print "-----------END-----------"        
+            numer = numer.factor(r)        
+            
+        numer = self.factorRadiiTerms(numer)
         
-        expr = numer/denom
+        #Magic line to eliminate z from '2d' expressions
+        if r_2d in numer:
+            numer = numer.subs(r*r, r_2d*r_2d + z2).subs(z2, r**2 - r_2d**2).factor(r_2d)
+
+        numerTest = self.factorRadiiTerms(numer)
+        if numerTest != numer:
+            print "THIS MADE SENCE HERE:"
+            print numer
+            print numerTest
+            raw_input()
+        while numerTest != numer:    
+            numer = numerTest
+            print "lolol-------------------------------\n\n\n\----LOOLO.---\n\n"
+            numerTest = self.factorRadiiTerms(numer) 
         
-#        expr = expr.factor([x, y, z])
         
+        print "--------WA THIS------------"
+        print str(numerTest).replace("**", "^")
+        print "---------------------------"
+        expr = numerTest/denom
+        
+        print expr
+        
+        print "---------------END---------------"
 
         
         return expr*self.genericFactor(qNums)
@@ -483,7 +763,7 @@ def texThis(thing):
     
 def main():
 #    orbitalSet = HOOrbitals()
-    orbitalSet = hydrogenicOrbitals()
+    orbitalSet = hydrogenicOrbitals(10)
     
     with open('/home/jorgmeister/scratch/orbitals.tex', 'w') as f:        
         f.write(texThis(orbitalSet))
