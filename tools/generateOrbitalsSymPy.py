@@ -318,8 +318,6 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         func = func.subs(cos(phi), z/r3d)
         func = func.subs(sin(phi), r2d/(r3d))
         
-        
-
         return func
     
     def getSphericalFunc(self, l, m):
@@ -337,8 +335,8 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
  
     def factorRadiiTerms(self, expr):
    
-        print "\n------------GOT EXPRESSION---------------"
-        print expr
+#        print "\n------------GOT EXPRESSION---------------"
+#        print expr
         
  
         raw = str(expr).replace("- ", "-").replace("+ ", "+")
@@ -346,13 +344,12 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         raw = regxp.sub("^(\w)", "+\g<1>", raw)
         raw = regxp.sub("([\+\-])", "\g<1>1*", raw)
         s = raw        
-        print s
   
-        hits, totalScore = self.getOptimizedHits(raw)
+        hits = self.getOptimizedHits(raw)
 
         #Nothing can be done        
-        if totalScore == 0:
-            print "Nothing to do."
+        if hits is None:
+#            print "Nothing to do."
             return expr
 
         for hit in zip(*hits):
@@ -360,16 +357,14 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
 #        return expr
 
         if s != raw:
-            print "----------CONCATINATED RADII TERMS----------"
-  
-            print s
+#            print "----------CONCATINATED RADII TERMS----------"
             
             expr = sympify(s)
             expr = eval(str(expr))
-            print expr
+#            print expr
      
         
-        print "-------------------END FACTORIZATION-----------\n"        
+#        print "-------------------END FACTORIZATION-----------\n"        
         return expr
 
     def getExp(self, hit, i):
@@ -384,32 +379,12 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             
         return thisExp
         
-
-#    def getLowestExp(self, hit):
-#        """Finds the lowest exponent in the match, and splits up expressions
-#        so that ax^4 + ax^2y^2 -> ax^2x^2 + ax^2y^2 -> ax^2(x^2 + y^2)
-#        """
-#        
-#        lowest = 100
-#        for i in range(self.dim):
-#            
-#            #Placein None to optimize factorization
-#            if hit[i] is None:
-#                continue            
-#
-#            thisExp = self.getExp(hit, i)
-#            
-#            if thisExp < lowest:
-#                lowest = thisExp
-#                
-#        return lowest
-
     def getFactors(self, hit):
         
         factors = [0,0,0]
         for i in range(self.dim):
                 
-            #Placein None to optimize factorization
+            #If we get a None, it's a dummy factor fill
             if hit[i] is None:
                 factors[i] = None
                 continue                
@@ -450,47 +425,21 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             
     def checkFactors(self, factors):
        
-       strippedPlus = []
-       for factor in factors:
-           if factor:
-               if factor[0] not in ["+", "-"]:
-                   strippedPlus.append("+" + factor)
-               else:
-                   strippedPlus.append(factor)
-           else:
-               #This will match an empty string
-               if type(factor) is str:
-                   factor = "+"
-               strippedPlus.append(factor)
-       
-       return len(set(strippedPlus)) == 1
+       if factors[0] is None:
+           return False
+               
+       return len(set(factors)) == 1
        
 
     def factorCore(self, hit, s):
-
-#        lowest = self.getLowestExp(hit)
            
         factors = self.getFactors(hit)
         
         s, orig = self.markReplacements(hit, s)
-            
-        print "-------factors-------"
-        for fac in factors:
-            print fac
-        print "---------------------"
-            
-#    
-#        print
-#        print lowest
-
         
         #If all the factors match it means we got a x^2 y^2 z^2 term
         if self.checkFactors(factors):
             newS = factors[1] + "*r**2"
-            print factors[1]
-            print newS
-            print s
-            print orig
          
             #Insert the new factor over the prev x expression
             s = s.replace("__x2__", newS)
@@ -502,10 +451,6 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         #as above, only a match for 2d only
         elif self.checkFactors(factors[:2]) and factors.count(None) != 2:
             newS = factors[1] + "*r_2d**2"
-            print factors[1]
-            print newS
-            print s
-            print orig
             
             #overwrite the x-expression
             s = s.replace("__x2__", newS)
@@ -515,18 +460,11 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             
             #Reinsert the z-expression
             s = s.replace("__z2__", orig[2])
-            
-        
-            
+    
         else:
             for i in range(self.dim):
                 s = s.replace("__%s__" % self.xi2[i], orig[i])
-                
-                
-        print "NEW S: ", s
-        print "---------------------------------------------------------"
-                
-                
+         
         return s
 
         
@@ -535,7 +473,6 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         score = 0        
                 
         factors = self.getFactors(xyzFactors)
-        print "LOL", factors
            
         #If all the factors match it means we got a x^2 y^2 z^2 term 
         if self.checkFactors(factors): 
@@ -555,17 +492,16 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             hits.append(regxp.findall("([^\s\(]*?)\*?%s\*?\*?(\d*)(\*?[^\s\)]*)" % self.xi2[i], raw))
             if len(hits[-1]) > maxLen:
                 maxLen = len(hits[-1])
-                
-        print "---hits---"
-        
-
-        for hit in hits:
-            print hit
-
-        print "----------"
-        
-                
-        print "GOT MAXLEN: ", maxLen
+#                
+#        print "---hits---"
+#
+#        for hit in hits:
+#            print hit
+#
+#        print "----------"
+#        
+#                
+#        print "GOT MAXLEN: ", maxLen
         
         for i in range(self.dim):
             if len(hits[i]) != maxLen:
@@ -587,7 +523,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
                 for k, zFac in enumerate(hits[2]):
                     
                     score = self.getFactorScore(xFac, yFac, zFac)
-                    print score
+      
                     if score > maxScore:
 
                         localOptimal = [xFac, yFac, zFac]
@@ -600,20 +536,6 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             totalScore += maxScore
             if localOptimal:
                 
-                print "max score: ", maxScore
-                print "optimal: ", localOptimal
-                print "---------- HITS -------"
-                
-                for hit in hits:
-                    print hit
-        
-                print "----------"            
-                
-                raw_input()
-                
-                
-            
-                        
                 if maxScore == 2:
                     hits[1].pop(jM)
                     goodHits.append(localOptimal[:2] + [None])
@@ -626,23 +548,24 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         #Transpose
         goodHits = zip(*goodHits)
         
-        print "GOT MAXSCORE ", totalScore
-        print "AT CONFIG "
-        for hit in goodHits:
-            print hit
-            
-        if goodHits:
-            raw_input()
+#        print "GOT MAXSCORE ", totalScore
+#        print "AT CONFIG "
+#        for hit in goodHits:
+#            print hit
         
-        return goodHits, totalScore
+        
+        if totalScore == 0:
+            return None
+            
+        
+        return goodHits
         
 
         
 
     def simplifyLocal(self, expr, qNums):
-        if qNums != [2, 1, 0]:
-            return expr
-        print expr
+#        if qNums != [3,0,0]:
+#            return expr
         generic = exp(-r3d/qNums[0])
         expr = expr.collect(generic)/generic
         
@@ -660,18 +583,15 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         numer = numer.subs(y*y, y2)
         numer = numer.subs(z*z, z2)
 
-        print "\n\n\n\n---------START---%s----" % str(qNums).strip("[").strip("]")
-        print numer
-        print "-----------------"
-        print denom
+#        print "\n\n\n\n--------------------------------START---%s--------------------------" % str(qNums).strip("[").strip("]")
+#        print numer
+#        print "-----------------"
+#        print denom
 
         numer = numer.factor(r)
-        ###TEST####
-        numer = S('x2**4 + y2**4 + 2*(6*x2**3 + 6*y2*x2**2) + 50')
-        ####
+
         numer = self.factorRadiiTerms(numer)     
-        import sys        
-        sys.exit(1)
+
         if r_2d in numer:
             numer = numer.factor(r_2d)
         else:
@@ -683,28 +603,45 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         if r_2d in numer:
             numer = numer.subs(r*r, r_2d*r_2d + z2).subs(z2, r**2 - r_2d**2).factor(r_2d)
 
-        numerTest = self.factorRadiiTerms(numer)
-        if numerTest != numer:
-            print "THIS MADE SENCE HERE:"
-            print numer
-            print numerTest
-            raw_input()
-        while numerTest != numer:    
+        again = True
+        if again:
+        
+            numerTest = self.factorRadiiTerms(numer)
+            again = str(numerTest) != str(numer)
+           
+            
+            if again:
+                
+                print "AGAIN!"
+                print numer
+                print "----------------"
+                print numerTest
+         
+                raw_input()
+                
+                
             numer = numerTest
-            print "lolol-------------------------------\n\n\n\----LOOLO.---\n\n"
-            numerTest = self.factorRadiiTerms(numer) 
         
+        numer = numerTest
+        tresh = 50
+        if len(str(numer)) > tresh:            
+            print "THIS TOO LONG:", len(str(numer))
+            print "USE WOLFRAM ALPHA: "
+            print numer
+            print "-"*len(str(numer))
+            print denom        
+       
+        numer = numer.subs(x2, x*x)
+        numer = numer.subs(y2, y*y)
+        numer = numer.subs(z2, z*z)
+              
+        expr = numer/denom
         
-        print "--------WA THIS------------"
-        print str(numerTest).replace("**", "^")
-        print "---------------------------"
-        expr = numerTest/denom
-        
-        print expr
-        
-        print "---------------END---------------"
-
-        
+#        print "FINAL: ", expr
+#        
+#        print "----------------------------------END--------------------------------"
+#
+#        
         return expr*self.genericFactor(qNums)
     
     def makeStateMap(self):
@@ -760,7 +697,7 @@ def texThis(thing):
     
 def main():
 #    orbitalSet = HOOrbitals()
-    orbitalSet = hydrogenicOrbitals(10)
+    orbitalSet = hydrogenicOrbitals(28)
     
     with open('/home/jorgmeister/scratch/orbitals.tex', 'w') as f:        
         f.write(texThis(orbitalSet))
