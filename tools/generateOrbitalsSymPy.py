@@ -344,6 +344,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         raw = str(expr).replace("- ", "-").replace("+ ", "+")
         raw = regxp.sub("\((\w)", "(+\g<1>", raw)
         raw = regxp.sub("^(\w)", "+\g<1>", raw)
+        raw = regxp.sub("([\+\-])", "\g<1>1*", raw)
         s = raw        
         print s
   
@@ -384,24 +385,24 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         return thisExp
         
 
-    def getLowestExp(self, hit):
-        """Finds the lowest exponent in the match, and splits up expressions
-        so that ax^4 + ax^2y^2 -> ax^2x^2 + ax^2y^2 -> ax^2(x^2 + y^2)
-        """
-        
-        lowest = 100
-        for i in range(self.dim):
-            
-            #Placein None to optimize factorization
-            if hit[i] is None:
-                continue            
-
-            thisExp = self.getExp(hit, i)
-            
-            if thisExp < lowest:
-                lowest = thisExp
-                
-        return lowest
+#    def getLowestExp(self, hit):
+#        """Finds the lowest exponent in the match, and splits up expressions
+#        so that ax^4 + ax^2y^2 -> ax^2x^2 + ax^2y^2 -> ax^2(x^2 + y^2)
+#        """
+#        
+#        lowest = 100
+#        for i in range(self.dim):
+#            
+#            #Placein None to optimize factorization
+#            if hit[i] is None:
+#                continue            
+#
+#            thisExp = self.getExp(hit, i)
+#            
+#            if thisExp < lowest:
+#                lowest = thisExp
+#                
+#        return lowest
 
     def getFactors(self, hit):
         
@@ -416,14 +417,12 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             #First: Collects the exponent from the expression.
             #Compresses it so it's FACTOR*xi^2 only (which means x2^1).
             thisExp = self.getExp(hit, i)
+        
             pre = hit[i][0]
-
-            if not pre and type(pre) is str:
-                pre = "+"
             
-            xiTerms = self.xi2[i] + ("**%d" % (thisExp - 1))*(thisExp - 1)
+            xiTerms = (self.xi2[i] + "**%d" % (thisExp - 1))*bool(thisExp - 1)
             suff = hit[i][2]
-            factors[i] = "%s*%s"
+            factors[i] = pre + ("*" + xiTerms.replace("**1", ""))*bool(xiTerms.replace("**1", "")) + ("*" + suff)*bool(suff)
             
         return factors
 
@@ -480,14 +479,14 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             print fac
         print "---------------------"
             
-    
-        print
-        print lowest
+#    
+#        print
+#        print lowest
 
         
         #If all the factors match it means we got a x^2 y^2 z^2 term
         if self.checkFactors(factors):
-            newS = factors[1] + "*"*(factors[1] not in ["+", "-"]) + "r**%d" % (2*lowest)
+            newS = factors[1] + "*r**2"
             print factors[1]
             print newS
             print s
@@ -502,8 +501,8 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             
         #as above, only a match for 2d only
         elif self.checkFactors(factors[:2]) and factors.count(None) != 2:
-            newS = factors[1] + "*r_2d**%d" % (2*lowest)
-            
+            newS = factors[1] + "*r_2d**2"
+            print factors[1]
             print newS
             print s
             print orig
@@ -534,11 +533,9 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
     def getFactorScore(self, *xyzFactors):
 
         score = 0        
-
-        lowest = self.getLowestExp(xyzFactors)
                 
-        factors = self.getFactors(xyzFactors, lowest)
-
+        factors = self.getFactors(xyzFactors)
+        print "LOL", factors
            
         #If all the factors match it means we got a x^2 y^2 z^2 term 
         if self.checkFactors(factors): 
@@ -590,7 +587,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
                 for k, zFac in enumerate(hits[2]):
                     
                     score = self.getFactorScore(xFac, yFac, zFac)
-                    
+                    print score
                     if score > maxScore:
 
                         localOptimal = [xFac, yFac, zFac]
@@ -603,9 +600,9 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             totalScore += maxScore
             if localOptimal:
                 
-                print maxScore
-                print localOptimal
-                print "------------------------_"
+                print "max score: ", maxScore
+                print "optimal: ", localOptimal
+                print "---------- HITS -------"
                 
                 for hit in hits:
                     print hit
@@ -670,7 +667,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
 
         numer = numer.factor(r)
         ###TEST####
-        numer = x2**4 + y2**4
+        numer = S('x2**4 + y2**4 + 2*(6*x2**3 + 6*y2*x2**2) + 50')
         ####
         numer = self.factorRadiiTerms(numer)     
         import sys        
