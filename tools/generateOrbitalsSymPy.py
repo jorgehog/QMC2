@@ -1,7 +1,10 @@
 from sympy import *
 from math import ceil
 import re as regxp
-import sympy.galgebra.latex_ex as tex
+from sympy.physics.hydrogen import R_nl
+
+from pyLibQMC import paths
+from os.path import join as pjoin
 
 cycle = lambda a: [a[-1]] + a[:-1]
 def copyList2(a):
@@ -30,17 +33,365 @@ r2 = Symbol('r^2', real=True, positive = True)
 r_2d = Symbol('r_2d', real=True, positive = True)
 
 k = Symbol('k', real=True, positive = True)
+Z = Symbol('Z', real=True, positive = True)
 
 x2, y2, z2 = symbols('x2 y2 z2', real=True, positive=True)
 
+class CPPBasis:
+    
+    def __init__(self):
 
+        self.dim = 3        
+
+        self.xi = ['x', 'y', 'z']
+        
+        self.includes = ["../../QMCheaders.h"]        
+        
+        self.name = 'undefined'        
+        
+        self.superClassInfo = {'memberVars'   : {'double*' : [] ,
+                                                 'double'  : [] ,
+                                                 'int*'    : [] ,
+                                                 'int'     : []},
+    
+                               'constArgs'    : {'double*' : [] ,
+                                                 'double'  : [] ,
+                                                 'int*'    : [] ,
+                                                 'int'     : []}}
+      
+        self.supClassShell = '''
+class __name__ : public BasisFunctions {
+protected:
+
+__members__
+
+public:
+
+    __name__(__constArgs__);
+
+};
+'''
+                                        
+        self.subClassShell = '''
+class __name__ : public __superName__ {
+public:
+
+    __name__(__constArgs__);
+    virtual double eval(const Walker* walker, int i);
+
+};
+'''
+
+        self.supClassConstShell = '''__name__::__name__(__constArgs__) {
+__statements__
+}
+'''
+
+        self.subClassConstShell = '''
+__name__::__name__(__constArgs__)
+: __superName__(__constArgsRaw__) {
+__statements__
+}
+'''
+    
+        self.evalShell = '''
+double __name__::eval(const Walker* walker, int i) {
+
+__necessities__
+    
+    //__simpleExpr__
+__preCalc__
+    return __return__;
+    
+}
+'''
+     
+     
+        self.rawCPP = """
+__includes__
+
+//Superclass Constructor
+__superClassConst__
+
+
+/*
+    Subclass Constructors
+*/
+
+__subclassConst__
+
+
+/*
+    Subclass Eval functions
+*/
+
+__subclassEval__
+"""        
+
+        self.rawH = """
+        
+#ifndef __nameUpper___H
+#define __nameUpper___H 
+
+//Superclass 
+__superClass__
+
+/*
+    Subclasses
+*/
+
+__subClass__
+
+#endif /* __nameUpper___H */
+"""
+        
+    
+    def getSeparator(self, size=20, header=""):
+        l = (int(size) - len(header))/2
+        if l < 0:
+            l = 0
+        
+        return "\n" + r"/*" + "-"*l + header + "-"*l + r"*/" + "\n"
+
+    def setupClasses(self):
+        
+        superName = self.name
+        
+        self.supClassShell = self.supClassShell.replace("__name__", superName)
+        self.subClassShell = self.subClassShell.replace("__superName__", superName) 
+        
+        self.supClassConstShell = self.supClassConstShell.replace("__name__", superName)
+        self.subClassConstShell = self.subClassConstShell.replace("__superName__", superName)
+        
+        args = ""
+        argsRaw = ""
+        for ctype in self.superClassInfo['constArgs'].keys():
+            
+            names = self.superClassInfo['constArgs'][ctype]
+            
+            if not names:
+                continue
+            
+            for name in names:
+                args += "%s %s, " % (ctype, name)
+                argsRaw += "%s, " % name
+        
+        args = args.strip(", ")
+        argsRaw = argsRaw.strip(", ") 
+        self.argsRaw = argsRaw
+        
+        self.supClassConstShell = \
+            self.supClassConstShell.replace("__constArgs__", args)
+        self.subClassConstShell = \
+            self.subClassConstShell.replace("__constArgsRaw__", argsRaw)
+            
+        self.supClassShell = self.supClassShell.replace("__constArgs__", args)
+        self.subClassShell = self.subClassShell.replace("__constArgs__", args)
+        
+        supConstStatements = ""
+        for arg in argsRaw.split(","):
+            supConstStatements += "    this->%s = %s;\n" % (arg, arg)
+        supConstStatements = supConstStatements.strip("\n")
+        
+        self.supClassConstShell = \
+            self.supClassConstShell.replace("__statements__", supConstStatements)
+   
+        members = ""
+        for ctype in self.superClassInfo['memberVars'].keys():
+            
+            names = self.superClassInfo['memberVars'][ctype]
+            
+            if not names:
+                continue
+            
+            for name in names:
+                members += "    %s %s;\n" % (ctype, name)
+         
+            members += "\n"
+        
+        members = members.strip("\n")
+        
+        self.supClassShell = self.supClassShell.replace("__members__", members)
+        
+        self.rawH = self.rawH.replace("__superClass__", self.supClassShell)
+        self.rawH = self.rawH.replace("__nameUpper__", superName.upper())
+
+        includes = ""        
+        for include in self.includes:
+            includes += "#include %s\n" % include
+
+        self.rawCPP = self.rawCPP.replace("__includes__", includes)
+        self.rawCPP = self.rawCPP.replace("__superClassConst__", self.supClassConstShell)
+        
+#        print self.rawCPP
+#        print self.getSeparator(header="^rawCPP")
+#        print self.rawH
+#        print self.getSeparator(header="^rawH")
+#        H, CPP, EVAL = self.makeSubclasses("func")
+#        print H
+#        print self.getSeparator(header="^Subclass Hfile")
+#        print CPP
+#        print self.getSeparator(header="^Subclass CPPfile")
+#        s = ""
+#        keyList = ['phi'] + ['d' + i for i in self.xi[:self.dim]] + ['lapl']
+#        for key in keyList:
+#            print EVAL[key]
+#            s += EVAL[key]
+#        print s
+#        self.rawH = self.rawH.replace("__subClass__", H)
+#        self.rawCPP = self.rawCPP.replace("__subclassConst__", CPP)
+#        self.rawCPP = self.rawCPP.replace("__subclassEval__", s)
+#        print self.getSeparator(header="^Subclass EVAL")
+#        print self.rawH
+#        print self.getSeparator(header="^rawH")
+#        print self.rawCPP
+#        print self.getSeparator(header="^rawCPP")
+        
+
+    
+    def makeSubclasses(self, name, cppConstStatements = ""):
+        
+        EVAL = {}        
+        
+        #H part
+        H    = self.subClassShell.replace("__name__", name)
+        CPP  = self.subClassConstShell.replace("__name__", name)
+        EVAL["phi"] = self.evalShell.replace("__name__", name)
+        
+        nameDell = "dell_" + name + "_"    
+        
+        
+        for i in range(self.dim):
+            xi = self.xi[i]
+            dimName = nameDell + xi
+            H    += self.subClassShell.replace("__name__", dimName)
+            CPP  += self.subClassConstShell.replace("__name__", dimName)
+            EVAL["d" + xi] = self.evalShell.replace("__name__", dimName)
+            
+        laplName = "lapl_" + name
+        
+        H   += self.subClassShell.replace("__name__", laplName)
+        CPP += self.subClassConstShell.replace("__name__", laplName)   
+        EVAL["lapl"] = self.evalShell.replace("__name__", laplName)
+        
+        CPP = CPP.replace("__statements__", cppConstStatements)
+        
+        return H, CPP, EVAL
+    
+    def setConstVars(self, *args):
+        for arg in args:
+            ctype, name = arg.split()
+            self.superClassInfo['constArgs'][ctype].append(name)
+            
+    def setMembers(self, *args):
+        for arg in args:
+            ctype, name = arg.split()
+            self.superClassInfo['memberVars'][ctype].append(name)
+    
+    def setName(self, name):
+        self.name = name
+
+    def updateOrbConstState(self, orbConstState, i):
+        bf = 'basis_functions'
+        bfi = "_#_%s_d_[%d] = new _#_%s_%d_dim_(%s);\n" % (bf, 
+                                                           i, 
+                                                           self.name, 
+                                                           i, 
+                                                           self.argsRaw)
+                                                           
+        orbConstState[0] += bfi.replace("_#_", "").replace("_dim_", "").replace("_d_", "")
+        for j in range(self.dim):
+            orbConstState[1] += \
+            bfi.replace("_#_", "dell_").replace("_dim_", "_%s" % self.xi[j]).replace("_d_", "[%s]" % j)
+
+        orbConstState[2] += bfi.replace("_#_", "lapl_").replace("_dim_", "").replace("_d_", "")
+    
+        return orbConstState
+    
+    def updateExpressions(self, constCPP, evalCPP, constH, orbitals, i):
+        
+        size = 40        
+        sep = self.getSeparator(size=size, header="  END %d  " % i)    
+        
+        name = "%s_%d" % (self.name, i)        
+        H, CPP, EVAL = self.makeSubclasses(name)
+        
+        constH += H + sep
+        constCPP += CPP + sep
+   
+        evalCPP += self.getEvalFunc(EVAL, orbitals, i) + sep
+        
+        
+        return constCPP, evalCPP, constH
+    
+    def getEvalExpr(self, orbitals, raw, expr):
+        nec, simple, preCalc, ret = orbitals.getCCode(expr)
+        return raw.replace("__necessities__", nec).\
+                replace("__preCalc__", preCalc).\
+                replace("__return__", ret).\
+                replace("__simpleExpr__", simple)
+    
+    def getEvalFunc(self, EVAL, orbitals, i):
+           
+        s = ""
+    
+        #Phi part 
+        s += self.getEvalExpr(orbitals, EVAL['phi'], orbitals.orbitals[i])
+        
+        #Dell part
+        for j, key in enumerate(['d' + k for k in self.xi[:self.dim]]):
+            s += self.getEvalExpr(orbitals, EVAL[key], orbitals.gradients[i][j])
+            
+        #Laplace part
+        s += self.getEvalExpr(orbitals, EVAL['lapl'], orbitals.Laplacians[i])
+        
+        return s
+        
+    def make(self, orbitals):
+        
+        self.setupClasses()
+        
+        orbConstState = ["", "", ""]
+        
+        constCPP = ""
+        evalCPP = ""
+        constH = ""
+        for i in range(orbitals.maxImplemented/2):
+        
+            orbConstState = self.updateOrbConstState(orbConstState, i)
+            
+            constCPP, evalCPP, constH =\
+                self.updateExpressions(constCPP, 
+                                       evalCPP, 
+                                       constH, 
+                                       orbitals, 
+                                       i)
+            
+        
+        
+        constStatesOrbitals = "\n".join(orbConstState)
+        
+        self.rawH = self.rawH.replace("__subClass__", constH)
+        self.rawCPP = self.rawCPP.replace("__subclassConst__", constCPP)
+        self.rawCPP = self.rawCPP.replace("__subclassEval__", evalCPP)
+        
+        print constStatesOrbitals
+        print self.rawH
+        print self.rawCPP
+        
+ 
+        
 class orbitalGenerator(object):
     
     genericFactor = sympify(1)    
     xi = ['x', 'y', 'z']
     xi2 = ['x2', 'y2', 'z2']
     
-    def __init__(self, doInit=True):
+    figsPrPage = 5
+    
+    cppBasis = CPPBasis()
+    
+    def __init__(self, doInit, toCPP):
         if not doInit:
             return
     
@@ -51,6 +402,13 @@ class orbitalGenerator(object):
         self.setupOrbitals()
         self.getGradientsAndLaplacians()
         self.simplify()
+        
+        if toCPP:
+            self.initCPPbasis()
+            self.cppBasis.make(self)
+        
+    def initCPPbasis(self):
+        raise NotImplementedError("initCPPbasis not in class " + self.__class__.__name__)        
         
     def simplify(self):
         for i in range(len(self.orbitals)):
@@ -138,7 +496,7 @@ class orbitalGenerator(object):
             s += self.endTable(caption="Orbital expressions %s : %s. Factor $%s$ is omitted." % \
                                 (self.__class__.__name__, qNums, latex(genericFactor)))
             
-            if (key+1)%5 == 0:
+            if (key+1)%self.figsPrPage == 0:
                 s += "\\clearpage\n"
             
         return s
@@ -148,12 +506,8 @@ class orbitalGenerator(object):
         
     def get_real(self, expr):
         
-        
-#        print "\n::::REAL CALL\n----Before:::----"
-#        print expr
         expr = expr.factor(exp(x))
         if not I in expr:
-#            print "-----nothing----"
             return expr
         else:
             
@@ -163,44 +517,46 @@ class orbitalGenerator(object):
                 for argument in arguments:
                     if not "I" in argument:
                         continue
-#                    print "found imaginary exp function: ", argument
+
                     newArg = argument.replace("I*", "")                    
                     s = s.replace('exp(%s)' % (argument), 'cos(%s)' % argument.replace("I*", ""))
                     expr = expr.subs(exp(eval(argument)), cos(eval(newArg)))
-#        print "----after:::----"
-#        print expr
-#        print "END OF FUNC\n"
+
         return expr
         
     def get_imag(self, expr):
-#        print "\n::::IMAGINARY CALL\n----Before:::----"
-#        print expr
+
         expr = expr.factor(exp(x))
         if not I in expr:
-#            print "-----THIS EXPR IS REAL RETURN ZERO----"
             return sympify(0)
         else:
             
-
             s = str(expr)
             if regxp.findall('exp\((.+?)\)', s):
                 arguments = regxp.findall('exp\((.+?)\)', s)
                 for argument in arguments:
                     if not "I" in argument:
                         continue
-#                    print "found imaginary exp function: ", argument
+                    
                     newArg = argument.replace("I*", "")       
                     s = s.replace('exp(%s)' % (argument), 'sin(%s)' % argument.replace("I*", ""))
                     expr =  expr.subs(exp(eval(argument)), sin(eval(newArg)))
-#        print "----after:::----"
-#        print expr
-#        print "END OF FUNC\n"
-        return expr
 
+        return expr        
+
+    def makeCPP(self):
+        self.setupSuperclass()
+        self.setupSubclasses()
+        
+    def getCCode(self, expr):
+        raise NotImplementedError("getCCode not implemented!")
+            
+                
+        
 class HOOrbitals(orbitalGenerator):
     dim = 2
     
-    def __init__(self, M, doInit=True):
+    def __init__(self, M, doInit=True, toCPP=False):
         
         self.setMax(M)
         self.Hx = []        
@@ -213,7 +569,7 @@ class HOOrbitals(orbitalGenerator):
           
         self.expFactor = exp(-Rational(1,2)*k**2*(x**2 + y**2))
         
-        super(HOOrbitals, self).__init__(doInit)
+        super(HOOrbitals, self).__init__(doInit, toCPP)
         
     def simplifyLocal(self, expr, qNums):
         expr = (expr.collect(self.expFactor)/self.expFactor).expand().collect(k)
@@ -266,10 +622,46 @@ where $k = \omega\alpha$ is the scaled oscillator frequency.
     def genericFactor(self, qNums):
         return exp(-Rational(1,2)*k**2*r2)
 
+
+    def initCPPbasis(self):
+        
+        self.cppBasis.dim = 2
+        
+        self.cppBasis.setName('alphaHO')
+        
+        self.cppBasis.setConstVars('double* k', 
+                                   'double* k2', 
+                                   'double* exp_factor')
+                                   
+        self.cppBasis.setMembers('double* k', 
+                                 'double* k2', 
+                                 'double* exp_factor',
+                                 'double H',
+                                 'double x2',
+                                 'double y2')
+        
+    
+
+    def getCCode(self, expr):
+
+        exprS = str(expr)
+        nec = "    //No necessities"
+        simple = exprS
+        pre = "    H = %s;" % printing.ccode(expr)
+        
+        pre = pre.replace("r^2", "walker->get_r_i2(i)")
+        
+        ret = "H"
+        
+        return nec, simple, pre, ret     
+
+
+
 class hydrogenicOrbitals(orbitalGenerator):
     dim = 3
+    figsPrPage = 3
     
-    def __init__(self, M, doInit=True):
+    def __init__(self, M, doInit=True, toCPP=False):
         self.setMax(M)
         
         nShells = 0
@@ -289,24 +681,28 @@ class hydrogenicOrbitals(orbitalGenerator):
             for m in range(-l, l+1):
                 self.S[l][m] = self.getSphericalFunc(l, m)
         
-        self.expFactor = exp(-r3d)
+        self.expFactor = exp(-Z*r3d)
 
         
-        super(hydrogenicOrbitals, self).__init__(doInit)
+        super(hydrogenicOrbitals, self).__init__(doInit, toCPP)
 
     def texOrbitalEq(self):
         return r"""
 Orbitals are constructed in the following fashion:
 \begin{equation*}
-\phi(\vec r)_{n, l, m} = L_{n - l - 1}^{2l + 1}(2r/n)S_{l}^{m}(\vec r)e^{-\frac{r}{n}}
+\phi(\vec r)_{n, l, m} = L_{n - l - 1}^{2l + 1}\Big(\frac{2r}{n}Z\Big)S_{l}^{m}(\vec r)e^{-\frac{r}{n}Z}
 \end{equation*}   
 
-where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 1, ..., l$.  
+where $n$ is the principal quantum numer and $Z$ is the total charge. \\
+$$l = 0,\, 1,\, ...,\, (n-1)$$ 
+$$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
+  
+\newpage
 """      
         
     
     def getRadialFunc(self, n, l):
-        return laguerre_l(n - l - 1, 2*l + 1, 2*r3d/n)*exp(-r3d/n)
+        return R_nl(n, l, r3d, Z=Z)
     
     def sphere2Cart(self, func):
 
@@ -329,7 +725,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
         else:
             S = self.get_imag(Y)
             
-        return self.sphere2Cart(S)*r2_3d**l
+        return self.sphere2Cart(S)
 
      
  
@@ -566,7 +962,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
     def simplifyLocal(self, expr, qNums):
 #        if qNums != [3,0,0]:
 #            return expr
-        generic = exp(-r3d/qNums[0])
+        generic = self.genericFactor(qNums)
         expr = expr.collect(generic)/generic
         
         expr = expr.subs(r2d, r_2d)
@@ -616,8 +1012,9 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
                 print numer
                 print "----------------"
                 print numerTest
-         
-                raw_input()
+                
+#                print "\n PRESS ENTER!! \n"
+#                raw_input()
                 
                 
             numer = numerTest
@@ -670,7 +1067,7 @@ where $n$ is the principal quantum numer. $l = 0, 1, ..., (n-1)$. $m = -l, -l + 
             self.orbitals[i] = self.R[n][l]*self.S[l][m]
         
     def genericFactor(self, qNums):
-        return exp(-r/qNums[0])
+        return exp(-Z*r/qNums[0])
 
 def texThis(thing):
 
@@ -694,12 +1091,17 @@ def texThis(thing):
 
 """ % (thing.texOrbitalEq(), thing)
     return s
+
+
+
     
+    
+
 def main():
-#    orbitalSet = HOOrbitals()
-    orbitalSet = hydrogenicOrbitals(28)
+    orbitalSet = HOOrbitals(6, toCPP=True)
+#    orbitalSet = hydrogenicOrbitals(10)
     
-    with open('/home/jorgmeister/scratch/orbitals.tex', 'w') as f:        
+    with open(pjoin(paths.scratchPath, 'orbitals.tex'), 'w') as f:        
         f.write(texThis(orbitalSet))
         f.close()
 
