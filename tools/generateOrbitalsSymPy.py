@@ -30,12 +30,15 @@ r3d = sqrt(r2_3d)
 
 r = Symbol('r', real=True, positive = True)
 r2 = Symbol('r^2', real=True, positive = True)
+r22d = Symbol('r^2_2d', real=True, positive=True)
 r_2d = Symbol('r_2d', real=True, positive = True)
 
 k = Symbol('k', real=True, positive = True)
 Z = Symbol('Z', real=True, positive = True)
 
 x2, y2, z2 = symbols('x2 y2 z2', real=True, positive=True)
+
+w = Wild('w')
 
 class CPPBasis:
     
@@ -929,7 +932,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         orig = ["SHOULD NEVER APPEAR", 
                 "SHOULD NEVER APPEAR", 
                 "SHOULD NEVER APPEAR"]
-        
+
         for i in range(self.dim):
             
             #Placein None to optimize factorization
@@ -938,11 +941,16 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
             
             #The original expression
             orig[i] = hit[i][0] + "*"*(hit[i][0] not in ["+", "-"]) + (self.xi2[i]  + "**" + hit[i][1]).strip("*") + hit[i][2]
-        
+            
+            sPre = s            
             #Set a trigger for where to insert the new expression
             #Adding fake ( or lineshift to not disturb other factors
             s = s.replace("(" + orig[i], "(__%s__" % self.xi2[i])
             s = s.replace(" " + orig[i], " __%s__" % self.xi2[i])
+            
+            #This means the term is at the start of the line
+            if s == sPre:
+                s = s.replace(orig[i] + " ", "__%s__ " % self.xi2[i])
 
         return s, orig
             
@@ -963,7 +971,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         #If all the factors match it means we got a x^2 y^2 z^2 term
         if self.checkFactors(factors):
             newS = factors[1] + "*r**2"
-         
+   
             #Insert the new factor over the prev x expression
             s = s.replace("__x2__", newS)
                 
@@ -987,7 +995,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         else:
             for i in range(self.dim):
                 s = s.replace("__%s__" % self.xi2[i], orig[i])
-         
+
         return s
 
         
@@ -1083,12 +1091,17 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         
         return goodHits
         
-
+#==============================================================================
+#     def simplifyLocal(self, expr, qNums):
+#         expr = (expr.collect(self.expFactor)/self.expFactor).expand().collect(k)
+#         expr = expr.factor(k)
+#         return (expr*self.expFactor).subs(x**2 + y**2, r2)
+#==============================================================================
         
 
     def simplifyLocal(self, expr, qNums):
-#        if qNums != [3,0,0]:
-#            return expr
+        if qNums != [2,1,0]:
+            return expr
         generic = self.genericFactor(qNums)
         expr = expr.collect(generic)/generic
         
@@ -1098,13 +1111,101 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         expr = expr.subs(r2_2d, r_2d*r_2d)
         
         expr = ratsimp(expr)
-        expr = expr.factor(pi)   
+
+        expr = expr.factor(pi) 
         
+    
         numer, denom = expr.as_numer_denom()
+        
         
         numer = numer.subs(x*x, x2)
         numer = numer.subs(y*y, y2)
         numer = numer.subs(z*z, z2)
+        
+        print qNums
+        print numer
+        print
+        numFac = numer.as_independent(x2, y2, z2, x, y, z, r, r_2d)[0]
+        numer = cancel(numer/numFac)
+        print "removed ", numFac
+        print
+        print numer
+        print
+        numer = sqf(numer)                
+        print numer
+        print   
+        
+        numer = self.factorRadiiTerms(numer)
+        print numer
+        print
+#        print "redef"
+#        print numer
+#        numer = numer.collect(r**2, exact=True)
+#        numer = numer.subs(r**3, r*r2)
+#        numer = numer.subs(r**2, r2)
+#        numer = numer.subs(r_2d**3, r_2d*r22d)        
+#        numer = numer.subs(r_2d**2, r22d)
+#        print numer
+#        print "end"
+        
+        if r_2d in numer:
+            print "R_2d found"
+
+       
+            numer = numer.subs(r**2, r_2d**2 + z2).collect(r_2d)
+            numer = numer.subs(z2, r**2 - r_2d**2)
+            print numer
+        
+            numer = numer.expand()
+            terms = numer.as_ordered_terms()
+            for term in terms:
+                tmp = numer
+                numer = numer.subs(term, term.subs(r**2, r_2d**2 + z2)).expand().collect(r_2d)
+              
+                if len(str(numer)) > len(str(tmp)):
+                    numer = tmp
+                    
+                print "hei---"
+                print term
+                print "-----"
+                print numer
+                print "-----"
+           
+            tmp = numer
+            numer = numer.subs(z2, r**2 - r_2d**2)
+                
+            if len(str(numer)) > len(str(tmp)):
+                numer = tmp
+            try:   
+                numer = numer.factor(r_2d)
+            except:
+                print "damn..."
+      
+            print numer
+            raw_input()
+            
+      
+            
+        else:
+#            numer = numer.expand().collect(r)
+            numer = numer.factor(r)
+#            numer = numer.subs(r_2d*r_2d, r*r - z2)
+#        numer = numer.subs(z2, r**2 - r_2d**2)
+#        numer = numer.subs(x2, r_2d**2 - y2)
+#        numer = numer.factor(r_2d)    
+
+#        numer = numer.collect(r)
+        
+        
+        
+        print numer
+        print "---!-------"
+ 
+        
+        expr = numer/denom
+        return expr        
+        
+        
 
 #        print "\n\n\n\n--------------------------------START---%s--------------------------" % str(qNums).strip("[").strip("]")
 #        print numer
@@ -1204,15 +1305,18 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
     
 
 def main():
-    orbitalSet = HOOrbitals(12, toCPP=True)
-#    orbitalSet = hydrogenicOrbitals(10)
-    orbitalSet.TeXToFile(paths.scratchPath)
-    orbitalSet.CPPToFile(paths.scratchPath)
+    
+#==============================================================================
+#     orbitalSet = HOOrbitals(42, toCPP=True)
+# 
+#     orbitalSet.TeXToFile(paths.scratchPath)
+#     orbitalSet.CPPToFile(paths.scratchPath)
+#==============================================================================
    
-        
+    orbitalSet = hydrogenicOrbitals(10, toCPP=False)
+    
+    orbitalSet.TeXToFile(paths.scratchPath)
 
-    #atoms = hydrogenicOrbitals()
-    #print atoms
 
     
 
