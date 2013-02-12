@@ -100,6 +100,7 @@ double __name__::eval(const Walker* walker, int i) {
 __necessities__
     
     //__simpleExpr__
+    
 __preCalc__
     return __return__;
     
@@ -183,6 +184,8 @@ __subClass__
         self.supClassConstShell = \
             self.supClassConstShell.replace("__constArgs__", args)
         self.subClassConstShell = \
+            self.subClassConstShell.replace("__constArgs__", args)
+        self.subClassConstShell = \
             self.subClassConstShell.replace("__constArgsRaw__", argsRaw)
             
         self.supClassShell = self.supClassShell.replace("__constArgs__", args)
@@ -218,34 +221,10 @@ __subClass__
 
         includes = ""        
         for include in self.includes:
-            includes += "#include %s\n" % include
+            includes += "#include \"%s\"\n" % include
 
         self.rawCPP = self.rawCPP.replace("__includes__", includes)
         self.rawCPP = self.rawCPP.replace("__superClassConst__", self.supClassConstShell)
-        
-#        print self.rawCPP
-#        print self.getSeparator(header="^rawCPP")
-#        print self.rawH
-#        print self.getSeparator(header="^rawH")
-#        H, CPP, EVAL = self.makeSubclasses("func")
-#        print H
-#        print self.getSeparator(header="^Subclass Hfile")
-#        print CPP
-#        print self.getSeparator(header="^Subclass CPPfile")
-#        s = ""
-#        keyList = ['phi'] + ['d' + i for i in self.xi[:self.dim]] + ['lapl']
-#        for key in keyList:
-#            print EVAL[key]
-#            s += EVAL[key]
-#        print s
-#        self.rawH = self.rawH.replace("__subClass__", H)
-#        self.rawCPP = self.rawCPP.replace("__subclassConst__", CPP)
-#        self.rawCPP = self.rawCPP.replace("__subclassEval__", s)
-#        print self.getSeparator(header="^Subclass EVAL")
-#        print self.rawH
-#        print self.getSeparator(header="^rawH")
-#        print self.rawCPP
-#        print self.getSeparator(header="^rawCPP")
         
 
     
@@ -324,8 +303,8 @@ __subClass__
         
         return constCPP, evalCPP, constH
     
-    def getEvalExpr(self, orbitals, raw, expr):
-        nec, simple, preCalc, ret = orbitals.getCCode(expr)
+    def getEvalExpr(self, orbitals, raw, expr, i):
+        nec, simple, preCalc, ret = orbitals.getCCode(expr, i)
         return raw.replace("__necessities__", nec).\
                 replace("__preCalc__", preCalc).\
                 replace("__return__", ret).\
@@ -336,14 +315,23 @@ __subClass__
         s = ""
     
         #Phi part 
-        s += self.getEvalExpr(orbitals, EVAL['phi'], orbitals.orbitals[i])
+        s += self.getEvalExpr(orbitals, 
+                              EVAL['phi'], 
+                              orbitals.orbitals[i], 
+                              i)
         
         #Dell part
         for j, key in enumerate(['d' + k for k in self.xi[:self.dim]]):
-            s += self.getEvalExpr(orbitals, EVAL[key], orbitals.gradients[i][j])
+            s += self.getEvalExpr(orbitals, 
+                                  EVAL[key],
+                                  orbitals.gradients[i][j],
+                                  i)
             
         #Laplace part
-        s += self.getEvalExpr(orbitals, EVAL['lapl'], orbitals.Laplacians[i])
+        s += self.getEvalExpr(orbitals, 
+                              EVAL['lapl'], 
+                              orbitals.Laplacians[i],
+                              i)
         
         return s
         
@@ -369,19 +357,26 @@ __subClass__
             
         
         
-        constStatesOrbitals = "\n".join(orbConstState)
+        self.constStatesOrbitals = "\n".join(orbConstState)
         
         self.rawH = self.rawH.replace("__subClass__", constH)
         self.rawCPP = self.rawCPP.replace("__subclassConst__", constCPP)
         self.rawCPP = self.rawCPP.replace("__subclassEval__", evalCPP)
-        
-        print constStatesOrbitals
-        print self.rawH
-        print self.rawCPP
+    
+    def getH(self):
+        return self.rawH
+    
+    def getCPP(self):
+        return self.rawCPP
+    
+    def getOrbitalConstructorArgs(self):
+        return self.constStatesOrbitals
         
  
         
 class orbitalGenerator(object):
+    
+    name = "orbitals"    
     
     genericFactor = sympify(1)    
     xi = ['x', 'y', 'z']
@@ -544,19 +539,154 @@ class orbitalGenerator(object):
 
         return expr        
 
+    def getTeX(self):
+
+        s = r"""\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{SymPy generated orbital functions}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+%s
+
+%s
+
+\end{document}
+
+""" % (self.texOrbitalEq(), str(self))
+
+        return s
+
+    def TeXToFile(self, path):
+        with open(pjoin(path, '%s.tex' % self.name), 'w') as f:        
+             f.write(self.getTeX())
+             f.close()
+
     def makeCPP(self):
         self.setupSuperclass()
         self.setupSubclasses()
-        
-    def getCCode(self, expr):
-        raise NotImplementedError("getCCode not implemented!")
+
             
-                
+    def replaceCCode(self, code, necList):
+     
+        code = code.replace("r^2", "walker->get_r_i2(i)")
+ 
+        hits = regxp.findall("pow\((\w+), (\d+)\)", code)
+        for hit in hits:
+            
+            d = int(hit[1])
+            
+            replc = ""
+            orig = "pow(%s, %d)" % (hit[0], d)
+            
+            #HO k-factors
+            if hit[0] == "k":
+                replc = "(*k2)*"*(d/2) + "(*k)*"*(d%2 != 0)
+            
+            for x in self.xi:
+                x2 = "%s2" % x
+                if hit[0] == x:
+                    if x2 in necList:
+                        replc = ("%s*" % x2)*(d/2) + \
+                                ("%s" % x)*(d%2 != 0)
+                    else:
+                        replc =  ("%s*" % x)*d
+
+            if replc:
+                code = code.replace(orig, replc.strip("*"))
+ 
+        #Replace standalone x, y and z with walker calls
+#        code = regxp.sub("([^\w]?)([xyz])([^\w])", #Any 'x' not in a word
+#                         "\g<1>walker->r(i, _\g<2>_)\g<3>", 
+#                         code).\
+#                         replace("_x_", "0").\
+#                         replace("_y_", "1").\
+#                         replace("_z_", "2")      
+   
+        return code
         
+     
+
+    def getCCode(self, expr, i):
+
+        exprS = str(expr)
+
+        nec, necList = self.getNecessities(expr)
+ 
+        simple = self.makeReadable(exprS)
+
+        pre = self.getCPre(expr, i)      
+        pre = self.replaceCCode(pre, necList)
+        
+        ret = self.getCReturn(expr, i)         
+        ret = self.replaceCCode(ret, necList)        
+    
+        return nec, simple, pre, ret   
+               
+    def makeReadable(self, s):
+        s = s.replace("**", "^")
+        return s
+    
+    def getNecessities(self, expr):
+        
+        s = printing.ccode(expr)        
+        
+        nec = []
+        necS = ""
+        necS2 = ""
+
+        for i, x in enumerate(self.xi):
+            l = len(regxp.findall("pow\(%s\, \d+\)" % x, s))
+       
+            if regxp.findall("[^\w]?%s[^\w]" % x, s):
+                nec.append(x)
+                necS += "    %s = walker->r(i, %d);\n" % (x, i)
+
+            if l > 0:
+                x2 = x + "2"
+                nec.append(x2)
+                necS2 += "    %s = %s*%s;\n" % (x2, x, x)
+
+            
+                          
+        necS = ("%s\n%s" % (necS, necS2)).strip("\n")
+        
+        return necS, nec
+        
+    def getCReturn(self, expr, i):
+         raise NotImplementedError("Function not implemented in subclass.")
+         
+    def getCPre(self, expr, i):
+         raise NotImplementedError("Function not implemented in subclass.")
+    
+    def CPPToFile(self, path):
+        
+        with open(pjoin(path, '%s.cpp' % self.name), 'w') as f:        
+             f.write(self.cppBasis.getCPP())
+             f.close()
+        
+        with open(pjoin(path, '%s.h' % self.name), 'w') as f:        
+             f.write(self.cppBasis.getH())
+             f.close()
+            
+        with open(pjoin(path, '%s_orbConst.cpp' % self.name), 'w') as f:        
+             f.write(self.cppBasis.getOrbitalConstructorArgs())
+             f.close()
+             
+    
 class HOOrbitals(orbitalGenerator):
+    
     dim = 2
     
     def __init__(self, M, doInit=True, toCPP=False):
+        
+        self.name = "alphaHO"        
         
         self.setMax(M)
         self.Hx = []        
@@ -570,7 +700,7 @@ class HOOrbitals(orbitalGenerator):
         self.expFactor = exp(-Rational(1,2)*k**2*(x**2 + y**2))
         
         super(HOOrbitals, self).__init__(doInit, toCPP)
-        
+       
     def simplifyLocal(self, expr, qNums):
         expr = (expr.collect(self.expFactor)/self.expFactor).expand().collect(k)
         expr = expr.factor(k)
@@ -627,7 +757,7 @@ where $k = \omega\alpha$ is the scaled oscillator frequency.
         
         self.cppBasis.dim = 2
         
-        self.cppBasis.setName('alphaHO')
+        self.cppBasis.setName(self.name)
         
         self.cppBasis.setConstVars('double* k', 
                                    'double* k2', 
@@ -637,31 +767,28 @@ where $k = \omega\alpha$ is the scaled oscillator frequency.
                                  'double* k2', 
                                  'double* exp_factor',
                                  'double H',
+                                 'double x',
+                                 'double y',
                                  'double x2',
                                  'double y2')
         
-    
-
-    def getCCode(self, expr):
-
-        exprS = str(expr)
-        nec = "    //No necessities"
-        simple = exprS
-        pre = "    H = %s;" % printing.ccode(expr)
-        
-        pre = pre.replace("r^2", "walker->get_r_i2(i)")
-        
-        ret = "H"
-        
-        return nec, simple, pre, ret     
+    def getCReturn(self, expr, i):
+         return "H*(*exp_factor)" 
+         
+    def getCPre(self, expr, i):
+         return "    H = %s;" % printing.ccode(expr/self.genericFactor(i))
 
 
 
 class hydrogenicOrbitals(orbitalGenerator):
+    
     dim = 3
     figsPrPage = 3
     
     def __init__(self, M, doInit=True, toCPP=False):
+
+        self.name = "hydrogenic"        
+        
         self.setMax(M)
         
         nShells = 0
@@ -1069,28 +1196,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
     def genericFactor(self, qNums):
         return exp(-Z*r/qNums[0])
 
-def texThis(thing):
 
-    s = r"""\documentclass[a4paper,10pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-
-\title{SymPy generated orbital functions}
-\author{}
-\date{}
-
-\begin{document}
-
-\maketitle
-
-%s
-
-%s
-
-\end{document}
-
-""" % (thing.texOrbitalEq(), thing)
-    return s
 
 
 
@@ -1098,12 +1204,12 @@ def texThis(thing):
     
 
 def main():
-    orbitalSet = HOOrbitals(6, toCPP=True)
+    orbitalSet = HOOrbitals(12, toCPP=True)
 #    orbitalSet = hydrogenicOrbitals(10)
-    
-    with open(pjoin(paths.scratchPath, 'orbitals.tex'), 'w') as f:        
-        f.write(texThis(orbitalSet))
-        f.close()
+    orbitalSet.TeXToFile(paths.scratchPath)
+    orbitalSet.CPPToFile(paths.scratchPath)
+   
+        
 
     #atoms = hydrogenicOrbitals()
     #print atoms
