@@ -15,30 +15,16 @@ def copyList2(a):
         
     return b
 
-x = Symbol('x', real=True)
-y = Symbol('y', real=True)
-z = Symbol('z', real=True)
-
-theta = Symbol('theta', real=True)
-phi = Symbol('phi', real=True)
+x, y, z, theta, phi = symbols('x y z theta phi', real=True)
 
 r2_2d = x**2 + y**2
-r2d = sqrt(r2_2d)
-
 r2_3d = r2_2d + z**2
+
+r2d = sqrt(r2_2d)
 r3d = sqrt(r2_3d)
 
-r = Symbol('r', real=True, positive = True)
-r2 = Symbol('r^2', real=True, positive = True)
-r22d = Symbol('r^2_2d', real=True, positive=True)
-r_2d = Symbol('r_2d', real=True, positive = True)
+r, r2, r_2d, k, x2, y2, z2 = symbols('r r^2 r_2d k x2 y2 z2', real=True, positive = True)
 
-k = Symbol('k', real=True, positive = True)
-#Z = Symbol('Z', real=True, positive = True)
-
-x2, y2, z2 = symbols('x2 y2 z2', real=True, positive=True)
-
-w = Wild('w')
 
 class CPPBasis:
     
@@ -1267,7 +1253,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
 
 def main():
     
-#      orbitalSet = HOOrbitals(42, toCPP=True)
+#     orbitalSet = HOOrbitals(42, toCPP=True)
 #
 #      orbitalSet.TeXToFile(paths.scratchPath)
 #      orbitalSet.CPPToFile(paths.scratchPath)
@@ -1275,7 +1261,7 @@ def main():
 #   
 #
      orbitalSet = hydrogenicOrbitals(10, toCPP=True)
-     
+#     
      orbitalSet.TeXToFile(paths.scratchPath)
      orbitalSet.CPPToFile(paths.scratchPath)
 #
