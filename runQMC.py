@@ -338,34 +338,62 @@ def varParameterMap(n_p, dim, systemConstant, system):
 
 
         else:
-            print "No saved parameters for n_p=", n_p 
+            print "\n\nNo saved parameters for n_p=", n_p , "\n"
             
         return alpha, beta
-
-    else:
-        print "Unknown type ", system, "with dim=", dim 
+        
+        
+    elif dim==3 and system == "Atoms":
+        
+        return 0, 0
+        
+        
+    else:        
+        print "\n\nUnknown type ", system, "with dim=", dim, "\n"
+        return None
 
 
 def consistencyCheck(cmlArgs):
   
-    #no minimization initialized -> get param set
-    if (cmlArgs[cmlMAPg['doMIN']]=="0" or cmlArgs[cmlMAPg['doMIN']]=="def"):
-
-        n_p = 2
-        dim = 2
-        systemConstant = 1
+    #If no system is specified, we select Qdots
+    if (cmlArgs[cmlMAPg['system']] != "def"):
+        system = cmlArgs[cmlMAPg['system']] 
+    else:
         system = "QDots"
 
-        if (cmlArgs[cmlMAPg['n_p']] != "def"):
-            n_p = int(cmlArgs[cmlMAPg['n_p']])
-        if (cmlArgs[cmlMAPg['dim']] != "def"):
-            dim = int(cmlArgs[cmlMAPg['dim']])
-        if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
-            systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
-        if (cmlArgs[cmlMAPg['system']] != "def"):
-            system = cmlArgs[cmlMAPg['system']]
-            
+    #if no number of particles specified -> n_p=2        
+    if (cmlArgs[cmlMAPg['n_p']] != "def"):
+        n_p = int(cmlArgs[cmlMAPg['n_p']])
+    else:
+        n_p = 2
+    
+    #If no dim is specified, we choose 3 for atoms, 2 for qdots etc.
+    #NOTE n_p=3 is not standard, so def on dim with atoms is segFault material
+    if (cmlArgs[cmlMAPg['dim']] != "def"):
+        dim = int(cmlArgs[cmlMAPg['dim']])
+    else:
+        print "HER HER HER"
+        if system == "QDots":
+            dim = 2
+        elif system == "Atoms":
+            dim = 3
+            cmlArgs[cmlMAPg['dim']] = "3"
+
+    #if no systemConstant is selected, we set it to 1 for qdots, and 2 for atoms etc.
+    if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
+        systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
+    else:
+        if system == "QDots":
+            systemConstant = 1.0
+        elif system == "Atoms":
+            systemConstant = n_p
+            cmlArgs[cmlMAPg['systemConstant']] = str(n_p)
         
+         
+  
+    #no minimization initialized -> get param set. Overritten if specified.
+    if (cmlArgs[cmlMAPg['doMIN']]=="0" or cmlArgs[cmlMAPg['doMIN']]=="def"):
+ 
         alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
 
         if cmlArgs[cmlMAPvp['alpha']] == "def":
@@ -374,7 +402,7 @@ def consistencyCheck(cmlArgs):
             cmlArgs[cmlMAPvp['beta']] = str(beta)
             
      
-    #No col -> no jast, alpha=1
+    #No col -> no jast and alpha=1
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
         cmlArgs[cmlMAPg['use_jastrow']] = "0"
         cmlArgs[cmlMAPvp['alpha']] = "1"

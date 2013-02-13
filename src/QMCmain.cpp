@@ -116,12 +116,13 @@ int main(int argc, char** argv) {
 
 
     } else if (generalParams.system == "Atoms") {
-        
+  
         systemObjects.SP_basis = new hydrogenicOrbitals(generalParams, variationalParams);
-
+    
         systemObjects.onebody_pot = new AtomCore(generalParams);
 
         systemObjects.SYSTEM = new Fermions(generalParams, systemObjects.SP_basis);
+       
         systemObjects.SYSTEM->add_potential(systemObjects.onebody_pot);
         
     } else {

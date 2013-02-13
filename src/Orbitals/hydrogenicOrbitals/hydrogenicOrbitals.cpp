@@ -19,6 +19,10 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     this->alpha = new double();
     this->k = new double();
     this->k2 = new double();
+    
+    this->r22d = new double();
+    this->r2d = new double();
+    
     this->exp_factor_n1 = new double();
     this->exp_factor_n2 = new double();
 

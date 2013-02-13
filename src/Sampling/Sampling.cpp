@@ -27,12 +27,13 @@ void Sampling::set_trial_pos(Walker* walker, bool set_pos) {
         }
     }
 
+    
     walker->calc_r_i2();
 
     set_trial_states(walker);
 
     walker->make_rel_matrix();
-
+    
     qmc->get_system_ptr()->initialize(walker);
 
     qmc->get_jastrow_ptr()->get_dJ_matrix(walker);
@@ -44,9 +45,9 @@ void Sampling::set_trial_pos(Walker* walker, bool set_pos) {
 void Sampling::set_trial_states(Walker * walker) {
 
     for (int i = 0; i < n_p; i++) {
-
+       
         qmc->get_orbitals_ptr()->set_qnum_indie_terms(walker, i);
-
+     
         for (int j = 0; j < n2; j++) {
             walker->phi(i, j) = qmc->get_orbitals_ptr()->phi(walker, i, j);
         }

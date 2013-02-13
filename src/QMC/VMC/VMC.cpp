@@ -20,18 +20,17 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp)
 }
 
 void VMC::initialize() {
+
     jastrow->initialize();
- 
     sampling->set_trial_pos(original_walker);
-   
     copy_walker(original_walker, trial_walker);
+  
 }
 
 void VMC::run_method() {
-
+ 
     initialize();
-    using namespace arma;
-    
+
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
 
