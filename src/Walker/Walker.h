@@ -60,6 +60,10 @@ public:
     double get_r_i2(int i) const {
         return r2(i);
     }
+    
+    double get_r_i(int i) const {
+        return sqrt(get_r_i2(i));
+    }
 
     void kill() {
         is_murdered = true;

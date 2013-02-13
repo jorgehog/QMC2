@@ -115,6 +115,15 @@ int main(int argc, char** argv) {
         systemObjects.SYSTEM->add_potential(systemObjects.onebody_pot);
 
 
+    } else if (generalParams.system == "Atoms") {
+        
+        systemObjects.SP_basis = new hydrogenicOrbitals(generalParams, variationalParams);
+
+        systemObjects.onebody_pot = new AtomCore(generalParams);
+
+        systemObjects.SYSTEM = new Fermions(generalParams, systemObjects.SP_basis);
+        systemObjects.SYSTEM->add_potential(systemObjects.onebody_pot);
+        
     } else {
         if (parParams.is_master) cout << "unknown system" << endl;
         if (parParams.is_master) exit(1);
@@ -197,9 +206,9 @@ int main(int argc, char** argv) {
 
 
         systemObjects.sample_method->set_dt(dmcParams.dt);
-        
+
         DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
-        
+
         if (outputParams.dmc_out && parParams.is_master) {
             string dmcOutname = (string) "DMC_out";
             OutputHandler* DMCout = new stdoutDMC(dmcOutname, outputParams.outputPath);
@@ -377,9 +386,9 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[42]) != 0) variationalParams.beta = atof(argv[42]);
 
 
-	int vmc_dt_loc = 19;
-	int dist_in_loc = 27;
-	int dist_out_loc = 1;
+        int vmc_dt_loc = 19;
+        int dist_in_loc = 27;
+        int dist_out_loc = 1;
 
         if (def.compare(argv[vmc_dt_loc]) == 0) {
             if (generalParams.sampling == "IS") {
@@ -396,7 +405,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[dist_in_loc]) == 0) {
             dmcParams.dist_in = outputParams.dist_out;
         }
-        
+
     }
 
     //Seting dmc inpath if dist out VMC is set
@@ -428,7 +437,7 @@ void parseCML(int argc, char** argv,
             if (dmcParams.dist_in && outputParams.dist_out) {
                 if (dmcParams.n_w > vmcParams.n_c / (200)) {
                     std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
-                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << dmcParams.n_w*200 << std::endl;
+                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << dmcParams.n_w * 200 << std::endl;
                     exit(1);
                 }
             }

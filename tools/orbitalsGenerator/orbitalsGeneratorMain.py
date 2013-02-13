@@ -11,7 +11,7 @@ def main():
     
     outPath = pjoin(os.getcwd(), "output")    
     
-#    orbitalSet = HO.HOOrbitals(6, toCPP=True)
+#    orbitalSet = HO.HOOrbitals(42, toCPP=True)
     orbitalSet = hydrogenic.hydrogenicOrbitals(10, toCPP=True)
 #     
     orbitalSet.TeXToFile(outPath)

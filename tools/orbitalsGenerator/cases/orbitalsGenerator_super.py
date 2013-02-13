@@ -478,15 +478,15 @@ class orbitalGenerator(object):
             
             #k-factors
             if hit[0] == "k":
-                replc = "k2*"*(d/2) + "*k*"*(d%2 != 0)
+                replc = "k2*"*(d/2) + "k*"*(d%2 != 0)
                 
             #r factors
             elif hit[0] == 'r':
-                replc = 'r^2*'*(d/2) + "r"*(d%2 != 0)
+                replc = 'r^2*'*(d/2) + "r*"*(d%2 != 0)
             
             #r_2d factors
             elif hit[0] == 'r_2d':
-                replc = 'r_2d^2'*(d/2) + 'r_2d'*(d%2 != 0)                
+                replc = 'r_2d^2*'*(d/2) + 'r_2d*'*(d%2 != 0)                
                 
             #x factors
             for x in self.xi:

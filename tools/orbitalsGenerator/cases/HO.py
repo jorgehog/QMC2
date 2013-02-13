@@ -13,7 +13,7 @@ class HOOrbitals(orbitalGenerator):
     
     def __init__(self, M, doInit=True, toCPP=False):
         
-        self.name = "alphaHO"        
+        self.name = "HarmonicOscillator"        
         
         self.setMax(M)
         self.Hx = []        
@@ -62,7 +62,7 @@ Orbitals are constructed in the following fashion:
 \phi(\vec r)_{n_x, n_y} = H_{n_x}(kx)H_{n_y}(ky)e^{-\frac{1}{2}k^2r^2}
 \end{equation*}   
 
-where $k = \omega\alpha$, with $\omega$ being the oscillator frequency and $\alpha$ being the variational parameter.  
+where $k = \sqrt(\omega\alpha)$, with $\omega$ being the oscillator frequency and $\alpha$ being the variational parameter.  
 """
         
     def __str__(self):
