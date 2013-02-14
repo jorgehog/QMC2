@@ -160,12 +160,9 @@ double Pade_Jastrow::get_lapl_sum(Walker * walker) const {
     int k, j, d;
     double sum1, sum2, b_kj, dim_term, factor;
 
-    using namespace std;
-    cout << setprecision(10);
-
     sum1 = 0;
     sum2 = 0;
-    //    cout << a << endl;
+
     for (k = 0; k < n_p; k++) {
         for (j = k + 1; j < n_p; j++) {
             b_kj = 1 + beta * walker->r_rel(k, j);
@@ -181,8 +178,6 @@ double Pade_Jastrow::get_lapl_sum(Walker * walker) const {
             sum1 += walker->jast_grad(k, d) * walker->jast_grad(k, d);
         }
     }
-
-    cout << sum1 + 2 * sum2 - get_laplaciansum_num(walker) << endl;
 
     return sum1 + 2 * sum2;
 }

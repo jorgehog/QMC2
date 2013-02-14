@@ -61,7 +61,7 @@ double Jastrow::get_derivative_num(Walker* walker, int i, int d) const {
 }
 
 double Jastrow::get_laplaciansum_num(Walker* walker) const {
-    using namespace std;
+
     double val_p, val_m;
     double val = get_val(walker);
     
@@ -84,12 +84,11 @@ double Jastrow::get_laplaciansum_num(Walker* walker) const {
             walker->make_rel_matrix();
             
             lapl += val_p + val_m;
-            cout << "in lapl"<<val_m << "  " << val_p << "  " << val << endl;
+            
         }
     }
-    sleep(1);
 
-    lapl = (lapl - 2*dim*n_p*val)/(h*h);
+    lapl = (lapl - 2*dim*n_p*val)/(h*h*val);
     return lapl;
     
 }
