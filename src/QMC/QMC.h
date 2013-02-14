@@ -71,6 +71,9 @@ protected:
     void estimate_error() const;
     
     void switch_souls(int root, int source);
+    
+    //TEST FUNCTIONS
+    void test_ratios(const Walker* walker_pre, const Walker* walker_post, int particle, double R_qmc) const;
 
 public:
 
@@ -96,7 +99,7 @@ public:
         walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
     }
 
-    double get_wf_value(Walker* walker) const {
+    double get_wf_value(const Walker* walker) const {
         return system->get_spatial_wf(walker) * jastrow->get_val(walker);
     }
 

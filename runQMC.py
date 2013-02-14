@@ -344,9 +344,34 @@ def varParameterMap(n_p, dim, systemConstant, system):
         
         
     elif dim==3 and system == "Atoms":
+
+        Z = systemConstant
+
+        if Z == n_p == 2:
+            alpha = 0.925 
+            beta = 0.35
+        elif Z == n_p == 4:
+            alpha = 0.975
+            beta = 0.12
+            
+        elif Z == n_p == 10:
+            alpha = 0.92
+            beta = 0.5
         
-        return 0, 0
+        elif Z == n_p == 12:
+            alpha = 0.9 
+            beta = 0.4
         
+        elif Z == n_p == 14:
+            alpha = 0.9
+            beta = 0.5            
+            
+        
+        else:
+            print "\n\nNo saved parameters for n_p=", n_p , "\n"
+            return 0, 0
+        
+        return alpha, beta
         
     else:        
         print "\n\nUnknown type ", system, "with dim=", dim, "\n"

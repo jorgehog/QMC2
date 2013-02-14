@@ -19,7 +19,9 @@ protected:
     virtual double get_parameter(int n) = 0;
     virtual void set_parameter(double param, int n) = 0;
     virtual double get_variational_derivative(const Walker* walker, int n);
-
+    
+    double get_derivative_num(Walker* walker, int i, int d) const;
+    double get_laplaciansum_num(Walker* walker) const;
 
 public:
     Jastrow(int n_p, int dim);
@@ -35,7 +37,8 @@ public:
     virtual void get_dJ_matrix(Walker* walker, int i) const = 0;
     void get_dJ_matrix(Walker* walker) const;
     
-    virtual double get_lapl_sum(const Walker* walker) const = 0;
+    virtual double get_lapl_sum(Walker* walker) const = 0;
+    
   
     friend class Minimizer;
     friend class ASGD;

@@ -62,6 +62,7 @@ void Pade_Jastrow::get_dJ_matrix(Walker* walker, int i) const {
     double b_ij, factor;
 
     for (int j = 0; j < i; j++) {
+
         b_ij = 1.0 + beta * walker->r_rel(i, j);
         factor = a(i, j) / (walker->r_rel(i, j) * b_ij * b_ij);
         for (int k = 0; k < dim; k++) {
@@ -82,7 +83,8 @@ void Pade_Jastrow::get_dJ_matrix(Walker* walker, int i) const {
 
 void Pade_Jastrow::get_grad(Walker* walker) const {
     double sum;
-
+    using namespace std;
+    cout << setprecision(10);
     for (int i = 0; i < n_p; i++) {
         for (int k = 0; k < dim; k++) {
 
@@ -96,6 +98,8 @@ void Pade_Jastrow::get_grad(Walker* walker) const {
             }
 
             walker->jast_grad(i, k) = sum;
+            //            cout << "get grad "<<walker->jast_grad(i, k) - get_derivative(walker, i, k) << endl;
+
         }
     }
 
@@ -103,10 +107,12 @@ void Pade_Jastrow::get_grad(Walker* walker) const {
 
 void Pade_Jastrow::get_grad(const Walker* walker_pre, Walker* walker_post, int p) const {
     double sum;
-
+    //    using namespace std;
     for (int i = 0; i < p; i++) {
         for (int k = 0; k < dim; k++) {
             walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
+            //            cout << "get grad 2 1 "<<walker_post->jast_grad(i, k) - get_derivative_num(walker_post, i, k) << endl;
+
         }
     }
 
@@ -122,11 +128,15 @@ void Pade_Jastrow::get_grad(const Walker* walker_pre, Walker* walker_post, int p
         }
 
         walker_post->jast_grad(p, k) = sum;
+        //        cout << "get grad 2 2 "<<walker_post->jast_grad(p, k) - get_derivative_num(walker_post, p, k) << endl;
+
     }
 
     for (int i = p + 1; i < n_p; i++) {
         for (int k = 0; k < dim; k++) {
             walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
+            //            cout << "get grad 2 3 "<<walker_post->jast_grad(i, k) - get_derivative_num(walker_post, i, k) << endl;
+
         }
     }
 
@@ -146,22 +156,33 @@ double Pade_Jastrow::get_j_ratio(const Walker* walker_new, const Walker* walker_
     return exp(j_ratio);
 }
 
-double Pade_Jastrow::get_lapl_sum(const Walker * walker) const {
+double Pade_Jastrow::get_lapl_sum(Walker * walker) const {
     int k, j, d;
-    double sum1, sum2, b_kj;
+    double sum1, sum2, b_kj, dim_term, factor;
 
-    sum1 = sum2 = 0;
+    using namespace std;
+    cout << setprecision(10);
 
+    sum1 = 0;
+    sum2 = 0;
+    //    cout << a << endl;
     for (k = 0; k < n_p; k++) {
         for (j = k + 1; j < n_p; j++) {
             b_kj = 1 + beta * walker->r_rel(k, j);
-            sum2 += a(k, j) * (1 - beta * walker->r_rel(k, j)) / (walker->r_rel(k, j) * b_kj * b_kj * b_kj);
+            
+            factor = a(k, j) / (walker->r_rel(k, j) * b_kj * b_kj * b_kj);
+            
+            dim_term = (dim - 1) + beta*walker->r_rel(k, j)*(dim - 3);
+            
+            sum2 += factor*dim_term;
         }
 
         for (d = 0; d < dim; d++) {
             sum1 += walker->jast_grad(k, d) * walker->jast_grad(k, d);
         }
     }
+
+    cout << sum1 + 2 * sum2 - get_laplaciansum_num(walker) << endl;
 
     return sum1 + 2 * sum2;
 }

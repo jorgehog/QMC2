@@ -36,7 +36,7 @@ public:
 
     virtual double get_j_ratio(const Walker* walker_new, const Walker* walker_old, int i) const;
     virtual double get_val(const Walker* walker) const;
-    virtual double get_lapl_sum(const Walker* walker) const;
+    virtual double get_lapl_sum(Walker* walker) const;
 
 };
 

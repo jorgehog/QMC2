@@ -40,7 +40,7 @@ public:
         return 1;
     }
 
-    virtual double get_lapl_sum(const Walker* walker) const {
+    virtual double get_lapl_sum(Walker* walker) const {
         return 0;
     }
 

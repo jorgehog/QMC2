@@ -87,10 +87,15 @@ void QMC::get_gradients(Walker* walker) const {
 
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
     double spatial_jast = sampling->get_spatialjast_ratio(walker_post, walker_pre, particle);
+    
+//    test_ratios(walker_pre, walker_post, particle, spatial_jast);
+    
     double G = sampling->get_g_ratio(walker_post, walker_pre);
 
     return spatial_jast * spatial_jast * G;
 }
+
+
 
 void QMC::set_spin_state(int particle) const {
     int start = n2 * (particle >= n2);
@@ -221,4 +226,40 @@ double QMC::get_KE(const Walker* walker) const {
 
 void QMC::get_QF(Walker* walker) const {
     walker->qforce = 2 * (walker->jast_grad + walker->spatial_grad);
+}
+
+
+/*
+ 
+ Test functions
+ * 
+ */
+
+
+void QMC::test_ratios(const Walker* walker_pre, const Walker* walker_post, int particle, double R_qmc) const {
+  
+    double wf_new_s = system->get_spatial_wf(walker_post);
+    double wf_new_j = jastrow->get_val(walker_post);
+    double wf_new = wf_new_s*wf_new_j;
+    
+    double wf_old_s = system->get_spatial_wf(walker_pre);
+    double wf_old_j = jastrow->get_val(walker_pre);
+    double wf_old = wf_old_s*wf_old_j;
+    
+    
+    double R_opt_s = system->get_spatial_ratio(walker_pre, walker_post, particle);
+    double R_opt_j = jastrow->get_j_ratio(walker_post, walker_pre, particle);
+    double R = wf_new/wf_old;
+    
+    double t1 = R_opt_s/(wf_new_s/wf_old_s);
+    double t2 = R_opt_j/(wf_new_j/wf_old_j);
+    double t3 = R_qmc / R ;
+    
+    double eps = 1e-10;
+    if (abs(t1 - 1) < eps  & abs(t2 - 1) < eps & abs(t3 - 1) < eps){
+        std::cout << "ratio success" << std::endl;
+    } else {
+        std::cout << "ratio fail " << t1 << " " << t2 << " " << t3 << std::endl;
+    }
+    
 }
