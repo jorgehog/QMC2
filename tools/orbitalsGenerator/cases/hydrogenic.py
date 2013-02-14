@@ -1,4 +1,6 @@
-from sympy import (Ylm, 
+from sympy import (diff, 
+                   trigsimp,
+                   assoc_legendre,
                    sin, 
                    cos, 
                    exp, 
@@ -7,10 +9,12 @@ from sympy import (Ylm,
                    pi, 
                    cancel, 
                    sqf, 
-                   printing)
+                   printing,
+                   Symbol)
                    
 from sympy.physics.hydrogen import R_nl
 import sys, os
+from os.path import join as pjoin
 
 sys.path.append(os.getcwd())
 
@@ -76,7 +80,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
     def sphere2Cart(self, func):
 
         func = func.subs(sin(2*phi), sympify(2)*z*r2d/r3d**2)
-        func = func.subs(cos(2*phi), (z**2-r2d**2)/r3d**2)
+        func = func.subs(cos(2*phi), 1 - r2d**2/r3d**2)
 
         func = func.subs(cos(theta), x/r2d)
         func = func.subs(sin(theta), y/r2d)
@@ -85,16 +89,36 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         
         return func
     
+#    def getSphericalFunc(self, l, m):
+#        
+#        Y = Ylm(l, m, theta, phi)    
+#        
+#        if m >= 0:
+#            S = self.get_real(Y)
+#        else:
+#            S = self.get_imag(Y)
+#            
+#        return self.sphere2Cart(S)
+        
     def getSphericalFunc(self, l, m):
-        
-        Y = Ylm(l, m, theta, phi)    
-        
-        if m >= 0:
-            S = self.get_real(Y)
+   
+        if m < 0:
+            m = abs(m)
+            fac = sin(m*theta)
         else:
-            S = self.get_imag(Y)
+            fac = cos(m*theta)
             
-        return self.sphere2Cart(S)
+
+        P = assoc_legendre(l, m, cos(phi))
+        
+        res = fac*P
+        res = self.sphere2Cart(trigsimp(res))
+        
+        #Line which takes care of the stupid Abs when the argument is obviously real..
+        res = res.subs(r2d, r_2d).subs(r3d, r).subs(r, r3d).subs(r_2d, r2d)
+
+        return res;        
+        
         
 
     def simplifyLocal(self, expr, qNums, subs=True):
@@ -188,7 +212,7 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         for i, nlm in sorted(self.stateMap.items(), key=lambda x: x[0]):
             n, l, m = nlm
             self.orbitals[i] = self.R[n][l]*self.S[l][m]
-        
+
     def genericFactor(self, qNums, basic=False):
         
         if basic:
@@ -234,4 +258,72 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         args = args.replace('exp_factor', 'exp_factor_n%d' % n)
         return args
     
+    def extraToFile(self, path):
+
+        raw = """double %sOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, int i){
+    
+    double dphi;
+    
+    __code__
+    
+    return dphi;
+    
+}""" % self.name
+
+        shell = """if (qnum == _q_) {
+
+    __necessities__
+    
+        //__simple__
+        
+        dphi = __expr__
+        
+    } else """
+    
+        
+
+        Z = Symbol('Z', positive=True, real=True)
+
+        code = "    "
+
+        for i in range(self.maxImplemented/2):
+
+            psi = self.orbitals[i]
+            qNums = self.stateMap[i] 
+            genFac = self.genericFactor(qNums, basic=False)
+           
+            kdiff = diff(psi, k).factor(genFac)/psi*Z
+            
+            simple = self.makeReadable(str(kdiff))
+
+            nec, necList = self.getNecessities(kdiff)
+            expr = printing.ccode(kdiff) + ";"
+            expr = self.replaceCCode(expr, necList)
+
+            #hack to get the right indent
+            nec = "\n".join([" "*4  + nec_i for nec_i in nec.split("\n")])
+
+            subCode = shell
+            subCode = subCode.replace("\n\n    __necessities__", nec)\
+                             .replace("__expr__", expr)\
+                             .replace("__simple__", simple)\
+                             .replace("_q_", str(i))
+            
+            code += subCode
    
+        code = code.strip("else ")
+       
+        ccode = raw.replace("__code__", code)
+      
+        with open(pjoin(path, "%sOrbitalsAlphaDeriv.cpp" % self.name), 'w') as f:
+            f.write(ccode)
+            f.close()
+        
+        
+        
+        
+        
+        
+        
+        
+        

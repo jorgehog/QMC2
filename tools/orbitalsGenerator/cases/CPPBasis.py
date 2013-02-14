@@ -274,7 +274,7 @@ __subClass__
         
         nec, simple, preCalc, ret = orbitals.getCCode(expr, i)
         
-        return raw.replace("__necessities__", nec).\
+        return raw.replace("\n\n__necessities__", nec).\
                 replace("__preCalc__", preCalc).\
                 replace("__return__", ret).\
                 replace("__simpleExpr__", simple)

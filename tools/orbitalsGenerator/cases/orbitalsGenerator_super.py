@@ -559,9 +559,13 @@ class orbitalGenerator(object):
                 necS2 += "    %s = %s*%s;\n" % (x2, x, x)
 
                 
-        necS = ("%s\n%s" % (necS, necS2))
+        necS = ("%s\n%s" % (necS, necS2)).strip("\n")
         
-        return necS.strip("\n"), nec
+        #Manually add the lineshifts so that if no nec, then no lineshift        
+        if necS:
+            necS = "\n\n" + necS
+        
+        return necS, nec
         
     def getCReturn(self, expr, i):
          raise NotImplementedError("Function not implemented in subclass.")

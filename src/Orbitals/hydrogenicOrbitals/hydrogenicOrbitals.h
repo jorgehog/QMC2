@@ -34,8 +34,7 @@ protected:
 
     virtual double get_variational_derivative(const Walker* walker, int n);
 
-    void get_qnums();
-    double L(int n, int l, double r) const;
+    double get_dell_alpha_phi(const Walker* walker, int qnum, int i);
 
     virtual double get_parameter(int n) {
         return *alpha;

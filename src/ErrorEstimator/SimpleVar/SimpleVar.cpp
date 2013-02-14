@@ -19,7 +19,8 @@ double SimpleVar::estimate_error() {
     //sample variance
     double mean = f/i;
     double var = f2/(i-1) - i*mean*mean/(i-1);
-    
+    using namespace std;
+    cout << mean << endl;
     return combine_variance(var, mean, i);
      
 }

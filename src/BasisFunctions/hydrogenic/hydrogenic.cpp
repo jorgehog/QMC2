@@ -290,11 +290,11 @@ double lapl_hydrogenic_1::eval(const Walker* walker, int i) {
 
 double hydrogenic_2::eval(const Walker* walker, int i) {
 
-    x = walker->r(i, 0);
+    z = walker->r(i, 2);
     
-    //r*x*exp(-k*r/2)/r_2d
+    //z*exp(-k*r/2)
     
-    psi = walker->get_r_i(i)*x/(*r2d);
+    psi = z;
     return psi*(*exp_factor);
     
 }
@@ -303,51 +303,46 @@ double dell_hydrogenic_2_x::eval(const Walker* walker, int i) {
 
     x = walker->r(i, 0);
     z = walker->r(i, 2);
-
-    x2 = x*x;
-    z2 = z*z;
     
-    //(-r_2d^2*(k*r*x^2 - 2*r^2) - 2*x^2*z^2)*exp(-k*r/2)/(2*r*r_2d^3)
+    //-k*x*z*exp(-k*r/2)/(2*r)
     
-    psi = (-(*r22d)*((*k)*walker->get_r_i(i)*x2 - 2*walker->get_r_i2(i)) - 2*x2*z2)/(2*walker->get_r_i(i)*(*r22d)*(*r2d));
+    psi = -(*k)*x*z/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
 
 double dell_hydrogenic_2_y::eval(const Walker* walker, int i) {
 
-    x = walker->r(i, 0);
     y = walker->r(i, 1);
     z = walker->r(i, 2);
-
-    z2 = z*z;
     
-    //-x*y*(k*r*r_2d^2 + 2*z^2)*exp(-k*r/2)/(2*r*r_2d^3)
+    //-k*y*z*exp(-k*r/2)/(2*r)
     
-    psi = -x*y*((*k)*walker->get_r_i(i)*(*r22d) + 2*z2)/(2*walker->get_r_i(i)*(*r22d)*(*r2d));
+    psi = -(*k)*y*z/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
 
 double dell_hydrogenic_2_z::eval(const Walker* walker, int i) {
 
-    x = walker->r(i, 0);
     z = walker->r(i, 2);
+
+    z2 = z*z;
     
-    //-x*z*(k*r - 2)*exp(-k*r/2)/(2*r*r_2d)
+    //(-k*z^2 + 2*r)*exp(-k*r/2)/(2*r)
     
-    psi = -x*z*((*k)*walker->get_r_i(i) - 2)/(2*walker->get_r_i(i)*(*r2d));
+    psi = (-(*k)*z2 + 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
 
 double lapl_hydrogenic_2::eval(const Walker* walker, int i) {
 
-    x = walker->r(i, 0);
+    z = walker->r(i, 2);
     
-    //x*(-4*r^2 + r_2d^2*(k^2*r^2 - 8*k*r + 8))*exp(-k*r/2)/(4*r*r_2d^3)
+    //k*z*(k*r - 8)*exp(-k*r/2)/(4*r)
     
-    psi = x*(-4*walker->get_r_i2(i) + (*r22d)*((*k2)*walker->get_r_i2(i) - 8*(*k)*walker->get_r_i(i) + 8))/(4*walker->get_r_i(i)*(*r22d)*(*r2d));
+    psi = (*k)*z*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
@@ -358,12 +353,11 @@ double lapl_hydrogenic_2::eval(const Walker* walker, int i) {
 
 double hydrogenic_3::eval(const Walker* walker, int i) {
 
-    y = walker->r(i, 1);
-    z = walker->r(i, 2);
+    x = walker->r(i, 0);
     
-    //y*z*exp(-k*r/2)/r_2d
+    //x*exp(-k*r/2)
     
-    psi = y*z/(*r2d);
+    psi = x;
     return psi*(*exp_factor);
     
 }
@@ -371,52 +365,47 @@ double hydrogenic_3::eval(const Walker* walker, int i) {
 double dell_hydrogenic_3_x::eval(const Walker* walker, int i) {
 
     x = walker->r(i, 0);
-    y = walker->r(i, 1);
-    z = walker->r(i, 2);
+
+    x2 = x*x;
     
-    //-x*y*z*(k*r_2d^2 + 2*r)*exp(-k*r/2)/(2*r*r_2d^3)
+    //(-k*x^2 + 2*r)*exp(-k*r/2)/(2*r)
     
-    psi = -x*y*z*((*k)*(*r22d) + 2*walker->get_r_i(i))/(2*walker->get_r_i(i)*(*r22d)*(*r2d));
+    psi = (-(*k)*x2 + 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
 
 double dell_hydrogenic_3_y::eval(const Walker* walker, int i) {
 
+    x = walker->r(i, 0);
     y = walker->r(i, 1);
-    z = walker->r(i, 2);
-
-    y2 = y*y;
     
-    //-z*(2*r*y^2 + r_2d^2*(k*y^2 - 2*r))*exp(-k*r/2)/(2*r*r_2d^3)
+    //-k*x*y*exp(-k*r/2)/(2*r)
     
-    psi = -z*(2*walker->get_r_i(i)*y2 + (*r22d)*((*k)*y2 - 2*walker->get_r_i(i)))/(2*walker->get_r_i(i)*(*r22d)*(*r2d));
+    psi = -(*k)*x*y/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
 
 double dell_hydrogenic_3_z::eval(const Walker* walker, int i) {
 
-    y = walker->r(i, 1);
+    x = walker->r(i, 0);
     z = walker->r(i, 2);
-
-    z2 = z*z;
     
-    //y*(-k*z^2 + 2*r)*exp(-k*r/2)/(2*r*r_2d)
+    //-k*x*z*exp(-k*r/2)/(2*r)
     
-    psi = y*(-(*k)*z2 + 2*walker->get_r_i(i))/(2*walker->get_r_i(i)*(*r2d));
+    psi = -(*k)*x*z/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
 
 double lapl_hydrogenic_3::eval(const Walker* walker, int i) {
 
-    y = walker->r(i, 1);
-    z = walker->r(i, 2);
+    x = walker->r(i, 0);
     
-    //y*z*(-4*r + r_2d^2*(k^2*r - 8*k))*exp(-k*r/2)/(4*r*r_2d^3)
+    //k*x*(k*r - 8)*exp(-k*r/2)/(4*r)
     
-    psi = y*z*(-4*walker->get_r_i(i) + (*r22d)*((*k2)*walker->get_r_i(i) - 8*(*k)))/(4*walker->get_r_i(i)*(*r22d)*(*r2d));
+    psi = (*k)*x*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }

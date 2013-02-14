@@ -5,22 +5,30 @@ mainCppFile = open(os.path.join(paths.CODE, "src", "QMCmain.cpp"), 'r')
 raw = mainCppFile.read()
 mainCppFile.close()
 
-generateSTDOUTtests = False
+generateSTDOUTtests = True
 generateCMLMaps = True
 
 
 if generateSTDOUTtests:
 
-	p = "\s*if \(def\.compare\(argv\[(\d+)\]\) != 0\) (.+) = "
-
-	data = re.findall(p, raw)
+    p = "\s*if \(def\.compare\(argv\[(\d+)\]\) != 0\) (.+) = "
+    data = re.findall(p, raw)
+    	
+    print "    if (initOut) {"
+    print "        if (parParams.is_master) {"
+    
+    for index, var in data:
+        print '            std::cout << "%2s" << " %s" << " = " << %s << std::endl;' % (index, var.ljust(32), var.ljust(32))
 	
-	print "    if (initOut) {"
-	for index, var in data:
-		print '        std::cout << "%2s" << " %s" << " = " << %s << std::endl;' % (index, var.ljust(32), var.ljust(32))
-	print "    }"
+    print "        }"
+    print
+    print "#ifdef MPI_ON"
+    print "        MPI_Finalize();"
+    print "#endif"
+    print    
+    print "        exit(0);\n    }\n\n\n"
 
-elif generateCMLMaps:
+if generateCMLMaps:
 
 	p = "^(\s*if \(def\.compare\(argv\[\d+\]\) != 0\) .+ = .*argv\[\d+\].*\;\s*)$"
 	data = re.findall(p, raw, re.MULTILINE)
@@ -40,7 +48,7 @@ elif generateCMLMaps:
 
 
 		pyData = re.findall("\s*if \(def.compare\(argv\[\d+\]\) != 0\) (.+)\.(.+) = ", data[i])[0]
-		print pyData
+	
 		pyMap[pyData[0][:2]].append((pyData[1], i))
 
 		

@@ -16,6 +16,7 @@ def main():
 #     
     orbitalSet.TeXToFile(outPath)
     orbitalSet.CPPToFile(outPath)
+    orbitalSet.extraToFile(outPath)
     
     
 

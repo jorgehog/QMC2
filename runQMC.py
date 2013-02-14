@@ -397,12 +397,13 @@ def consistencyCheck(cmlArgs):
     if (cmlArgs[cmlMAPg['dim']] != "def"):
         dim = int(cmlArgs[cmlMAPg['dim']])
     else:
-        print "HER HER HER"
         if system == "QDots":
             dim = 2
         elif system == "Atoms":
             dim = 3
             cmlArgs[cmlMAPg['dim']] = "3"
+        else:
+            raise NotImplementedError("System %s is not implemented." % system)
 
     #if no systemConstant is selected, we set it to 1 for qdots, and 2 for atoms etc.
     if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
