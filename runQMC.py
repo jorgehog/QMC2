@@ -348,8 +348,8 @@ def varParameterMap(n_p, dim, systemConstant, system):
         Z = systemConstant
 
         if Z == n_p == 2:
-            alpha = 0.925 
-            beta = 0.35
+            alpha = 0.918918
+            beta = 0.35639
         elif Z == n_p == 4:
             alpha = 0.975
             beta = 0.12

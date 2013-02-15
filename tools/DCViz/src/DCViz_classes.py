@@ -134,55 +134,52 @@ class DMC_OUT(DCVizPlotter):
 
 class dist_out(DCVizPlotter):
     
-    nametag = "dist.+\.arma"
-    figMap = {"fig1" : ["subfigMeanPos", "subfigRadii"], "fig2": ["subfigHist2d", "subfigDist1d"]}
+    nametag = "dist_out0_.+\.arma"
+    figMap = {"fig1" : ["subfigRadii"], "fig2": ["subfigHist2d"], "fig3": ["subfigDist1d"]}
 
     armaBin = True
     
     isFamilyMember = True
     familyName = "Dist"
- 
+  
+  
     def plot(self, data):
         
-        n_p = len(data[0][0])        
+        n_p = len(data[0][0])  
+        dim = len(data[0])
         n = len(data)
 
+        cores = re.findall("dist_out(\d+)_\d+\.arma", " ".join(self.familyFileNames[::1000]))     
+        nCores = max([int(core) for core in cores]) + 1        
+        print nCores
         nBins = 100
         
-        X = numpy.zeros([n, n_p])
-        Y = numpy.zeros([n, n_p])  
+        xyz = numpy.empty([n, n_p, dim])
+        rMean = numpy.zeros([n_p])
         
         for i in xrange(n):
-            x, y = data[i]
-            X[i] = x
-            Y[i] = y
             
+            for j in xrange(dim):
+                xyz[i, :, j] = data[i][j]
             
-        Xavg = X.sum(0)/n
-        Yavg = Y.sum(0)/n
-
-        
-        rMean = numpy.sqrt(Xavg**2 + Yavg**2)
-        
+        for i in xrange(n_p):
+            rMean[i] = numpy.sqrt((xyz**2)[:, i, :].sum(1)).sum()/n
         rMean.sort()
-
-        X.resize(n*n_p)
-        Y.resize(n*n_p)
         
-        R = numpy.sqrt(X**2 + Y**2)        
+        xyz.resize(n*n_p, dim)
+      
         
-        self.subfigHist2d.hexbin(X, Y)
+     
+        self.subfigHist2d.hexbin(xyz[:, 0], xyz[:, 1])
         self.subfigHist2d.set_xlabel(r'x')
         self.subfigHist2d.set_ylabel(r'y')
         
-        self.subfigDist1d.hist(R, nBins, facecolor='green', histtype='stepfilled')
-        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2}$')
+#        self.subfigDist1d.hist(R, nBins, facecolor='green', histtype='stepfilled')
+#        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')
 
-        self.subfigMeanPos.plot(Xavg, Yavg, 'ro')
-        self.subfigMeanPos.set_xlabel(r'$\langle x\rangle$')
-        self.subfigMeanPos.set_ylabel(r'$\langle y\rangle$')
-
-        self.subfigRadii.plot(rMean, 'b*')
+        self.subfigRadii.scatter(range(1, n_p+1), rMean, s=10, marker='o', c='b')
+        self.subfigRadii.set_ylim(0, rMean[n_p/2]*2)
+        self.subfigRadii.axes.get_xaxis().set_major_locator(pylab.MaxNLocator(integer=True))
         self.subfigRadii.set_xlabel(r'Particle')
         self.subfigRadii.set_ylabel(r'$\langle r \rangle$')
         
