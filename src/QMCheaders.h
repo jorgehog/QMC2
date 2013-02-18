@@ -144,12 +144,13 @@ class ErrorEstimator;
 class QMC;
 
 #include "BasisFunctions/BasisFunctions.h"
-#include "BasisFunctions/semiAlphaHO/semiAlphaHO.h"
-#include "BasisFunctions/alphaHO/alphaHO.h"
+#include "BasisFunctions/HarmonicOscillator/HarmonicOscillator.h"
+//#include "BasisFunctions/semiAlphaHO/semiAlphaHO.h"
+//#include "BasisFunctions/alphaHO/alphaHO.h"
 #include "BasisFunctions/hydrogenic/hydrogenic.h"
 
 #include "Orbitals/Orbitals.h"
-#include "Orbitals/AlphaHarmonicOscillatorOld/AlphaHarmonicOscillatorOld.h"
+//#include "Orbitals/AlphaHarmonicOscillatorOld/AlphaHarmonicOscillatorOld.h"
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
 #include "Orbitals/ExpandedBasis/ExpandedBasis.h"

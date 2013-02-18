@@ -335,7 +335,10 @@ def varParameterMap(n_p, dim, systemConstant, system):
                 beta = 0.85;
             else:
                 print "No saved parameters for (n_p, w) = ", n_p, " ", w 
-
+        elif n_p==42:
+            if w==1:
+                alpha = 0.7
+                beta = 0.9
 
         else:
             print "\n\nNo saved parameters for n_p=", n_p , "\n"

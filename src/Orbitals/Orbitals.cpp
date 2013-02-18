@@ -17,7 +17,7 @@ Orbitals::Orbitals(int n_p, int dim) {
     two_h = 1 / (2 * h);
 
 
-    max_implemented = 15; //for 30 particles
+    max_implemented = 20; //for 42 particles
     basis_functions = new BasisFunctions*[max_implemented];
 
     dell_basis_functions = new BasisFunctions**[dim];
@@ -108,12 +108,12 @@ double Orbitals::phi(const Walker* walker, int particle, int q_num) {
 }
 
 double Orbitals::del_phi(const Walker* walker, int particle, int q_num, int d) {
-    testDell(walker, particle, q_num, d);
+//    testDell(walker, particle, q_num, d);
     return dell_basis_functions[d][q_num]->eval(walker, particle);
 }
 
 double Orbitals::lapl_phi(const Walker* walker, int particle, int q_num) {
-    testLaplace(walker, particle, q_num);
+//    testLaplace(walker, particle, q_num);
     return lapl_basis_functions[q_num]->eval(walker, particle);
 }
 
