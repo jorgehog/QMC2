@@ -98,8 +98,7 @@ void Pade_Jastrow::get_grad(Walker* walker) const {
             }
 
             walker->jast_grad(i, k) = sum;
-            //            cout << "get grad "<<walker->jast_grad(i, k) - get_derivative(walker, i, k) << endl;
-
+          
         }
     }
 
@@ -107,12 +106,10 @@ void Pade_Jastrow::get_grad(Walker* walker) const {
 
 void Pade_Jastrow::get_grad(const Walker* walker_pre, Walker* walker_post, int p) const {
     double sum;
-    //    using namespace std;
+
     for (int i = 0; i < p; i++) {
         for (int k = 0; k < dim; k++) {
             walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
-            //            cout << "get grad 2 1 "<<walker_post->jast_grad(i, k) - get_derivative_num(walker_post, i, k) << endl;
-
         }
     }
 
@@ -128,15 +125,12 @@ void Pade_Jastrow::get_grad(const Walker* walker_pre, Walker* walker_post, int p
         }
 
         walker_post->jast_grad(p, k) = sum;
-        //        cout << "get grad 2 2 "<<walker_post->jast_grad(p, k) - get_derivative_num(walker_post, p, k) << endl;
-
+     
     }
 
     for (int i = p + 1; i < n_p; i++) {
         for (int k = 0; k < dim; k++) {
             walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
-            //            cout << "get grad 2 3 "<<walker_post->jast_grad(i, k) - get_derivative_num(walker_post, i, k) << endl;
-
         }
     }
 

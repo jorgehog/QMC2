@@ -14,7 +14,7 @@ protected:
     int n2;
     int dim;
     int max_implemented;
-    
+
     QMC* qmc;
 
     double h;
@@ -33,6 +33,13 @@ protected:
     double num_diff(const Walker* walker, int particle, int q_num, int d);
     double num_ddiff(const Walker* walker, int particle, int q_num);
 
+    /*
+     Test functions
+     */
+    
+    void testLaplace(const Walker* walker, int particle, int q_num);
+    void testDell(const Walker* walker, int particle, int q_num, int d);
+    
     friend class Minimizer;
     friend class ASGD;
     friend class stdoutASGD;
@@ -45,22 +52,16 @@ public:
     virtual void set_qnum_indie_terms(const Walker* walker, int i) {
     };
 
-    virtual double phi(const Walker* walker, int particle, int q_num) {
-        return basis_functions[q_num]->eval(walker, particle);
-    }
+    virtual double phi(const Walker* walker, int particle, int q_num);
 
-    virtual double del_phi(const Walker* walker, int particle, int q_num, int d) {
-        return dell_basis_functions[d][q_num]->eval(walker, particle);
-    }
+    virtual double del_phi(const Walker* walker, int particle, int q_num, int d);
 
-    virtual double lapl_phi(const Walker* walker, int particle, int q_num) {
-        return lapl_basis_functions[q_num]->eval(walker, particle);
-    }
+    virtual double lapl_phi(const Walker* walker, int particle, int q_num);
 
-    void set_qmc_ptr(QMC* qmc){
+    void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;
     }
-    
+
 };
 
 

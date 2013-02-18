@@ -134,11 +134,11 @@ class DMC_OUT(DCVizPlotter):
 
 class dist_out(DCVizPlotter):
     
-    nametag = "dist_out0_.+\.arma"
+    nametag = "dist_out.+\.arma"
     figMap = {"fig1" : ["subfigRadii"], "fig2": ["subfigHist2d"], "fig3": ["subfigDist1d"]}
 
     armaBin = True
-    
+
     isFamilyMember = True
     familyName = "Dist"
   
@@ -150,32 +150,67 @@ class dist_out(DCVizPlotter):
         n = len(data)
 
         cores = re.findall("dist_out(\d+)_\d+\.arma", " ".join(self.familyFileNames[::1000]))     
-        nCores = max([int(core) for core in cores]) + 1        
-        print nCores
-        nBins = 100
+        nCores = max([int(core) for core in cores]) + 1     
+        N = n/nCores
+    
+        I = [0 for i in range(nCores)]
         
-        xyz = numpy.empty([n, n_p, dim])
-        rMean = numpy.zeros([n_p])
         
-        for i in xrange(n):
+        xyz = numpy.empty([nCores, N, n_p, dim])
+        rMean = numpy.zeros([nCores, n_p])
+        R = numpy.zeros([nCores, n_p, N])
+        
+        for i in xrange(N*nCores):
+            
+            #find which core this walker belongs to
+            c = int(re.findall("dist_out(\d+)_\d+\.arma", 
+                               self.familyFileNames[i])[0])
             
             for j in xrange(dim):
-                xyz[i, :, j] = data[i][j]
+                xyz[c, I[c], :, j] = data[i][j]
+                
+            I[c]+=1
             
-        for i in xrange(n_p):
-            rMean[i] = numpy.sqrt((xyz**2)[:, i, :].sum(1)).sum()/n
-        rMean.sort()
-        
-        xyz.resize(n*n_p, dim)
+        for c in xrange(nCores):
+            for i in xrange(n_p):
+                R[c, i, :] = numpy.sqrt((xyz[c]**2)[:, i, :].sum(1))
+                rMean[c, i] = R[c, i, :].sum()
       
+
+        indexes = rMean.argsort(1)
         
-     
-        self.subfigHist2d.hexbin(xyz[:, 0], xyz[:, 1])
+        rMean.sort(1)
+        rMean = rMean.sum(0)/(N*nCores)
+        
+        
+        for i in range(nCores):
+            R[i, :, :] = R[i, indexes[i], :]
+        
+        RSorted = numpy.zeros([n_p, N*nCores])
+        R.resize([n_p*nCores, N])
+        
+        for i in range(n_p):
+            RSorted[i, :] = R[i::n_p].reshape(N*nCores)
+            
+        R = RSorted
+        
+        nBins = 100
+        
+        xyz.resize(N*nCores*n_p, dim)
+        
+        self.subfigHist2d.hexbin(xyz[:,0], xyz[:,1])
+#        self.subfigHist2d.set_xlim([-0.5, 0.5])
+#        self.subfigHist2d.set_ylim([-0.5, 0.5])
+                
         self.subfigHist2d.set_xlabel(r'x')
         self.subfigHist2d.set_ylabel(r'y')
         
-#        self.subfigDist1d.hist(R, nBins, facecolor='green', histtype='stepfilled')
-#        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')
+        for i in range(n_p):
+            self.subfigDist1d.hist(R[i, :], 
+                                   nBins, 
+                                   histtype='step')
+                                   
+        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')
 
         self.subfigRadii.scatter(range(1, n_p+1), rMean, s=10, marker='o', c='b')
         self.subfigRadii.set_ylim(0, rMean[n_p/2]*2)
