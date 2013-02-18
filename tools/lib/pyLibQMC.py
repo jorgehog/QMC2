@@ -12,6 +12,7 @@ class paths:
     scratchPath = pjoin(HOME ,"scratch")
     iniFilePath = pjoin(CODE ,"iniFiles")
     programPath =pjoin(HOME ,"NetBeansProjects/nbQMC2/dist/Debug/MPI-Linux-x86")
+    buildPath = pjoin(HOME, "tmp/testMake/build")    
     #programPath = HOME + "/NetBeansProjects/nbQMC2/dist/Debug/GNU-Linux-x86"
     
 
