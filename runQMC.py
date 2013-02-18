@@ -10,20 +10,12 @@ from os.path import join as pjoin
 
 from pyLibQMC import paths, misc, add_date, parseCML
 
-from PySide.QtCore import *
-from PySide.QtGui import *
-"""
-class guiThread(threading.Thread):
-    def __init__(self, masterDir):
-        super(guiThread, self).__init__()
-        self.masterDir = masterDir
-        
-    def run(self):
-        
-        os.system("python %s %s > %s" % (os.path.join(paths.toolsPath, 'qmcGUI.py'),\
-                                    self.masterDir, \
-                                    os.path.join(self.masterDir, "GUI_out.txt")))
-"""       
+try:
+    from PySide.QtCore import *
+    from PySide.QtGui import *
+except:
+    print "Unable to detect pyside. GUI not supported."
+       
 cmlMAPo = {"dist_out"      : 0,
            "outputPath"    : 1,
            "dmc_out"       : 2,
