@@ -7,6 +7,7 @@ class paths:
     HOME = os.path.expanduser('~')
     CODE = pjoin(HOME ,"MASTER/QMC2")
     IDEPath = pjoin(HOME ,"NetBeansProjects/nbQMC2")
+    src = pjoin(CODE, "src")
     toolsPath = pjoin(CODE ,"tools")
     scratchPath = pjoin(HOME ,"scratch")
     iniFilePath = pjoin(CODE ,"iniFiles")
@@ -77,6 +78,7 @@ def main():
     print "HOME:".ljust(spacing) + "%s" % paths.HOME 
     print "CODE:".ljust(spacing) + "%s" % paths.CODE
     print "IDEPath:".ljust(spacing) + "%s" % paths.IDEPath
+    print "src:".ljust(spacing) + "%s" % paths.src
     print "toolsPath:".ljust(spacing) + "%s" % paths.toolsPath
     print "scratchPath:".ljust(spacing) + "%s" % paths.scratchPath
     print "iniFiles:".ljust(spacing) + "%s" % paths.iniFilePath
