@@ -151,6 +151,9 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
     } else if (n == 4) {
         double x2 = x*x;
         return 16 * x2 * x2 - 48 * x2 + 12;
+    } else if (n == 5) {
+        double x2 = x*x;
+        return 32*x2*x2*x - 160*x2*x + 120*x;
     } else {
         std::cout << "Unsopported Hermite polynomial level: " << n << std::endl;
         exit(1);
