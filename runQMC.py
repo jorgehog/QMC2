@@ -194,7 +194,7 @@ def setOutPath(arglist, dirPath):
         arglist.append("-o")
         arglist.append("outputPath=%s/" % dirPath)
 
-def parseFiles(openGUI):
+def parseFiles(openGUI, codename):
     
     
     if openGUI:
@@ -210,7 +210,7 @@ def parseFiles(openGUI):
         fileNames = selectFilesRaw()
 
     #The master directory of runs are set to the scratchPath variable
-    superDir = initializeDir(paths.scratchPath, "QMCrun")
+    superDir = initializeDir(paths.scratchPath, codename)
     
     dirs = []
     parsedFiles = []
@@ -566,6 +566,17 @@ def consistentMap():
     
     return consistent
       
+def getCodename(argv):
+    
+    codename = "QMCrun"
+    for arg in argv:
+        p = re.findall("codename\s*\=\s*(.+)", arg)
+        
+        if p:
+            codename = p[0]
+            argv.remove(arg)            
+            
+    return codename
 
 def main():
     
@@ -576,11 +587,12 @@ def main():
         print "Map consistent"
     
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
+    codename = getCodename(sys.argv)
 
     print "MPI nodes: ", n_cores
     
     if len(sys.argv) == 1:
-        CMLargs, dirs, superDir = parseFiles(openGUI)
+        CMLargs, dirs, superDir = parseFiles(openGUI, codename)
     else:
         dirs = [pjoin(paths.scratchPath, "QMC_SCRATCH")]
         setOutPath(sys.argv, dirs[0])
