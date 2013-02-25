@@ -10,7 +10,7 @@ try:
     from PySide.QtGui import *
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
     import DCVizGUI
-    int("heI")
+
     forceTerminal = False
     QDialog = None
 except:
