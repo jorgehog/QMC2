@@ -6,13 +6,14 @@ from os.path import join as pjoin
 from pyLibQMC import paths, parseCML, misc
 
 try:
+    int("hei")
     from PySide.QtCore import *
     from PySide.QtGui import *
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
     import DCVizGUI
 
     forceTerminal = False
-    QDialog = None
+   
 except:
     
     print "pyside not supported. Terminal usage enabled."
@@ -21,6 +22,8 @@ except:
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
     
     from DCViz_classes import Blocking
+    
+    QDialog = list
 
        
 
