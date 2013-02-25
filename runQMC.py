@@ -194,8 +194,7 @@ def setOutPath(arglist, dirPath):
         arglist.append("-o")
         arglist.append("outputPath=%s/" % dirPath)
 
-def parseFiles(openGUI, codename):
-    
+def parseFiles(openGUI, codename): 
     
     if openGUI:
         fileNames = None

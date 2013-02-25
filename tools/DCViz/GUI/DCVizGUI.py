@@ -527,7 +527,11 @@ def main(masterDir = None):
     if masterDir is None:
         masterDir = os.getcwd()
     
-    app = QApplication(sys.argv)
+    try:
+        app = QApplication(sys.argv)
+    except:
+        app = QCoreApplication.instance()
+        
     app.setStyle(QStyleFactory.create("Cleanlooks"))
     #app.setWindowIcon(QIcon("Images/QMC.ico"))
                             

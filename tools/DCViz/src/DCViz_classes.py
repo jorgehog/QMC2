@@ -19,12 +19,17 @@ sys.path.append(classes_thisDir)
 
 from DCViz_sup import DCVizPlotter
 
-
-useTex = True
-if useTex:    
-    #~ Enabling latex support in matplotlib
+try:
     rc('text', usetex=True)
     rc('font', family='serif')
+    pylab.title("$\LaTeX$")
+    pylab.draw()
+    pylab.clf()
+    
+except:
+    print "Neccessary latex packages not installed. Disabling latex support."
+    rc('text', usetex=False)   
+
 
 
 class myTestClass(DCVizPlotter):

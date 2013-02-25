@@ -6,13 +6,13 @@ from os.path import join as pjoin
 from pyLibQMC import paths, parseCML, misc
 
 try:
+    int("hei")
     from PySide.QtCore import *
     from PySide.QtGui import *
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
-    import DCVizGUI
-
+    
     forceTerminal = False
-   
+       
 except:
     
     print "pyside not supported. Terminal usage enabled."
@@ -22,6 +22,7 @@ except:
     
     from DCViz_classes import Blocking
     
+    #Evil haxx
     QDialog = list
 
        
@@ -238,12 +239,14 @@ def selectFileFromList(path):
             selections.append([pjoin(path, cont), "file"])
             i += 1
     
-    j = raw_input("Select file/folder ('..' to go up) #")
+    j = raw_input("Select file/folder ('..' to go up 'q' to end) #")
     
     try:
         
         if j == "..":
             return [os.path.split(path)[0], "dir"]
+        elif j == "q":
+            return None
         
         selected = selections[int(j)]
     except:
@@ -256,10 +259,12 @@ def selectFileTerminal(thisDir):
 
     selected = selectFileFromList(thisDir)
 
-    if selected[1] == "dir":
-         fileName = selectFileTerminal(selected[0])
+    if selected is None:
+         fileName = None
     elif selected[1] == "file":
          fileName = selected[0]
+    elif selected[1] == "dir":
+        fileName = selectFileTerminal(selected[0])
     else:
         print "Something went wrong.."
   
@@ -299,7 +304,7 @@ def getParamsTerminal(blockFile, lastParams, n_cores):
             
             Max = raw_input("Max block size (< %d) = " % (size/2))
             
-            if Max == "exit":
+            if Max == "q":
                 return None
                 
             Max = int(Max)
@@ -314,7 +319,7 @@ def getParamsTerminal(blockFile, lastParams, n_cores):
             
             Min =  raw_input("Min block size (> %s) = " % n_cores)
             
-            if Min == "exit":
+            if Min == "q":
                 return None
             
             Min = int(Min)
@@ -333,7 +338,7 @@ def getParamsTerminal(blockFile, lastParams, n_cores):
                 lim = (Max-Min)/n_cores
                 nb = raw_input("nBlocks (2 < nB < %d) = " % lim)
                 
-                if nb == "exit":
+                if nb == "q":
                     return None                                
                 
                 nb = int(nb)
@@ -378,7 +383,7 @@ def displayTerminal(path):
 
 
 def main():
-    forceTerminal=True
+
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
     
     openGUI = openGUI&(not forceTerminal)
@@ -402,9 +407,11 @@ def main():
     else:
         mainDir = pjoin(paths.scratchPath, "QMC_SCRATCH")
     
-    
     if not forceTerminal:
-        app = QApplication(sys.argv)
+        try:
+            app = QApplication(sys.argv)
+        except RuntimeError:
+            app = QCoreApplication.instance() 
     
     active = True
     GUIopened = False
@@ -452,9 +459,9 @@ def main():
             
         
         active = getYesNo("View more files?")
-
+    
     if not forceTerminal:
-        app.exit()        
+        app.exit()
 
 
 if __name__ == "__main__":
