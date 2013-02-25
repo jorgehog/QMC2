@@ -289,7 +289,7 @@ def testbedJorgen(dynamic):
     from pyLibQMC import paths
     path = os.path.join(paths.scratchPath, "QMC_SCRATCH")
 
-    setting = "ALL"
+    setting = "MIN"
 
     if setting == "MIN" or setting == "ALL":
         filepath = os.path.join(path, "ASGD_out.dat")

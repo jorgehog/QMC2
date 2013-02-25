@@ -2,25 +2,27 @@
 import sys, os, subprocess, re
 from os.path import join as pjoin
 
-from PySide.QtCore import *
-from PySide.QtGui import *
 
 from pyLibQMC import paths, parseCML, misc
 
-sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
+try:
+    from PySide.QtCore import *
+    from PySide.QtGui import *
+    int("Hei")
+    sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
+    import DCVizGUI
 
-import DCVizGUI
+    forceTerminal = False
+except:
+    
+    print "pyside not supported. Terminal usage enabled."
+    forceTerminal = True
+    
+    sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
+    
+    from DCViz_classes import Blocking
 
-def selectFile(mainDir):
-
-    dialog = QFileDialog()
-    dialog.setDirectory(mainDir)
-    dialog.setNameFilter("All arma files (*.arma)")
-    dialog.setFileMode(QFileDialog.ExistingFile)
-        
-    if dialog.exec_():          
-        return dialog.selectedFiles()
-
+       
 
 class runAgainForm(QDialog):
     def __init__(self, Q, parent=None):
@@ -53,10 +55,7 @@ class runAgainForm(QDialog):
     def answer(self, ans):
         self.answeredYes = ans
         self.close()
-        
-
-                
-        
+    
 
 class paramForm(QDialog):
     
@@ -65,11 +64,7 @@ class paramForm(QDialog):
         
         self.n_cores = n_cores        
         
-        #Sniff number of samples
-        with open(blockFile, 'r') as f:
-            f.readline()
-            self.size = f.readline().split()[1]
-        
+        self.size = sniffSize(blockFile)   
         
         self.headLabel = QLabel("Number of samples: %g" % int(self.size), self)        
         
@@ -198,10 +193,205 @@ class paramForm(QDialog):
     def warning(self, m):
         QMessageBox.warning(None, "Blocking parameters", m, QMessageBox.Ok)
 
+def sniffSize(blockFile):
+    
+    with open(blockFile, 'r') as f:
+        f.readline()
+        size = f.readline().split()[1]
+    f.close()
+    
+    return size
+
+
+def selectFileGUI(mainDir):
+
+    dialog = QFileDialog()
+    dialog.setDirectory(mainDir)
+    dialog.setNameFilter("All arma files (*.arma)")
+    dialog.setFileMode(QFileDialog.ExistingFile)
+        
+    if dialog.exec_():
+        
+        if dialog.selectedFiles() is not None:
+            return dialog.selectedFiles()[0]
+            
+        return dialog.selectedFiles()
+
+
+
+def selectFileFromList(path):
+    
+    i = 0
+    selections = []
+    
+    for cont in os.listdir(path):
+        if os.path.isdir(pjoin(path, cont)):
+            print "[%d] %s" % (i, cont)
+            selections.append([pjoin(path, cont), "dir"])
+            i += 1
+            
+    for cont in os.listdir(path):
+        if re.findall("blocking.+\.arma", cont):
+            print "[%d] %s" % (i, cont)
+            selections.append([pjoin(path, cont), "file"])
+            i += 1
+    
+    j = raw_input("Select file/folder ('..' to go up) #")
+    
+    try:
+        
+        if j == "..":
+            return [os.path.split(path)[0], "dir"]
+        
+        selected = selections[int(j)]
+    except:
+        print "error in selecting element"
+        selected = selectFileFromList(path)
+
+    return selected
+
+def selectFileTerminal(thisDir):
+
+    selected = selectFileFromList(thisDir)
+
+    if selected[1] == "dir":
+         fileName = selectFileTerminal(selected[0])
+    elif selected[1] == "file":
+         fileName = selected[0]
+    else:
+        print "Something went wrong.."
+  
+    return fileName
+    
+
+
+def getParamsGUI(blockFile, lastParams, n_cores):
+    
+    form = paramForm(blockFile, n_cores, lastParams)
+    form.show()
+    
+    #Has returncode 0 = Success
+    if not form.exec_():
+        try:
+            nBlocks, maxBlockSize, minBlockSize = form.Nb, form.Max, form.Min
+            lastParams = [nBlocks, maxBlockSize, minBlockSize]
+        except:
+            print "No sizes set. Breaking..."   
+            return
+
+    return lastParams
+    
+def getParamsTerminal(blockFile, lastParams, n_cores):
+    
+    size = int(sniffSize(blockFile))
+    
+   
+    MaxSet = False
+    MinSet = False
+    NbSet = False
+     
+   
+    while not (MaxSet & MinSet & NbSet):
+        
+        try:
+            
+            Max = raw_input("Max block size (< %d) = " % (size/2))
+            
+            if Max == "exit":
+                return None
+                
+            Max = int(Max)
+            MaxSet = True
+            
+        except:
+            
+            print "Answer could not be cast to integer"
+            MaxSet = False
+        
+        try:
+            
+            Min =  raw_input("Min block size (> %s) = " % n_cores)
+            
+            if Min == "exit":
+                return None
+            
+            Min = int(Min)
+            MinSet = True
+            
+        except:
+            
+            print "Answer could not be cast to integer"
+            MinSet = False
+            
+            
+        if MaxSet and MinSet:
+            
+            try:
+                
+                lim = (Max-Min)/n_cores
+                nb = raw_input("nBlocks (2 < nB < %d) = " % lim)
+                
+                if nb == "exit":
+                    return None                                
+                
+                nb = int(nb)
+                NbSet = True
+                
+            except:
+                
+                print "Answer could not be cast to integer"
+                NbSet = False
+        
+    return [nb, Max, Min]
+
+
+def getYesNoGUI(Q):
+    
+    dialog = runAgainForm(Q)
+        
+    if not dialog.exec_():
+        A = dialog.answeredYes
+    
+    return A
+
+def getYesNoTerminal(Q):
+    
+    ans = raw_input("\n" + Q + "  (y/n): ")
+    print
+    
+    if ans in ["y", "yes", "Y", "YES", "1", "True", "true"]:
+        return True
+        
+    elif ans in ["n", "no", "N", "NO", "0", "False", "false"]:
+        return False
+        
+    else:
+        print "Answer not understood."
+        getYesNoTerminal(Q)
+
+
+def displayTerminal(path):
+    displayTool = Blocking(path, dynamic=False)
+    displayTool.mainloop()
+
 
 def main():
-    
+    forceTerminal=True
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
+    
+    openGUI = openGUI&(not forceTerminal)
+
+    if forceTerminal: 
+        display = displayTerminal
+        selectFile = selectFileTerminal
+        getYesNo = getYesNoTerminal
+        getParams = getParamsTerminal
+        
+    else:
+        display = lambda a : None
+        selectFile = selectFileGUI
+        getYesNo = getYesNoGUI
+        getParams = getParamsGUI
 
     print "MPI nodes: ", n_cores
     
@@ -210,7 +400,9 @@ def main():
     else:
         mainDir = pjoin(paths.scratchPath, "QMC_SCRATCH")
     
-    app = QApplication(sys.argv)
+    
+    if not forceTerminal:
+        app = QApplication(sys.argv)
     
     active = True
     GUIopened = False
@@ -221,8 +413,6 @@ def main():
         if not blockFile:
             print "No file selected. Breaking..."
             break
-        
-        blockFile = blockFile[0]
         
         path, fileName = os.path.split(blockFile)
         
@@ -235,18 +425,13 @@ def main():
         lastParams = None
     
         while not localSatisfaction:
+             
+            lastParams = getParams(blockFile, lastParams, n_cores)
+                
+            if lastParams is None:
+                break
             
-            form = paramForm(blockFile, n_cores, lastParams)
-            form.show()
-            
-            #Has returncode 0 = Success
-            if not form.exec_():
-                try:
-                    nBlocks, maxBlockSize, minBlockSize = form.Nb, form.Max, form.Min
-                    lastParams = [nBlocks, maxBlockSize, minBlockSize]
-                except:
-                    print "No sizes set. Breaking..."   
-                    break                 
+            nBlocks, maxBlockSize, minBlockSize = lastParams
             
             mpirun = ""
             if mpiFlag:
@@ -258,20 +443,16 @@ def main():
             
             subprocess.call(args)
             
-            dialog = runAgainForm("Satisfied with result?")
-        
-            if not dialog.exec_():
-                localSatisfaction = dialog.answeredYes
+            outName = blockFile.strip("_RAWDATA.arma") + ".dat"
+            display(outName)
+                
+            localSatisfaction = getYesNo("Satisfied with result?")
             
         
-        dialog = runAgainForm("View more files?")
-        if not dialog.exec_():
-            active = dialog.answeredYes
-        
+        active = getYesNo("View more files?")
 
-
-
-    app.exit()        
+    if not forceTerminal:
+        app.exit()        
 
 
 if __name__ == "__main__":

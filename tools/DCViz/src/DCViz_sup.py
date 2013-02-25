@@ -51,7 +51,7 @@ class DCVizPlotter:
     
     
     def signal_handler(self, signal, frame):
-        print "Ending session..."
+        print "[%s] Ending session..." % "DCViz".center(10)
         self.SIGINT_CAPTURED = True
     
     def __str__(self):
@@ -115,7 +115,7 @@ class DCVizPlotter:
             
         for i in range(data.shape[1]):
             output[i] = data[:,i]
-        
+
         return tuple(output)
     
     def unpackBinFile(self, binFile):
@@ -131,8 +131,6 @@ class DCVizPlotter:
             
     
     def unpackArmaMatBin(self, armaFile):   
-    
-        armaFormat = armaFile.readline().strip()
         
         n, m = armaFile.readline().strip().split()
         n = int(n)       
@@ -183,7 +181,7 @@ class DCVizPlotter:
         if self.useGUI:
             self.parent.parent.terminalTracker("DCViz", s)
         else:
-            print s
+            print "[%s] %s" % ("DCViz".center(10), s)
 
 
     def waitForGreenLight(self):
@@ -259,7 +257,7 @@ class DCVizPlotter:
                 self.sleep()     
             else:
                 if not self.useGUI:
-                    raw_input("Press any key to exit")
+                    raw_input("[%s] Press any key to exit" % "DCViz".center(10))
                 break
                 
         if not self.useGUI:
