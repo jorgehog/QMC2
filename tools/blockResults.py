@@ -8,7 +8,6 @@ from pyLibQMC import paths, parseCML, misc
 try:
     from PySide.QtCore import *
     from PySide.QtGui import *
-    int("Hei")
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
     import DCVizGUI
 
