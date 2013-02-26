@@ -19,7 +19,7 @@ except:
     
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
     
-    from DCViz_classes import Blocking
+    from DCViz_classes import Blocking, MIN_OUT
     
     #Evil haxx
     QDialog = list
@@ -261,13 +261,24 @@ def selectFileFromList(path):
             
         elif j.startswith("display"):
             
-            n = int(j.split()[1])
-            blockFile = selections[n][0]
-  
-            if os.path.isdir(blockFile):
-                print "Cannot display directory..."
+            if j.split()[1] == "min":
+                n = int(j.split()[2])
+                
+                blockFile = selections[n][0]
+      
+                if os.path.isdir(blockFile):
+                    print "Cannot display directory..."
+                else:
+                    displayMinTerminal(blockFile)
+                    
             else:
-                displayTerminal(blockFile)
+                n = int(j.split()[1])
+                blockFile = selections[n][0]
+      
+                if os.path.isdir(blockFile):
+                    print "Cannot display directory..."
+                else:
+                    displayTerminal(blockFile)
             
             selected = selectFileFromList(path)
                         
@@ -413,6 +424,17 @@ def displayTerminal(blockFile):
     displayTool = Blocking(path, dynamic=False)
     displayTool.mainloop()
 
+def displayMinTerminal(blockFile):
+    
+    path = pjoin(os.path.split(blockFile)[0], "ASGD_out.dat")
+    
+    if not os.path.exists(path):
+        print "Spesified min file does not exist. Display canceled."
+        return
+    
+    displayTool = MIN_OUT(path, dynamic=False)
+    displayTool.mainloop()
+    
 
 def main():
 
