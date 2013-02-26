@@ -413,10 +413,10 @@ def getYesNoGUI(Q):
 
 def getYesNoTerminal(Q):
     
-    ans = raw_input("\n" + Q + "  (y/n): ")
+    ans = raw_input("\n" + Q + "  ([y]/n): ")
     print
     
-    if ans in ["y", "yes", "Y", "YES", "1", "True", "true"]:
+    if ans in ["y", "yes", "Y", "YES", "1", "True", "true", ""]:
         return True
         
     elif ans in ["n", "no", "N", "NO", "0", "False", "false"]:
