@@ -424,7 +424,7 @@ def getYesNoTerminal(Q):
         
     else:
         print "Answer not understood."
-        getYesNoTerminal(Q)
+        return getYesNoTerminal(Q)
 
 
 def displayTerminal(blockFile):
