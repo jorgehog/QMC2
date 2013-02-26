@@ -6,6 +6,7 @@ from os.path import join as pjoin
 from pyLibQMC import paths, parseCML, misc
 
 try:
+    raise Exception()
     from PySide.QtCore import *
     from PySide.QtGui import *
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
@@ -19,7 +20,7 @@ except:
     
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
     
-    from DCViz_classes import Blocking, MIN_OUT
+    from DCViz_classes import Blocking, MIN_OUT, DMC_OUT
     
     #Evil haxx
     QDialog = list
@@ -245,11 +246,14 @@ def selectFileFromList(path):
         
         if j == "h":
 
-            s = 15            
+            s = 20         
             
             print "\n%s : up one level" % "'..'".ljust(s)
             print "%s : quit mainloop" % "'q'".ljust(s)
-            print "%s : display result n (if any)" % "'display [n]'".ljust(s)
+            print "%s : display blocking result n (if any)" % "'display [n]'".ljust(s)
+            print "%s : display ASGD result n (if any)" % "'display min [n]'".ljust(s)
+            print "%s : display DMC result n (if any)" % "'display dmc [n]'".ljust(s)
+                        
             
             selected = selectFileFromList(path)
             
@@ -270,6 +274,16 @@ def selectFileFromList(path):
                     print "Cannot display directory..."
                 else:
                     displayMinTerminal(blockFile)
+                    
+            elif j.split()[1] == "dmc":
+                n = int(j.split()[2])
+                
+                blockFile = selections[n][0]
+      
+                if os.path.isdir(blockFile):
+                    print "Cannot display directory..."
+                else:
+                    displayDMCTerminal(blockFile)
                     
             else:
                 n = int(j.split()[1])
@@ -434,6 +448,18 @@ def displayMinTerminal(blockFile):
     
     displayTool = MIN_OUT(path, dynamic=False)
     displayTool.mainloop()
+    
+def displayDMCTerminal(blockFile):
+    
+    path = pjoin(os.path.split(blockFile)[0], "DMC_out.dat")
+    
+    if not os.path.exists(path):
+        print "Spesified dmc file does not exist. Display canceled."
+        return
+    
+    displayTool = DMC_OUT(path, dynamic=False)
+    displayTool.mainloop()
+    
     
 
 def main():
