@@ -226,6 +226,7 @@ def selectFileFromList(path):
     i = 0
     selections = []
     
+    print
     for cont in os.listdir(path):
         if os.path.isdir(pjoin(path, cont)):
             print "[%d] %s" % (i, cont)
@@ -238,16 +239,41 @@ def selectFileFromList(path):
             selections.append([pjoin(path, cont), "file"])
             i += 1
     
-    j = raw_input("Select file/folder ('..' to go up 'q' to end) #")
+    j = raw_input("\nSelect file/folder ('h' for help) #")
     
     try:
         
-        if j == "..":
+        if j == "h":
+
+            s = 15            
+            
+            print "\n%s : up one level" % "'..'".ljust(s)
+            print "%s : quit mainloop" % "'q'".ljust(s)
+            print "%s : display result n (if any)" % "'display [n]'".ljust(s)
+            
+            selected = selectFileFromList(path)
+            
+        elif j == "..":
             return [os.path.split(path)[0], "dir"]
+            
         elif j == "q":
             return None
-        
-        selected = selections[int(j)]
+            
+        elif j.startswith("display"):
+            
+            n = int(j.split()[1])
+            blockFile = selections[n][0]
+  
+            if os.path.isdir(blockFile):
+                print "Cannot display directory..."
+            else:
+                displayTerminal(blockFile)
+            
+            selected = selectFileFromList(path)
+                        
+        else:
+            selected = selections[int(j)]
+            
     except:
         print "error in selecting element"
         selected = selectFileFromList(path)
@@ -376,7 +402,14 @@ def getYesNoTerminal(Q):
         getYesNoTerminal(Q)
 
 
-def displayTerminal(path):
+def displayTerminal(blockFile):
+    
+    path = blockFile.strip("_RAWDATA.arma") + ".dat"
+    
+    if not os.path.exists(path):
+        print "Spesified file has not been blocked. Display canceled."
+        return
+    
     displayTool = Blocking(path, dynamic=False)
     displayTool.mainloop()
 
@@ -451,8 +484,7 @@ def main():
             
             subprocess.call(args)
             
-            outName = blockFile.strip("_RAWDATA.arma") + ".dat"
-            display(outName)
+            display(blockFile)
                 
             localSatisfaction = getYesNo("Satisfied with result?")
             
