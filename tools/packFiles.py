@@ -27,7 +27,7 @@ def update():
 
 def excludeFunc(filename):
     
-    filesizeLimit = 10 #MB
+    filesizeLimit = 1 #MB
     filesizeLimit *= 1024*1024 #convert to MB
     
     excludes = []
@@ -63,10 +63,12 @@ def packFiles(runPath):
     with tarfile.open(thisTarpath, 'w:gz') as tar:
         for root, dirs, files in os.walk(runPath):
             
+            print "Entring directory: ", root
             for file_ in files:
                 abspath = pjoin(root, file_)
+                print "packing ", file_
                 tar.add(abspath, exclude=excludeFunc)                
-                
+            
     return thisTarpath       
 
 def sendTar(path):    
