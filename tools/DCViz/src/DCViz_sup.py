@@ -43,7 +43,7 @@ class DCVizPlotter:
         self.filepath = filepath
         self.file = None
         
-        self.toFile = False
+        self.toFile = toFile
         
         signal.signal(signal.SIGINT, self.signal_handler)
         
@@ -340,7 +340,7 @@ class DCVizPlotter:
             os.mkdir(dirpath)
         
         i = 0
-        for fig in self.figures:
+        for fig in zip(*self.figures)[0]:
             
             figname = fname.split(".")[0] + "_" + str(i) + ".png"
             figpath = pjoin(dirpath, figname)
