@@ -30,7 +30,7 @@ class DCVizPlotter:
     
     canStart = False
     
-    def __init__(self, filepath=None, dynamic=False, useGUI=False):
+    def __init__(self, filepath=None, dynamic=False, useGUI=False, toFile=False):
         self.dynamic = dynamic
         self.useGUI = useGUI
         
@@ -42,6 +42,8 @@ class DCVizPlotter:
     
         self.filepath = filepath
         self.file = None
+        
+        self.toFile = False
         
         signal.signal(signal.SIGINT, self.signal_handler)
         
@@ -211,7 +213,7 @@ class DCVizPlotter:
         
         if not self.useGUI:
             if not self.plotted:
-                self.show()
+                self.show(drawOnly = self.toFile)
             else:
                 self.show(drawOnly=True)
         else:
@@ -256,11 +258,13 @@ class DCVizPlotter:
             if self.dynamic:
                 self.sleep()     
             else:
-                if not self.useGUI:
+                if not self.useGUI and not self.toFile:
                     raw_input("[%s] Press any key to exit" % "DCViz".center(10))
                 break
                 
         if not self.useGUI:
+            if self.toFile:
+                self.saveFigs()
             self.close()
         
             
@@ -326,8 +330,24 @@ class DCVizPlotter:
             for i in range(self.skipRows):
                 self.skippedRows.append(self.file.readline().strip())
               
+    def saveFigs(self):
+        path, fname = os.path.split(self.filepath)
         
+        dirname = "DCViz_out"
+        dirpath = pjoin(path, dirname)
         
+        if not os.path.exists(dirpath):
+            os.mkdir(dirpath)
+        
+        i = 0
+        for fig in self.figures:
+            
+            figname = fname.split(".")[0] + "_" + str(i) + ".png"
+            figpath = pjoin(dirpath, figname)
+            fig.savefig(figpath)
+
+            i += 1
+            
         
             
     def add_figure(self, fig):

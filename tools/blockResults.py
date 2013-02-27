@@ -539,6 +539,20 @@ def main():
         
         active = getYesNo("View more files?")
     
+    if getYesNo("Save figs to file?"):
+        
+        plotTool = Blocking(toFile=True)        
+        
+        for root, dirs, files in os.walk(mainDir):
+            
+            if root == mainDir:
+                continue
+            
+            for outfile in files:
+                if re.findall(plotTool.nametag, outfile):
+                    plotTool.filepath = pjoin(root, outfile)
+                    plotTool.mainloop()
+    
     if not forceTerminal:
         app.exit()
 
