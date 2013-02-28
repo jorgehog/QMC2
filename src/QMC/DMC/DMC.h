@@ -59,6 +59,8 @@ protected:
     void switch_souls(int root, int root_id, int dest, int dest_id);
 
     void normalize_population();
+    
+    void dump_distribution();
 
 public:
 

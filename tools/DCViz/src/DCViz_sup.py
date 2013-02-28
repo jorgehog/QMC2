@@ -133,6 +133,8 @@ class DCVizPlotter:
             
     
     def unpackArmaMatBin(self, armaFile):   
+
+        armaFormat =  armaFile.readline()
         
         n, m = armaFile.readline().strip().split()
         n = int(n)       

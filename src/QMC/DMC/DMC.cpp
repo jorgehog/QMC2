@@ -115,14 +115,6 @@ void DMC::update_energies() {
     E_tot += E;
     tot_samples += samples;
 
-    //    dmc_E = E_tot / tot_samples;
-    //    dmc_E_unscaled += dmc_E;
-    //    E_T = dmc_E_unscaled / cycle;
-
-    //    E_T = E_tot / tot_samples;
-    //    dmc_E_unscaled += E_T;
-    //    dmc_E = dmc_E_unscaled / cycle;
-
     E_T = E / samples;
     dmc_E_unscaled += E_T;
     dmc_E = dmc_E_unscaled / cycle;
@@ -200,11 +192,25 @@ void DMC::run_method() {
         dump_output();
 
     }
-
+    
+    dump_distribution();
+    
     finalize_output();
 
     error_estimator->normalize();
     estimate_error();
+}
+
+void DMC::dump_distribution() {
+    
+    std::string outpath = this->dist_in_path + "walker_positions/";
+    
+    for (int i = 0; i < n_w; i++){
+        s << outpath << "dist_out_dmc" << node << "_" << i << ".arma";
+        original_walkers[i]->r.save(s.str());
+        s.str(std::string());
+    }
+    
 }
 
 void DMC::bury_the_dead() {

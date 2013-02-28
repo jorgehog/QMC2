@@ -140,7 +140,7 @@ class DMC_OUT(DCVizPlotter):
 class dist_out(DCVizPlotter):
     
     nametag = "dist_out.+\.arma"
-    figMap = {"fig1" : ["subfigRadii"], "fig2": ["subfigHist2d"], "fig3": ["subfigDist1d"]}
+    figMap = {"fig1": ["subfigHist2d"], "fig2": ["subfigDist1d"]}
 
     armaBin = True
 
@@ -148,7 +148,7 @@ class dist_out(DCVizPlotter):
     familyName = "Dist"
   
   
-    def plot(self, data):
+    def plotDEPRECATED(self, data):
         
         n_p = len(data[0][0])  
         dim = len(data[0])
@@ -203,7 +203,15 @@ class dist_out(DCVizPlotter):
         
         xyz.resize(N*nCores*n_p, dim)
         
-        self.subfigHist2d.hexbin(xyz[:,0], xyz[:,1])
+        H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins))
+
+        extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
+        #Lanzcos gaussian mitchell sinc
+        self.subfigHist2d.imshow(H,
+                  extent=extent,
+                  interpolation='lanczos',
+                  cmap=pylab.cm.hot)
+#        self.subfigHist2d.hexbin(xyz[:,0], xyz[:,1])
 #        self.subfigHist2d.set_xlim([-0.5, 0.5])
 #        self.subfigHist2d.set_ylim([-0.5, 0.5])
                 
@@ -222,6 +230,45 @@ class dist_out(DCVizPlotter):
         self.subfigRadii.axes.get_xaxis().set_major_locator(pylab.MaxNLocator(integer=True))
         self.subfigRadii.set_xlabel(r'Particle')
         self.subfigRadii.set_ylabel(r'$\langle r \rangle$')
+        
+    def plot(self, data):
+        
+        n_p = len(data[0][0])  
+        dim = len(data[0])
+        n = len(data)
+
+        nBins=100
+
+        xyz = numpy.zeros((n, n_p, dim))
+        R = numpy.zeros((n, n_p))
+
+        for i, xyz_local in enumerate(data):
+            for j in range(dim):
+                xyz[i, :, j] = xyz_local[j]
+            R[i, :] = numpy.sqrt((xyz[i]**2).sum(1))
+            
+        xyz.resize(n*n_p, dim)
+        R.resize(n*n_p)
+        
+        H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins))
+
+        extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
+        #Lanzcos gaussian mitchell sinc
+        self.subfigHist2d.imshow(H,
+                  extent=extent,
+                  interpolation='lanczos',
+                  cmap=pylab.cm.hot)
+          
+        self.subfigHist2d.set_xlabel(r'x')
+        self.subfigHist2d.set_ylabel(r'y')
+        
+        hist, bins = numpy.histogram(R, bins=nBins)
+        width = 1*(bins[1]-bins[0])
+        bins = (bins[:-1]+bins[1:])/2
+        self.subfigDist1d.plot(bins, bins**(dim-1)*hist)#, align='center', width=width)
+                                   
+        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')
+
         
 class testBinFile(DCVizPlotter):
     
