@@ -88,7 +88,7 @@ void VMC::output() {
     using namespace std;
 
     s << "VMC energy: " << get_energy() << endl;
-    s << "Acceptance ratio: " << get_accepted_ratio(n_p * n_w * (thermalization + n_c)) << endl;
+    s << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
 
     std_out->cout(s);
 }

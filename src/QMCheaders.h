@@ -19,6 +19,22 @@
 #include <mpi.h>
 #endif
 
+//#define RNG_NUMREC
+#define RNG_ZIG
+
+#ifdef RNG_ZIG
+#ifdef RNG_NUMREC
+#undef RNG_NUMREC
+#endif
+typedef int seed_type;
+#endif
+
+#ifdef RNG_NUMREC
+typedef long seed_type;
+#endif
+
+
+
 #include <armadillo>
 #include <boost/lexical_cast.hpp>
 #include <stdlib.h>
@@ -58,7 +74,7 @@ struct ParParams {
 struct GeneralParams {
     int n_p, dim;
     int n_w;
-    long random_seed;
+    seed_type random_seed;
 
     double h, systemConstant;
 
@@ -145,6 +161,8 @@ class OutputHandler;
 class ErrorEstimator;
 
 class QMC;
+
+
 
 #include "BasisFunctions/BasisFunctions.h"
 #include "BasisFunctions/HarmonicOscillator/HarmonicOscillator.h"

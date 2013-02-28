@@ -24,14 +24,9 @@ protected:
 
 public:
 
-    Diffusion(int n_p, int dim, double timestep, long random_seed, double D);
-    
-    double ran2(long *idum);
-    double gaussian_deviate(long *idum);
+    Diffusion(int n_p, int dim, double timestep, seed_type random_seed, double D);
 
-    virtual double get_new_pos(const Walker* walker, int i, int j) {
-        return gaussian_deviate(&random_seed) * std;
-    };
+    virtual double get_new_pos(const Walker* walker, int i, int j);
 
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const = 0;
 
@@ -39,9 +34,7 @@ public:
         return exp(-(0.5 * (E_x + E_y) - E_T) * timestep);
     }
 
-    double call_RNG() {
-        return ran2(&random_seed);
-    }
+    double call_RNG();
 
     void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;

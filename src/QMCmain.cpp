@@ -249,7 +249,7 @@ void parseCML(int argc, char** argv,
     generalParams.dim = 2;
     generalParams.n_w = 1000;
     generalParams.systemConstant = 1;
-    generalParams.random_seed = -(long) time(NULL);
+    generalParams.random_seed = (seed_type) time(NULL);
     //    generalParams.random_seed = -1355160055;
     generalParams.h = 0.0001;
 
@@ -455,7 +455,7 @@ void parseCML(int argc, char** argv,
 
     vmcParams.n_c /= parParams.n_nodes;
     generalParams.n_w /= parParams.n_nodes;
-
+    
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
     bool initOut = false;
