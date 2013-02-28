@@ -134,14 +134,12 @@ int main(int argc, char** argv) {
         systemObjects.SYSTEM->add_potential(new Coulomb(generalParams));
     }
 
-
+    VMC* vmc = NULL;
+    generalParams.runpath = outputParams.outputPath;
 
     if (generalParams.doVMC || generalParams.doMIN) {
 
-        VMC* vmc = new VMC(generalParams, vmcParams, systemObjects, parParams);
-        systemObjects.sample_method->set_dt(vmcParams.dt);
-
-
+        vmc = new VMC(generalParams, vmcParams, systemObjects, parParams);
 
         if (generalParams.doMIN) {
 
@@ -197,18 +195,12 @@ int main(int argc, char** argv) {
             vmc->run_method();
             if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
 
-            dmcParams.E_T = vmc->get_energy();
         }
-
-
     }
 
     if (generalParams.doDMC) {
 
-
-        systemObjects.sample_method->set_dt(dmcParams.dt);
-
-        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams);
+        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc);
 
         if (outputParams.dmc_out && parParams.is_master) {
             string dmcOutname = (string) "DMC_out";
@@ -216,7 +208,7 @@ int main(int argc, char** argv) {
             dmc->add_output(DMCout);
         }
 
-        int DMCerrorN = dmcParams.n_c * dmcParams.n_b * dmcParams.n_w * DMC::K;
+        int DMCerrorN = dmcParams.n_c * dmcParams.n_b * generalParams.n_w;
         if (generalParams.do_blocking) {
             string dmcBlockname = (string) "blocking_DMC_out";
             ErrorEstimator* blocking = new Blocking(DMCerrorN, parParams, dmcBlockname, outputParams.outputPath);
@@ -255,6 +247,7 @@ void parseCML(int argc, char** argv,
 
     generalParams.n_p = 2;
     generalParams.dim = 2;
+    generalParams.n_w = 1000;
     generalParams.systemConstant = 1;
     generalParams.random_seed = -(long) time(NULL);
     //    generalParams.random_seed = -1355160055;
@@ -290,7 +283,6 @@ void parseCML(int argc, char** argv,
     dmcParams.dt = 0.001;
     dmcParams.E_T = 0;
     dmcParams.n_b = 100;
-    dmcParams.n_w = 1000;
     dmcParams.n_c = 1000;
     dmcParams.therm = 1000;
     dmcParams.dist_in = outputParams.dist_out & generalParams.doVMC;
@@ -361,7 +353,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[20]) != 0) dmcParams.dt = atof(argv[20]);
         if (def.compare(argv[21]) != 0) dmcParams.E_T = atof(argv[21]);
         if (def.compare(argv[22]) != 0) dmcParams.n_b = atoi(argv[22]);
-        if (def.compare(argv[23]) != 0) dmcParams.n_w = atoi(argv[23]);
+        if (def.compare(argv[23]) != 0) generalParams.n_w = atoi(argv[23]);
         if (def.compare(argv[24]) != 0) dmcParams.n_c = atoi(argv[24]);
         if (def.compare(argv[25]) != 0) dmcParams.therm = atoi(argv[25]);
         if (def.compare(argv[26]) != 0) dmcParams.dist_in = (bool)atoi(argv[26]);
@@ -415,6 +407,11 @@ void parseCML(int argc, char** argv,
         dmcParams.dist_in_path = outputParams.outputPath;
     }
 
+    if (!(generalParams.doVMC && generalParams.doDMC) && generalParams.doMIN) {
+        //This means only minimization, which has it's own set of walkers.
+        generalParams.n_w = 1;
+    }
+
     //Check consitency in chosen cycle numbers etc. given node number.
     if (parParams.is_master) {
         if (parParams.parallel) {
@@ -428,54 +425,36 @@ void parseCML(int argc, char** argv,
                 }
             }
 
-            if (dmcParams.n_w < parParams.n_nodes) {
-                std::cout << "Unsufficient walkers for node structure." << std::endl;
-            }
 
         }
 
-        if (generalParams.doVMC && generalParams.doDMC) {
-            if (dmcParams.dist_in && outputParams.dist_out) {
-                if (dmcParams.n_w > vmcParams.n_c / (200)) {
-                    std::cout << "Unsufficient VMC cycles to load dist in DMC." << std::endl;
-                    std::cout << "For n_w=" << dmcParams.n_w << "the minimum is n_c=" << dmcParams.n_w * 200 << std::endl;
-                    exit(1);
-                }
+        if (generalParams.doVMC || generalParams.doDMC) {
+            if (generalParams.n_w < parParams.n_nodes) {
+                std::cout << "n_w = " << generalParams.n_w << " is insufficient for ";
+                std::cout << parParams.n_nodes << " nodes." << std::endl;
             }
-        }
+        } 
 
-        if (generalParams.doDMC) {
+//        if (generalParams.doVMC) {
+//
+//            if (generalParams.n_w > vmcParams.n_c) {
+//                std::cout << "Unsufficient VMC cycles store all walkers." << std::endl;
+//                std::cout << "For n_w=" << generalParams.n_w << "the minimum is n_c=" << generalParams.n_w << std::endl;
+//                exit(1);
+//            }
+//
+//        }
 
-            if (dmcParams.dist_in && (!outputParams.dist_out)) {
-                arma::mat r_test;
-                std::stringstream s;
-                s << dmcParams.dist_in_path << "walker_positions/dist_out0_0.arma";
-                bool dataFound = r_test.load(s.str());
-                if (!dataFound) {
-                    std::cout << "No walker output data found in " << dmcParams.dist_in_path << "walker_positions/" << std::endl;
-                    exit(1);
-                }
-                s.str(std::string());
-
-                for (int i = 0; i < parParams.n_nodes; i++) {
-                    s << dmcParams.dist_in_path << "walker_positions/dist_out" << i << "_0.arma";
-                    dataFound = r_test.load(s.str());
-                    if (!dataFound) {
-                        std::cout << "No walker output data found for node " << i << ". Data generated on less nodes?" << std::endl;
-                        exit(1);
-                    }
-                    s.str(std::string());
-                }
-                r_test.clear();
-
-            }
-        }
+      
     }
+
+    vmcParams.pop_tresh = vmcParams.n_c / generalParams.n_w;
 
     generalParams.random_seed -= parParams.node;
     minimizerParams.n_c_SGD /= parParams.n_nodes;
+
     vmcParams.n_c /= parParams.n_nodes;
-    dmcParams.n_w /= parParams.n_nodes;
+    generalParams.n_w /= parParams.n_nodes;
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
@@ -504,7 +483,7 @@ void parseCML(int argc, char** argv,
             std::cout << "20" << " dmcParams.dt                    " << " = " << dmcParams.dt << std::endl;
             std::cout << "21" << " dmcParams.E_T                   " << " = " << dmcParams.E_T << std::endl;
             std::cout << "22" << " dmcParams.n_b                   " << " = " << dmcParams.n_b << std::endl;
-            std::cout << "23" << " dmcParams.n_w                   " << " = " << dmcParams.n_w << std::endl;
+            std::cout << "23" << " generalParams.n_w                   " << " = " << generalParams.n_w << std::endl;
             std::cout << "24" << " dmcParams.n_c                   " << " = " << dmcParams.n_c << std::endl;
             std::cout << "25" << " dmcParams.therm                 " << " = " << dmcParams.therm << std::endl;
             std::cout << "26" << " dmcParams.dist_in               " << " = " << dmcParams.dist_in << std::endl;
@@ -532,5 +511,7 @@ void parseCML(int argc, char** argv,
 
         exit(0);
     }
-
+#ifdef MPI_ON
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
 }

@@ -8,28 +8,52 @@
 #include "../../QMCheaders.h"
 
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp)
-: QMC(gP.n_p, gP.dim, vP.n_c, sO, pp) {
+: QMC(gP, vP.n_c, sO, pp) {
 
-    vmc_E = 0;
+    name = "vmc";
 
     original_walker = new Walker(n_p, dim);
-    trial_walker = new Walker(n_p, dim);
 
-    this->thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
+    pop_tresh = vP.pop_tresh;
+    last_walker = 0;
 
-}
+    vmc_E = 0;
+    thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
 
-void VMC::initialize() {
+    sampling->set_dt(vP.dt);
 
-    jastrow->initialize();
-    sampling->set_trial_pos(original_walker);
+    set_trial_positions();
     copy_walker(original_walker, trial_walker);
-  
+    
 }
+
+VMC::~VMC() {
+    delete trial_walker;
+    delete [] original_walkers;
+}
+
+void VMC::set_trial_positions() {
+    sampling->set_trial_pos(original_walker);
+
+}
+
+void VMC::store_walker() {
+    if (cycle % pop_tresh == 0){
+        copy_walker(original_walker, original_walkers[last_walker]);
+        original_walkers[last_walker]->set_E(local_E);
+        last_walker++;
+    }
+}
+
+//void VMC::initialize() {
+//
+//    sampling->set_trial_pos(original_walker);
+//
+//}
 
 void VMC::run_method() {
- 
-    initialize();
+
+    //    initialize();
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
@@ -37,7 +61,7 @@ void VMC::run_method() {
     }
 
     for (cycle = 1; cycle <= n_c; cycle++) {
-
+        
         diffuse_walker(original_walker, trial_walker);
 
         calculate_energy_necessities(original_walker);
@@ -47,9 +71,12 @@ void VMC::run_method() {
 
         dump_output();
         error_estimator->update_data(local_E);
-
+        store_walker();
+        
     }
 
+
+    dump_distribution();
     node_comm();
     scale_values();
     output();
@@ -61,7 +88,7 @@ void VMC::output() {
     using namespace std;
 
     s << "VMC energy: " << get_energy() << endl;
-    s << "Acceptance ratio: " << get_accepted_ratio(n_p * (thermalization + n_c)) << endl;
+    s << "Acceptance ratio: " << get_accepted_ratio(n_p * n_w * (thermalization + n_c)) << endl;
 
     std_out->cout(s);
 }

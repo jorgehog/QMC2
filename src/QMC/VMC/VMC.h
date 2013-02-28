@@ -11,13 +11,17 @@
 class VMC : public QMC {
 protected:
 
+    int pop_tresh;
+    int last_walker;
+    
     double vmc_E;
-
     Walker* original_walker;
-    Walker* trial_walker;
 
-    virtual void initialize();
-
+//    virtual void initialize();
+    void set_trial_positions();
+    
+    void store_walker();
+    
     virtual bool move_autherized(double A) {
         return metropolis_test(A);
     }
@@ -31,7 +35,8 @@ protected:
 public:
 
     VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &);
-
+    ~VMC();
+    
     void set_e(double E) {
         vmc_E = E;
     }
@@ -43,6 +48,8 @@ public:
     virtual void run_method();
     virtual void output();
 
+    friend class DMC;
+    
     friend class Minimizer;
     friend class ASGD;
 

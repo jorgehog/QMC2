@@ -18,7 +18,7 @@ Sampling::Sampling() {
 }
 
 void Sampling::set_trial_pos(Walker* walker, bool set_pos) {
-
+    using namespace std;
     if (set_pos) {
         for (int i = 0; i < n_p; i++) {
             for (int j = 0; j < dim; j++) {
@@ -27,7 +27,6 @@ void Sampling::set_trial_pos(Walker* walker, bool set_pos) {
         }
     }
 
-    
     walker->calc_r_i2();
 
     set_trial_states(walker);

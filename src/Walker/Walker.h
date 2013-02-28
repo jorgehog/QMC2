@@ -18,8 +18,9 @@ protected:
 
 public:
 
-    Walker();
     Walker(int n_p, int dim, bool do_init = true);
+    
+    ~Walker();
     
     double spatial_ratio;
     double lapl_sum;
@@ -89,7 +90,7 @@ public:
         return E;
     }
 
-    void print(std::string header = "----");
+    void print(std::string header = "----") const;
 
 
 };

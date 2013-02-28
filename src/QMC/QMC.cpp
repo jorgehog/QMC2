@@ -7,14 +7,23 @@
 
 #include "../QMCheaders.h"
 
-QMC::QMC(int n_p, int dim, int n_c,
+QMC::QMC(GeneralParams & gP, int n_c,
         SystemObjects & sO,
-        ParParams & pp) {
+        ParParams & pp,
+        int K) {
 
-    this->n_p = n_p;
-    this->dim = dim;
+    n_p = gP.n_p;
+    dim = gP.dim;
     this->n_c = n_c;
+    n_w = gP.n_w;
+
     n2 = n_p / 2;
+
+    trial_walker = new Walker(n_p, dim);
+    original_walkers = new Walker*[K * n_w];
+    for (int i = 0; i < K * n_w; i++) {
+        original_walkers[i] = new Walker(n_p, dim);
+    }
 
     jastrow = sO.jastrow;
     sampling = sO.sample_method;
@@ -30,11 +39,15 @@ QMC::QMC(int n_p, int dim, int n_c,
     is_master = pp.is_master;
     parallel = pp.parallel;
 
+    jastrow->initialize();
+
     if (is_master) {
         std_out = new STDOUT();
     } else {
         std_out = new NO_STDOUT();
     }
+
+    runpath = gP.runpath;
 
 }
 
@@ -87,15 +100,13 @@ void QMC::get_gradients(Walker* walker) const {
 
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
     double spatial_jast = sampling->get_spatialjast_ratio(walker_post, walker_pre, particle);
-    
-//    test_ratios(walker_pre, walker_post, particle, spatial_jast);
-    
+
+    //    test_ratios(walker_pre, walker_post, particle, spatial_jast);
+
     double G = sampling->get_g_ratio(walker_post, walker_pre);
 
     return spatial_jast * spatial_jast * G;
 }
-
-
 
 void QMC::set_spin_state(int particle) const {
     int start = n2 * (particle >= n2);
@@ -206,6 +217,10 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
 
 }
 
+double QMC::calculate_local_energy(const Walker* walker) const {
+    return get_KE(walker) + system->get_potential_energy(walker);
+}
+
 double QMC::get_KE(const Walker* walker) const {
     int i, j;
     double xterm, e_kinetic;
@@ -228,6 +243,17 @@ void QMC::get_QF(Walker* walker) const {
     walker->qforce = 2 * (walker->jast_grad + walker->spatial_grad);
 }
 
+void QMC::dump_distribution() {
+
+    std::string outpath = runpath + "walker_positions/";
+
+    for (int i = 0; i < n_w; i++) {
+        s << outpath << "dist_out_" << name << node << "_" << i << ".arma";
+        original_walkers[i]->r.save(s.str());
+        s.str(std::string());
+    }
+
+}
 
 /*
  
@@ -237,29 +263,29 @@ void QMC::get_QF(Walker* walker) const {
 
 
 void QMC::test_ratios(const Walker* walker_pre, const Walker* walker_post, int particle, double R_qmc) const {
-  
+
     double wf_new_s = system->get_spatial_wf(walker_post);
     double wf_new_j = jastrow->get_val(walker_post);
     double wf_new = wf_new_s*wf_new_j;
-    
+
     double wf_old_s = system->get_spatial_wf(walker_pre);
     double wf_old_j = jastrow->get_val(walker_pre);
     double wf_old = wf_old_s*wf_old_j;
-    
-    
+
+
     double R_opt_s = system->get_spatial_ratio(walker_pre, walker_post, particle);
     double R_opt_j = jastrow->get_j_ratio(walker_post, walker_pre, particle);
-    double R = wf_new/wf_old;
-    
-    double t1 = R_opt_s/(wf_new_s/wf_old_s);
-    double t2 = R_opt_j/(wf_new_j/wf_old_j);
-    double t3 = R_qmc / R ;
-    
+    double R = wf_new / wf_old;
+
+    double t1 = R_opt_s / (wf_new_s / wf_old_s);
+    double t2 = R_opt_j / (wf_new_j / wf_old_j);
+    double t3 = R_qmc / R;
+
     double eps = 1e-10;
-    if (abs(t1 - 1) < eps  & abs(t2 - 1) < eps & abs(t3 - 1) < eps){
+    if (abs(t1 - 1) < eps & abs(t2 - 1) < eps & abs(t3 - 1) < eps) {
         std::cout << "ratio success" << std::endl;
     } else {
         std::cout << "ratio fail " << t1 << " " << t2 << " " << t3 << std::endl;
     }
-    
+
 }

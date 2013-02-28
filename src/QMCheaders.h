@@ -30,7 +30,7 @@
 #include <sys/time.h>
 
 struct DMCparams {
-    int n_c, therm, n_w, n_b;
+    int n_c, therm, n_b;
     double dt, E_T;
     bool dist_in;
     std::string dist_in_path;
@@ -40,7 +40,7 @@ struct DMCparams {
 struct VMCparams {
     int n_c;
     double dt;
-
+    int pop_tresh;
 };
 
 struct VariationalParams {
@@ -57,6 +57,7 @@ struct ParParams {
 
 struct GeneralParams {
     int n_p, dim;
+    int n_w;
     long random_seed;
 
     double h, systemConstant;
@@ -72,6 +73,8 @@ struct GeneralParams {
 
     std::string system;
     std::string sampling;
+    
+    std::string runpath;
 
 };
 

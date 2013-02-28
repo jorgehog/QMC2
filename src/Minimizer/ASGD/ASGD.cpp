@@ -88,7 +88,6 @@ void ASGD::get_total_grad() {
 
 VMC* ASGD::minimize() {
 
-    vmc->initialize();
     thermalize_walkers();
     
     for (sample = 1; sample <= SGDsamples; sample++) {

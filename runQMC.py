@@ -485,8 +485,8 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
         stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
         MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
-        if CMLarg.split()[cmlMAPo["dist_out"]] != "0":
-            createDistFolder(CMLarg.split()[cmlMAPo["outputPath"]])        
+     
+        createDistFolder(CMLarg.split()[cmlMAPo["outputPath"]])        
         
         os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
                     + " " + CMLarg + stdout)
@@ -579,11 +579,14 @@ def getCodename(argv):
 
 def main():
     
-    if not consistentMap():
-        print "The map is inconsistent with the C++ reader."
-        sys.exit(1)
-    else:
-        print "Map consistent"
+#    if not consistentMap():
+#        print "The map is inconsistent with the C++ reader."
+#        ans = raw_input("Proceed? [y]/n")
+#        if ans in ["n", "no"]:
+#            sys.exit(1)
+#
+#    else:
+#        print "Map consistent"
     
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
     codename = getCodename(sys.argv)

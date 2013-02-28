@@ -16,16 +16,16 @@ Distribution::Distribution(ParParams & pp, std::string filename,
 
 void Distribution::dump() {
 
-    if ((vmc->cycle >= vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
-        
-        //s: unique file name for the current snapshot of the diffusing walker
-        s << path << "walker_positions/" << filename << node <<"_"<< i <<".arma";
-        
-        //saves the position matrix to file
-        vmc->original_walker->r.save(s.str());
-        
-        //clears the stringstream and iterates identifyer 'i'
-        s.str(std::string());
-        i++;
-    }
+//    if ((vmc->cycle >= vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
+//        
+//        //s: unique file name for the current snapshot of the diffusing walker
+//        s << path << "walker_positions/" << filename << node <<"_"<< i <<".arma";
+//        
+//        //saves the position matrix to file
+//        vmc->original_walker->r.save(s.str());
+//        
+//        //clears the stringstream and iterates identifyer 'i'
+//        s.str(std::string());
+//        i++;
+//    }
 }

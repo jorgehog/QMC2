@@ -7,83 +7,126 @@
 
 #include "../../QMCheaders.h"
 
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
-: QMC(gP.n_p, gP.dim, dP.n_c, sO, pp) {
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc)
+: QMC(gP, dP.n_c, sO, pp, K) {
 
+    name = "dmc";
+    
     this->dist_from_file = dP.dist_in;
     this->dist_in_path = dP.dist_in_path;
 
     this->block_size = dP.n_b;
-    this->n_w = dP.n_w;
     this->thermalization = dP.therm;
-    this->E_T = dP.E_T;
+    //    this->E_T = dP.E_T;
+    
+    sampling->set_dt(dP.dt);
 
-    int max_walkers = K * n_w;
-   
-    original_walkers = new Walker*[max_walkers];
-    trial_walker = new Walker(n_p, dim);
+    E_tot = 0;
+    tot_samples = 0;
+    dmc_E = 0;
+    dmc_E_unscaled = 0;
+    
+    if (vmc != NULL) {
+
+        E_T = vmc->get_energy();
+        for (int i = 0; i < n_w; i++) {
+            copy_walker(vmc->original_walkers[i], original_walkers[i]);
+        }
+
+    } else {
+        set_trial_positions();
+    }
+
+    //    int max_walkers = K * n_w;
+
+    //    original_walkers = new Walker*[max_walkers];
+    //    trial_walker = new Walker(n_p, dim);
 
     if (parallel) {
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
 
+    
+
 }
 
-void DMC::initialize() {
+void DMC::set_trial_positions() {
 
-    jastrow->initialize();
-    
-    //Initializing active walkers
+    double tmpDt = sampling->get_dt();
+    sampling->set_dt(0.5);
     for (int k = 0; k < n_w; k++) {
-        original_walkers[k] = new Walker(n_p, dim);
+        sampling->set_trial_pos(original_walkers[k]);
     }
-    
-    //Seting trial position of active walkers
-    if (dist_from_file) {
-        for (int k = 0; k < n_w; k++) {
-            s << dist_in_path << "walker_positions/dist_out" << node << "_" << k << ".arma";
-
-            original_walkers[k]->r.load(s.str());
-            sampling->set_trial_pos(original_walkers[k], false);
-
-            s.str(std::string());
-        }
-
-    } else {
-        double tmpDt = sampling->get_dt();
-        sampling->set_dt(0.5);
-        for (int k = 0; k < n_w; k++) {
-            sampling->set_trial_pos(original_walkers[k]);
-        }
-        sampling->set_dt(tmpDt);
-
-    }
+    sampling->set_dt(tmpDt);
 
     //Calculating and storing energies of active walkers
+    E_T = 0;
     for (int k = 0; k < n_w; k++) {
         calculate_energy_necessities(original_walkers[k]);
         double El = calculate_local_energy(original_walkers[k]);
 
         original_walkers[k]->set_E(El);
+        E_T += El;
     }
 
-    if (E_T == 0) {
-        for (int k = 0; k < n_w; k++) {
-            E_T += original_walkers[k]->get_E();
-        }
-        E_T /= n_w;
-    }
-
-    //Creating unactive walker objects (note: 3. arg=false implies dead) 
-    for (int k = n_w; k < K * n_w; k++) {
-        original_walkers[k] = new Walker(n_p, dim, false);
-    }
+    E_T /= n_w;
 
 }
 
+//void DMC::initialize() {
+//
+//    jastrow->initialize();
+////    std::cout << original_walkers[n_w - 1]->E << std::endl;
+//    original_walkers[n_w - 1]->E = 0;
+////    sleep(5);
+//    //    //Initializing active walkers
+//    //    for (int k = 0; k < n_w; k++) {
+//    //        original_walkers[k] = new Walker(n_p, dim);
+//    //    }
+//
+//    
+//    //BS
+//    //Seting trial position of active walkers
+//    if (dist_from_file) {
+//        for (int k = 0; k < n_w; k++) {
+//            s << dist_in_path << "walker_positions/dist_out" << node << "_" << k << ".arma";
+//
+//            original_walkers[k]->r.load(s.str());
+//            sampling->set_trial_pos(original_walkers[k], false);
+//
+//            s.str(std::string());
+//            
+//            calculate_energy_necessities(original_walkers[k]);
+//            double El = calculate_local_energy(original_walkers[k]);
+//
+//            original_walkers[k]->set_E(El);
+//            
+//        }
+//
+//    } else {
+//        set_trial_positions();
+//    }
+//
+//    //Calculating and storing energies of active walkers
+//
+//
+//    //    if (E_T == 0) {
+//    //        for (int k = 0; k < n_w; k++) {
+//    //            E_T += original_walkers[k]->get_E();
+//    //        }
+//    //        E_T /= n_w;
+//    //    }
+//
+//    //Creating unactive walker objects (note: 3. arg=false implies dead) 
+//    //    for (int k = n_w; k < K * n_w; k++) {
+//    //        original_walkers[k] = new Walker(n_p, dim, false);
+//    //    }
+//
+//}
+
 void DMC::output() {
 
-    s << "dmcE:" << dmc_E << "| Nw: " << n_w_tot << "| " << (double) cycle / n_c * 100 << "%";
+    s << "dmcE:" << dmc_E << "| <E>: "<< E_tot/tot_samples << " | Nw: " << n_w_tot << "| " << (double) cycle / n_c * 100 << "%";
     std_out->cout(s);
 }
 
@@ -103,6 +146,7 @@ void DMC::Evolve_walker(int k, double GB) {
         }
 
         E += GB * local_E;
+//        E += local_E;
         samples++;
 
     }
@@ -150,8 +194,7 @@ void DMC::iterate_walker(int k, int n_b, bool production) {
 
 void DMC::run_method() {
 
-    initialize();
-    E_tot = tot_samples = dmc_E = dmc_E_unscaled = 0;
+    //    initialize();
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
@@ -192,26 +235,16 @@ void DMC::run_method() {
         dump_output();
 
     }
-    
+
     dump_distribution();
-    
+
     finalize_output();
 
     error_estimator->normalize();
     estimate_error();
 }
 
-void DMC::dump_distribution() {
-    
-    std::string outpath = this->dist_in_path + "walker_positions/";
-    
-    for (int i = 0; i < n_w; i++){
-        s << outpath << "dist_out_dmc" << node << "_" << i << ".arma";
-        original_walkers[i]->r.save(s.str());
-        s.str(std::string());
-    }
-    
-}
+
 
 void DMC::bury_the_dead() {
 
@@ -309,7 +342,7 @@ void DMC::normalize_population() {
 #ifdef MPI_ON
     using namespace arma;
 
-    if (!(cycle % (n_c / check_thresh) == 0) || cycle > (int) n_c * 0.9) return;
+    if (!(cycle % check_thresh == 0)) return;
 
     int avg = n_w_tot / n_nodes;
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
@@ -333,14 +366,6 @@ void DMC::normalize_population() {
         }
     }
 
-    uvec test = sum(swap_map, 1);
-    if (test.max() < sendcount_thresh) {
-        test.clear();
-        swap_map.clear();
-        s.str(std::string());
-        return;
-    }
-
     s << n_w_list.st() << endl;
     std_out->cout(s);
 
@@ -360,7 +385,7 @@ void DMC::normalize_population() {
     }
 
     swap_map.clear();
-    test.clear();
+
     MPI_Barrier(MPI_COMM_WORLD);
 
 #endif

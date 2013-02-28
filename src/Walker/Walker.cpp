@@ -7,12 +7,6 @@
 
 #include "../QMCheaders.h"
 
-Walker::Walker(){
-    
-    std::cout << "called" << std::endl;
-    
-}
-
 Walker::Walker(int n_p, int dim, bool alive) {
     using namespace arma;
 
@@ -43,6 +37,25 @@ Walker::Walker(int n_p, int dim, bool alive) {
 
     dJ = zeros<cube > (n_p, n_p, dim);
 
+}
+
+Walker::~Walker(){
+    
+    r.reset();
+    r_rel.reset();
+
+    qforce.reset();
+
+    spatial_grad.reset();
+    jast_grad.reset();
+    inv.reset();
+
+    phi.reset();
+    dell_phi.reset();
+    dJ.reset();
+
+    r2.reset();
+    
 }
 
 void Walker::calc_r_i2(int i) {
@@ -80,7 +93,7 @@ double Walker::calc_r_rel(int i, int j) const {
     return r_ij;
 }
 
-void Walker::print(std::string header) {
+void Walker::print(std::string header) const {
     using namespace std;
 
     cout << endl;

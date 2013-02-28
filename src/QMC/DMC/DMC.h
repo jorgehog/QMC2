@@ -11,7 +11,6 @@
 class DMC : public QMC {
 protected:
 
-    int n_w;
     int n_w_last;
     
     int n_w_tot;
@@ -32,10 +31,9 @@ protected:
     bool dist_from_file;
     std::string dist_in_path;
 
-    Walker **original_walkers;
-    Walker *trial_walker;
-
-    void initialize();
+    void set_trial_positions();
+    
+//    void initialize();
 
     virtual bool move_autherized(double A) {
         return metropolis_test(A)&(A > 0);
@@ -53,22 +51,20 @@ protected:
         n_w_last = n_w;
         E = samples = deaths = 0;
     }
-
+    
     virtual void node_comm();
 
     void switch_souls(int root, int root_id, int dest, int dest_id);
 
     void normalize_population();
     
-    void dump_distribution();
 
 public:
 
-    static const int K = 2; //Factor of empty space for walkers over initial walkers
-    static const int check_thresh = 20;
-    static const int sendcount_thresh = 20;
+    static const int K = 10; //Factor of empty space for walkers over initial walkers
+    static const int check_thresh = 100; //normalize every [] cycle
 
-    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc = NULL);
 
     virtual void run_method();
 

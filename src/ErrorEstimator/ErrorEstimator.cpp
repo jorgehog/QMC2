@@ -186,6 +186,12 @@ double ErrorEstimator::combine_variance(double var, double mean, int n) {
 }
 
 void ErrorEstimator::update_data(double val) {
+    
+    if (i == n_c) {
+        data.resize(2*data.n_elem);
+        n_c = data.n_elem;
+    }
+    
     data(i) = val;
     i++;
 }

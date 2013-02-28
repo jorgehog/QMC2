@@ -17,17 +17,19 @@
  */
 class QMC {
 protected:
-    
+
     STDOUT* std_out;
     std::stringstream s; //!< This stream is awesome!
-    
+    std::string name;
+    std::string runpath;
+
     bool is_master;
     bool parallel;
     int node;
     int n_nodes;
-    virtual void node_comm() = 0;
 
     int n_c;
+    int n_w;
 
     int n_p;
     int n2;
@@ -40,6 +42,9 @@ protected:
 
     double local_E;
 
+    Walker *trial_walker;
+    Walker **original_walkers;
+
     Jastrow *jastrow;
     Sampling *sampling;
     System *system;
@@ -47,12 +52,14 @@ protected:
 
     std::vector<OutputHandler*> output_handler;
 
-    virtual void initialize() = 0;
+    //    virtual void initialize() = 0;
+    virtual void set_trial_positions() = 0;
 
     virtual bool move_autherized(double A) = 0;
 
     void dump_output();
     void finalize_output();
+    void dump_distribution();
 
     void diffuse_walker(Walker* original, Walker* trial);
 
@@ -67,19 +74,22 @@ protected:
     void copy_walker(const Walker* parent, Walker* child) const;
 
     void calculate_energy_necessities(Walker* walker) const;
-    
+
     void estimate_error() const;
-    
+
+    virtual void node_comm() = 0;
+
     void switch_souls(int root, int source);
-    
+
     //TEST FUNCTIONS
     void test_ratios(const Walker* walker_pre, const Walker* walker_post, int particle, double R_qmc) const;
 
 public:
 
-    QMC(int n_p, int dim, int n_c,
+    QMC(GeneralParams &, int n_c,
             SystemObjects &,
-            ParParams &);
+            ParParams &,
+            int K = 1);
     QMC();
 
     void add_output(OutputHandler* output_handler);
@@ -103,9 +113,7 @@ public:
         return system->get_spatial_wf(walker) * jastrow->get_val(walker);
     }
 
-    double calculate_local_energy(const Walker* walker) const {
-        return get_KE(walker) + system->get_potential_energy(walker);
-    }
+    double calculate_local_energy(const Walker* walker) const;
 
     System* get_system_ptr() const {
         return system;
@@ -126,8 +134,8 @@ public:
     double get_accepted_ratio(int total_cycles) const {
         return accepted / double(total_cycles);
     }
-    
-    void set_error_estimator(ErrorEstimator* error_estimator){
+
+    void set_error_estimator(ErrorEstimator* error_estimator) {
         this->error_estimator = error_estimator;
     }
 
