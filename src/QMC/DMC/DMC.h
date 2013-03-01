@@ -32,8 +32,6 @@ protected:
     std::string dist_in_path;
 
     void set_trial_positions();
-    
-//    void initialize();
 
     virtual bool move_autherized(double A) {
         return metropolis_test(A)&(A > 0);
@@ -53,6 +51,8 @@ protected:
     }
     
     virtual void node_comm();
+    
+    void store_walkers();
 
     void switch_souls(int root, int root_id, int dest, int dest_id);
 

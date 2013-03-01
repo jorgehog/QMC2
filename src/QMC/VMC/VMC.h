@@ -13,14 +13,13 @@ protected:
 
     int pop_tresh;
     int last_walker;
-    
+
     double vmc_E;
     Walker* original_walker;
 
-//    virtual void initialize();
     void set_trial_positions();
     
-    void store_walker();
+    void store_walkers();
     
     virtual bool move_autherized(double A) {
         return metropolis_test(A);

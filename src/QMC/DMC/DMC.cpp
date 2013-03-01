@@ -15,9 +15,10 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     this->dist_from_file = dP.dist_in;
     this->dist_in_path = dP.dist_in_path;
 
+    dist_tresh = (n_nodes * n_w * n_c) / (2 * n_distout);
+
     this->block_size = dP.n_b;
     this->thermalization = dP.therm;
-    //    this->E_T = dP.E_T;
 
     sampling->set_dt(dP.dt);
 
@@ -37,10 +38,6 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
         set_trial_positions();
     }
 
-    //    int max_walkers = K * n_w;
-
-    //    original_walkers = new Walker*[max_walkers];
-    //    trial_walker = new Walker(n_p, dim);
 
     if (parallel) {
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
@@ -73,77 +70,27 @@ void DMC::set_trial_positions() {
 
 }
 
-//void DMC::initialize() {
-//
-//    jastrow->initialize();
-////    std::cout << original_walkers[n_w - 1]->E << std::endl;
-//    original_walkers[n_w - 1]->E = 0;
-////    sleep(5);
-//    //    //Initializing active walkers
-//    //    for (int k = 0; k < n_w; k++) {
-//    //        original_walkers[k] = new Walker(n_p, dim);
-//    //    }
-//
-//    
-//    //BS
-//    //Seting trial position of active walkers
-//    if (dist_from_file) {
-//        for (int k = 0; k < n_w; k++) {
-//            s << dist_in_path << "walker_positions/dist_out" << node << "_" << k << ".arma";
-//
-//            original_walkers[k]->r.load(s.str());
-//            sampling->set_trial_pos(original_walkers[k], false);
-//
-//            s.str(std::string());
-//            
-//            calculate_energy_necessities(original_walkers[k]);
-//            double El = calculate_local_energy(original_walkers[k]);
-//
-//            original_walkers[k]->set_E(El);
-//            
-//        }
-//
-//    } else {
-//        set_trial_positions();
-//    }
-//
-//    //Calculating and storing energies of active walkers
-//
-//
-//    //    if (E_T == 0) {
-//    //        for (int k = 0; k < n_w; k++) {
-//    //            E_T += original_walkers[k]->get_E();
-//    //        }
-//    //        E_T /= n_w;
-//    //    }
-//
-//    //Creating unactive walker objects (note: 3. arg=false implies dead) 
-//    //    for (int k = n_w; k < K * n_w; k++) {
-//    //        original_walkers[k] = new Walker(n_p, dim, false);
-//    //    }
-//
-//}
-
 void DMC::output() {
     using namespace std;
-    
-    s << setprecision(5)<< fixed;
+
+    s << setprecision(5) << fixed;
     s << "dmcE: " << dmc_E << " | <E_T>: " << E_tot / tot_samples;
+
     s << " | Nw: ";
     s << setfill(' ') << setw(5);
     s << n_w_tot << " | ";
-    s << setprecision(1)<< fixed;
-    s << setfill(' ') << setw(5) <<(double) cycle / n_c * 100 << "%";
+
+    s << setprecision(1) << fixed << setfill(' ') << setw(5);
+    s << (double) cycle / n_c * 100 << "%";
+
     std_out->cout(s);
 }
 
 void DMC::Evolve_walker(int k, double GB) {
 
     int branch_mean = int(GB + sampling->call_RNG());
-    //    double dE = (original_walkers[k]->get_E() - E_T);
-    //    dE = dE*dE;
 
-    if (branch_mean == 0) { //|| dE > 1. / sampling->get_dt()) {
+    if (branch_mean == 0) {
         original_walkers[k]->kill();
     } else {
 
@@ -153,7 +100,6 @@ void DMC::Evolve_walker(int k, double GB) {
         }
 
         E += GB * local_E;
-        //        E += local_E;
         samples++;
 
     }
@@ -201,8 +147,6 @@ void DMC::iterate_walker(int k, int n_b, bool production) {
 
 void DMC::run_method() {
 
-    //    initialize();
-
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
         reset_parameters();
@@ -241,14 +185,25 @@ void DMC::run_method() {
         output();
         dump_output();
 
+        store_walkers();
     }
 
-    dump_distribution();
-
     finalize_output();
-
+    get_accepted_ratio();
     error_estimator->normalize();
     estimate_error();
+}
+
+void DMC::store_walkers() {
+
+    if ((cycle > n_c / 2) && (cycle % dist_tresh == 0)) {
+
+        for (int i = 0; i < n_w; i++) {
+            std::string suffix = (TOSTR(cycle) + "_") + TOSTR(i);
+            dump_distribution(original_walkers[i], suffix);
+        }
+
+    }
 }
 
 void DMC::bury_the_dead() {
@@ -374,7 +329,7 @@ void DMC::normalize_population() {
             root++;
         }
     }
-    
+
     //At this point we have at most a unbalance of n_nodes-1 at one node.
     //optimal in this case is a unbalance of 1 on n_nodes-1 nodes.
     //To do this shuffeling we send walkers from the highest to the lowest untill
@@ -425,7 +380,7 @@ void DMC::normalize_population() {
             }
         }
     }
-    
+
     s << endl;
     std_out->cout(s);
 

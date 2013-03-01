@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
                 if (generalParams.do_blocking) {
 
                     string minBlockname = (string) "blocking_MIN_out";
-                    minBlockname = minBlockname + boost::lexical_cast<std::string > (i);
+                    minBlockname = minBlockname + TOSTR(i);
                     ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples, parParams,
                             minBlockname, outputParams.outputPath);
                     minimizer->add_error_estimator(blocking);

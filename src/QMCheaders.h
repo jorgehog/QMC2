@@ -45,6 +45,9 @@ typedef long seed_type;
 #include <vector>
 #include <sys/time.h>
 
+#define TOSTR boost::lexical_cast<std::string>
+
+
 struct DMCparams {
     int n_c, therm, n_b;
     double dt, E_T;

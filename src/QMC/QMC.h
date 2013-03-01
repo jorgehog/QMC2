@@ -22,11 +22,16 @@ protected:
     std::stringstream s; //!< This stream is awesome!
     std::string name;
     std::string runpath;
+    std::string dist_path;
+    
+    static const int n_distout = 100000;
 
     bool is_master;
     bool parallel;
     int node;
     int n_nodes;
+
+    int dist_tresh;
 
     int n_c;
     int n_w;
@@ -38,6 +43,7 @@ protected:
     int cycle;
 
     int accepted;
+    int total_samples;
     int thermalization;
 
     double local_E;
@@ -52,14 +58,13 @@ protected:
 
     std::vector<OutputHandler*> output_handler;
 
-    //    virtual void initialize() = 0;
     virtual void set_trial_positions() = 0;
 
     virtual bool move_autherized(double A) = 0;
 
     void dump_output();
     void finalize_output();
-    void dump_distribution();
+    void dump_distribution(Walker* walker, std::string suffix);
 
     void diffuse_walker(Walker* original, Walker* trial);
 
@@ -78,6 +83,8 @@ protected:
     void estimate_error() const;
 
     virtual void node_comm() = 0;
+    
+    virtual void store_walkers() = 0;
 
     void switch_souls(int root, int source);
 
@@ -131,9 +138,7 @@ public:
         return system->get_orbital_ptr();
     }
 
-    double get_accepted_ratio(int total_cycles) const {
-        return accepted / double(total_cycles);
-    }
+    void get_accepted_ratio();
 
     void set_error_estimator(ErrorEstimator* error_estimator) {
         this->error_estimator = error_estimator;

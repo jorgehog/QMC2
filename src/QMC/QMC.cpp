@@ -33,6 +33,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
     get_orbitals_ptr()->set_qmc_ptr(this);
 
     accepted = 0;
+    total_samples = 0;
 
     n_nodes = pp.n_nodes;
     node = pp.node;
@@ -48,6 +49,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
     }
 
     runpath = gP.runpath;
+    dist_path = runpath + "walker_positions/";
 
 }
 
@@ -119,7 +121,6 @@ bool QMC::metropolis_test(double A) {
     double r = sampling->call_RNG();
 
     if (r <= A) {
-        accepted++;
         return true;
 
     } else {
@@ -192,10 +193,13 @@ void QMC::diffuse_walker(Walker* original, Walker* trial) {
         double A = get_acceptance_ratio(original, trial, particle);
 
         if (move_autherized(A)) {
+            accepted++;
             update_walker(original, trial, particle);
         } else {
             reset_walker(original, trial, particle);
         }
+
+        total_samples++;
 
     }
 }
@@ -243,15 +247,28 @@ void QMC::get_QF(Walker* walker) const {
     walker->qforce = 2 * (walker->jast_grad + walker->spatial_grad);
 }
 
-void QMC::dump_distribution() {
+void QMC::get_accepted_ratio() {
 
-    std::string outpath = runpath + "walker_positions/";
-
-    for (int i = 0; i < n_w; i++) {
-        s << outpath << "dist_out_" << name << node << "_" << i << ".arma";
-        original_walkers[i]->r.save(s.str());
-        s.str(std::string());
+#ifdef MPI_ON
+    if (is_master) {
+        MPI_Reduce(MPI_IN_PLACE, &accepted, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &total_samples, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    } else {
+        MPI_Reduce(&accepted, new int(), 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&total_samples, new int(), 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     }
+#endif
+
+    s << "Acceptance ratio: " << accepted / (double)total_samples << std::endl;
+    std_out->cout(s);
+}
+
+void QMC::dump_distribution(Walker* walker, std::string suffix) {
+
+    //    s << dist_path << "dist_out_" << name << node << suffix << ".arma";
+    //    walker->r.save(s.str());
+    //    s.str(std::string());
+
 
 }
 

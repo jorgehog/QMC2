@@ -48,7 +48,7 @@ ErrorEstimator::ErrorEstimator(int n_c,
 
 
     if (parallel) {
-        filename = filename + boost::lexical_cast<std::string > (node);
+        filename = filename + TOSTR(node);
     }
 
     //will be overwritten (true) if a file is opened.

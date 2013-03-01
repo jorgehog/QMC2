@@ -28,7 +28,7 @@ OutputHandler::OutputHandler(std::string filename,
     this->path = path;
 
     if (parallel) {
-        filename = filename + boost::lexical_cast<std::string > (node);
+        filename = filename + TOSTR(node);
     }
 
     //default:
@@ -65,24 +65,4 @@ void OutputHandler::finalize() {
         return;
     }
     file.close();
-
-    if (parallel & (node == 0)) {
-        std::string compressorPath = "~/MASTER/QMC2/tools/compressData.sh";
-
-        //Bash script "~/compressData ~/test/ blocking 4"
-        int success = std::system(((((((((std::string)"bash " +
-                                  compressorPath) +
-                                  " ") +
-                                  path) +
-                                   " ") +
-                                   filename) +
-                                  " ") +
-                                  boost::lexical_cast<std::string > (n_nodes)).c_str()
-                                 );
-        if (success != 0){
-            std::cout << "compressData failed. " << std::endl;
-            exit(1);
-        }
-
-    }
 }
