@@ -125,8 +125,15 @@ void DMC::set_trial_positions() {
 //}
 
 void DMC::output() {
-
-    s << "dmcE:" << dmc_E << "| <E>: " << E_tot / tot_samples << " | Nw: " << n_w_tot << "| " << (double) cycle / n_c * 100 << "%";
+    using namespace std;
+    
+    s << setprecision(5)<< fixed;
+    s << "dmcE: " << dmc_E << " | <E_T>: " << E_tot / tot_samples;
+    s << " | Nw: ";
+    s << setfill(' ') << setw(5);
+    s << n_w_tot << " | ";
+    s << setprecision(1)<< fixed;
+    s << setfill(' ') << setw(5) <<(double) cycle / n_c * 100 << "%";
     std_out->cout(s);
 }
 
@@ -343,20 +350,20 @@ void DMC::normalize_population() {
     if (!(cycle % check_thresh == 0)) return;
 
     int avg = n_w_tot / n_nodes;
-    
+
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
     uvec snw = sort_index(n_w_list, 1); //enables us to index n_w as decreasing
 
     s << n_w_list.st() << endl;
 
-    //Start iterating sending from highest to lowest. If either reach the condition
-    //avg_n_w + 1, the next in line is as root or dest. Continues untill root == dest.
-    //Addition of 1 because of integer division assume equal loads to be achievable. 
+    //Start iterating sending from highest to lowest. When root or dest reaches the average
+    //value they are shifted to the second highest/lowest. Process continues untill root
+    //reaches dest.
     int root = 0;
     int dest = n_nodes - 1;
     while (root < dest) {
-        if (n_w_list(snw(root)) > avg + 1) {
-            if (n_w_list(snw(dest)) < avg + 1) {
+        if (n_w_list(snw(root)) > avg) {
+            if (n_w_list(snw(dest)) < avg) {
                 swap_map(snw(root), snw(dest))++;
                 n_w_list(snw(root))--;
                 n_w_list(snw(dest))++;
@@ -367,7 +374,29 @@ void DMC::normalize_population() {
             root++;
         }
     }
+    
+    //At this point we have at most a unbalance of n_nodes-1 at one node.
+    //optimal in this case is a unbalance of 1 on n_nodes-1 nodes.
+    //To do this shuffeling we send walkers from the highest to the lowest untill
+    //the highest reaches avg+1 walkers. The lowest is shifted every time it recieves a 
+    //walker.
 
+    snw = sort_index(n_w_list, 1);
+    root = 0;
+    dest = n_nodes - 1;
+    while (root < dest) {
+        if (n_w_list(snw(root)) > avg + 1) {
+
+            swap_map(snw(root), snw(dest))++;
+            n_w_list(snw(root))--;
+            n_w_list(snw(dest))++;
+
+            dest--;
+
+        } else {
+            root++;
+        }
+    }
 
     uvec test = sum(swap_map, 1);
     if (test.max() < sendcount_thresh) {
@@ -385,7 +414,7 @@ void DMC::normalize_population() {
             if (swap_map(root, dest) != 0) {
 
                 s << "node" << root << " sends ";
-                s << swap_map(root, dest) << " walkers to node " << dest << endl;
+                s << swap_map(root, dest) << " walkers to node " << dest;
                 std_out->cout(s);
 
                 for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
@@ -396,10 +425,12 @@ void DMC::normalize_population() {
             }
         }
     }
+    
+    s << endl;
+    std_out->cout(s);
 
     test.reset();
     swap_map.reset();
-    
     MPI_Barrier(MPI_COMM_WORLD);
 
 #endif
