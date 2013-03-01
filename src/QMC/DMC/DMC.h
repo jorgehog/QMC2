@@ -63,6 +63,7 @@ public:
 
     static const int K = 10; //Factor of empty space for walkers over initial walkers
     static const int check_thresh = 100; //normalize every [] cycle
+    static const int sendcount_thresh = 20; //abort normalization if max difference in walkers small
 
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc = NULL);
 

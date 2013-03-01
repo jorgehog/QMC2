@@ -11,21 +11,21 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
 : QMC(gP, dP.n_c, sO, pp, K) {
 
     name = "dmc";
-    
+
     this->dist_from_file = dP.dist_in;
     this->dist_in_path = dP.dist_in_path;
 
     this->block_size = dP.n_b;
     this->thermalization = dP.therm;
     //    this->E_T = dP.E_T;
-    
+
     sampling->set_dt(dP.dt);
 
     E_tot = 0;
     tot_samples = 0;
     dmc_E = 0;
     dmc_E_unscaled = 0;
-    
+
     if (vmc != NULL) {
 
         E_T = vmc->get_energy();
@@ -46,7 +46,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
 
-    
+
 
 }
 
@@ -126,7 +126,7 @@ void DMC::set_trial_positions() {
 
 void DMC::output() {
 
-    s << "dmcE:" << dmc_E << "| <E>: "<< E_tot/tot_samples << " | Nw: " << n_w_tot << "| " << (double) cycle / n_c * 100 << "%";
+    s << "dmcE:" << dmc_E << "| <E>: " << E_tot / tot_samples << " | Nw: " << n_w_tot << "| " << (double) cycle / n_c * 100 << "%";
     std_out->cout(s);
 }
 
@@ -146,7 +146,7 @@ void DMC::Evolve_walker(int k, double GB) {
         }
 
         E += GB * local_E;
-//        E += local_E;
+        //        E += local_E;
         samples++;
 
     }
@@ -243,8 +243,6 @@ void DMC::run_method() {
     error_estimator->normalize();
     estimate_error();
 }
-
-
 
 void DMC::bury_the_dead() {
 
@@ -349,7 +347,7 @@ void DMC::normalize_population() {
     uvec snw = sort_index(n_w_list, 1);
 
     s << n_w_list.st() << endl;
-
+    s << avg << endl;
     int root = 0;
     int dest = n_nodes - 1;
     while (root < dest) {
@@ -366,6 +364,15 @@ void DMC::normalize_population() {
         }
     }
 
+
+    uvec test = sum(swap_map, 1);
+    if (test.max() < sendcount_thresh) {
+        test.reset();
+        swap_map.reset();
+        s.str(std::string());
+        return;
+    }
+
     s << n_w_list.st() << endl;
     std_out->cout(s);
 
@@ -380,12 +387,14 @@ void DMC::normalize_population() {
                 for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
                     switch_souls(root, n_w - 1, dest, n_w);
                 }
+
+
             }
         }
     }
 
-    swap_map.clear();
-
+    test.reset();
+    swap_map.reset();
     MPI_Barrier(MPI_COMM_WORLD);
 
 #endif

@@ -13,8 +13,8 @@
 #endif
 
 #ifdef RNG_NUMREC
-#include "Diffusion/RNGs/gaussian_deviate.h"
-#include "Diffusion/RNGs/ran2.h"
+#include "RNGs/gaussian_deviate.h"
+#include "RNGs/ran2.h"
 #endif
 
 Diffusion::Diffusion(int n_p, int dim, double timestep, seed_type random_seed, double D) {
@@ -34,7 +34,7 @@ Diffusion::Diffusion(int n_p, int dim, double timestep, seed_type random_seed, d
 #endif
 
 #ifdef RNG_NUMREC
-    if (random_seed) < 0 {
+    if (random_seed < 0) {
         random_seed = -random_seed;
     }
 #endif
@@ -45,7 +45,7 @@ double Diffusion::get_new_pos(const Walker* walker, int i, int j) {
 #ifdef RNG_ZIG
     return DRanNormalZig32() * std;
 #endif
-#ifdef RNG_NUM_REC
+#ifdef RNG_NUMREC
     return gaussian_deviate(&random_seed) * std;
 #endif
 }
@@ -54,7 +54,7 @@ double Diffusion::call_RNG() {
 #ifdef RNG_ZIG
     return DRan_MWC8222();
 #endif
-#ifdef RNG_NUM_REC
+#ifdef RNG_NUMREC
     return ran2(&random_seed);
 #endif
 }
