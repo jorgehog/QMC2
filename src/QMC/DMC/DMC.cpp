@@ -343,16 +343,20 @@ void DMC::normalize_population() {
     if (!(cycle % check_thresh == 0)) return;
 
     int avg = n_w_tot / n_nodes;
+    
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
-    uvec snw = sort_index(n_w_list, 1);
+    uvec snw = sort_index(n_w_list, 1); //enables us to index n_w as decreasing
 
     s << n_w_list.st() << endl;
-    s << avg << endl;
+
+    //Start iterating sending from highest to lowest. If either reach the condition
+    //avg_n_w + 1, the next in line is as root or dest. Continues untill root == dest.
+    //Addition of 1 because of integer division assume equal loads to be achievable. 
     int root = 0;
     int dest = n_nodes - 1;
     while (root < dest) {
-        if (n_w_list(snw(root)) > avg) {
-            if (n_w_list(snw(dest)) < avg) {
+        if (n_w_list(snw(root)) > avg + 1) {
+            if (n_w_list(snw(dest)) < avg + 1) {
                 swap_map(snw(root), snw(dest))++;
                 n_w_list(snw(root))--;
                 n_w_list(snw(dest))++;
@@ -395,6 +399,7 @@ void DMC::normalize_population() {
 
     test.reset();
     swap_map.reset();
+    
     MPI_Barrier(MPI_COMM_WORLD);
 
 #endif
