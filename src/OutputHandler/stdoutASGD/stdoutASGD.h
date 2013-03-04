@@ -12,9 +12,9 @@ class stdoutASGD : public OutputHandler {
 public:
     stdoutASGD(std::string path, std::string filename = "ASGD_out");
 
-    virtual void dump();
+    void dump();
     
-    virtual void post_pointer_init(){
+    void post_pointer_init(){
         grad = arma::zeros(asgd->Nparams);
     }
     

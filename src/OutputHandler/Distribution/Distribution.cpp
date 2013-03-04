@@ -7,25 +7,20 @@
 
 #include "../../QMCheaders.h"
 
-Distribution::Distribution(ParParams & pp, std::string path, 
-        std::string filename)
-: OutputHandler(filename, path, pp.parallel, pp.node, pp.n_nodes) {
-    i = 0;
+Distribution::Distribution(ParParams & pp, std::string path)
+: OutputHandler("", path, pp.parallel, pp.node, pp.n_nodes) {
 
 }
 
 void Distribution::dump() {
 
-//    if ((vmc->cycle >= vmc->n_c / 2) && (vmc->cycle % 100 == 0)) {
-//        
-//        //s: unique file name for the current snapshot of the diffusing walker
-//        s << path << "walker_positions/" << filename << node <<"_"<< i <<".arma";
-//        
-//        //saves the position matrix to file
-//        vmc->original_walker->r.save(s.str());
-//        
-//        //clears the stringstream and iterates identifyer 'i'
-//        s.str(std::string());
-//        i++;
-//    }
+    qmc->save_distribution();
+
+}
+
+void Distribution::finalize() {
+    s << path << "walker_positions/dist_out_" << qmc->name << node << ".arma";
+    qmc->dist.save(s.str());
+    qmc->dist.reset();
+    s.str(std::string());
 }

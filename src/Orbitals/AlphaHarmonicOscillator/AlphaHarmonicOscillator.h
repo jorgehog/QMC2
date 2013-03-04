@@ -13,7 +13,7 @@ public:
     AlphaHarmonicOscillator(GeneralParams &, VariationalParams &);
     AlphaHarmonicOscillator(GeneralParams &);
 
-    virtual void set_qnum_indie_terms(const Walker * walker, int i) {
+    void set_qnum_indie_terms(const Walker * walker, int i) {
         *exp_factor = exp(-0.5 * (*k2) * walker->get_r_i2(i));
     }
 
@@ -31,16 +31,16 @@ protected:
 
     double w;
 
-    virtual double get_variational_derivative(const Walker* walker, int n);
+    double get_variational_derivative(const Walker* walker, int n);
 
     void get_qnums();
     double H(int n, double x) const;
 
-    virtual double get_parameter(int n) {
+    double get_parameter(int n) {
         return *alpha;
     }
 
-    virtual void set_parameter(double parameter, int n) {
+    void set_parameter(double parameter, int n) {
         *alpha = parameter;
         *k2 = parameter*w;
         *k = sqrt(*k2);

@@ -45,7 +45,7 @@ protected:
     
     void get_total_grad();
     
-    virtual void update_parameters();
+    void update_parameters();
     
     void output_cycle();
     
@@ -60,7 +60,7 @@ protected:
 public:
     ASGD(VMC*, MinimizerParams &, const ParParams &);
 
-    virtual void minimize();
+    void minimize();
 
     friend class stdoutASGD;
 };

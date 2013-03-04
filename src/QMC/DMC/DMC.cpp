@@ -85,10 +85,10 @@ void DMC::Evolve_walker(int k, double GB) {
 
     int branch_mean = int(GB + sampling->call_RNG());
 
-    
+
     bool E_cut_cond = (local_E < E_T - 1 / get_sampling_ptr()->get_std());
-    E_cut_cond = E_cut_cond || (local_E > E_T + 1/get_sampling_ptr()->get_std());
-    
+    E_cut_cond = E_cut_cond || (local_E > E_T + 1 / get_sampling_ptr()->get_std());
+
     if (branch_mean == 0 || E_cut_cond) {
         original_walkers[k]->kill();
     } else {
@@ -184,7 +184,6 @@ void DMC::run_method() {
         output();
         dump_output();
 
-        store_walkers();
     }
 
     dump_distribution();
@@ -194,17 +193,16 @@ void DMC::run_method() {
     estimate_error();
 }
 
-void DMC::store_walkers() {
+void DMC::save_distribution() {
 
     if (cycle % dist_tresh == 0) {
 
         for (int i = 0; i < n_w; i++) {
-            save_distribution(original_walkers[i]);
+            dist.insert_rows(dist.n_rows, original_walkers[i]->r);
         }
 
     }
 }
-
 
 void DMC::bury_the_dead() {
 

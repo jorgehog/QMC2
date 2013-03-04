@@ -13,7 +13,7 @@ public:
     hydrogenicOrbitals(GeneralParams &, VariationalParams &);
     hydrogenicOrbitals(GeneralParams &);
 
-    virtual void set_qnum_indie_terms(const Walker * walker, int i);
+    void set_qnum_indie_terms(const Walker * walker, int i);
 
     friend class ExpandedBasis;
 
@@ -32,15 +32,15 @@ protected:
 
     int Z;
 
-    virtual double get_variational_derivative(const Walker* walker, int n);
+    double get_variational_derivative(const Walker* walker, int n);
 
     double get_dell_alpha_phi(const Walker* walker, int qnum, int i);
 
-    virtual double get_parameter(int n) {
+    double get_parameter(int n) {
         return *alpha;
     }
 
-    virtual void set_parameter(double parameter, int n) {
+    void set_parameter(double parameter, int n) {
         *alpha = parameter;
         *k = parameter*Z;
         *k2 = (*k)*(*k);

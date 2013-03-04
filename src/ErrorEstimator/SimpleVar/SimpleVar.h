@@ -13,8 +13,8 @@ public:
     SimpleVar(ParParams &);
     
     double estimate_error();
-    virtual void update_data(double val);
-    virtual void normalize();
+    void update_data(double val);
+    void normalize();
 protected:
     
     double f;

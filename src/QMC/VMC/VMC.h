@@ -20,8 +20,9 @@ protected:
     void set_trial_positions();
     
     void store_walkers();
+    void save_distribution();
     
-    virtual bool move_autherized(double A) {
+    bool move_autherized(double A) {
         return metropolis_test(A);
     }
 
@@ -29,7 +30,7 @@ protected:
         vmc_E /= (n_c*n_nodes);
     }
     
-    virtual void node_comm();
+    void node_comm();
 
 public:
 
@@ -44,15 +45,14 @@ public:
         return vmc_E;
     }
 
-    virtual void run_method();
-    virtual void output();
+    void run_method();
+    void output();
 
     friend class DMC;
     
     friend class Minimizer;
     friend class ASGD;
 
-    friend class Distribution;
     friend class BlockingData;
 
 };

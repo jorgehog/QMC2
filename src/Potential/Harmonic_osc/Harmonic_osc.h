@@ -16,7 +16,7 @@ public:
 
     Harmonic_osc(GeneralParams &);
 
-    virtual double get_pot_E(const Walker* walker) const;
+    double get_pot_E(const Walker* walker) const;
 
 };
 

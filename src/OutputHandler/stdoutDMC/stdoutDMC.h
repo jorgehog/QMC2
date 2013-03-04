@@ -19,7 +19,7 @@ public:
 
     stdoutDMC(std::string path, std::string filename = "DMC_out");
 
-    virtual void dump();
+    void dump();
 
 };
 

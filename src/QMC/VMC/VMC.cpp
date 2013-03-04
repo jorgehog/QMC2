@@ -37,6 +37,12 @@ void VMC::set_trial_positions() {
 
 }
 
+void VMC::save_distribution() {
+    if (cycle % dist_tresh == 0) {
+        dist.insert_rows(dist.n_rows, original_walker->r);
+    }
+}
+
 void VMC::store_walkers() {
 
     //store for DMC
@@ -46,10 +52,6 @@ void VMC::store_walkers() {
         last_walker++;
     }
 
-    //store for distribution processing
-    if (cycle % dist_tresh == 0) {
-        save_distribution(original_walker);
-    }
 }
 
 void VMC::run_method() {

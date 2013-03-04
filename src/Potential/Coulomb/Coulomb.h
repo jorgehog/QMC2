@@ -13,7 +13,7 @@ public:
 
     Coulomb(GeneralParams &);
 
-    virtual double get_pot_E(const Walker* walker) const;
+    double get_pot_E(const Walker* walker) const;
 
 };
 

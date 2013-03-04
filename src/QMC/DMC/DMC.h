@@ -30,7 +30,7 @@ protected:
 
     void set_trial_positions();
 
-    virtual bool move_autherized(double A) {
+    bool move_autherized(double A) {
         return metropolis_test(A)&(A > 0);
     };
 
@@ -47,9 +47,9 @@ protected:
         E = samples = deaths = 0;
     }
     
-    virtual void node_comm();
+    void node_comm();
     
-    void store_walkers();
+    void save_distribution();
 
     void switch_souls(int root, int root_id, int dest, int dest_id);
 
@@ -64,9 +64,9 @@ public:
 
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc = NULL);
 
-    virtual void run_method();
+    void run_method();
 
-    virtual void output();
+    void output();
 
     friend class stdoutDMC;
 

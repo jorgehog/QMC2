@@ -20,14 +20,14 @@ protected:
 
     STDOUT* std_out;
     std::stringstream s; //!< This stream is awesome!
-    
+
     std::string name;
-    
+
     std::string runpath;
-    
+
     std::string dist_path;
     arma::mat dist;
-    
+
     bool is_master;
     bool parallel;
     int node;
@@ -66,7 +66,7 @@ protected:
 
     void dump_output();
     void finalize_output();
-    void save_distribution(Walker* walker);
+    virtual void save_distribution() = 0;
     void dump_distribution();
 
     void diffuse_walker(Walker* original, Walker* trial);
@@ -86,8 +86,6 @@ protected:
     void estimate_error() const;
 
     virtual void node_comm() = 0;
-    
-    virtual void store_walkers() = 0;
 
     void switch_souls(int root, int source);
 
@@ -147,6 +145,8 @@ public:
     void set_error_estimator(ErrorEstimator* error_estimator) {
         this->error_estimator = error_estimator;
     }
+
+    friend class Distribution;
 
 };
 

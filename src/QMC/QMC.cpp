@@ -268,15 +268,8 @@ void QMC::get_accepted_ratio() {
     std_out->cout(s);
 }
 
-void QMC::save_distribution(Walker* walker) {
-    dist.insert_rows(dist.n_rows, walker->r);
-}
-
 void QMC::dump_distribution() {
-    s << dist_path << "dist_out_" << name << node << ".arma";
-    dist.save(s.str());
-    dist.reset();
-    s.str(std::string());
+ 
 }
 
 /*

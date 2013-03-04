@@ -9,13 +9,12 @@
 #define	DISTRIBUTION_H
 
 class Distribution : public OutputHandler {
-protected:
-    int i;
 public:
-    Distribution(ParParams &, std::string path, std::string filename = "dist_out");
+    Distribution(ParParams &, std::string path);
 
-    virtual void dump();
-
+    void dump();
+    void finalize();
+    
 };
 
 

@@ -11,13 +11,13 @@
 class No_Jastrow : public Jastrow {
 protected:
 
-    virtual double get_parameter(int n) {
+    double get_parameter(int n) {
         return 0;
     }
     
-    virtual void set_parameter(double param, int n) {};
+    void set_parameter(double param, int n) {};
 
-    virtual double get_variational_derivative(const Walker* walker, int n) {
+    double get_variational_derivative(const Walker* walker, int n) {
         return 0;
     }
 
@@ -25,22 +25,22 @@ public:
 
     No_Jastrow();
 
-    virtual void get_grad(Walker* walker) const {};
-    virtual void get_grad(const Walker* walker_pre, Walker* walker_post, int i) const {};
+    void get_grad(Walker* walker) const {};
+    void get_grad(const Walker* walker_pre, Walker* walker_post, int i) const {};
 
-    virtual void initialize() {};
+    void initialize() {};
     
-    virtual void get_dJ_matrix(Walker* walker, int i) const {};
+    void get_dJ_matrix(Walker* walker, int i) const {};
 
-    virtual double get_j_ratio(const Walker* walker_post, const Walker* walker_pre, int i) const {
+    double get_j_ratio(const Walker* walker_post, const Walker* walker_pre, int i) const {
         return 1;
     }
 
-    virtual double get_val(const Walker* walker) const {
+    double get_val(const Walker* walker) const {
         return 1;
     }
 
-    virtual double get_lapl_sum(Walker* walker) const {
+    double get_lapl_sum(Walker* walker) const {
         return 0;
     }
 
