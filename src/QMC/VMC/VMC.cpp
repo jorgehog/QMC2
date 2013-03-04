@@ -7,24 +7,19 @@
 
 #include "../../QMCheaders.h"
 
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp)
-: QMC(gP, vP.n_c, sO, pp) {
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w)
+: QMC(gP, vP.n_c, sO, pp, n_w) {
 
     name = "vmc";
-
     original_walker = new Walker(n_p, dim);
 
-    pop_tresh = vP.pop_tresh;
+    dist_tresh = 100;
+    pop_tresh = n_c / n_w;
     last_walker = 0;
-
-    dist_tresh = (n_nodes * n_c) / n_distout;
-    if (dist_tresh < 1) {
-        dist_tresh = 1;
-    }
 
     vmc_E = 0;
     thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
-    
+
     sampling->set_dt(vP.dt);
 
     set_trial_positions();
@@ -53,7 +48,7 @@ void VMC::store_walkers() {
 
     //store for distribution processing
     if (cycle % dist_tresh == 0) {
-        dump_distribution(original_walker, TOSTR(cycle));
+        save_distribution(original_walker);
     }
 }
 
@@ -79,7 +74,7 @@ void VMC::run_method() {
 
     }
 
-
+    dump_distribution();
     node_comm();
     scale_values();
     output();
@@ -93,7 +88,7 @@ void VMC::output() {
     s << "VMC energy: " << get_energy() << endl;
     std_out->cout(s);
     get_accepted_ratio();
-    
+
 }
 
 void VMC::node_comm() {

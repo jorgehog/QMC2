@@ -10,8 +10,7 @@
 
 class stdoutASGD : public OutputHandler {
 public:
-    stdoutASGD(std::string filename = "ASGD_out",
-            std::string path = "./");
+    stdoutASGD(std::string path, std::string filename = "ASGD_out");
 
     virtual void dump();
     

@@ -86,7 +86,7 @@ void ASGD::get_total_grad() {
     
 }
 
-VMC* ASGD::minimize() {
+void ASGD::minimize() {
 
     thermalize_walkers();
     
@@ -131,7 +131,6 @@ VMC* ASGD::minimize() {
     error_output();
 
     vmc->accepted = 0;
-    return vmc;
 }
 
 void ASGD::update_parameters() {

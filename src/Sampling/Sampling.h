@@ -62,6 +62,10 @@ public:
         return diffusion->get_dt();
     }
 
+    double get_std() const {
+        return diffusion->get_std();
+    }
+    
     double call_RNG() {
         return diffusion->call_RNG();
     }

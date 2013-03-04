@@ -28,9 +28,6 @@ protected:
     double E_T;
     double E;
 
-    bool dist_from_file;
-    std::string dist_in_path;
-
     void set_trial_positions();
 
     virtual bool move_autherized(double A) {

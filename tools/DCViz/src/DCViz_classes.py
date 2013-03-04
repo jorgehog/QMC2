@@ -216,10 +216,12 @@ class dist_out(DCVizPlotter):
             fig.set_xlabel(r'x')
             fig.set_ylabel(r'y')
             
-            hist, bins = numpy.histogram(R, bins=nBins)
+            hist, bins = numpy.histogram(R, bins=nBins, density=True)
    
             bins = (bins[:-1]+bins[1:])/2
-            self.subfigDist1d.plot(bins, bins**(dim-1)*hist**2, label=legend)
+            dr = bins[1]-bins[0]
+#            self.subfigDist1d.plot(bins, bins**(dim-1)*hist**2, label=legend)
+            self.subfigDist1d.plot(bins, hist/(2*numpy.pi*bins*dr), label=legend)
         
         self.subfigDist1d.legend()
         self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')

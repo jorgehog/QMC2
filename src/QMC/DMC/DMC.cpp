@@ -8,17 +8,14 @@
 #include "../../QMCheaders.h"
 
 DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc)
-: QMC(gP, dP.n_c, sO, pp, K) {
+: QMC(gP, dP.n_c, sO, pp, dP.n_w, K) {
 
     name = "dmc";
 
-    this->dist_from_file = dP.dist_in;
-    this->dist_in_path = dP.dist_in_path;
+    dist_tresh = 100;
 
-    dist_tresh = (n_nodes * n_w * n_c) / (2 * n_distout);
-
-    this->block_size = dP.n_b;
-    this->thermalization = dP.therm;
+    block_size = dP.n_b;
+    thermalization = dP.therm;
 
     sampling->set_dt(dP.dt);
 
@@ -27,7 +24,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     dmc_E = 0;
     dmc_E_unscaled = 0;
 
-    if (vmc != NULL) {
+    if (gP.doVMC) {
 
         E_T = vmc->get_energy();
         for (int i = 0; i < n_w; i++) {
@@ -42,8 +39,6 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     if (parallel) {
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
-
-
 
 }
 
@@ -90,7 +85,11 @@ void DMC::Evolve_walker(int k, double GB) {
 
     int branch_mean = int(GB + sampling->call_RNG());
 
-    if (branch_mean == 0) {
+    
+    bool E_cut_cond = (local_E < E_T - 1 / get_sampling_ptr()->get_std());
+    E_cut_cond = E_cut_cond || (local_E > E_T + 1/get_sampling_ptr()->get_std());
+    
+    if (branch_mean == 0 || E_cut_cond) {
         original_walkers[k]->kill();
     } else {
 
@@ -188,6 +187,7 @@ void DMC::run_method() {
         store_walkers();
     }
 
+    dump_distribution();
     finalize_output();
     get_accepted_ratio();
     error_estimator->normalize();
@@ -196,15 +196,15 @@ void DMC::run_method() {
 
 void DMC::store_walkers() {
 
-    if ((cycle > n_c / 2) && (cycle % dist_tresh == 0)) {
+    if (cycle % dist_tresh == 0) {
 
         for (int i = 0; i < n_w; i++) {
-            std::string suffix = (TOSTR(cycle) + "_") + TOSTR(i);
-            dump_distribution(original_walkers[i], suffix);
+            save_distribution(original_walkers[i]);
         }
 
     }
 }
+
 
 void DMC::bury_the_dead() {
 

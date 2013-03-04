@@ -12,8 +12,7 @@ class Distribution : public OutputHandler {
 protected:
     int i;
 public:
-    Distribution(ParParams &, std::string filename = "dist_out",
-            std::string path = "./");
+    Distribution(ParParams &, std::string path, std::string filename = "dist_out");
 
     virtual void dump();
 

@@ -17,8 +17,7 @@ protected:
 
 public:
 
-    stdoutDMC(std::string filename = "DMC_out",
-            std::string path = "./");
+    stdoutDMC(std::string path, std::string filename = "DMC_out");
 
     virtual void dump();
 

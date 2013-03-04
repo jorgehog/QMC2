@@ -33,7 +33,7 @@ protected:
 
 public:
 
-    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &);
+    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w);
     ~VMC();
     
     void set_e(double E) {

@@ -48,7 +48,7 @@ public:
         return vmc->get_jastrow_ptr();
     }
 
-    virtual VMC* minimize() = 0;
+    virtual void minimize() = 0;
 
     void output(std::string message, double number = -1);
 

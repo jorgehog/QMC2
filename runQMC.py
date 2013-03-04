@@ -15,54 +15,44 @@ try:
     from PySide.QtGui import *
 except:
     print "Unable to detect pyside. GUI not supported."
-       
-cmlMAPo = {"dist_out"      : 0,
-           "outputPath"    : 1,
-           "dmc_out"       : 2,
-           "ASGD_out"      : 3}
 
-cmlMAPg = {"n_p"           : 4,
+
+cmlMAPo = {"dist_out"      : 0,
+           "dmc_out"       : 1,
+           "ASGD_out"      : 2}
+
+cmlMAPg = {"runpath"       : 3,
+           "n_p"           : 4,
            "dim"           : 5,
            "systemConstant" : 6,
            "random_seed"   : 7,
-           "h"             : 8,
-           "doMIN"         : 9,
-           "doVMC"         : 10,
-           "doDMC"         : 11,
-           "use_coulomb"   : 12,
-           "use_jastrow"   : 13,
+           "doMIN"         : 8,
+           "doVMC"         : 9,
+           "doDMC"         : 10,
+           "use_coulomb"   : 11,
+           "use_jastrow"   : 12,
+           "do_blocking"   : 13,
            "sampling"      : 14,
-           "system"        : 15,
-           "do_blocking"   : 16}
+           "system"        : 15}
 
-cmlMAPv = {"n_c"           : 17,
-           "dt"            : 18}
+cmlMAPv = {"n_c"           : 16,
+           "dt"            : 17}
 
-cmlMAPd = {"dt"            : 19,
-           "E_T"           : 20,
-           "n_b"           : 21,
-           "n_w"           : 22,
-           "n_c"           : 23,
-           "therm"         : 24,
-           "dist_in"       : 25,
-           "dist_in_path"  : 26}
+cmlMAPd = {"dt"            : 18,
+           "n_b"           : 19,
+           "n_w"           : 20,
+           "n_c"           : 21,
+           "therm"         : 22}
 
-cmlMAPm = {"max_step"      : 27,
-           "f_max"         : 28,
-           "f_min"         : 29,
-           "omega"         : 30,
-           "A"             : 31,
-           "a"             : 32,
-           "SGDsamples"    : 33,
-           "n_w"           : 34,
-           "therm"         : 35,
-           "n_c"           : 36,
-           "n_c_SGD"       : 37,
-           "alpha"         : 38,
-           "beta"          : 39}
+cmlMAPm = {"SGDsamples"    : 23,
+           "n_w"           : 24,
+           "therm"         : 25,
+           "n_c_SGD"       : 26,
+           "alpha"         : 27,
+           "beta"          : 28}
 
-cmlMAPvp = {"alpha"         : 40,
-            "beta"          : 41}
+cmlMAPvp = {"alpha"         : 29,
+            "beta"          : 30}
 
 
 def dumpStrList(aList):
@@ -189,10 +179,10 @@ def initializeDir(path, filename, date=True):
 def setOutPath(arglist, dirPath):
     #In case the ini file contains no output flags
     try:
-        arglist.insert(arglist.index("-o") + 1, "outputPath=%s/" % dirPath)
+        arglist.insert(arglist.index("-g") + 1, "runpath=%s/" % dirPath)
     except ValueError:
-        arglist.append("-o")
-        arglist.append("outputPath=%s/" % dirPath)
+        arglist.append("-g")
+        arglist.append("runpath=%s/" % dirPath)
 
 def parseFiles(openGUI, codename): 
     
@@ -486,7 +476,7 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
         MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
      
-        createDistFolder(CMLarg.split()[cmlMAPo["outputPath"]])        
+        createDistFolder(CMLarg.split()[cmlMAPg["runpath"]])        
         
         os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
                     + " " + CMLarg + stdout)

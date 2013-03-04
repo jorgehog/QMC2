@@ -10,14 +10,18 @@
 QMC::QMC(GeneralParams & gP, int n_c,
         SystemObjects & sO,
         ParParams & pp,
+        int n_w,
         int K) {
 
     n_p = gP.n_p;
     dim = gP.dim;
     this->n_c = n_c;
-    n_w = gP.n_w;
+    this->n_w = n_w;
 
     n2 = n_p / 2;
+
+    dist = arma::zeros<arma::mat>(1, dim);
+    dist(0, 0) = n_p;
 
     trial_walker = new Walker(n_p, dim);
     original_walkers = new Walker*[K * n_w];
@@ -222,6 +226,7 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
 }
 
 double QMC::calculate_local_energy(const Walker* walker) const {
+//    std::cout <<  get_KE(walker) <<"  " <<system->get_potential_energy(walker) << std::endl;
     return get_KE(walker) + system->get_potential_energy(walker);
 }
 
@@ -263,13 +268,15 @@ void QMC::get_accepted_ratio() {
     std_out->cout(s);
 }
 
-void QMC::dump_distribution(Walker* walker, std::string suffix) {
+void QMC::save_distribution(Walker* walker) {
+    dist.insert_rows(dist.n_rows, walker->r);
+}
 
-    //    s << dist_path << "dist_out_" << name << node << suffix << ".arma";
-    //    walker->r.save(s.str());
-    //    s.str(std::string());
-
-
+void QMC::dump_distribution() {
+    s << dist_path << "dist_out_" << name << node << ".arma";
+    dist.save(s.str());
+    dist.reset();
+    s.str(std::string());
 }
 
 /*

@@ -7,8 +7,7 @@
 
 #include "../../QMCheaders.h"
 
-stdoutASGD::stdoutASGD(std::string filename,
-        std::string path)
+stdoutASGD::stdoutASGD(std::string path, std::string filename)
 : OutputHandler(filename, path, false, 0, 1) {
     this->is_ASGD = true;
 

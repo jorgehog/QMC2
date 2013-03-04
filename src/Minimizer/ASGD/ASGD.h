@@ -60,7 +60,7 @@ protected:
 public:
     ASGD(VMC*, MinimizerParams &, const ParParams &);
 
-    virtual VMC* minimize();
+    virtual void minimize();
 
     friend class stdoutASGD;
 };

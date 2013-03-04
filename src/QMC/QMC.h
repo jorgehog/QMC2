@@ -20,12 +20,14 @@ protected:
 
     STDOUT* std_out;
     std::stringstream s; //!< This stream is awesome!
-    std::string name;
-    std::string runpath;
-    std::string dist_path;
     
-    static const int n_distout = 100000;
-
+    std::string name;
+    
+    std::string runpath;
+    
+    std::string dist_path;
+    arma::mat dist;
+    
     bool is_master;
     bool parallel;
     int node;
@@ -64,7 +66,8 @@ protected:
 
     void dump_output();
     void finalize_output();
-    void dump_distribution(Walker* walker, std::string suffix);
+    void save_distribution(Walker* walker);
+    void dump_distribution();
 
     void diffuse_walker(Walker* original, Walker* trial);
 
@@ -96,6 +99,7 @@ public:
     QMC(GeneralParams &, int n_c,
             SystemObjects &,
             ParParams &,
+            int n_w,
             int K = 1);
     QMC();
 

@@ -7,8 +7,7 @@
 
 #include "../../QMCheaders.h"
 
-stdoutDMC::stdoutDMC(std::string filename,
-        std::string path)
+stdoutDMC::stdoutDMC(std::string path, std::string filename)
 : OutputHandler(filename, path, false, 0, 1) {
 
     this->is_dmc = true;

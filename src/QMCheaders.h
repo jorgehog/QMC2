@@ -49,22 +49,17 @@ typedef long seed_type;
 
 
 struct DMCparams {
-    int n_c, therm, n_b;
-    double dt, E_T;
-    bool dist_in;
-    std::string dist_in_path;
-
+    int n_c, therm, n_b, n_w;
+    double dt;
 };
 
 struct VMCparams {
     int n_c;
     double dt;
-    int pop_tresh;
 };
 
 struct VariationalParams {
     double alpha, beta;
-
 };
 
 struct ParParams {
@@ -76,10 +71,9 @@ struct ParParams {
 
 struct GeneralParams {
     int n_p, dim;
-    int n_w;
     seed_type random_seed;
 
-    double h, systemConstant;
+    double systemConstant;
 
     bool doMIN;
     bool doVMC;
@@ -118,8 +112,6 @@ struct OutputParams {
     bool dist_out;
     bool dmc_out;
     bool ASGD_out;
-    std::string outputPath;
-
 };
 
 class Orbitals;
@@ -139,7 +131,7 @@ struct SystemObjects {
 
 class STDOUT {
 public:
-
+    
     virtual void cout(std::stringstream & a) {
         std::cout << a.str() << std::endl;
         a.str(std::string());
@@ -157,7 +149,6 @@ public:
 #include "Walker/Walker.h"
 
 class Minimizer;
-//class stdoutASGD;
 
 class OutputHandler;
 
@@ -165,16 +156,11 @@ class ErrorEstimator;
 
 class QMC;
 
-
-
 #include "BasisFunctions/BasisFunctions.h"
 #include "BasisFunctions/HarmonicOscillator/HarmonicOscillator.h"
-//#include "BasisFunctions/semiAlphaHO/semiAlphaHO.h"
-//#include "BasisFunctions/alphaHO/alphaHO.h"
 #include "BasisFunctions/hydrogenic/hydrogenic.h"
 
 #include "Orbitals/Orbitals.h"
-//#include "Orbitals/AlphaHarmonicOscillatorOld/AlphaHarmonicOscillatorOld.h"
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
 #include "Orbitals/ExpandedBasis/ExpandedBasis.h"

@@ -7,11 +7,11 @@
 
 #include "../../QMCheaders.h"
 
-Distribution::Distribution(ParParams & pp, std::string filename,
-        std::string path)
+Distribution::Distribution(ParParams & pp, std::string path, 
+        std::string filename)
 : OutputHandler(filename, path, pp.parallel, pp.node, pp.n_nodes) {
     i = 0;
-    this->is_vmc = true;
+
 }
 
 void Distribution::dump() {

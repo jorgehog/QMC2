@@ -48,6 +48,10 @@ public:
     double get_dt() const {
         return timestep;
     }
+    
+    double get_std() const {
+        return std;
+    }
 
 };
 
