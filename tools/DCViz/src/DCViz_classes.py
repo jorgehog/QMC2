@@ -17,7 +17,7 @@ from matplotlib import rc, pylab
 classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(classes_thisDir)
 
-from DCViz_sup import DCVizPlotter
+from DCViz_sup import DCVizPlotter, dataGenerator
 
 try:
     rc('text', usetex=True)
@@ -42,9 +42,7 @@ class myTestClass(DCVizPlotter):
     skipRows = 1    
     
     def plot(self, data):
-   
-        column1 = data
-        
+        column1 = data[0]
 
         self.subfig1.set_title('I have $\LaTeX$ support!')
               
@@ -75,8 +73,14 @@ class myTestClassFamily(DCVizPlotter):
         mainFig.suptitle('I have $\LaTeX$ support!')        
         subfigs = self.figures[0][1:]
     
+        #Notice we plot fileData.data and not fileData alone.
+        #The dataGenerator class is used to speed up file reading;
+        #looping over family members and directly plotting means
+        #we send a dataGenerator instance to matplotlib.
+        #in order to get the numpy object, we send the data.
+        #Alternatively, we could send data[:]
         for subfig, fileData in zip(subfigs, data):
-            subfig.plot(fileData)
+            subfig.plot(fileData.data)
             subfig.set_ylim([-1,1])
         
 
@@ -254,8 +258,8 @@ class MIN_OUT(DCVizPlotter):
     def plot(self, data):
 
         n_params = (self.Ncols - 3)/2
-        
-        E, Eavg, step = data[:3]
+
+        E, Eavg, step = dataGenerator(data[:3])
         
         E_plot, step_plot, param_plot, grad_plot = self.E_plot, self.step_plot, \
                                                     self.param_plot, self.grad_plot

@@ -5,6 +5,56 @@ import matplotlib.pylab as plab
 from os.path import join as pjoin
 
 
+class dataGenerator:
+    def __init__(self, data):
+        self.data = data
+        
+        if len(data.shape) == 2:
+            self.m, self.n = data.shape
+            self.getD = lambda i : self.data[:, i]
+        else:
+            self.m = data.shape
+            self.n = 1
+            self.getD = self.get1Ddata
+        
+        self.shape = data.shape
+        self.fullshape = (self.m, self.n)
+        self.size = data.size
+
+    def get1Ddata(self, i):
+        if i == slice(0, 9223372036854775807, None):
+            return self.data
+        elif i == 0:
+            return self.data
+        elif i == slice(0, 1, None):
+            return self.data
+        else:
+            raise IndexError("Index out of bounds.")
+
+    def __iter__(self):
+        for i in range(self.n):
+            yield self.getD(i)
+
+    def __len__(self):
+        return self.n
+
+    def __getitem__(self, i):
+        return self.getD(i)
+
+    def __str__(self):
+        return str(self.data)
+
+    def __add__(self, other):
+            
+        if isinstance(other, dataGenerator):
+            return self.data + other.data
+        else:        
+            raise NotImplementedError("add/sub only works for two datasets. Use 'sum([sum(d) for d in data])'")
+
+    def __sub__(self, other):    
+            return self.data + (-other.data)
+
+
 class DCVizPlotter:
     
     figMap = {}
@@ -72,11 +122,13 @@ class DCVizPlotter:
                             if re.findall(self.nametag, name) and "tmp" not in name]
            
             familyMembers = sorted([pjoin(familyHome, name) for name in familyNames])
-            self.familySkippedRows = []
-            data = [0]*len(familyMembers)
+            N = len(familyMembers)
+            
+            self.familySkippedRows = [0]*N
+            data = [0]*N
             self.familyFileNames = [0]*len(data)     
             
-            for i in range(len(familyMembers)):
+            for i in range(N):
              
                 self.file = None
                 self.filepath = familyMembers[i]
@@ -90,7 +142,6 @@ class DCVizPlotter:
             return data
             
         data = []
-        
         #attempt to reload file untill data is found.
         t0 = time.time()
         while len(data) == 0:
@@ -110,15 +161,7 @@ class DCVizPlotter:
                
         self.file.close()
         
-        if len(data.shape) > 1:
-            output = [0]*data.shape[1]
-        else:
-            return data
-            
-        for i in range(data.shape[1]):
-            output[i] = data[:,i]
-
-        return tuple(output)
+        return dataGenerator(data)
     
     def unpackBinFile(self, binFile):
  
