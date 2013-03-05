@@ -20,8 +20,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
     n2 = n_p / 2;
 
-    dist = arma::zeros<arma::mat>(1, dim);
-    dist(0, 0) = n_p;
+    dist = arma::zeros<arma::mat>(0, dim);
 
     trial_walker = new Walker(n_p, dim);
     original_walkers = new Walker*[K * n_w];

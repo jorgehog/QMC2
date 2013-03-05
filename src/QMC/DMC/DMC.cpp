@@ -12,7 +12,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
 
     name = "dmc";
 
-    dist_tresh = 100;
+    dist_tresh = 50;
 
     block_size = dP.n_b;
     thermalization = dP.therm;

@@ -13,7 +13,7 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     name = "vmc";
     original_walker = new Walker(n_p, dim);
 
-    dist_tresh = 100;
+    dist_tresh = 50;
     pop_tresh = n_c / n_w;
     last_walker = 0;
 
@@ -38,8 +38,15 @@ void VMC::set_trial_positions() {
 }
 
 void VMC::save_distribution() {
+//    using namespace std;
     if (cycle % dist_tresh == 0) {
+//        cout << dist << endl;
         dist.insert_rows(dist.n_rows, original_walker->r);
+//        cout << "------------" << endl;
+//        cout << dist << endl;
+//        if (dist.n_rows > 10) {
+//            exit(0);
+//        }
     }
 }
 

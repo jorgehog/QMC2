@@ -154,31 +154,32 @@ class dist_out(DCVizPlotter):
         
     def plot(self, data):
     
-        n_p = int(data[0][0][0])
+        n_p = int(re.findall("out_(\d+)", self.familyFileNames[0])[0])
         dim = data[0].m
 
         n_vmc = 0;
         n_dmc = 0;
         for i, name in enumerate(self.familyFileNames):
             if "vmc" in name:
-                n_vmc+=data[i].n-1
+                n_vmc+=data[i].n
             elif "dmc" in name:
-                n_dmc+=data[i].n-1
+                n_dmc+=data[i].n
         
-        nBins=100
-
-        xyz_vmc = numpy.zeros((n_vmc*n_p, dim))
-        xyz_dmc = numpy.zeros((n_dmc*n_p, dim))
+        nBins=150
+        print "nVmc: ", n_vmc, " nDMC: ", n_dmc
+        xyz_vmc = numpy.zeros((n_vmc, dim))
+        xyz_dmc = numpy.zeros((n_dmc, dim))
         
-        R_vmc = numpy.zeros((n_vmc*n_p))
-        R_dmc = numpy.zeros((n_dmc*n_p))
+        R_vmc = numpy.zeros((n_vmc))
+        R_dmc = numpy.zeros((n_dmc))
 
         i_vmc = 0
         i_dmc = 0
         
         for i, xyz_local in enumerate(data):
-            n = xyz_local.n-1
-            local_data = xyz_local.data[1:, :]
+            n = xyz_local.n
+
+            local_data = xyz_local.data
             
             if "vmc" in self.familyFileNames[i]:
         

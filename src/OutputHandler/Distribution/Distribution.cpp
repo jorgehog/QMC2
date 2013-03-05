@@ -19,7 +19,7 @@ void Distribution::dump() {
 }
 
 void Distribution::finalize() {
-    s << path << "walker_positions/dist_out_" << qmc->name << node << ".arma";
+    s << path << "walker_positions/dist_out_" << qmc->n_p <<qmc->name << node << ".arma";
     qmc->dist.save(s.str());
     qmc->dist.reset();
     s.str(std::string());
