@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, numpy, time, sys, signal, os, struct
+import re, numpy, time, signal, os
 import matplotlib.pylab as plab
 from os.path import join as pjoin
 
@@ -10,15 +10,15 @@ class dataGenerator:
         self.data = data
         
         if len(data.shape) == 2:
-            self.m, self.n = data.shape
-            self.getD = lambda i : self.data[:, i]
+            self.n, self.m = data.shape
+            self.getD = self.get2Ddata
         else:
             self.m = data.shape
             self.n = 1
             self.getD = self.get1Ddata
         
         self.shape = data.shape
-        self.fullshape = (self.m, self.n)
+        self.fullshape = (self.n, self.m)
         self.size = data.size
 
     def get1Ddata(self, i):
@@ -31,8 +31,11 @@ class dataGenerator:
         else:
             raise IndexError("Index out of bounds.")
 
+    def get2Ddata(self, i):
+        return self.data[:, i]
+
     def __iter__(self):
-        for i in range(self.n):
+        for i in range(self.m):
             yield self.getD(i)
 
     def __len__(self):

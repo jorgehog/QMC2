@@ -153,51 +153,47 @@ class dist_out(DCVizPlotter):
   
         
     def plot(self, data):
-        
-        n_p = len(data[0][0])  
-        dim = len(data[0])
+    
+        n_p = int(data[0][0][0])
+        dim = data[0].m
 
         n_vmc = 0;
         n_dmc = 0;
-        for name in self.familyFileNames:
+        for i, name in enumerate(self.familyFileNames):
             if "vmc" in name:
-                n_vmc+=1
+                n_vmc+=data[i].n-1
             elif "dmc" in name:
-                n_dmc+=1
+                n_dmc+=data[i].n-1
         
-        nBins=150
+        nBins=100
+
+        xyz_vmc = numpy.zeros((n_vmc*n_p, dim))
+        xyz_dmc = numpy.zeros((n_dmc*n_p, dim))
         
-        xyz_vmc = numpy.zeros((n_vmc, n_p, dim))
-        xyz_dmc = numpy.zeros((n_dmc, n_p, dim))
-        
-        R_vmc = numpy.zeros((n_vmc, n_p))
-        R_dmc = numpy.zeros((n_dmc, n_p))
+        R_vmc = numpy.zeros((n_vmc*n_p))
+        R_dmc = numpy.zeros((n_dmc*n_p))
 
         i_vmc = 0
         i_dmc = 0
+        
         for i, xyz_local in enumerate(data):
+            n = xyz_local.n-1
+            local_data = xyz_local.data[1:, :]
             
             if "vmc" in self.familyFileNames[i]:
-                for j in range(dim):
-                    xyz_vmc[i_vmc, :, j] = xyz_local[j]
+        
+                xyz_vmc[i_vmc:i_vmc+n, :] = local_data
               
-            
-                R_vmc[i_vmc, :] = numpy.sqrt((xyz_vmc[i_vmc]**2).sum(1))
-                i_vmc += 1
+                R_vmc[i_vmc:i_vmc+n] = numpy.sqrt((local_data**2).sum(1))
+                i_vmc += n
             
             else:
-                for j in range(dim):
-                    xyz_dmc[i_dmc, :, j] = xyz_local[j]
-              
             
-                R_dmc[i_dmc, :] = numpy.sqrt((xyz_dmc[i_dmc]**2).sum(1))
-                i_dmc += 1
+                xyz_dmc[i_dmc:i_dmc+n, :] = local_data
+            
+                R_dmc[i_dmc:i_dmc+n] = numpy.sqrt((local_data**2).sum(1))
+                i_dmc += n
                                 
-        xyz_vmc.resize(n_vmc*n_p, dim)        
-        R_vmc.resize(n_vmc*n_p)
-
-        xyz_dmc.resize(n_dmc*n_p, dim)
-        R_dmc.resize(n_dmc*n_p)
         
         for fig, legend, xyz, R in zip([self.subfigHist2d_vmc,
                                         self.subfigHist2d_dmc],
