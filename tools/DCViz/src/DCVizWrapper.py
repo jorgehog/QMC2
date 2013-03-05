@@ -35,20 +35,8 @@ def autodetectModes():
     return uniqueModes
     
     
-def main():
+def main(path, dynamic):
     
-    dynamic = False
-    
-    try:
-        if "-d" in sys.argv:
-            dynamic = True
-            sys.argv.remove("-d")
-        path = sys.argv[1]
-            
-    except:
-        print "please supply a path as cmdline arg"
-        sys.exit(1)
-        
     modes = autodetectModes()
     root, name = os.path.split(path)    
     
@@ -65,4 +53,16 @@ def main():
     instance.mainloop()
     
 if __name__ == "__main__":
-    main()
+    dynamic = False
+    
+    try:
+        if "-d" in sys.argv:
+            dynamic = True
+            sys.argv.remove("-d")
+        path = sys.argv[1]
+            
+    except:
+        print "please supply a path as cmdline arg"
+        sys.exit(1)
+        
+    main(path, dynamic)
