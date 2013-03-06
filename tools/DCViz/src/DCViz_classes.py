@@ -206,7 +206,6 @@ class dist_out(DCVizPlotter):
             H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins))
     
             extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
-
             #Lanzcos gaussian mitchell sinc
             fig.imshow(H,
                       extent=extent,
@@ -222,7 +221,7 @@ class dist_out(DCVizPlotter):
             bins = (bins[:-1]+bins[1:])/2
             dr = bins[1]-bins[0]
 #            self.subfigDist1d.plot(bins, bins**(dim-1)*hist**2, label=legend)
-            self.subfigDist1d.plot(bins, hist/(2*numpy.pi*bins**(dim-1)*dr), label=legend)
+            self.subfigDist1d.plot(bins, hist/(2*numpy.pi*bins*dr), label=legend)
         
         self.subfigDist1d.legend()
         self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')
