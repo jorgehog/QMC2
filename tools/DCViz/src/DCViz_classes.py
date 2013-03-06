@@ -204,10 +204,11 @@ class dist_out(DCVizPlotter):
                 continue
             
             H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins), normed=True, range=[[-l,l],[-l,l]])
-    
+            H2, xedges, yedges = numpy.histogram2d(-xyz[:, 1], xyz[:, 0], bins=(nBins, nBins), normed=True, range=[[-l,l],[-l,l]])
+            
             extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
             #Lanzcos gaussian mitchell sinc
-            fig.imshow(H,
+            fig.imshow((H + H2)/2,
                       extent=extent,
                       interpolation='lanczos',
                       cmap=pylab.cm.jet,
