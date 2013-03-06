@@ -194,7 +194,7 @@ class dist_out(DCVizPlotter):
                 R_dmc[i_dmc:i_dmc+n] = numpy.sqrt((local_data**2).sum(1))
                 i_dmc += n
        
-        l = 2*numpy.average(R_vmc);
+        l = xyz_vmc.max()
         for fig, legend, xyz, R in zip([self.subfigHist2d_vmc,
                                         self.subfigHist2d_dmc],
                                         ["VMC", "DMC"],
@@ -213,7 +213,7 @@ class dist_out(DCVizPlotter):
 #                      cmap=pylab.cm.jet)
 #                      norm=colors.LogNorm())
             fig.plot(xyz[:,0], xyz[:,1], 'b*')
-            fig.plot(2*numpy.cos(numpy.linspace(0, 2*numpy.pi, 1000)),2*numpy.sin(numpy.linspace(0, 2*numpy.pi, 1000)), 'r')
+            fig.plot(l*numpy.cos(numpy.linspace(0, 2*numpy.pi, 1000)),l*numpy.sin(numpy.linspace(0, 2*numpy.pi, 1000)), 'r')
             fig.axis('equal')
             fig.set_title(legend)    
             fig.set_xlabel(r'x')
