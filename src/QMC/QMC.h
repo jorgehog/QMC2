@@ -90,7 +90,9 @@ protected:
 
     //TEST FUNCTIONS
     void test_ratios(const Walker* walker_pre, const Walker* walker_post, int particle, double R_qmc) const;
-
+    void test_gradients(Walker* walker);
+    
+    
 public:
 
     QMC(GeneralParams &, int n_c,

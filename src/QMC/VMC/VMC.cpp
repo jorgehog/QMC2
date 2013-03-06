@@ -35,15 +35,29 @@ void VMC::set_trial_positions() {
 }
 
 void VMC::save_distribution() {
-    //    using namespace std;
+//    using namespace std;
     if (cycle % dist_tresh == 0) {
-        //        cout << dist << endl;
+//        cout << "-----preDist------" << endl;
+//                cout << dist << endl; 
+//        cout << "-----thisR--------"<< endl;
+//                cout << original_walker->r << endl;
         dist.insert_rows(dist.n_rows, original_walker->r);
-        //        cout << "------------" << endl;
-        //        cout << dist << endl;
-        //        if (dist.n_rows > 10) {
-        //            exit(0);
-        //        }
+
+
+//        arma::mat rlol = arma::zeros<arma::mat > (2, 2);
+//        rlol(0, 0) = 1;
+//        rlol(0, 1) = -1;
+//        rlol(1, 0) = 1;
+//        rlol(1, 1) = -1;
+//        if (cycle == dist_tresh) {
+//            std::cout << rlol << std::endl;
+//        }
+//        dist.insert_rows(dist.n_rows, rlol);
+
+//        cout << "-----newDist----" << endl;
+//        cout << dist << endl;
+//        cout << "-----------------" << endl;
+//        sleep(10);
     }
 }
 

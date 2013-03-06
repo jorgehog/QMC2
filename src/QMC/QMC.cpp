@@ -20,7 +20,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
     n2 = n_p / 2;
 
-    dist = arma::zeros<arma::mat>(0, dim);
+    dist = arma::zeros<arma::mat > (0, dim);
 
     trial_walker = new Walker(n_p, dim);
     original_walkers = new Walker*[K * n_w];
@@ -156,7 +156,7 @@ void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int parti
         walker_pre->dell_phi(particle)(arma::span(), i) = walker_post->dell_phi(particle)(arma::span(), i);
     }
 
-    walker_pre->r2[particle] = walker_post->r2[particle];
+    walker_pre->r2(particle) = walker_post->r2(particle);
 
     system->update_walker(walker_pre, walker_post, particle);
     sampling->update_walker(walker_pre, walker_post, particle);
@@ -181,7 +181,7 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
         walker_post->dell_phi(particle)(arma::span(), i) = walker_pre->dell_phi(particle)(arma::span(), i);
     }
 
-    walker_post->r2[particle] = walker_pre->r2[particle];
+    walker_post->r2(particle) = walker_pre->r2(particle);
 
     system->reset_walker(walker_pre, walker_post, particle);
     sampling->reset_walker(walker_pre, walker_post, particle);
@@ -192,6 +192,8 @@ void QMC::diffuse_walker(Walker* original, Walker* trial) {
 
         set_spin_state(particle);
         sampling->update_pos(original, trial, particle);
+
+//        test_gradients(trial);
 
         double A = get_acceptance_ratio(original, trial, particle);
 
@@ -225,7 +227,7 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
 }
 
 double QMC::calculate_local_energy(const Walker* walker) const {
-//    std::cout <<  get_KE(walker) <<"  " <<system->get_potential_energy(walker) << std::endl;
+    //    std::cout <<  get_KE(walker) <<"  " <<system->get_potential_energy(walker) << std::endl;
     return get_KE(walker) + system->get_potential_energy(walker);
 }
 
@@ -263,10 +265,9 @@ void QMC::get_accepted_ratio() {
     }
 #endif
 
-    s << "Acceptance ratio: " << accepted / (double)total_samples << std::endl;
+    s << "Acceptance ratio: " << accepted / (double) total_samples << std::endl;
     std_out->cout(s);
 }
-
 
 /*
  
@@ -274,6 +275,40 @@ void QMC::get_accepted_ratio() {
  * 
  */
 
+void QMC::test_gradients(Walker* walker) {
+
+    double val = get_wf_value(walker);
+    double h = 0.000001;
+    for (int i = 0; i < n_p; i++) {
+        for (int j = 0; j < dim; j++) {
+            walker->r(i, j) += h;
+            walker->make_rel_matrix();
+            walker->calc_r_i2();
+            sampling->set_trial_states(walker);
+
+            double vp = get_wf_value(walker);
+
+            walker->r(i, j) -= 2 * h;
+            walker->make_rel_matrix();
+            walker->calc_r_i2();
+            sampling->set_trial_states(walker);
+
+            double vm = get_wf_value(walker);
+
+            double deriv = (vp - vm) / (2 * val * h);
+            double anal = walker->spatial_grad(i, j) + walker->jast_grad(i, j);
+            if ((deriv - anal) / anal > 1E-3) {
+                std::cout << i << "  " << j << "   "<<deriv << "   " << anal << std::endl;
+            }
+            walker->r(i, j) += h;
+            walker->make_rel_matrix();
+            walker->calc_r_i2();
+            sampling->set_trial_states(walker);
+        }
+    }
+
+
+}
 
 void QMC::test_ratios(const Walker* walker_pre, const Walker* walker_post, int particle, double R_qmc) const {
 
