@@ -267,9 +267,6 @@ void QMC::get_accepted_ratio() {
     std_out->cout(s);
 }
 
-void QMC::dump_distribution() {
- 
-}
 
 /*
  

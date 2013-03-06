@@ -56,12 +56,13 @@ void DMC::set_trial_positions() {
     for (int k = 0; k < n_w; k++) {
         calculate_energy_necessities(original_walkers[k]);
         double El = calculate_local_energy(original_walkers[k]);
-
+        
         original_walkers[k]->set_E(El);
         E_T += El;
     }
 
     E_T /= n_w;
+    std::cout << "!!!!" << E_T << std::endl;
 
 }
 
@@ -186,7 +187,6 @@ void DMC::run_method() {
 
     }
 
-    dump_distribution();
     finalize_output();
     get_accepted_ratio();
     error_estimator->normalize();

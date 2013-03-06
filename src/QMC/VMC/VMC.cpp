@@ -22,9 +22,6 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
 
     sampling->set_dt(vP.dt);
 
-    set_trial_positions();
-    copy_walker(original_walker, trial_walker);
-
 }
 
 VMC::~VMC() {
@@ -38,15 +35,15 @@ void VMC::set_trial_positions() {
 }
 
 void VMC::save_distribution() {
-//    using namespace std;
+    //    using namespace std;
     if (cycle % dist_tresh == 0) {
-//        cout << dist << endl;
+        //        cout << dist << endl;
         dist.insert_rows(dist.n_rows, original_walker->r);
-//        cout << "------------" << endl;
-//        cout << dist << endl;
-//        if (dist.n_rows > 10) {
-//            exit(0);
-//        }
+        //        cout << "------------" << endl;
+        //        cout << dist << endl;
+        //        if (dist.n_rows > 10) {
+        //            exit(0);
+        //        }
     }
 }
 
@@ -63,9 +60,11 @@ void VMC::store_walkers() {
 
 void VMC::run_method() {
 
+    set_trial_positions();
+    copy_walker(original_walker, trial_walker);
+
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
-
     }
 
     for (cycle = 1; cycle <= n_c; cycle++) {
@@ -83,7 +82,6 @@ void VMC::run_method() {
 
     }
 
-    dump_distribution();
     node_comm();
     scale_values();
     output();

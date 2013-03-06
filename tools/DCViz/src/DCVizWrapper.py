@@ -46,6 +46,10 @@ def main(path, dynamic):
             matchedMode = mode
             break
     
+    if matchedMode is None:
+        terminalTracker("Warning", "found no matching nametags for specified filename")
+        sys.exit(1)
+        
     if dynamic:
         terminalTracker("DCViz", "Interrupt dynamic mode with CTRL+C")
         

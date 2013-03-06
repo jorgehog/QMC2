@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
 
     if (generalParams.doDMC) {
 
-        DMC* dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc);
+        dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc);
 
         if (outputParams.dmc_out && parParams.is_master) {
 
@@ -223,9 +223,8 @@ void parseCML(int argc, char** argv,
     generalParams.dim = 2;
     generalParams.systemConstant = 1;
     generalParams.random_seed = (seed_type) time(NULL);
-
     generalParams.doMIN = false;
-    generalParams.doVMC = true;
+    generalParams.doVMC = false;
     generalParams.doDMC = false;
 
     generalParams.use_coulomb = true;
@@ -396,40 +395,72 @@ void parseCML(int argc, char** argv,
     bool initOut = false;
     if (initOut) {
         if (parParams.is_master) {
-            std::cout << n_args << " =? " << argc << std::endl;
-            std::cout << " 1" << " outputParams.dist_out           " << " = " << outputParams.dist_out << "   " << argv[1] << std::endl;
-            std::cout << " 2" << " outputParams.dmc_out            " << " = " << outputParams.dmc_out << "   " << argv[2] << std::endl;
-            std::cout << " 3" << " outputParams.ASGD_out           " << " = " << outputParams.ASGD_out << "   " << argv[3] << std::endl;
-            std::cout << " 4" << " generalParams.runpath           " << " = " << generalParams.runpath << "   " << argv[4] << std::endl;
-            std::cout << " 5" << " generalParams.n_p               " << " = " << generalParams.n_p << "   " << argv[5] << std::endl;
-            std::cout << " 6" << " generalParams.dim               " << " = " << generalParams.dim << "   " << argv[6] << std::endl;
-            std::cout << " 7" << " generalParams.systemConstant    " << " = " << generalParams.systemConstant << "   " << argv[7] << std::endl;
-            std::cout << " 8" << " generalParams.random_seed       " << " = " << generalParams.random_seed << "   " << argv[8] << std::endl;
-            std::cout << " 9" << " generalParams.doMIN             " << " = " << generalParams.doMIN << "   " << argv[9] << std::endl;
-            std::cout << "10" << " generalParams.doVMC             " << " = " << generalParams.doVMC << "   " << argv[10] << std::endl;
-            std::cout << "11" << " generalParams.doDMC             " << " = " << generalParams.doDMC << "   " << argv[11] << std::endl;
-            std::cout << "12" << " generalParams.use_coulomb       " << " = " << generalParams.use_coulomb << "   " << argv[12] << std::endl;
-            std::cout << "13" << " generalParams.use_jastrow       " << " = " << generalParams.use_jastrow << "   " << argv[13] << std::endl;
-            std::cout << "14" << " generalParams.do_blocking       " << " = " << generalParams.do_blocking << "   " << argv[14] << std::endl;
-            std::cout << "15" << " generalParams.sampling          " << " = " << generalParams.sampling << "   " << argv[15] << std::endl;
-            std::cout << "16" << " generalParams.system            " << " = " << generalParams.system << "   " << argv[16] << std::endl;
-            std::cout << "17" << " vmcParams.n_c                   " << " = " << vmcParams.n_c << "   " << argv[17] << std::endl;
-            std::cout << "18" << " vmcParams.dt                    " << " = " << vmcParams.dt << "   " << argv[18] << std::endl;
-            std::cout << "19" << " dmcParams.dt                    " << " = " << dmcParams.dt << "   " << argv[19] << std::endl;
-            std::cout << "20" << " dmcParams.n_b                   " << " = " << dmcParams.n_b << "   " << argv[20] << std::endl;
-            std::cout << "21" << " dmcParams.n_w                   " << " = " << dmcParams.n_w << "   " << argv[21] << std::endl;
-            std::cout << "22" << " dmcParams.n_c                   " << " = " << dmcParams.n_c << "   " << argv[22] << std::endl;
-            std::cout << "23" << " dmcParams.therm                 " << " = " << dmcParams.therm << "   " << argv[23] << std::endl;
-            std::cout << "24" << " minimizerParams.SGDsamples      " << " = " << minimizerParams.SGDsamples << "   " << argv[24] << std::endl;
-            std::cout << "25" << " minimizerParams.n_w             " << " = " << minimizerParams.n_w << "   " << argv[25] << std::endl;
-            std::cout << "26" << " minimizerParams.therm           " << " = " << minimizerParams.therm << "   " << argv[26] << std::endl;
-            std::cout << "27" << " minimizerParams.n_c_SGD         " << " = " << minimizerParams.n_c_SGD << "   " << argv[27] << std::endl;
-            std::cout << "28" << " minimizerParams.alpha           " << " = " << minimizerParams.alpha << "   " << argv[28] << std::endl;
-            std::cout << "29" << " minimizerParams.beta            " << " = " << minimizerParams.beta << "   " << argv[29] << std::endl;
-            std::cout << "30" << " variationalParams.alpha         " << " = " << variationalParams.alpha << "   " << argv[30] << std::endl;
-            std::cout << "31" << " variationalParams.beta          " << " = " << variationalParams.beta << "   " << argv[31] << std::endl;
+            if (n_args == argc) {
+                std::cout << " 1" << " outputParams.dist_out           " << " = " << outputParams.dist_out << "   " << argv[1] << std::endl;
+                std::cout << " 2" << " outputParams.dmc_out            " << " = " << outputParams.dmc_out << "   " << argv[2] << std::endl;
+                std::cout << " 3" << " outputParams.ASGD_out           " << " = " << outputParams.ASGD_out << "   " << argv[3] << std::endl;
+                std::cout << " 4" << " generalParams.runpath           " << " = " << generalParams.runpath << "   " << argv[4] << std::endl;
+                std::cout << " 5" << " generalParams.n_p               " << " = " << generalParams.n_p << "   " << argv[5] << std::endl;
+                std::cout << " 6" << " generalParams.dim               " << " = " << generalParams.dim << "   " << argv[6] << std::endl;
+                std::cout << " 7" << " generalParams.systemConstant    " << " = " << generalParams.systemConstant << "   " << argv[7] << std::endl;
+                std::cout << " 8" << " generalParams.random_seed       " << " = " << generalParams.random_seed << "   " << argv[8] << std::endl;
+                std::cout << " 9" << " generalParams.doMIN             " << " = " << generalParams.doMIN << "   " << argv[9] << std::endl;
+                std::cout << "10" << " generalParams.doVMC             " << " = " << generalParams.doVMC << "   " << argv[10] << std::endl;
+                std::cout << "11" << " generalParams.doDMC             " << " = " << generalParams.doDMC << "   " << argv[11] << std::endl;
+                std::cout << "12" << " generalParams.use_coulomb       " << " = " << generalParams.use_coulomb << "   " << argv[12] << std::endl;
+                std::cout << "13" << " generalParams.use_jastrow       " << " = " << generalParams.use_jastrow << "   " << argv[13] << std::endl;
+                std::cout << "14" << " generalParams.do_blocking       " << " = " << generalParams.do_blocking << "   " << argv[14] << std::endl;
+                std::cout << "15" << " generalParams.sampling          " << " = " << generalParams.sampling << "   " << argv[15] << std::endl;
+                std::cout << "16" << " generalParams.system            " << " = " << generalParams.system << "   " << argv[16] << std::endl;
+                std::cout << "17" << " vmcParams.n_c                   " << " = " << vmcParams.n_c << "   " << argv[17] << std::endl;
+                std::cout << "18" << " vmcParams.dt                    " << " = " << vmcParams.dt << "   " << argv[18] << std::endl;
+                std::cout << "19" << " dmcParams.dt                    " << " = " << dmcParams.dt << "   " << argv[19] << std::endl;
+                std::cout << "20" << " dmcParams.n_b                   " << " = " << dmcParams.n_b << "   " << argv[20] << std::endl;
+                std::cout << "21" << " dmcParams.n_w                   " << " = " << dmcParams.n_w << "   " << argv[21] << std::endl;
+                std::cout << "22" << " dmcParams.n_c                   " << " = " << dmcParams.n_c << "   " << argv[22] << std::endl;
+                std::cout << "23" << " dmcParams.therm                 " << " = " << dmcParams.therm << "   " << argv[23] << std::endl;
+                std::cout << "24" << " minimizerParams.SGDsamples      " << " = " << minimizerParams.SGDsamples << "   " << argv[24] << std::endl;
+                std::cout << "25" << " minimizerParams.n_w             " << " = " << minimizerParams.n_w << "   " << argv[25] << std::endl;
+                std::cout << "26" << " minimizerParams.therm           " << " = " << minimizerParams.therm << "   " << argv[26] << std::endl;
+                std::cout << "27" << " minimizerParams.n_c_SGD         " << " = " << minimizerParams.n_c_SGD << "   " << argv[27] << std::endl;
+                std::cout << "28" << " minimizerParams.alpha           " << " = " << minimizerParams.alpha << "   " << argv[28] << std::endl;
+                std::cout << "29" << " minimizerParams.beta            " << " = " << minimizerParams.beta << "   " << argv[29] << std::endl;
+                std::cout << "30" << " variationalParams.alpha         " << " = " << variationalParams.alpha << "   " << argv[30] << std::endl;
+                std::cout << "31" << " variationalParams.beta          " << " = " << variationalParams.beta << "   " << argv[31] << std::endl;
+            } else {
+                std::cout << " 1" << " outputParams.dist_out           " << " = " << outputParams.dist_out << std::endl;
+                std::cout << " 2" << " outputParams.dmc_out            " << " = " << outputParams.dmc_out << std::endl;
+                std::cout << " 3" << " outputParams.ASGD_out           " << " = " << outputParams.ASGD_out << std::endl;
+                std::cout << " 4" << " generalParams.runpath           " << " = " << generalParams.runpath << std::endl;
+                std::cout << " 5" << " generalParams.n_p               " << " = " << generalParams.n_p << std::endl;
+                std::cout << " 6" << " generalParams.dim               " << " = " << generalParams.dim << std::endl;
+                std::cout << " 7" << " generalParams.systemConstant    " << " = " << generalParams.systemConstant << std::endl;
+                std::cout << " 8" << " generalParams.random_seed       " << " = " << generalParams.random_seed << std::endl;
+                std::cout << " 9" << " generalParams.doMIN             " << " = " << generalParams.doMIN << std::endl;
+                std::cout << "10" << " generalParams.doVMC             " << " = " << generalParams.doVMC << std::endl;
+                std::cout << "11" << " generalParams.doDMC             " << " = " << generalParams.doDMC << std::endl;
+                std::cout << "12" << " generalParams.use_coulomb       " << " = " << generalParams.use_coulomb << std::endl;
+                std::cout << "13" << " generalParams.use_jastrow       " << " = " << generalParams.use_jastrow << std::endl;
+                std::cout << "14" << " generalParams.do_blocking       " << " = " << generalParams.do_blocking << std::endl;
+                std::cout << "15" << " generalParams.sampling          " << " = " << generalParams.sampling << std::endl;
+                std::cout << "16" << " generalParams.system            " << " = " << generalParams.system << std::endl;
+                std::cout << "17" << " vmcParams.n_c                   " << " = " << vmcParams.n_c << std::endl;
+                std::cout << "18" << " vmcParams.dt                    " << " = " << vmcParams.dt << std::endl;
+                std::cout << "19" << " dmcParams.dt                    " << " = " << dmcParams.dt << std::endl;
+                std::cout << "20" << " dmcParams.n_b                   " << " = " << dmcParams.n_b << std::endl;
+                std::cout << "21" << " dmcParams.n_w                   " << " = " << dmcParams.n_w << std::endl;
+                std::cout << "22" << " dmcParams.n_c                   " << " = " << dmcParams.n_c << std::endl;
+                std::cout << "23" << " dmcParams.therm                 " << " = " << dmcParams.therm << std::endl;
+                std::cout << "24" << " minimizerParams.SGDsamples      " << " = " << minimizerParams.SGDsamples << std::endl;
+                std::cout << "25" << " minimizerParams.n_w             " << " = " << minimizerParams.n_w << std::endl;
+                std::cout << "26" << " minimizerParams.therm           " << " = " << minimizerParams.therm << std::endl;
+                std::cout << "27" << " minimizerParams.n_c_SGD         " << " = " << minimizerParams.n_c_SGD << std::endl;
+                std::cout << "28" << " minimizerParams.alpha           " << " = " << minimizerParams.alpha << std::endl;
+                std::cout << "29" << " minimizerParams.beta            " << " = " << minimizerParams.beta << std::endl;
+                std::cout << "30" << " variationalParams.alpha         " << " = " << variationalParams.alpha << std::endl;
+                std::cout << "31" << " variationalParams.beta          " << " = " << variationalParams.beta << std::endl;
+            }
         }
-
 #ifdef MPI_ON
         MPI_Finalize();
 #endif

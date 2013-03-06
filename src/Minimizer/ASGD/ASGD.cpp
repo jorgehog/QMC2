@@ -27,11 +27,13 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
 
     walkers = new Walker*[n_walkers];
     trial_walkers = new Walker*[n_walkers];
+    
     for (int i = 0; i < n_walkers; i++) {
         walkers[i] = new Walker(vmc->n_p, vmc->dim);
         trial_walkers[i] = new Walker(vmc->n_p, vmc->dim);
     }
-
+ 
+    
     gradient = zeros(1, Nparams);
     gradient_local = zeros(1, Nparams);
 
@@ -87,7 +89,7 @@ void ASGD::get_total_grad() {
 }
 
 void ASGD::minimize() {
-
+    
     thermalize_walkers();
     
     for (sample = 1; sample <= SGDsamples; sample++) {
@@ -182,6 +184,8 @@ void ASGD::output_cycle() {
 
 void ASGD::thermalize_walkers() {
     int k = 0;
+    vmc->get_sampling_ptr()->set_trial_pos(vmc->original_walker);
+    vmc->copy_walker(vmc->original_walker, vmc->trial_walker);
     for (int cycle = 1; cycle <= thermalization + n_walkers * n_c; cycle++) {
         vmc->diffuse_walker(vmc->original_walker, vmc->trial_walker);
 

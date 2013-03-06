@@ -67,7 +67,6 @@ protected:
     void dump_output();
     void finalize_output();
     virtual void save_distribution() = 0;
-    void dump_distribution();
 
     void diffuse_walker(Walker* original, Walker* trial);
 

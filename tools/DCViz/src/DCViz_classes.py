@@ -174,8 +174,7 @@ class dist_out(DCVizPlotter):
         R_dmc = numpy.zeros((n_dmc))
 
         i_vmc = 0
-        i_dmc = 0
-        
+        i_dmc = 0  
         for i, xyz_local in enumerate(data):
             n = xyz_local.n
 
@@ -194,7 +193,19 @@ class dist_out(DCVizPlotter):
             
                 R_dmc[i_dmc:i_dmc+n] = numpy.sqrt((local_data**2).sum(1))
                 i_dmc += n
-                                
+       
+       
+        hist = numpy.zeros((nBins, nBins));
+        for i in range(n_dmc/n_p):
+            H, xe, ye = numpy.histogram2d(xyz_dmc[i*n_p:(i+1)*n_p, 0], xyz_dmc[i*n_p:(i+1)*n_p, 1], bins=(nBins, nBins))
+            hist += H**2
+        
+        hist /= (n_dmc/n_p);
+        self.subfigHist2d_dmc.imshow(hist,
+                      extent=[-1, 1, -1, 1],
+                      interpolation='lanczos',
+                      cmap=pylab.cm.jet)
+        return
         
         for fig, legend, xyz, R in zip([self.subfigHist2d_vmc,
                                         self.subfigHist2d_dmc],
