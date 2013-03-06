@@ -11,7 +11,7 @@ except:
     print "\n" 
     sys.exit(1)
 
-from matplotlib import rc, pylab
+from matplotlib import rc, pylab, colors
 
 #~ Paths include
 classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -194,7 +194,7 @@ class dist_out(DCVizPlotter):
                 R_dmc[i_dmc:i_dmc+n] = numpy.sqrt((local_data**2).sum(1))
                 i_dmc += n
        
-        
+        l = 2*numpy.average(R_vmc);
         for fig, legend, xyz, R in zip([self.subfigHist2d_vmc,
                                         self.subfigHist2d_dmc],
                                         ["VMC", "DMC"],
@@ -203,14 +203,19 @@ class dist_out(DCVizPlotter):
             if len(xyz) == 0:
                 continue
             
-            H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins))
+#            H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins), normed=True, range=[[-l,l],[-l,l]])
     
-            extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
+#            extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
             #Lanzcos gaussian mitchell sinc
-            fig.imshow(H,
-                      extent=extent,
-                      interpolation='lanczos',
-                      cmap=pylab.cm.jet)
+#            fig.imshow(H,
+#                      extent=extent,
+#                      interpolation='lanczos',
+#                      cmap=pylab.cm.jet,
+#                      norm=colors.LogNorm())
+            fig.hexbin(xyz[:,0], xyz[:,1], bins=nBins, 
+                       norm=colors.LogNorm())#, 
+#                       range=[[-l,l],[-l,l]],
+#                       normed=True)
                       
             fig.set_title(legend)    
             fig.set_xlabel(r'x')
