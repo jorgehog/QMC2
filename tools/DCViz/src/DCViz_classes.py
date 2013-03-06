@@ -203,19 +203,15 @@ class dist_out(DCVizPlotter):
             if len(xyz) == 0:
                 continue
             
-#            H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins), normed=True, range=[[-l,l],[-l,l]])
+            H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins), normed=True, range=[[-l,l],[-l,l]])
     
-#            extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
+            extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
             #Lanzcos gaussian mitchell sinc
-#            fig.imshow(H,
-#                      extent=extent,
-#                      interpolation='lanczos',
-#                      cmap=pylab.cm.jet,
-#                      norm=colors.LogNorm())
-            fig.hexbin(xyz[:,0], xyz[:,1], bins=nBins, 
-                       norm=colors.LogNorm())#, 
-#                       range=[[-l,l],[-l,l]],
-#                       normed=True)
+            fig.imshow(H,
+                      extent=extent,
+                      interpolation='lanczos',
+                      cmap=pylab.cm.jet,
+                      norm=colors.LogNorm())
                       
             fig.set_title(legend)    
             fig.set_xlabel(r'x')
