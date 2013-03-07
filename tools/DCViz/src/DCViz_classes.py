@@ -192,7 +192,7 @@ class dist_out(DCVizPlotter):
 #        print (R_vmc**2).mean()
 #        l = xyz_vmc.max()
 #        print data[0].data
-        self.subfigHist2d_vmc.imshow(data.data, norm=colors.LogNorm())
+        self.subfigHist2d_vmc.imshow(data.data)#, cmap=pylab.cm.RdGy)#, norm=colors.LogNorm())
         
 #        for fig, legend, xyz, R in zip([self.subfigHist2d_vmc,
 #                                        self.subfigHist2d_dmc],
