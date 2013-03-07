@@ -10,11 +10,16 @@
 
 class Distribution : public OutputHandler {
 public:
-    Distribution(ParParams &, std::string path);
+    Distribution(ParParams &, std::string path, std::string name);
 
     void dump();
     void finalize();
+
+private:
     
+    std::string name;
+    void generate_distribution();
+
 };
 
 

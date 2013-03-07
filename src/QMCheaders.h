@@ -8,7 +8,7 @@
 #ifndef QMCHEADERS_H
 #define	QMCHEADERS_H
 
-#define ARMA_NO_DEBUG
+//#define ARMA_NO_DEBUG
 //#define OMP_ON
 #define MPI_ON
 
@@ -135,6 +135,7 @@ public:
     virtual void cout(std::stringstream & a) {
         std::cout << a.str() << std::endl;
         a.str(std::string());
+        a.clear();
     }
 };
 
@@ -143,6 +144,7 @@ public:
 
     virtual void cout(std::stringstream & a) {
         a.str(std::string());
+        a.clear();
     }
 };
 

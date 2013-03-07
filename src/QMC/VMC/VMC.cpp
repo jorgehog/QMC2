@@ -7,13 +7,12 @@
 
 #include "../../QMCheaders.h"
 
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w)
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool dist_out)
 : QMC(gP, vP.n_c, sO, pp, n_w) {
 
-    name = "vmc";
     original_walker = new Walker(n_p, dim);
 
-    dist_tresh = 50;
+    dist_tresh = 25;
     pop_tresh = n_c / n_w;
     last_walker = 0;
 
@@ -21,6 +20,10 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
 
     sampling->set_dt(vP.dt);
+
+    if (dist_out) {
+        dist = arma::zeros(n_c * n_p / dist_tresh, dim);
+    }
 
 }
 
@@ -35,29 +38,11 @@ void VMC::set_trial_positions() {
 }
 
 void VMC::save_distribution() {
-//    using namespace std;
+    using namespace arma;
+    
     if (cycle % dist_tresh == 0) {
-//        cout << "-----preDist------" << endl;
-//                cout << dist << endl; 
-//        cout << "-----thisR--------"<< endl;
-//                cout << original_walker->r << endl;
-        dist.insert_rows(dist.n_rows, original_walker->r);
-
-
-//        arma::mat rlol = arma::zeros<arma::mat > (2, 2);
-//        rlol(0, 0) = 1;
-//        rlol(0, 1) = -1;
-//        rlol(1, 0) = 1;
-//        rlol(1, 1) = -1;
-//        if (cycle == dist_tresh) {
-//            std::cout << rlol << std::endl;
-//        }
-//        dist.insert_rows(dist.n_rows, rlol);
-
-//        cout << "-----newDist----" << endl;
-//        cout << dist << endl;
-//        cout << "-----------------" << endl;
-//        sleep(10);
+        dist(span(last_inserted, last_inserted + n_p - 1), span()) = original_walker->r;
+        last_inserted += n_p;
     }
 }
 
@@ -94,7 +79,16 @@ void VMC::run_method() {
         error_estimator->update_data(local_E);
         store_walkers();
 
+        if (is_master) {
+            if (cycle % 10000 == 0) {
+                std::cout << "\rVMC progress: " << (double) cycle / n_c * 100 << "%";
+                std::cout.flush();
+            }
+        }
+
     }
+
+    if (is_master) std::cout << "done" << std::endl;
 
     node_comm();
     scale_values();

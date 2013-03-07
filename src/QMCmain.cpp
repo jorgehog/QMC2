@@ -101,10 +101,12 @@ int main(int argc, char** argv) {
     Minimizer* minimizer;
     VMC* vmc;
     DMC* dmc;
+    
+    std::stringstream name;
 
     if (generalParams.doVMC) {
 
-        vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w);
+        vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, outputParams.dist_out);
 
         if (generalParams.doMIN) {
 
@@ -139,8 +141,16 @@ int main(int argc, char** argv) {
 
 
         if (outputParams.dist_out) {
-            OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath);
+            
+            name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
+            name << "vmc";
+            
+            OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath, name.str());
             vmc->add_output(dist_vmc);
+            
+            name.str(std::string());
+            name.clear();
+            
         }
 
 
@@ -165,7 +175,7 @@ int main(int argc, char** argv) {
 
     if (generalParams.doDMC) {
 
-        dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc);
+        dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc, outputParams.dist_out);
 
         if (outputParams.dmc_out && parParams.is_master) {
 
@@ -174,8 +184,16 @@ int main(int argc, char** argv) {
         }
 
         if (outputParams.dist_out) {
-            OutputHandler* dist_dmc = new Distribution(parParams, generalParams.runpath);
+            
+            name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
+            name << "dmc";
+            
+            OutputHandler* dist_dmc = new Distribution(parParams, generalParams.runpath, name.str());
             dmc->add_output(dist_dmc);
+            
+            name.str(std::string());
+            name.clear();
+            
         }
 
         int DMCerrorN = dmcParams.n_c * dmcParams.n_b * dmcParams.n_w;

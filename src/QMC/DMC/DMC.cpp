@@ -7,12 +7,10 @@
 
 #include "../../QMCheaders.h"
 
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc)
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc, bool dist_out)
 : QMC(gP, dP.n_c, sO, pp, dP.n_w, K) {
 
-    name = "dmc";
-
-    dist_tresh = 50;
+    dist_tresh = 25;
 
     block_size = dP.n_b;
     thermalization = dP.therm;
@@ -40,6 +38,10 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
 
+    if (dist_out) {
+        dist = arma::zeros(n_w * n_p * n_c / dist_tresh, dim);
+    }
+
 }
 
 void DMC::set_trial_positions() {
@@ -56,13 +58,12 @@ void DMC::set_trial_positions() {
     for (int k = 0; k < n_w; k++) {
         calculate_energy_necessities(original_walkers[k]);
         double El = calculate_local_energy(original_walkers[k]);
-        
+
         original_walkers[k]->set_E(El);
         E_T += El;
     }
 
     E_T /= n_w;
-    std::cout << "!!!!" << E_T << std::endl;
 
 }
 
@@ -194,11 +195,17 @@ void DMC::run_method() {
 }
 
 void DMC::save_distribution() {
+    using namespace arma;
 
     if (cycle % dist_tresh == 0) {
 
+        if ((last_inserted + n_p * n_w) >= dist.n_rows) {
+            dist.resize(dist.n_rows + n_w * n_p * 100, dim);
+        }
+
         for (int i = 0; i < n_w; i++) {
-            dist.insert_rows(dist.n_rows, original_walkers[i]->r);
+            dist(span(last_inserted, last_inserted + n_p - 1), span()) = original_walkers[i]->r;
+            last_inserted += n_p;
         }
 
     }

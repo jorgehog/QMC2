@@ -13,7 +13,7 @@ protected:
 
     int pop_tresh;
     int last_walker;
-
+    
     double vmc_E;
     Walker* original_walker;
 
@@ -34,7 +34,7 @@ protected:
 
 public:
 
-    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w);
+    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w, bool dist_out);
     ~VMC();
     
     void set_e(double E) {

@@ -37,6 +37,10 @@ def autodetectModes():
     
 def main(path, dynamic):
     
+    if not os.path.exists(path):
+        terminalTracker("Warning", "No such file...")
+        return
+    
     modes = autodetectModes()
     root, name = os.path.split(path)    
     
@@ -47,8 +51,8 @@ def main(path, dynamic):
             break
     
     if matchedMode is None:
-        terminalTracker("Warning", "found no matching nametags for specified filename")
-        sys.exit(1)
+        terminalTracker("Warning", "Found no matching nametags for specified filename")
+        return
         
     if dynamic:
         terminalTracker("DCViz", "Interrupt dynamic mode with CTRL+C")
@@ -66,7 +70,7 @@ if __name__ == "__main__":
         path = sys.argv[1]
             
     except:
-        print "please supply a path as cmdline arg"
+        print "Please supply a path as cmdline arg"
         sys.exit(1)
         
     main(path, dynamic)

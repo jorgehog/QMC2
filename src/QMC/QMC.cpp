@@ -20,8 +20,6 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
     n2 = n_p / 2;
 
-    dist = arma::zeros<arma::mat > (0, dim);
-
     trial_walker = new Walker(n_p, dim);
     original_walkers = new Walker*[K * n_w];
     for (int i = 0; i < K * n_w; i++) {
@@ -53,6 +51,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
     runpath = gP.runpath;
     dist_path = runpath + "walker_positions/";
+    last_inserted = 0;
 
 }
 
@@ -193,7 +192,7 @@ void QMC::diffuse_walker(Walker* original, Walker* trial) {
         set_spin_state(particle);
         sampling->update_pos(original, trial, particle);
 
-//        test_gradients(trial);
+        //        test_gradients(trial);
 
         double A = get_acceptance_ratio(original, trial, particle);
 
@@ -263,6 +262,7 @@ void QMC::get_accepted_ratio() {
         MPI_Reduce(&accepted, new int(), 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
         MPI_Reduce(&total_samples, new int(), 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     }
+
 #endif
 
     s << "Acceptance ratio: " << accepted / (double) total_samples << std::endl;
@@ -298,7 +298,7 @@ void QMC::test_gradients(Walker* walker) {
             double deriv = (vp - vm) / (2 * val * h);
             double anal = walker->spatial_grad(i, j) + walker->jast_grad(i, j);
             if ((deriv - anal) / anal > 1E-3) {
-                std::cout << i << "  " << j << "   "<<deriv << "   " << anal << std::endl;
+                std::cout << i << "  " << j << "   " << deriv << "   " << anal << std::endl;
             }
             walker->r(i, j) += h;
             walker->make_rel_matrix();
