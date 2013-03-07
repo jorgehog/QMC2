@@ -321,9 +321,9 @@ double dell_hydrogenic_2_z::eval(const Walker* walker, int i) {
 
     z2 = z*z;
     
-    //(-k*z^2 + 2*r)*exp(-k*r/2)/(2*r)
+    //-(k*z^2 - 2*r)*exp(-k*r/2)/(2*r)
     
-    psi = (-(*k)*z2 + 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
+    psi = -((*k)*z2 - 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
@@ -360,9 +360,9 @@ double dell_hydrogenic_3_x::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //(-k*x^2 + 2*r)*exp(-k*r/2)/(2*r)
+    //-(k*x^2 - 2*r)*exp(-k*r/2)/(2*r)
     
-    psi = (-(*k)*x2 + 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
+    psi = -((*k)*x2 - 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }
@@ -435,9 +435,9 @@ double dell_hydrogenic_4_y::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //(-k*y^2 + 2*r)*exp(-k*r/2)/(2*r)
+    //-(k*y^2 - 2*r)*exp(-k*r/2)/(2*r)
     
-    psi = (-(*k)*y2 + 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
+    psi = -((*k)*y2 - 2*walker->get_r_i(i))/(2*walker->get_r_i(i));
     return psi*(*exp_factor);
     
 }

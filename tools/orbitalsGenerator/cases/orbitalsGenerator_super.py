@@ -457,7 +457,7 @@ class orbitalGenerator(object):
         return s
 
     def TeXToFile(self, path):
-        with open(pjoin(path, '%s.tex' % self.name), 'w') as f:        
+        with open(pjoin(path, '%s.tex' % self.name), 'w') as f:
              f.write(self.getTeX())
              f.close()
 
