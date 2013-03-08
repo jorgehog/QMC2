@@ -494,8 +494,32 @@ def createDistFolder(dirPath):
     if not os.path.exists(pjoin(dirPath, "walker_positions")):
         #print "making folder %s" % pjoin(dirPath, "walker_positions")
         initializeDir(dirPath, "walker_positions", date=False)
-            
-def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
+         
+def generateJobScript(Args, path, n_cores):
+
+        with open(pjoin(paths.CODE, 'jobScriptTemplate.slurm'), 'r') as f:
+            rawJob = f.read()
+        f.close()
+        
+        superDir, subdir = os.path.split(path)
+        superName = os.path.split(superDir)[1]        
+        
+        rawJob = rawJob.replace("__codeName__", "QMC_ABEL_" + subdir)
+        rawJob = rawJob.replace("__nCpus__", str(n_cores))
+        rawJob = rawJob.replace("__superDir__", superDir)
+        rawJob = rawJob.replace("__superName__", superName)
+        rawJob = rawJob.replace("__code__", pjoin(paths.programPath, misc.QMC2programName))
+        rawJob = rawJob.replace("__exec__", misc.QMC2programName)
+        
+        Args = Args.replace(path + "/", "$SCRATCH/" + superName + "/" + subdir + "/")
+        rawJob = rawJob.replace("__args__", Args)
+        rawJob = rawJob.replace("__homeScratch__", paths.scratchPath)
+        
+        print rawJob
+        
+         
+         
+def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores, makeJobScript):
 
     if openGUI:
         if superDir is None:
@@ -507,14 +531,18 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
     i = 0
     for CMLarg in CMLargs:
         print "Running job ", dirs[i]
-        stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
-        MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
-     
-        createDistFolder(CMLarg.split()[cmlMAPg["runpath"]])        
+        createDistFolder(CMLarg.split()[cmlMAPg["runpath"]])               
+        if makeJobScript and superDir is not None:
+            
+            generateJobScript(CMLarg, dirs[i], n_cores)            
+            
+        else:
+            stdout = (" > %s/stdout.txt" % dirs[i])*stdoutToFile
+            MPIrun = ("mpiexec -n %d " % n_cores)*mpiFlag        
         
-        os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
-                    + " " + CMLarg + stdout)
+            os.system(MPIrun + pjoin(paths.programPath, misc.QMC2programName) \
+                        + " " + CMLarg + stdout)
     
         i+=1
 
@@ -523,7 +551,7 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores):
     if superDir:
         sendVersion(superDir)
         
-        if stdoutToFile:
+        if stdoutToFile and not makeJobScript:
             subprocess.call(["python", pjoin(paths.toolsPath, "output2tex.py"), superDir])
             os.system('cat %s' % pjoin(superDir, 'texTable.tex'))
         #shutil.copy(pjoin(paths.toolsPath, "output2tex.py"), superDir)
@@ -601,6 +629,16 @@ def getCodename(argv):
             argv.remove(arg)            
             
     return codename
+    
+def getJobFlag(argv):
+
+    for arg in argv:
+        if arg == "-JOB":
+            argv.remove("-JOB")
+            return True            
+
+    return False
+    
 
 def main():
     
@@ -615,6 +653,7 @@ def main():
     
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
     codename = getCodename(sys.argv)
+    makeJobScript = getJobFlag(sys.argv)
 
     print "MPI nodes: ", n_cores
     
@@ -627,7 +666,15 @@ def main():
         
         superDir = None
     
-    initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores)
+    initRuns(CMLargs, 
+             dirs, 
+             superDir, 
+             stdoutToFile, 
+             mpiFlag,
+             openGUI, 
+             n_cores,
+             makeJobScript)
+  
   
 if __name__ == "__main__":  
     main()
