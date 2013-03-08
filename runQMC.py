@@ -511,7 +511,8 @@ def generateJobScript(Args, path, n_cores):
         rawJob = rawJob.replace("__superName__", superName)
         rawJob = rawJob.replace("__code__", pjoin(paths.programPath, misc.QMC2programName))
         rawJob = rawJob.replace("__exec__", misc.QMC2programName)
-        rawJob = rawJob.replace("__subDir__", subdirNew)        
+        rawJob = rawJob.replace("__subDir__", subdirNew)     
+        rawJob = rawJob.replace("__subdirOld__", path)
         
         Args = Args.replace(path + "/", subdirNew + "/")
         rawJob = rawJob.replace("__args__", Args)
