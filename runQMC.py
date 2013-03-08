@@ -502,7 +502,8 @@ def generateJobScript(Args, path, n_cores):
         f.close()
         
         superDir, subdir = os.path.split(path)
-        superName = os.path.split(superDir)[1]        
+        superName = os.path.split(superDir)[1]   
+        subdirNew = "$SCRATCH/" + superName + "/" + subdir
         
         rawJob = rawJob.replace("__codeName__", "QMC_ABEL_" + subdir)
         rawJob = rawJob.replace("__nCpus__", str(n_cores))
@@ -510,12 +511,16 @@ def generateJobScript(Args, path, n_cores):
         rawJob = rawJob.replace("__superName__", superName)
         rawJob = rawJob.replace("__code__", pjoin(paths.programPath, misc.QMC2programName))
         rawJob = rawJob.replace("__exec__", misc.QMC2programName)
+        rawJob = rawJob.replace("__subDir__", subdirNew)        
         
-        Args = Args.replace(path + "/", "$SCRATCH/" + superName + "/" + subdir + "/")
+        Args = Args.replace(path + "/", subdirNew + "/")
         rawJob = rawJob.replace("__args__", Args)
         rawJob = rawJob.replace("__homeScratch__", paths.scratchPath)
         
-        print rawJob
+        with open(pjoin(paths.CODE, "jobScripts", subdir + ".slurm"), 'w') as f:
+            f.write(rawJob)
+        f.close()
+
         
          
          
