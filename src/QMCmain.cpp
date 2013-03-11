@@ -87,6 +87,20 @@ int main(int argc, char** argv) {
     }
     //
 
+    //Test for rerunning distribution
+    //argv = [x-name, "redist", n_p, path, name, N, bin_edge?
+    string rerun_dist = "redist";
+    if ((argc == 7) && (rerun_dist.compare(argv[1]) == 0)) {
+        Distribution* redist = new Distribution(parParams, argv[3], argv[4]);
+        redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]));
+
+#ifdef MPI_ON
+        MPI_Finalize();
+#endif
+        return 0;
+    }
+    //
+
     parseCML(argc, argv,
             vmcParams,
             dmcParams,
@@ -101,7 +115,7 @@ int main(int argc, char** argv) {
     Minimizer* minimizer;
     VMC* vmc;
     DMC* dmc;
-    
+
     std::stringstream name;
 
     if (generalParams.doVMC) {
@@ -141,16 +155,16 @@ int main(int argc, char** argv) {
 
 
         if (outputParams.dist_out) {
-            
+
             name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
             name << "vmc";
-            
+
             OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath, name.str());
             vmc->add_output(dist_vmc);
-            
+
             name.str(std::string());
             name.clear();
-            
+
         }
 
 
@@ -184,16 +198,16 @@ int main(int argc, char** argv) {
         }
 
         if (outputParams.dist_out) {
-            
+
             name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
             name << "dmc";
-            
+
             OutputHandler* dist_dmc = new Distribution(parParams, generalParams.runpath, name.str());
             dmc->add_output(dist_dmc);
-            
+
             name.str(std::string());
             name.clear();
-            
+
         }
 
         int DMCerrorN = dmcParams.n_c * dmcParams.n_b * dmcParams.n_w;

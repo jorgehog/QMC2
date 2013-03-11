@@ -71,7 +71,7 @@ void DMC::output() {
     using namespace std;
 
     s << setprecision(5) << fixed;
-    s << "dmcE: " << dmc_E << " | <E_T>: " << E_tot / tot_samples;
+    s << "dmcE: " << dmc_E << " | E_T: " << E_T;
 
     s << " | Nw: ";
     s << setfill(' ') << setw(5);

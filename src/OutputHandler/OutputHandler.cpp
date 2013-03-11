@@ -36,7 +36,7 @@ OutputHandler::OutputHandler(std::string filename,
 
 }
 
-void OutputHandler::init_file(){
+void OutputHandler::init_file() {
     use_file = true;
     this->file.open(((path + filename) + ".dat").c_str());
 }
@@ -49,19 +49,20 @@ void OutputHandler::set_qmc_ptr(QMC* qmc) {
     } else {
         this->qmc = qmc;
     }
+    post_pointer_init();
 }
 
 void OutputHandler::set_min_ptr(Minimizer* min) {
     if (this->is_ASGD) {
         this->asgd = (ASGD*) min;
-        post_pointer_init();
     } else {
         this->min = min;
     }
+    post_pointer_init();
 }
 
 void OutputHandler::finalize() {
-    if (!use_file){
+    if (!use_file) {
         return;
     }
     file.close();

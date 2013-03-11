@@ -6,7 +6,6 @@ from os.path import join as pjoin
 from pyLibQMC import paths, parseCML, misc
 
 try:
-    raise Exception()
     from PySide.QtCore import *
     from PySide.QtGui import *
     sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))

@@ -141,92 +141,61 @@ class DMC_OUT(DCVizPlotter):
         N_plot.set_title('Walker population')
         N_plot.ticklabel_format(useOffset=False, axis='y')
 
+class radial_out(DCVizPlotter):
+    
+    nametag = "radial_out.+\.arma"
+    figMap = {"fig1": ["radialFig"]}
+    
+    armaBin = True
+    isFamilyMember=True
+    
+    def plot(self, data):
+        
+        
+        cut = data[0].n/20       
+
+        max_edge = 0        
+        for i in range(len(data)):
+
+            edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
+            if edge > max_edge:
+                max_edge = edge;
+            
+            if "dmc" in self.familyFileNames[i]:
+                method = "dmc"
+            elif "vmc" in self.familyFileNames[i]:
+                method = "vmc"
+            
+            r = numpy.linspace(0, edge, data[i].n)
+            self.radialFig.plot(r, data[i][0], label=method);
+                        
+        self.radialFig.legend()    
+        self.radialFig.axes.set_xlim(r[cut], max_edge)
+        self.radialFig.set_xlabel('r')
+        self.radialFig.set_ylabel(r'$|\psi(r)|^2$')
+        
+        
+        
+
 class dist_out(DCVizPlotter):
     
     nametag = "dist_out.+\.arma"
-    figMap = {"fig1": ["subfigHist2d_vmc"]}
+    figMap = {"fig1": ["subfigHist2d"]}
 
     armaBin = True
         
     def plot(self, data):
     
-#        n_p = int(re.findall("out_(\d+)", self.familyFileNames[0])[0])
-#        dim = data[0].m
-#
-#        n_vmc = 0;
-#        n_dmc = 0;
-#        for i, name in enumerate(self.familyFileNames):
-#            if "vmc" in name:
-#                n_vmc+=data[i].n
-#            elif "dmc" in name:
-#                n_dmc+=data[i].n
-#        
-#        nBins=150
-#        print "nVmc: ", n_vmc, " nDMC: ", n_dmc
-#        xyz_vmc = numpy.zeros((n_vmc, dim))
-#        xyz_dmc = numpy.zeros((n_dmc, dim))
-#        
-#        R_vmc = numpy.zeros((n_vmc))
-#        R_dmc = numpy.zeros((n_dmc))
-#
-#        i_vmc = 0
-#        i_dmc = 0  
-#        for i, xyz_local in enumerate(data):
-#            n = xyz_local.n
-#
-#            local_data = xyz_local.data
-#            
-#            if "vmc" in self.familyFileNames[i]:
-#        
-#                xyz_vmc[i_vmc:i_vmc+n, :] = local_data
-#              
-#                R_vmc[i_vmc:i_vmc+n] = numpy.sqrt((local_data**2).sum(1))
-#                i_vmc += n
-#            
-#            else:
-#            
-#                xyz_dmc[i_dmc:i_dmc+n, :] = local_data
-#            
-#                R_dmc[i_dmc:i_dmc+n] = numpy.sqrt((local_data**2).sum(1))
-#                i_dmc += n
-#        print (R_vmc**2).mean()
-#        l = xyz_vmc.max()
-#        print data[0].data
-        self.subfigHist2d_vmc.imshow(data.data)#, cmap=pylab.cm.RdGy)#, norm=colors.LogNorm())
+        print self.filepath
+        print re.findall("edge(\d+\.?\d*)\.arma", self.filepath)
+        edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.filepath)[0])
         
-#        for fig, legend, xyz, R in zip([self.subfigHist2d_vmc,
-#                                        self.subfigHist2d_dmc],
-#                                        ["VMC", "DMC"],
-#                                       [xyz_vmc, xyz_dmc],
-#                                       [R_vmc, R_dmc]):
-#            if len(xyz) == 0:
-#                continue
-#            
-##            H, xedges, yedges = numpy.histogram2d(xyz[:, 0], xyz[:, 1], bins=(nBins, nBins), normed=True, range=[[-l,l],[-l,l]])
-#    
-##            extent = [yedges[0], yedges[-1], xedges[-1], xedges[0]]
-#            #Lanzcos gaussian mitchell sinc
-##            fig.imshow(H,
-##                      extent=extent,
-##                      interpolation='lanczos',
-##                      cmap=pylab.cm.jet)
-##                      norm=colors.LogNorm())
-#            fig.plot(xyz[:,0], xyz[:,1], 'b*')
-#            fig.plot(l*numpy.cos(numpy.linspace(0, 2*numpy.pi, 1000)),l*numpy.sin(numpy.linspace(0, 2*numpy.pi, 1000)), 'r')
-#            fig.axis('equal')
-#            fig.set_title(legend)    
-#            fig.set_xlabel(r'x')
-#            fig.set_ylabel(r'y')
-#            
-#            hist, bins = numpy.histogram(R, bins=nBins, density=True)
-#   
-#            bins = (bins[:-1]+bins[1:])/2
-#            dr = bins[1]-bins[0]
-##            self.subfigDist1d.plot(bins, bins**(dim-1)*hist**2, label=legend)
-#            self.subfigDist1d.plot(bins, hist/(2*numpy.pi*bins*dr), label=legend)
-#        
-#        self.subfigDist1d.legend()
-#        self.subfigDist1d.set_xlabel(r'$r = \sqrt{x^2 + y^2' + ' +z^2'*(dim==3) + '}$')
+        extent = [-edge, edge, -edge, edge]
+        im = self.subfigHist2d.imshow(data.data, extent=extent)
+        self.subfigHist2d.set_ylabel(r'y')
+        self.subfigHist2d.set_xlabel(r'x')
+        self.fig1.colorbar(im)
+
 #        self.subfigDist1d.set_ylabel(r'$|P(r)|^2$')
         
 class testBinFile(DCVizPlotter):

@@ -42,6 +42,8 @@ void Pade_Jastrow::initialize() {
             }
         }
     }
+
+    
 }
 
 double Pade_Jastrow::get_val(const Walker* walker) const {

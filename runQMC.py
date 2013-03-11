@@ -351,8 +351,8 @@ def varParameterMap(n_p, dim, systemConstant, system):
                 print "No saved parameters for (n_p, w) = ", n_p, " ", w 
         elif n_p==42:
             if w==1:
-                alpha = 0.7
-                beta = 0.9
+                alpha = 0.8
+                beta = 0.95
             else:
                 print "No saved parameters for (n_p, w) = ", n_p, " ", w 
 
@@ -512,11 +512,18 @@ def generateJobScript(Args, path, n_cores):
         rawJob = rawJob.replace("__code__", pjoin(paths.programPath, misc.QMC2programName))
         rawJob = rawJob.replace("__exec__", misc.QMC2programName)
         rawJob = rawJob.replace("__subDir__", subdirNew)     
-        rawJob = rawJob.replace("__subdirOld__", path)
+#        rawJob = rawJob.replace("__subdirOld__", path)
         
         Args = Args.replace(path + "/", subdirNew + "/")
         rawJob = rawJob.replace("__args__", Args)
         rawJob = rawJob.replace("__homeScratch__", paths.scratchPath)
+        
+        time = raw_input("Expected time? [hh:mm:ss]: ")
+        mem = raw_input("Memory use pr CPU? max abel=3900 [Mb]: ")
+        mem += "M"
+        rawJob = rawJob.replace("__T__", time)     
+        rawJob = rawJob.replace("__MEM__", mem)
+        
         
         with open(pjoin(paths.CODE, "jobScripts", subdir + ".slurm"), 'w') as f:
             f.write(rawJob)

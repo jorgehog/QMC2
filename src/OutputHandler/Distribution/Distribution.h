@@ -14,11 +14,22 @@ public:
 
     void dump();
     void finalize();
+    void rerun(int n_p, int N, double bin_edge);
 
 private:
-    
+
+    int dim;
+
     std::string name;
-    void generate_distribution();
+    void generate_distribution(arma::mat & dist,
+            int n_p,
+            double bin_edge = 0,
+            int N = 400,
+            bool rerun = false);
+
+    void post_pointer_init() {
+        this->dim = qmc->dim;
+    }
 
 };
 
