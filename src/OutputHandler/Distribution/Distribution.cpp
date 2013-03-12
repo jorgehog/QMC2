@@ -27,10 +27,10 @@ void Distribution::finalize() {
 
 }
 
-void Distribution::generate_distribution(arma::mat & dist, 
+void Distribution::generate_distribution(arma::mat & dist,
         int n_p,
         double bin_edge,
-        int N, 
+        int N,
         bool rerun) {
 
     using namespace arma;
@@ -38,12 +38,13 @@ void Distribution::generate_distribution(arma::mat & dist,
     int x_i, y_i, r_i, n, n_tot;
     double x, y, r, dr, dr_R, stretch, mean_r;
 
-    n = dist.n_rows;
-
-    vec R = arma::sqrt(sum(dist % dist, 1));
     umat distribution = zeros<umat > (N, N);
     uvec radial_dist = zeros<uvec > (N);
     mat tot_dist;
+
+    vec R = arma::sqrt(sum(dist % dist, 1));
+
+    n = dist.n_rows;
 
 #ifdef MPI_ON
     ivec n_list = zeros<ivec > (n_nodes);
@@ -55,13 +56,14 @@ void Distribution::generate_distribution(arma::mat & dist,
     n_tot = n;
 #endif
 
+    //On fly calculation during QMC initialized by a binedge 0.
     if (bin_edge == 0) {
         stretch = 3;
 
         //calculate the bin edge and size based on the mean radius
         mean_r = qmc->error_estimator->combine_mean(mean(R), n, n_tot);
         bin_edge = stretch*mean_r;
-        if (node==0) cout << "pre " << mean_r << endl;
+        //        if (node==0) cout << "pre " << mean_r << endl;
     }
 
     dr = 2 * bin_edge / (N - 1);
@@ -123,7 +125,7 @@ void Distribution::generate_distribution(arma::mat & dist,
                         MPI_DOUBLE, 0, MPI_COMM_WORLD);
             }
 
-            cout << as_scalar(mean(arma::sqrt(sum(tot_dist % tot_dist, 1)))) << endl;
+            //            cout << as_scalar(mean(arma::sqrt(sum(tot_dist % tot_dist, 1)))) << endl;
 
             displs.reset();
 
@@ -160,12 +162,16 @@ void Distribution::generate_distribution(arma::mat & dist,
         mat normalized_dist = conv_to< mat>::from(distribution);
         vec normalized_radd = conv_to< vec>::from(radial_dist);
 
-        vec radial_x = linspace(0, bin_edge, N);
+        vec radial_axis = linspace(0, bin_edge, N);
 
         normalized_dist *= n_p / (accu(normalized_dist) * dr * dr);
 
-        normalized_radd /= (accu(normalized_radd) * dr_R);
-        normalized_radd /= (2 * datum::pi * dr_R * radial_x);
+        //project out a symmetric axis and normalize (skip singularity)
+        normalized_radd(span(1, N-1)) /= radial_axis(span(1, N-1));
+        normalized_radd(0) = normalized_radd(1);
+        
+//        cout << normalized_radd.max()/(2*datum::pi*accu(normalized_radd)*dr_R) << endl;
+        normalized_radd /= (2*datum::pi*accu(normalized_radd)*dr_R);
 
         if (!rerun) {
             s << path << "walker_positions/dist_rawdata_" << name << ".arma";
@@ -184,6 +190,7 @@ void Distribution::generate_distribution(arma::mat & dist,
         normalized_radd.reset();
         s.str(std::string());
 
+        radial_axis.reset();
         radial_dist.reset();
         distribution.reset();
 
@@ -200,7 +207,6 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
 
     if (node == 0) {
         s << path << "walker_positions/dist_rawdata_" << name << ".arma";
-        cout << s.str() << endl;
         dist.load(s.str());
         s.str(std::string());
 
@@ -244,6 +250,6 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
 #endif
 
     generate_distribution(dist, n_p, bin_edge, N, true);
-    
+
 }
 

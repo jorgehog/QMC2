@@ -45,7 +45,6 @@ def main():
     
     N = sys.argv[2]
     bin_edge = sys.argv[3]
-    print rawfile
     
     name = re.findall("dist_rawdata_(.+).arma", rawfile)[0]
     n_p = re.findall("(\d+)c\d", name)[0]
