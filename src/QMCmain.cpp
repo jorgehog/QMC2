@@ -274,7 +274,7 @@ void parseCML(int argc, char** argv,
 
     vmcParams.n_c = 1E6;
     if (generalParams.sampling == "IS") {
-        vmcParams.dt = 0.01;
+        vmcParams.dt = 0.005;
     } else {
         vmcParams.dt = 0.5;
     }
@@ -366,7 +366,7 @@ void parseCML(int argc, char** argv,
 
         if (def.compare(argv[vmc_dt_loc]) == 0) {
             if (generalParams.sampling == "IS") {
-                vmcParams.dt = 0.01;
+                vmcParams.dt = 0.005;
             } else {
                 vmcParams.dt = 0.5;
             }
