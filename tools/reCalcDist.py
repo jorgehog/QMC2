@@ -38,6 +38,11 @@ def main():
         sys.exit(1)    
         
     rawfile = sys.argv[1]
+
+    if 'rawdata' not in rawfile:
+        print "Selected file is not a distribution data file."
+        sys.exit(1)
+    
     N = sys.argv[2]
     bin_edge = sys.argv[3]
     print rawfile
