@@ -237,7 +237,7 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
         dist = zeros<mat > (n, dim);
 
         for (int i = 0; i < dim; i++) {
-            MPI_Scatter(new double(), 1, MPI_DOUBLE, dist.colptr(i), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            MPI_Scatter(NULL, 0, MPI_DATATYPE_NULL, dist.colptr(i), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         }
     }
 

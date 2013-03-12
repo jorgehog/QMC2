@@ -131,7 +131,7 @@ void ErrorEstimator::node_comm_scatter_data() {
             raw_data.clear();
         } else {
             data = zeros<rowvec > (n);
-            MPI_Scatter(new double(), 1, MPI_DOUBLE, data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            MPI_Scatter(NULL, 0, MPI_DATATYPE_NULL, data.memptr(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         }
     }
 #endif
@@ -175,7 +175,7 @@ double ErrorEstimator::combine_variance(double var, double mean, int n) {
             MPI_Reduce(MPI_IN_PLACE, &combined_var, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
             var = combined_var / (n_tot - 1);
         } else {
-            MPI_Reduce(&combined_var, new double(), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+            MPI_Reduce(&combined_var, NULL, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }
 
     }

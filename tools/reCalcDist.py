@@ -17,10 +17,11 @@ def initRun(n_p, path, name, N, bin_edge, n_cores, mpiFlag):
     
     args = mpi.split() + [exe, "redist", n_p, path, name, N, bin_edge]
 
-    subprocess.call(args);
+    subprocess.call(args)
     
-    dist_path = path +"walker_positions/dist_out_" + name + "_edge" + str(bin_edge) + ".arma"
-    radial_path = path +"walker_positions/radial_out_" + name + "_edge" + str(bin_edge) + ".arma"
+    outPath = "%swalker_positions/__type___out_%s_edge%s.arma" % (path, name, bin_edge)
+    dist_path = outPath.replace("__type__", "dist")
+    radial_path = outPath.replace("__type__", "radial")
     
     viz.main(dist_path, False)
     viz.main(radial_path, False)
@@ -33,15 +34,15 @@ def main():
     
     #path N binEdge
     if len(sys.argv) < 3:
-        print "Error in command line arguments."
+        print "Error in command line arguments. [rawdata, N, bin egde]"
         sys.exit(1)    
         
     rawfile = sys.argv[1]
     N = sys.argv[2]
     bin_edge = sys.argv[3]
-
+    print rawfile
     
-    name = re.findall("dist_out_(.+)_edge.+\.arma", rawfile)[0]
+    name = re.findall("dist_rawdata_(.+).arma", rawfile)[0]
     n_p = re.findall("(\d+)c\d", name)[0]
     path = rawfile.split("walker_positions")[0]
 
