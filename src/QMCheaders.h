@@ -8,13 +8,9 @@
 #ifndef QMCHEADERS_H
 #define	QMCHEADERS_H
 
-//#define ARMA_NO_DEBUG
-//#define OMP_ON
+#define ARMA_NO_DEBUG
 #define MPI_ON
 
-#ifdef OMP_ON
-#include <omp.h>
-#endif
 #ifdef MPI_ON
 #include <mpi.h>
 #endif
