@@ -24,7 +24,7 @@ private:
     void generate_distribution(arma::mat & dist,
             int n_p,
             double bin_edge = 0,
-            int N = 400,
+            int N = 200,
             bool rerun = false);
 
     void post_pointer_init() {
