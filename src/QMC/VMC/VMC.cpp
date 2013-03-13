@@ -53,7 +53,7 @@ void VMC::save_distribution() {
 void VMC::store_walkers() {
 
     //store for DMC
-    if ((cycle >= offset) && (cycle % pop_tresh == 0)) {
+    if ((cycle > offset) && (cycle % pop_tresh == 0)) {
         s << cycle << "  " <<last_walker << "  " << n_w << std::endl;
         std_out->cout(s);
         copy_walker(original_walker, original_walkers[last_walker]);
