@@ -12,6 +12,7 @@ class VMC : public QMC {
 protected:
 
     int pop_tresh;
+    int offset;
     int last_walker;
     
     double vmc_E;

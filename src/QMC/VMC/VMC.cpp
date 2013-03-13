@@ -14,6 +14,10 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
 
     dist_tresh = 25;
     pop_tresh = n_c / n_w;
+    offset = n_c - n_w*pop_tresh;
+    s << pop_tresh << "   " << offset << std::endl;
+    std_out->cout(s);
+    sleep(5);
     last_walker = 0;
 
     vmc_E = 0;
@@ -49,7 +53,9 @@ void VMC::save_distribution() {
 void VMC::store_walkers() {
 
     //store for DMC
-    if (cycle % pop_tresh == 0) {
+    if ((cycle >= offset) && (cycle % pop_tresh == 0)) {
+        s << cycle << "  " <<last_walker << "  " << n_w << std::endl;
+        std_out->cout(s);
         copy_walker(original_walker, original_walkers[last_walker]);
         original_walkers[last_walker]->set_E(local_E);
         last_walker++;
