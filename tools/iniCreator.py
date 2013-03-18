@@ -7,7 +7,7 @@ Created on Mon Oct  8 13:05:51 2012
 
 from pyLibQMC import paths
 
-validation = True
+validation = False
 fullruns = True
 test = False
 
@@ -85,30 +85,22 @@ n_c=100
                 
 if fullruns:
     
-    wList = [0.01, 0.1, 0.28, 0.5, 1]
-    npList = [2, 6, 12, 20, 30]
+    wList = [0.1, 0.28, 0.5, 1]
+    npList = [42]
     
     rawFile = """general:
 n_p = __NP__
 systemConstant = __W__
-doMIN = 1
 doVMC = 1
 doDMC = 1
+do_blocking=1
+
+VMC:
+n_c=1E3
 
 DMC:
-dist_in = 1
-therm=5000
-n_c=5000
-n_w=2000
-dt=0.0005
-
-output:
-dist_out = 1
-
-MIN:
-SGDsamples=10000
-n_c_SGD=1000
-
+n_c=3000
+n_w=100
 """
 
     for w in wList:
