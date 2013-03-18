@@ -60,15 +60,17 @@ def packFiles(runPath):
     print "Path: ", thisTarpath
     
     
-    with tarfile.open(thisTarpath, 'w:gz') as tar:
-        for root, dirs, files in os.walk(runPath):
-            
-            print "Entring directory: ", root
-            for file_ in files:
-                abspath = pjoin(root, file_)
-                print "packing ", file_
-                tar.add(abspath, exclude=excludeFunc)                
-            
+    tar = tarfile.open(thisTarpath, 'w:gz')
+    
+    for root, dirs, files in os.walk(runPath):
+        
+        print "Entring directory: ", root
+        for file_ in files:
+            abspath = pjoin(root, file_)
+            print "packing ", file_
+            tar.add(abspath, exclude=excludeFunc)                
+    
+    tar.close()
     return thisTarpath       
 
 def sendTar(path):    
@@ -85,7 +87,7 @@ def sendTar(path):
 
 def main():
 
-    if len(sys.argv) < 1:
+    if len(sys.argv) < 2:
         print "insufficient commandline arguments."
         print "python packFiles.py update | [runpath]" 
     
