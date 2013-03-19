@@ -27,7 +27,7 @@ def update():
 
 def excludeFunc(filename):
     
-    filesizeLimit = 1 #MB
+    filesizeLimit = 1024 #MB
     filesizeLimit *= 1024*1024 #convert to MB
     
     excludes = []
