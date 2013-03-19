@@ -383,8 +383,8 @@ def varParameterMap(n_p, dim, systemConstant, system):
             beta = 0.12
             
         elif Z == n_p == 10:
-            alpha = 0.92
-            beta = 0.5
+            alpha = 0.9456
+            beta = 0.177
         
         elif Z == n_p == 12:
             alpha = 0.9 
