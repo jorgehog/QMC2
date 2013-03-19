@@ -33,7 +33,7 @@ public:
 
     virtual double estimate_error() = 0;
     
-    virtual void normalize();
+//    virtual void normalize();
 
     virtual void update_data(double val); 
 

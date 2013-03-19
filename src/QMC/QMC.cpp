@@ -256,16 +256,16 @@ void QMC::get_accepted_ratio() {
 
 #ifdef MPI_ON
     if (is_master) {
-        MPI_Reduce(MPI_IN_PLACE, &accepted, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(MPI_IN_PLACE, &total_samples, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &accepted, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &total_samples, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     } else {
-        MPI_Reduce(&accepted, new int(), 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&total_samples, new int(), 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&accepted, NULL, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&total_samples, NULL, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     }
 
 #endif
 
-    s << "Acceptance ratio: " << accepted / (double) total_samples << std::endl;
+    s << "Acceptance ratio: " << (accepted/1000) / (double) (total_samples/1000) << std::endl;
     std_out->cout(s);
 }
 

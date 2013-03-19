@@ -210,10 +210,10 @@ int main(int argc, char** argv) {
 
         }
 
-        int DMCerrorN = dmcParams.n_c * dmcParams.n_b * dmcParams.n_w;
+//        int DMCerrorN = dmcParams.n_c;
         if (generalParams.do_blocking) {
 
-            ErrorEstimator* blocking = new Blocking(DMCerrorN,
+            ErrorEstimator* blocking = new Blocking(dmcParams.n_c,
                     parParams,
                     "blocking_DMC_out",
                     generalParams.runpath);

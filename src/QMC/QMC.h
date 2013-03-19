@@ -43,8 +43,8 @@ protected:
 
     int cycle;
 
-    int accepted;
-    int total_samples;
+    unsigned long int accepted;
+    unsigned long int total_samples;
     int thermalization;
 
     double local_E;

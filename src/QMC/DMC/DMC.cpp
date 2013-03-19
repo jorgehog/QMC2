@@ -119,7 +119,7 @@ void DMC::update_energies() {
 
 }
 
-void DMC::iterate_walker(int k, int n_b, bool production) {
+void DMC::iterate_walker(int k, int n_b) {
 
     copy_walker(original_walkers[k], trial_walker);
 
@@ -132,7 +132,6 @@ void DMC::iterate_walker(int k, int n_b, bool production) {
         calculate_energy_necessities(original_walkers[k]);
         local_E = calculate_local_energy(original_walkers[k]);
         original_walkers[k]->set_E(local_E);
-        if (production) error_estimator->update_data(local_E);
 
         double GB = sampling->get_branching_Gfunc(local_E, local_E_prev, E_T);
 
@@ -153,7 +152,7 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, 10, false);
+            iterate_walker(k, 10);
         }
 
         bury_the_dead();
@@ -175,8 +174,10 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, block_size, true);
+            iterate_walker(k, block_size);
         }
+
+        error_estimator->update_data(E/samples);
 
         bury_the_dead();
         update_energies();
@@ -190,7 +191,7 @@ void DMC::run_method() {
 
     finalize_output();
     get_accepted_ratio();
-    error_estimator->normalize();
+//    error_estimator->normalize();
     estimate_error();
 }
 

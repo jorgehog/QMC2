@@ -34,7 +34,7 @@ protected:
         return metropolis_test(A)&(A > 0);
     };
 
-    void iterate_walker(int k, int n_b = 1, bool production = false);
+    void iterate_walker(int k, int n_b = 1);
 
     void Evolve_walker(int k, double GB);
 

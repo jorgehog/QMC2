@@ -77,16 +77,16 @@ void ErrorEstimator::finalize() {
 
 }
 
-void ErrorEstimator::normalize() {
-#ifdef MPI_ON
-    arma::Row<int> sample_sizes = arma::zeros<arma::Row<int> >(n_nodes);
-
-    MPI_Allgather(&i, 1, MPI_INT, sample_sizes.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
-
-    data.resize(sample_sizes.min());
-    sample_sizes.clear();
-#endif
-}
+//void ErrorEstimator::normalize() {
+//#ifdef MPI_ON
+//    arma::Row<int> sample_sizes = arma::zeros<arma::Row<int> >(n_nodes);
+//
+//    MPI_Allgather(&i, 1, MPI_INT, sample_sizes.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
+//
+//    data.resize(sample_sizes.min());
+//    sample_sizes.clear();
+//#endif
+//}
 
 void ErrorEstimator::node_comm_gather_data() {
 #ifdef MPI_ON
