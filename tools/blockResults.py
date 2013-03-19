@@ -17,9 +17,12 @@ except:
     print "pyside not supported. Terminal usage enabled."
     forceTerminal = True
     
-    sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
+    try:
+        sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
     
-    from DCViz_classes import Blocking, MIN_OUT, DMC_OUT
+        from DCViz_classes import Blocking, MIN_OUT, DMC_OUT
+    except:
+        print "Warning: Displaying results not aviable.."
     
     #Evil haxx
     QDialog = list
