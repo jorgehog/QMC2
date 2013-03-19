@@ -38,7 +38,10 @@ def excludeFunc(filename):
     notExcluded = True
     for key in excludes:
         notExcluded = notExcluded&(not key in file_)
- 
+    
+    if not(0 < size < filesizeLimit and notExcluded):
+        print "excluded."
+        
     return not(0 < size < filesizeLimit and notExcluded)
                    
 

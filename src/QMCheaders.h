@@ -8,7 +8,7 @@
 #ifndef QMCHEADERS_H
 #define	QMCHEADERS_H
 
-#define ARMA_NO_DEBUG
+//#define ARMA_NO_DEBUG
 #define MPI_ON
 
 #ifdef MPI_ON

@@ -70,7 +70,7 @@ void DMC::set_trial_positions() {
 void DMC::output() {
     using namespace std;
 
-    s << setprecision(5) << fixed;
+    s << setprecision(6) << fixed;
     s << "dmcE: " << dmc_E << " | E_T: " << E_T;
 
     s << " | Nw: ";
