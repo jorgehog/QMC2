@@ -25,7 +25,7 @@ def getDmcE(path):
     stdoutRaw = stdout.read()
     stdout.close()
     
-    pattern = "dmcE:\s*(\d+\.?\d*)\s*\|\s*Nw:\s*\d+\|\s*100\.?[0]*%"
+    pattern = "dmcE:\s*(\d+\.?\d*).+\|\s*100\.?[0]*%"
     
     r = re.findall(pattern, stdoutRaw)
     

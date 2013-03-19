@@ -151,7 +151,8 @@ class radial_out(DCVizPlotter):
     
     def plot(self, data):
         
-        cut = data[0].n/20       
+        cut = data[0].n/20     
+        cut= 0
         print data[0].n
         
         max_edge = 0        
