@@ -459,6 +459,45 @@ def displayDMCTerminal(blockFile):
     displayTool = DMC_OUT(path, dynamic=False)
     displayTool.mainloop()
     
+def getJobFlag(argv):
+
+    for arg in argv:
+        if arg == "-JOB":
+            argv.remove("-JOB")
+            return True            
+
+    return False 
+
+def dumpJobScript(nBlocks, maxBlockSize, minBlockSize, 
+                              n_cores, 
+                              path,
+                              fileName):
+                                  
+    with open(pjoin(paths.CODE, 'jobScriptTemplate.slurm'), 'r') as f:
+        rawJob = f.read()
+    f.close()  
+    
+    rawFile = fileName.strip("_RAWDATA.arma")
+    args = "reblock %s $SCRATCH/ %d %d %d" % (rawFile,
+                                              nBlocks, 
+                                              maxBlockSize,
+                                              minBlockSize)
+    
+    rawJob = rawJob.replace("__codeName__", "blocking")
+    rawJob = rawJob.replace("__T__", "01:00:00")
+    rawJob = rawJob.replace("__MEM__", "3900")
+    rawJob = rawJob.replace("__nCpus__", str(n_cores))
+    rawJob = rawJob.replace("__superDir__", pjoin(path, fileName))
+    rawJob = rawJob.replace("__superName__", rawFile + ".dat")
+    rawJob = rawJob.replace("__homeScratch__", path)
+    rawJob = rawJob.replace("__code__", pjoin(paths.programPath, misc.QMC2programName))
+    rawJob = rawJob.replace("__args__", args)
+    rawJob = rawJob.replace(" > __subDir__/stdout.txt", "")
+    rawJob = rawJob.replace("__exec__", misc.QMC2programName)
+    
+    with open(pjoin(paths.CODE, "jobScripts", rawFile + ".slurm"), 'w') as f:
+            f.write(rawJob)
+    f.close()
     
 
 def main():
@@ -466,6 +505,8 @@ def main():
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
     
     openGUI = openGUI&(not forceTerminal)
+
+    makeJobScript = getJobFlag(sys.argv)
 
     if forceTerminal: 
         display = displayTerminal
@@ -521,17 +562,25 @@ def main():
             
             nBlocks, maxBlockSize, minBlockSize = lastParams
             
-            mpirun = ""
-            if mpiFlag:
-                mpirun = "mpiexec -n %d" % n_cores
             
-            args = mpirun.split() + [pjoin(paths.programPath, misc.QMC2programName), 
-                    'reblock', fileName.strip("_RAWDATA.arma"), 
-                    path + "/", str(nBlocks), str(maxBlockSize), str(minBlockSize)]
-            
-            subprocess.call(args)
-            
-            display(blockFile)
+            if not makeJobScript:
+
+                mpirun = ""
+                if mpiFlag:
+                    mpirun = "mpiexec -n %d" % n_cores
+                
+                args = mpirun.split() + [pjoin(paths.programPath, misc.QMC2programName), 
+                        'reblock', fileName.strip("_RAWDATA.arma"), 
+                        path + "/", str(nBlocks), str(maxBlockSize), str(minBlockSize)]                
+                
+                subprocess.call(args)
+                display(blockFile)
+                
+            else:
+                dumpJobScript(nBlocks, maxBlockSize, minBlockSize, 
+                              n_cores, 
+                              path,
+                              fileName)
                 
             localSatisfaction = getYesNo("Satisfied with result?")
             
