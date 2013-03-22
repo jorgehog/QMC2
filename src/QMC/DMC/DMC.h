@@ -31,7 +31,7 @@ protected:
     void set_trial_positions();
 
     bool move_autherized(double A) {
-        return metropolis_test(A)&(A > 0);
+        return metropolis_test(A)&system->allow_transition();
     };
 
     void iterate_walker(int k, int n_b = 1);

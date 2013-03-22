@@ -12,6 +12,7 @@ class Fermions : public System {
 protected:
 
     arma::rowvec I;
+    bool node_crossed;
 
     void make_merged_inv(Walker* walker);
     void update_inverse(const Walker* walker_old, Walker* walker_new, int particle);
@@ -22,9 +23,13 @@ public:
 
     void get_spatial_grad(Walker* walker, int particle) const;
     void get_spatial_grad_full(Walker* walker) const;
-    double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const;
+    double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle);
     double get_spatial_lapl_sum(const Walker* walker) const;
 
+    bool allow_transition(){
+        return !node_crossed;
+    }
+    
     void copy_walker(const Walker* parent, Walker* child) const {
         child->inv = parent->inv;
     }

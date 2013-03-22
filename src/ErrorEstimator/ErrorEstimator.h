@@ -21,7 +21,7 @@ public:
             bool parallel,
             int node, int n_nodes, bool rerun = false);
 
-    double combine_mean(double mean, int n, int n_tot);
+    double combine_mean(double mean, int n, int n_tot = 0);
     double combine_variance(double var, double mean = 0, int n = 0);
     
     void finalize();

@@ -11,6 +11,7 @@ Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
 : System(gP.n_p, gP.dim, orbital) {
 
     I = arma::zeros<arma::rowvec > (n_p);
+    node_crossed = false;
 
 }
 
@@ -22,7 +23,7 @@ void Fermions::get_spatial_grad_full(Walker* walker) const {
         for (int k = 0; k < dim; k++) {
             sum = 0;
             for (int j = 0; j < n2; j++) {
-                sum += walker->dell_phi(i)(k, j)*walker->inv(j, i);
+                sum += walker->dell_phi(i)(k, j) * walker->inv(j, i);
             }
             walker->spatial_grad(i, k) = sum;
         }
@@ -38,7 +39,7 @@ void Fermions::get_spatial_grad(Walker* walker, int particle) const {
         for (int k = 0; k < dim; k++) {
             sum = 0;
             for (int j = 0; j < n2; j++) {
-                sum += walker->dell_phi(i)(k, j)*walker->inv(j, i);
+                sum += walker->dell_phi(i)(k, j) * walker->inv(j, i);
             }
             walker->spatial_grad(i, k) = sum;
         }
@@ -56,7 +57,7 @@ void Fermions::make_merged_inv(Walker* walker) {
     }
 }
 
-double Fermions::get_spatial_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
+double Fermions::get_spatial_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) {
     int q_num;
     double s_ratio;
 
@@ -64,6 +65,12 @@ double Fermions::get_spatial_ratio(const Walker* walker_pre, const Walker* walke
     for (q_num = 0; q_num < n2; q_num++) {
         s_ratio += walker_post->phi(particle, q_num) * walker_pre->inv(q_num, particle);
     }
+
+    node_crossed = (s_ratio < 0);
+//    if (node_crossed) {
+//        std::cout << "node crossed" << s_ratio << std::endl;
+//        sleep(2);
+//    } 
 
     return s_ratio;
 }

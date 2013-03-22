@@ -123,6 +123,9 @@ bool QMC::metropolis_test(double A) {
     double r = sampling->call_RNG();
 
     if (r <= A) {
+//        if (!system->allow_transition()) {
+//            std::cout << "move " << total_samples << " rejected due to fixed node" << std::endl;
+//        }
         return true;
 
     } else {
@@ -202,7 +205,6 @@ void QMC::diffuse_walker(Walker* original, Walker* trial) {
         } else {
             reset_walker(original, trial, particle);
         }
-
         total_samples++;
 
     }
@@ -254,18 +256,10 @@ void QMC::get_QF(Walker* walker) const {
 
 void QMC::get_accepted_ratio() {
 
-#ifdef MPI_ON
-    if (is_master) {
-        MPI_Reduce(MPI_IN_PLACE, &accepted, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(MPI_IN_PLACE, &total_samples, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-    } else {
-        MPI_Reduce(&accepted, NULL, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&total_samples, NULL, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-    }
+    double ratio = ((double) accepted) / total_samples;
 
-#endif
-
-    s << "Acceptance ratio: " << (accepted/1000) / (double) (total_samples/1000) << std::endl;
+    s << "Acceptance ratio: " << error_estimator->combine_mean(ratio, total_samples);
+    s << std::endl;
     std_out->cout(s);
 }
 

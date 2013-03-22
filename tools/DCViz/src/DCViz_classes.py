@@ -11,7 +11,7 @@ except:
     print "\n" 
     sys.exit(1)
 
-from matplotlib import rc, pylab, colors
+from matplotlib import rc, pylab, colors, ticker
 
 #~ Paths include
 classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -96,15 +96,23 @@ class Blocking(DCVizPlotter):
         Fig, blockFig = self.Fig, self.blockFig
         blockSize, error = data
         
-        fileName = os.path.basename(self.filepath)
-        title = "Blocking data %s" % (fileName.split("_")[1] + " %s" % \
-              (self.nameMap[re.findall("blocking_\w+_out(\d*)\.dat", self.filepath)[0]]))
-        
+#        fileName = os.path.basename(self.filepath)
+#        title = "Blocking data %s" % (fileName.split("_")[1] + " %s" % \
+#              (self.nameMap[re.findall("blocking_\w+_out(\d*)\.dat", self.filepath)[0]]))
         blockFig.plot(blockSize, error, 'b+')  
         
-        blockFig.set_title(title)
+        formatter = ticker.ScalarFormatter(useOffset=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((-3, 4))
+        blockFig.axes.get_yaxis().set_major_formatter(formatter)
+        blockFig.axes.get_yaxis().get_label().set_fontsize(30)
+        blockFig.axes.get_yaxis().offsetText.set_size(20)
+        blockFig.axes.get_xaxis().get_label().set_fontsize(20)
+
+        
+#        blockFig.set_title(title)
         blockFig.set_xlabel(r'Block size')
-        blockFig.set_ylabel(r'$\sigma$')
+        blockFig.set_ylabel(r'$\sigma$', rotation=0)
         
 
 class DMC_OUT(DCVizPlotter):

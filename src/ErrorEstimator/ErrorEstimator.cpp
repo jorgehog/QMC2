@@ -145,6 +145,11 @@ double ErrorEstimator::combine_mean(double mean, int n, int n_tot){
     
     MPI_Allreduce(MPI_IN_PLACE, &mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     
+    if (n_tot == 0){
+        MPI_Allreduce(&n, &n_tot, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    }
+    
+    
     mean /= n_tot;
     
 #endif   
