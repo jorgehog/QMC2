@@ -135,7 +135,7 @@ n_c=2000
 
     for N in Nl:
         for w in wl:
-            filename = "abelRun_N%d_w%g.ini" % (N, w)
+            filename = "abelRun_N%d_w%s.ini" % (N, str(w).replace(".", ""))
             iniFile = raw.replace("__N__", str(N))
             iniFile = iniFile.replace("__w__", str(w))
             
