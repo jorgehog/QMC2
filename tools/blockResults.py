@@ -481,6 +481,8 @@ def dumpJobScript(nBlocks, maxBlockSize, minBlockSize,
     f.close()  
     
     rawFile = fileName.strip("_RAWDATA.arma")
+    mainDir = os.path.split(path)[1]
+   
     args = "reblock %s $SCRATCH/ %d %d %d" % (rawFile,
                                               nBlocks, 
                                               maxBlockSize,
@@ -498,7 +500,11 @@ def dumpJobScript(nBlocks, maxBlockSize, minBlockSize,
     rawJob = rawJob.replace(" > __subDir__/stdout.txt", "")
     rawJob = rawJob.replace("__exec__", misc.QMC2programName)
     
-    with open(pjoin(paths.CODE, "jobScripts", rawFile + ".slurm"), 'w') as f:
+    with open(pjoin(
+                paths.CODE, 
+                "jobScripts", 
+                "%s_%s.slurm" % (rawFile, mainDir)), 
+                        'w') as f:
             f.write(rawJob)
     f.close()
     
@@ -584,25 +590,29 @@ def main():
                               n_cores, 
                               path,
                               fileName)
-                
-            localSatisfaction = getYesNo("Satisfied with result?")
+            
+            if makeJobScript:
+                localSatisfaction = True
+            else:
+                localSatisfaction = getYesNo("Satisfied with result?")
             
         
         active = getYesNo("View more files?")
     
-    if getYesNo("Save figs to file?"):
-        
-        plotTool = Blocking(toFile=True)        
-        
-        for root, dirs, files in os.walk(mainDir):
+    if not makeJobScript:
+        if getYesNo("Save figs to file?"):
             
-            if root == mainDir:
-                continue
+            plotTool = Blocking(toFile=True)        
             
-            for outfile in files:
-                if re.findall(plotTool.nametag, outfile):
-                    plotTool.filepath = pjoin(root, outfile)
-                    plotTool.mainloop()
+            for root, dirs, files in os.walk(mainDir):
+                
+                if root == mainDir:
+                    continue
+                
+                for outfile in files:
+                    if re.findall(plotTool.nametag, outfile):
+                        plotTool.filepath = pjoin(root, outfile)
+                        plotTool.mainloop()
     
     if not forceTerminal:
         app.exit()
