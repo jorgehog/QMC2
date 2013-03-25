@@ -508,6 +508,65 @@ def dumpJobScript(nBlocks, maxBlockSize, minBlockSize,
             f.write(rawJob)
     f.close()
     
+def initializeCoumbRuns(mainDir, paramsDict, 
+                        n_cores, mpiFlag,
+                        makeJobScript):
+    
+    for root, dir_, files in os.walk(mainDir):
+        
+        for file_ in files:
+            abspath = pjoin(root, file_)            
+        
+            if re.findall("blocking_.+?\.arma", file_):
+                if "DMC" in file_:
+                    params = paramsDict["dmc"]
+                elif "VMC" in file_:
+                    params = paramsDict["vmc"]
+                else:
+                    continue
+                
+                initRun(n_cores, mpiFlag,
+                        file_, root,
+                        abspath,
+                        params,
+                        makeJobScript)
+
+        
+def initRun(n_cores, mpiFlag,
+            fileName, path,
+            blockFile,
+            lastParams,
+            makeJobScript,
+            display=None):
+                
+    nBlocks, maxBlockSize, minBlockSize = lastParams
+    
+    print "Initializing blocking job at "
+    print blockFile
+    print
+    print "with params [n_b, maxSize, minSize] = "
+    print lastParams
+    print    
+
+    if not makeJobScript:
+    
+        mpirun = ""
+        if mpiFlag:
+            mpirun = "mpiexec -n %d" % n_cores
+        
+        args = mpirun.split() + [pjoin(paths.programPath, misc.QMC2programName), 
+                'reblock', fileName.strip("_RAWDATA.arma"), 
+                path + "/", str(nBlocks), str(maxBlockSize), str(minBlockSize)]                
+        
+        subprocess.call(args)
+        if display is not None:
+            display(blockFile)
+        
+    else:
+        dumpJobScript(nBlocks, maxBlockSize, minBlockSize, 
+                      n_cores, 
+                      path,
+                      fileName)
 
 def main():
 
@@ -533,6 +592,42 @@ def main():
     
     if len(sys.argv) > 1:
         mainDir = sys.argv[1]
+        if not os.path.exists(mainDir):
+            print "First CML arg must be an existing path."
+            sys.exit(1)
+            
+        fixedParams = {"dmc": [0,0,0], "vmc": [0,0,0]}
+        
+        #If we supply the correct CML args, we can
+        #draw all runs under one comb, saving time.
+        if len(sys.argv) > 2:
+            for arg in sys.argv[2:]:
+                key, val = arg.split("=")
+                try:
+                    fixedParams[key] = eval(val)
+                except:
+                    print "Invalid CML arg: ", arg
+                    sys.exit(1)
+            
+            print "successfully initialized blocking runs in path:"
+            print mainDir
+            print 
+            print "with parameters:"
+            print fixedParams
+            print
+            proceed = raw_input("Continue? [y]")
+            
+            if proceed in ["", "y", "Y", "yes"]:
+                initializeCoumbRuns(mainDir, fixedParams, 
+                                    n_cores, mpiFlag,
+                                    makeJobScript)
+                sys.exit(0)
+                
+            else:
+                print "goodbye!"
+                sys.exit(1)
+
+            
     else:
         mainDir = pjoin(paths.scratchPath, "QMC_SCRATCH")
     
@@ -568,28 +663,14 @@ def main():
                 
             if lastParams is None:
                 break
-            
-            nBlocks, maxBlockSize, minBlockSize = lastParams
-            
-            
-            if not makeJobScript:
 
-                mpirun = ""
-                if mpiFlag:
-                    mpirun = "mpiexec -n %d" % n_cores
-                
-                args = mpirun.split() + [pjoin(paths.programPath, misc.QMC2programName), 
-                        'reblock', fileName.strip("_RAWDATA.arma"), 
-                        path + "/", str(nBlocks), str(maxBlockSize), str(minBlockSize)]                
-                
-                subprocess.call(args)
-                display(blockFile)
-                
-            else:
-                dumpJobScript(nBlocks, maxBlockSize, minBlockSize, 
-                              n_cores, 
-                              path,
-                              fileName)
+            initRun(n_cores, mpiFlag,
+                    fileName, path,
+                    blockFile,
+                    lastParams,
+                    makeJobScript,
+                    display)
+                                        
             
             if makeJobScript:
                 localSatisfaction = True
