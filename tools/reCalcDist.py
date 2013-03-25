@@ -6,7 +6,12 @@ from pyLibQMC import parseCML, paths, misc
 
 sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
     
-import DCVizWrapper as viz
+try:
+    import DCVizWrapper as viz
+    canViz = True
+except:
+    canViz = False
+
 
 def initRun(n_p, path, name, N, bin_edge, n_cores, mpiFlag):
     exe = pjoin(paths.programPath, misc.QMC2programName)
@@ -23,8 +28,9 @@ def initRun(n_p, path, name, N, bin_edge, n_cores, mpiFlag):
     dist_path = outPath.replace("__type__", "dist")
     radial_path = outPath.replace("__type__", "radial")
     
-    viz.main(dist_path, False)
-    viz.main(radial_path, False)
+    if canViz:
+        viz.main(dist_path, False)
+        viz.main(radial_path, False)
 
 
 def main():
