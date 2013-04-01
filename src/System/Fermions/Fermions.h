@@ -50,7 +50,6 @@ public:
      * Copies the inverse.
      */
     void copy_walker(const Walker* parent, Walker* child) const {
-        //## BURDE KOPIERE I??
         child->inv = parent->inv;
     }
 
@@ -59,7 +58,6 @@ public:
      */
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
         using namespace arma;
-        //## BURDE OPPDATERE I?
         walker_pre->inv(span(0, n2 - 1), span(start, end)) = walker_post->inv(span(0, n2 - 1), span(start, end));
     };
 
@@ -68,7 +66,6 @@ public:
      */
     void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
         using namespace arma;
-        //## BURDE RESETTE I?
         walker_post->inv(span(0, n2 - 1), span(start, end)) = walker_pre->inv(span(0, n2 - 1), span(start, end));
     }
 

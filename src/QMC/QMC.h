@@ -116,22 +116,18 @@ protected:
      */
     void calculate_energy_necessities(Walker* walker) const;
 
-    //! Method for storing positional data.
-    /*!
-     * Stored in the dist matrix. Used by OutputHandler::Distribution.
-     * \see Distribution::dump()
-     */
-
     //! Method for calculating the kinetic energy of a walker.
     double get_KE(const Walker* walker) const;
 
+    //! Method for storing positional data.
+    /*!
+     * Stored in the dist matrix. Used by OutputHandler::Distribution.
+     * \see Distribution::dump(), VMC::save_distribution(), DMC::save_distribution()
+     */
     virtual void save_distribution() = 0;
 
     //! Method for performing node communication.
     virtual void node_comm() = 0;
-
-
-   // void switch_souls(int root, int source); //## BURDE HETE DEST? TRENGER IKKE??? WTF?
 
     /*!
      * Iterates over the output objects in the output_handler vector. No if-tests.
@@ -157,7 +153,7 @@ protected:
      * This method sets the start and end position of the block that needs to be
      * changed.
      * 
-     * @param start,end See the System::Start System::End
+     * \see System::start, System::end
      */
     void set_spin_state(int particle) const;
 

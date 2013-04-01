@@ -132,28 +132,28 @@ void Walker::print(std::string header) const {
     cout << endl;
 }
 
-void Walker::send_soul(int source) {
+void Walker::send_soul(int dest) {
 #ifdef MPI_ON
 
-    MPI_Send(&E, 1, MPI_DOUBLE, source, 0, MPI_COMM_WORLD);
-    MPI_Send(r.memptr(), r.n_elem, MPI_DOUBLE, source, 1, MPI_COMM_WORLD);
-    MPI_Send(r_rel.memptr(), r_rel.n_elem, MPI_DOUBLE, source, 2, MPI_COMM_WORLD);
-    MPI_Send(r2.memptr(), r2.n_elem, MPI_DOUBLE, source, 3, MPI_COMM_WORLD);
-    MPI_Send(phi.memptr(), phi.n_elem, MPI_DOUBLE, source, 4, MPI_COMM_WORLD);
-    MPI_Send(spatial_grad.memptr(), spatial_grad.n_elem, MPI_DOUBLE, source, 5, MPI_COMM_WORLD);
+    MPI_Send(&E, 1, MPI_DOUBLE, dest, 0, MPI_COMM_WORLD);
+    MPI_Send(r.memptr(), r.n_elem, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
+    MPI_Send(r_rel.memptr(), r_rel.n_elem, MPI_DOUBLE, dest, 2, MPI_COMM_WORLD);
+    MPI_Send(r2.memptr(), r2.n_elem, MPI_DOUBLE, dest, 3, MPI_COMM_WORLD);
+    MPI_Send(phi.memptr(), phi.n_elem, MPI_DOUBLE, dest, 4, MPI_COMM_WORLD);
+    MPI_Send(spatial_grad.memptr(), spatial_grad.n_elem, MPI_DOUBLE, dest, 5, MPI_COMM_WORLD);
 
     //if jastrow
-    MPI_Send(dJ.memptr(), dJ.n_elem, MPI_DOUBLE, source, 6, MPI_COMM_WORLD);
-    MPI_Send(jast_grad.memptr(), jast_grad.n_elem, MPI_DOUBLE, source, 7, MPI_COMM_WORLD);
+    MPI_Send(dJ.memptr(), dJ.n_elem, MPI_DOUBLE, dest, 6, MPI_COMM_WORLD);
+    MPI_Send(jast_grad.memptr(), jast_grad.n_elem, MPI_DOUBLE, dest, 7, MPI_COMM_WORLD);
 
     //if IS
-    MPI_Send(qforce.memptr(), qforce.n_elem, MPI_DOUBLE, source, 8, MPI_COMM_WORLD);
+    MPI_Send(qforce.memptr(), qforce.n_elem, MPI_DOUBLE, dest, 8, MPI_COMM_WORLD);
 
     //if fermions
-    MPI_Send(inv.memptr(), inv.n_elem, MPI_DOUBLE, source, 9, MPI_COMM_WORLD);
+    MPI_Send(inv.memptr(), inv.n_elem, MPI_DOUBLE, dest, 9, MPI_COMM_WORLD);
 
     for (int i = 0; i < n_p; i++) {
-        MPI_Send(dell_phi(i).memptr(), dell_phi(i).n_elem, MPI_DOUBLE, source, i + 10, MPI_COMM_WORLD);
+        MPI_Send(dell_phi(i).memptr(), dell_phi(i).n_elem, MPI_DOUBLE, dest, i + 10, MPI_COMM_WORLD);
     }
 
     kill();

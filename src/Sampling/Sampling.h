@@ -58,10 +58,10 @@ public:
     virtual void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const = 0;
 
     //! Method for setting the trial position for a given walker.
-    void set_trial_pos(Walker* walker, bool set_pos = true); //## TRENGER IKKE SET POS
+    void set_trial_pos(Walker* walker);
 
     //! Method for setting up the single particle orbitals and it's derivatives for a given walker.
-    void set_trial_states(Walker* walker); //## BURDE VERE FERMIONS SLIK DEN STAR NA
+    void set_trial_states(Walker* walker); //## Should be Fermion specific.
 
     //! Method for calculating the sampling specific necessary values.
     /*!
@@ -87,8 +87,14 @@ public:
         return diffusion->get_g_ratio(walker_post, walker_pre);
     }
 
-    double get_branching_Gfunc(double E_x, double E_y, double E_T) const { //## BURDE IKKE KALLE DIFF
-        return diffusion->get_GBfunc(E_x, E_y, E_T);
+    //! Calculates the Branching Green's function ratio needed by DMC.
+    /*! 
+     * @param E_x Energy at current time step
+     * @param E_y Energy at previous time step
+     * @return The Branching Green's function ratio
+     */
+    double get_branching_Gfunc(double E_x, double E_y, double E_T) const {
+        return exp(-(0.5 * (E_x + E_y) - E_T) * diffusion->get_dt());
     }
 
     double get_spatialjast_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const { //Denne kan vel kastes inn i QMC::calc acc rat?

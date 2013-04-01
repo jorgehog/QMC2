@@ -15,7 +15,6 @@
 class AlphaHarmonicOscillator : public Orbitals {
 public:
     AlphaHarmonicOscillator(GeneralParams &, VariationalParams &);
-    AlphaHarmonicOscillator(GeneralParams &); //##TRASH?
 
     /*!
      * Calculates the exponential term shared by all oscillator function once pr. particle

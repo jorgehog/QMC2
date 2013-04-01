@@ -48,16 +48,6 @@ public:
      */
     virtual double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const = 0;
 
-    //! Calculates the Branching Green's function ratio needed by DMC.
-    /*! 
-     * @param E_x Energy at current time step
-     * @param E_y Energy at previous time step
-     * @return The Branching Green's function ratio
-     */
-    double get_GBfunc(double E_x, double E_y, double E_T) const {//##SHOULD BE IN SAMPLING?
-        return exp(-(0.5 * (E_x + E_y) - E_T) * timestep);
-    }
-
     //! Calls a uniform random number generator.
     /*!
      * Returns a random uniform number on [0,1).

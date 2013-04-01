@@ -23,9 +23,6 @@ protected:
 
     int block_size; //< The number of block samples for each walker for each cycle.
     int samples; //< The number of samples to the expectation value made every cycle.
-    unsigned long tot_samples; //## TRENGER IKKE
-    double E_tot; //## TRENGER IKKE
-
 
     double dmc_E; //!< The DMC energy.
     double dmc_E_unscaled; //!< The accumulative DMC energy: The sum of all previous trial energies.

@@ -7,12 +7,6 @@
 
 #include "../../QMCheaders.h"
 
-AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams& gp) {
-    VariationalParams dummyVar;
-    dummyVar.alpha = 1;
-    AlphaHarmonicOscillator(gp, dummyVar);
-}
-
 AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
 

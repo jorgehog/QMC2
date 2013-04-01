@@ -24,7 +24,11 @@ protected:
 
 public:
 
-    Walker(int n_p, int dim, bool do_init = true); //##FIKS...
+    //! Constructor.
+    /*!
+     * @param alive If false, the walker is initialized dead.
+     */
+    Walker(int n_p, int dim, bool alive = true);
     
     ~Walker();
     
@@ -74,9 +78,9 @@ public:
     
     /*!
      * Send a walker to a different node.
-     * @param source The receiving node's rank. 
+     * @param dest The receiving node's rank. 
      */
-    void send_soul(int source); //##BURDE HETE DEST?
+    void send_soul(int dest);
     
     /*!
      * Receives a walker from a different node.

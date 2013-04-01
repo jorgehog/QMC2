@@ -7,12 +7,6 @@
 
 #include "../../QMCheaders.h"
 
-hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams& gp) {
-    VariationalParams dummyVar;
-    dummyVar.alpha = 1;
-    hydrogenicOrbitals(gp, dummyVar);
-}
-
 hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
 
@@ -20,8 +14,8 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     this->k = new double();
     this->k2 = new double();
 
-    this->r22d = new double();
-    this->r2d = new double();
+    double* r22d = new double();
+    double* r2d = new double();
 
     this->exp_factor_n1 = new double();
     this->exp_factor_n2 = new double();
@@ -62,8 +56,6 @@ void hydrogenicOrbitals::set_qnum_indie_terms(const Walker* walker, int i) {
 
     *exp_factor_n1 = exp(-(*k) * walker->get_r_i(i));
     *exp_factor_n2 = exp(-(*k) * walker->get_r_i(i) / 2);
-    *r22d = walker->get_r_i2(i) - walker->r(i, 2) * walker->r(i, 2);
-    *r2d = sqrt((*r22d));
 
 }
 double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, int i){

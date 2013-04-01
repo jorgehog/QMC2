@@ -17,8 +17,6 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
 
     sampling->set_dt(dP.dt);
 
-    E_tot = 0;
-    tot_samples = 0;
     dmc_E = 0;
     dmc_E_unscaled = 0;
 
@@ -116,9 +114,6 @@ void DMC::update_energies() {
 
     node_comm();
 
-    E_tot += E;
-    tot_samples += samples;
-
     E_T = E / samples;
     dmc_E_unscaled += E_T;
     dmc_E = dmc_E_unscaled / cycle;
@@ -175,7 +170,7 @@ void DMC::run_method() {
     normalize_population();
 
     E_T = dmc_E;
-    E_tot = tot_samples = dmc_E = dmc_E_unscaled = 0;
+    dmc_E = dmc_E_unscaled = 0;
 
     for (cycle = 1; cycle <= n_c; cycle++) {
 
