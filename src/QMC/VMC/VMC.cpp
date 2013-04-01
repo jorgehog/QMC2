@@ -49,8 +49,7 @@ void VMC::save_distribution() {
 }
 
 void VMC::store_walkers() {
-
-    //store for DMC
+    
     if ((cycle > offset) && (cycle % pop_tresh == 0)) {
         copy_walker(original_walker, original_walkers[last_walker]);
         original_walkers[last_walker]->set_E(local_E);
@@ -95,6 +94,7 @@ void VMC::run_method() {
     node_comm();
     scale_values();
     output();
+    get_accepted_ratio();
     finalize_output();
     estimate_error();
 }
@@ -104,7 +104,6 @@ void VMC::output() {
 
     s << "VMC energy: " << get_energy() << endl;
     std_out->cout(s);
-    get_accepted_ratio();
 
 }
 

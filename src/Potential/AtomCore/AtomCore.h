@@ -8,9 +8,11 @@
 #ifndef ATOMCORE_H
 #define	ATOMCORE_H
 
+/*! \brief Implementation of the Atom Core potential. -Z/r
+ */
 class AtomCore : public Potential {
 protected:
-    int Z;
+    int Z; //!< The core charge.
 
 public:
 

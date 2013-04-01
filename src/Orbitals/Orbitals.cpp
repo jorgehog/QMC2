@@ -17,7 +17,7 @@ Orbitals::Orbitals(int n_p, int dim) {
     two_h = 1 / (2 * h);
 
 
-    max_implemented = 20; //for 42 particles
+    max_implemented = 20; //for 42 particles ##SHOULD BE 21??!?! WTF?
     basis_functions = new BasisFunctions*[max_implemented];
 
     dell_basis_functions = new BasisFunctions**[dim];

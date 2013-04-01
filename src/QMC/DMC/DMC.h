@@ -8,60 +8,112 @@
 #ifndef DMC_H
 #define	DMC_H
 
+/*! \brief Implementation of the Diffusion Monte-Carlo Method.
+ * Very little needs to be added when the QMC superclass holds all the
+ * general functionality.
+ */
 class DMC : public QMC {
 protected:
 
-    int n_w_last;
-    
-    int n_w_tot;
-    arma::uvec n_w_list;
-    
-    int deaths;
+    int n_w_last; //!< The amount of walkers at the time the walker loop was initiated.
+    int n_w_tot; //!< The total number of walkers across all nodes.
+    arma::uvec n_w_list; //!< List of the number of walkers of each node.
 
-    int block_size;
-    int samples;
-    unsigned long tot_samples;
-    double E_tot;
+    int deaths; //< The number of walkers who died the last cycle.
 
-    double dmc_E;
-    double dmc_E_unscaled;
-    double E_T;
-    double E;
+    int block_size; //< The number of block samples for each walker for each cycle.
+    int samples; //< The number of samples to the expectation value made every cycle.
+    unsigned long tot_samples; //## TRENGER IKKE
+    double E_tot; //## TRENGER IKKE
 
+
+    double dmc_E; //!< The DMC energy.
+    double dmc_E_unscaled; //!< The accumulative DMC energy: The sum of all previous trial energies.
+
+    double E_T; //!< The trial energy at the current cycle.
+    double E; //!< The accumulative energy for each cycle.
+
+    //! Method for setting the trial position of all DMC walkers.
+    /*!
+     * In case VMC is not run prior to DMC, trial positions must be set. 
+     */
     void set_trial_positions();
 
-    bool move_autherized(double A) {
-        return metropolis_test(A)&system->allow_transition();
-    };
-
+    //! Method for iterating a walker one time step.
+    /*!
+     * @param n_b The number of block samples used in the iteration.
+     * @param k The index of the walker.
+     */
     void iterate_walker(int k, int n_b = 1);
 
+    //! Method for the birth/death process of a walker.
+    /*!
+     * @param GB The branching Green's Function.
+     * @param k The index of the walker.
+     */
     void Evolve_walker(int k, double GB);
 
+    //! Method for cleaning up the dead walkers and compact the list.
     void bury_the_dead();
 
+    //! Method for updating the DMC energy and calculating the new trial energy.
     void update_energies();
+
+    /*!
+     * In case of DMC, we must let the system have the possibility to
+     * override the metropolis test (fixed node approximation in case of a
+     * Fermion system) 
+     */
+    bool move_autherized(double A) {
+        return metropolis_test(A) & system->allow_transition();
+    };
 
     void reset_parameters() {
         n_w_last = n_w;
         E = samples = deaths = 0;
     }
-    
+
+    /*!
+     * For each process:
+     * -Calculates the total number of walkers.
+     * -Sums up the energies sampled.
+     * -Sums up the total number of samples made. 
+     */
     void node_comm();
-    
+
+    //! Method for storing positional data for the Distribtuon.
+    /*!
+     * Stores the position data from all currently alive DMC walkers 
+     * every dist_tresh cycle.
+     */
     void save_distribution();
 
+    //! Method for sending a walker between two nodes.
+    /*!
+     * @param root The node from which the walker is sent.
+     * @param root_id The index of the walker being sent from root.
+     * @param dest The node which receives the walker.
+     * @param dest_id The index where the walker is to be received.
+     * \see Walker::send_soul(), Walker::recv_soul()
+     */
     void switch_souls(int root, int root_id, int dest, int dest_id);
 
+    //! Method for evening out the number of walkers on each node.
     void normalize_population();
-    
+
 
 public:
 
-    static const int K = 50; //Factor of empty space for walkers over initial walkers
-    static const int check_thresh = 25; //normalize every [] cycle
-    static const int sendcount_thresh = 20; //abort normalization if max difference in walkers small
+    //! Factor of empty space for walkers over initial walkers.
+    /*! \see QMC::QMC() */
+    static const int K = 50;
+    static const int check_thresh = 25; //< The amount of cycles between every time the population is normalized.
+    static const int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
 
+    //! Constructor.
+    /*
+     * @param dist_out If true, matrices to hold positional data is initialized.
+     */
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc, bool dist_out);
 
     void run_method();

@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 
 import sys, re, os, inspect
@@ -84,6 +85,41 @@ class myTestClassFamily(DCVizPlotter):
             subfig.set_ylim([-1,1])
         
 
+class EnergyTrail(DCVizPlotter):
+    
+    nametag = "\w+.trailingE.arma"
+    
+    armaBin=True
+    isFamilyMember=True
+    
+    figMap = {"fig1": ['eFig']}
+    c = ["#C0C0C0", '#008000', '#008000'] 
+    l = ["-", "--", "-"]
+    
+    def plot(self, data):
+
+        eDMC = 65.7
+        
+        for i, data_ in enumerate(data):
+            name = self.familyFileNames[i].split(".")[0].replace("_", " ")[1:]
+            self.eFig.plot(numpy.cumsum(data_.data)/numpy.linspace(1,data_.m,data_.m),
+                           self.l[i], c=self.c[i], label=name)
+                           
+        self.eFig.plot([1,data_.m], [eDMC, eDMC], 'k-.', label="DMC Energy")
+        self.eFig.legend()
+        
+        self.eFig.set_xlabel('Cycle')
+        self.eFig.set_ylabel(r'$\langle E\rangle $', rotation=0)
+        
+        self.eFig.axes.get_yaxis().get_label().set_fontsize(20)
+        self.eFig.axes.get_xaxis().get_label().set_fontsize(20)
+
+        formatter = ticker.ScalarFormatter(useOffset=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((-3, 2))
+        self.eFig.axes.get_xaxis().set_major_formatter(formatter)
+
+
 class Blocking(DCVizPlotter):
     
     nametag = "blocking_\w+_out\d*\.dat"
@@ -99,7 +135,8 @@ class Blocking(DCVizPlotter):
 #        fileName = os.path.basename(self.filepath)
 #        title = "Blocking data %s" % (fileName.split("_")[1] + " %s" % \
 #              (self.nameMap[re.findall("blocking_\w+_out(\d*)\.dat", self.filepath)[0]]))
-        blockFig.plot(blockSize, error, 'b+')  
+        blockFig.plot(blockSize, error, 
+                      '*', color='#008000', markersize=10)  
         
         formatter = ticker.ScalarFormatter(useOffset=True)
         formatter.set_scientific(True)
@@ -229,7 +266,8 @@ class MIN_OUT(DCVizPlotter):
               "param_fig": ["param_plot", "grad_plot"]}
     
     indexmap = {0: r"\alpha", 1: r"\beta"}
-    c = ['b', 'g']    
+    l = ["-", "--"]
+    c = ['#008000', 'k']    
     
     def plot(self, data):
 
@@ -241,35 +279,44 @@ class MIN_OUT(DCVizPlotter):
                                                     self.param_plot, self.grad_plot
         
         #~ E PLOTS
-        E_plot.plot(E, 'b', label="E")
-        E_plot.plot(Eavg, 'r', label="average E")
+        E_plot.plot(E, self.l[0], c=self.c[0], label="E")
+        E_plot.plot(Eavg, self.l[1], c=self.c[1], label="average E")
         
         E_plot.legend()
-        E_plot.set_title('Energy convergeance')
-        E_plot.set_xlabel(r'cycle')
+        #E_plot.set_title('Energy convergeance')
+        E_plot.set_xlabel(r'Cycle')
         E_plot.set_ylabel(r'E [Ha]')
+        E_plot.axes.get_yaxis().get_label().set_fontsize(30)
+        E_plot.axes.get_xaxis().get_label().set_fontsize(30)
         E_plot.ticklabel_format(useOffset=False, axis='y')
         
         #~ Step plot
-        step_plot.plot(step, 'b')
-        step_plot.set_title('step length')
-        step_plot.set_xlabel('cycle')
-        step_plot.set_ylabel('step')
-        E_plot.ticklabel_format(useOffset=False, axis='y')
-        
+        step_plot.plot(step, self.l[0], c=self.c[0])
+        #step_plot.set_title('Step length')
+        step_plot.set_xlabel('Cycle')
+        step_plot.set_ylabel('Step')
+        step_plot.axes.get_yaxis().get_label().set_fontsize(30)
+        step_plot.axes.get_xaxis().get_label().set_fontsize(30)
+
+        lw = 2
         #~ Param plots
         for i in range(0, 2*n_params, 2):
-            param_plot.plot(data[3 + i], self.c[i/2],label=r'$%s$' % self.indexmap[i/2])    
-            grad_plot.plot(data[4 + i], self.c[i/2])
+            param_plot.plot(data[3 + i], self.l[i/2], c=self.c[i/2],label=r'$%s$' % self.indexmap[i/2], linewidth=lw)    
+            grad_plot.plot(data[4 + i], self.l[i/2], c=self.c[i/2], linewidth=lw)
         
         param_plot.set_ylabel(r'$\alpha_i$')
-        param_plot.set_title('Variational parameters')
+        #param_plot.set_title('Variational parameters')
         param_plot.axes.get_xaxis().set_visible(False)
         param_plot.legend()
+        param_plot.axes.get_yaxis().get_label().set_fontsize(30)
+        param_plot.axes.get_xaxis().get_label().set_fontsize(30)
+        param_plot.axes.get_yaxis().labelpad = 20
         
-        grad_plot.set_title('Energy derivatives')
-        grad_plot.set_ylabel(r'$\frac{\partial E}{\partial \alpha_i}$ [Ha]')
-        grad_plot.set_xlabel('cycle')
+        #grad_plot.set_title('Energy derivatives')
+        grad_plot.set_ylabel(r'$\frac{\partial E}{\partial \alpha_i}$', rotation=0)
+        grad_plot.set_xlabel('Cycle')
+        grad_plot.axes.get_yaxis().get_label().set_fontsize(30)
+        grad_plot.axes.get_xaxis().get_label().set_fontsize(30)
             
             
         

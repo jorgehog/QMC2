@@ -8,6 +8,10 @@
 #ifndef NO_JASTROW_H
 #define	NO_JASTROW_H
 
+
+/*!
+ * \brief Class loaded when no correlation factor is used.
+ */
 class No_Jastrow : public Jastrow {
 protected:
 

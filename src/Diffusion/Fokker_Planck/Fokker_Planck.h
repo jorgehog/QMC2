@@ -8,6 +8,8 @@
 #ifndef FOKKER_PLANCK_H
 #define	FOKKER_PLANCK_H
 
+/*! \brief Anisotropic diffusion by the Fokker-Planck equation.
+ */
 class Fokker_Planck : public Diffusion {
 public:
     Fokker_Planck(int n_p, int dim, double timestep, seed_type random_seed, double D = 0.5);

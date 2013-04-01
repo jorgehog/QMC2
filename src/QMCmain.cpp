@@ -11,6 +11,11 @@
  * 
  */
 
+//! Function for parsing the command line for parameters.
+/*!
+ * The command line parameters are set up by the Python script runQMC.
+ * Compiling with a different main file is designed to be easy.
+ */
 void parseCML(int, char**,
         VMCparams &,
         DMCparams &,
@@ -21,6 +26,7 @@ void parseCML(int, char**,
         ParParams &
         );
 
+//! Function for setting up the system objects.
 void selectSystem(GeneralParams & gP,
         SystemObjects & sO,
         VariationalParams & vP,

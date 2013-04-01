@@ -8,6 +8,8 @@
 #ifndef COULOMB_H
 #define	COULOMB_H
 
+/*! \brief Implementation of the Coulomb potential. 1/r_{ij}
+ */
 class Coulomb : public Potential {
 public:
 

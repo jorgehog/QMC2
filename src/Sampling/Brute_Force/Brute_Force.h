@@ -8,6 +8,11 @@
 #ifndef BRUTE_FORCE_H
 #define	BRUTE_FORCE_H
 
+/*! \brief Implementation of the Brute Force QMC.
+ * Uses the Simle diffusion class.
+ * All methods are empty except for the energy necessities part which requires the
+ * gradients to be calculated (not using the Quantum Force).
+ */
 class Brute_Force : public Sampling {
 public:
 

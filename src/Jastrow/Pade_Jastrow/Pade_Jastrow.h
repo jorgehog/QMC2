@@ -8,10 +8,14 @@
 #ifndef PADE_JASTROW_H
 #define	PADE_JASTROW_H
 
+
+/*!
+ * \brief The Pade Jastrow factor with a single variational parameter.
+ */
 class Pade_Jastrow : public Jastrow {
 protected:
-    double beta;
-    arma::mat a;
+    double beta; //!< The variational parameter
+    arma::mat a; //!< The spin-dependent variables taking care of the cusp condition.
 
     double get_variational_derivative(const Walker* walker, int n);
 
@@ -27,6 +31,9 @@ public:
 
     Pade_Jastrow(GeneralParams &, VariationalParams &);
 
+    /*!
+     * In case of Pade Jastrow, initializing means seting up the a matrix.
+     */
     void initialize();
 
     void get_grad(Walker* walker) const;

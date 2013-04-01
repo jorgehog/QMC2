@@ -17,17 +17,16 @@ except:
     print "pyside not supported. Terminal usage enabled."
     forceTerminal = True
     
-    try:
-        sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
-    
-        from DCViz_classes import Blocking, MIN_OUT, DMC_OUT
-    except:
-        print "Warning: Displaying results not aviable.."
-    
     #Evil haxx
     QDialog = list
 
-       
+try:
+    sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
+
+    from DCViz_classes import Blocking, MIN_OUT, DMC_OUT
+except:
+    print "Warning: Displaying results not aviable.."
+    
 
 class runAgainForm(QDialog):
     def __init__(self, Q, parent=None):

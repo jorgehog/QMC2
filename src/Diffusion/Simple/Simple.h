@@ -8,6 +8,8 @@
 #ifndef SIMPLE_H
 #define	SIMPLE_H
 
+/*! \brief Simple Isotropic diffusion model.
+ */
 class Simple : public Diffusion {
 public:
     Simple(int n_p, int dim, double timestep, seed_type random_seed, double D = 0.5);
