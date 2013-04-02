@@ -155,7 +155,19 @@ void Walker::send_soul(int dest) {
     for (int i = 0; i < n_p; i++) {
         MPI_Send(dell_phi(i).memptr(), dell_phi(i).n_elem, MPI_DOUBLE, dest, i + 10, MPI_COMM_WORLD);
     }
+/*dmcE: 1.021642 | E_T: 1.022278 | Nw:  6045 | 100.0%
+Distribution calculated using 478732 samples.
+Acceptance ratio: 1.0
 
+Estimated Error: 1.433097397e-06
+
+ */
+/*VMC energy: 543.372
+seed: 1364823483
+
+Acceptance ratio: 0.997459
+
+ */
     kill();
 
 #endif
