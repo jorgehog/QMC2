@@ -6,6 +6,7 @@
  */
 
 #include "../QMCheaders.h"
+#include "CoulombElements/coulomb.h"
 
 Orbitals::Orbitals(int n_p, int dim) {
     this->n_p = n_p;
@@ -108,14 +109,24 @@ double Orbitals::phi(const Walker* walker, int particle, int q_num) {
 }
 
 double Orbitals::del_phi(const Walker* walker, int particle, int q_num, int d) {
-//    testDell(walker, particle, q_num, d);
+    //    testDell(walker, particle, q_num, d);
     return dell_basis_functions[d][q_num]->eval(walker, particle);
 }
 
 double Orbitals::lapl_phi(const Walker* walker, int particle, int q_num) {
-//    testLaplace(walker, particle, q_num);
+    //    testLaplace(walker, particle, q_num);
     return lapl_basis_functions[q_num]->eval(walker, particle);
 }
+
+double Orbitals::get_coulomb_element(const arma::uvec & qnum_set) {
+    //Do nothing
+    return 0;
+}
+double Orbitals::get_sp_energy(int qnum) const {
+    //Do nothing
+    return 0;
+}
+
 
 void Orbitals::testDell(const Walker* walker, int particle, int q_num, int d) {
     double cf = dell_basis_functions[d][q_num]->eval(walker, particle);

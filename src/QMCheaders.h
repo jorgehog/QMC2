@@ -198,6 +198,8 @@ class QMC;
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
 #include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
+//#include "HartreeFock/HartreeFock.h"
+
 #include "Potential/Potential.h"
 #include "Potential/Coulomb/Coulomb.h"
 #include "Potential/Harmonic_osc/Harmonic_osc.h"

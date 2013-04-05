@@ -16,6 +16,10 @@ public:
     double del_phi(const Walker* walker, int particle, int q_num, int d);
     double lapl_phi(const Walker* walker, int particle, int q_num);
 
+    void set_qnum_indie_terms(const Walker* walker, int i) {
+        basis->set_qnum_indie_terms(walker, i);
+    }
+    
 protected:
     int basis_size;
 

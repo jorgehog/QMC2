@@ -38,8 +38,6 @@ protected:
 
     double *exp_factor; //!< Pointer to a factor precalculated by set_qnum_indie_terms(). Shared address with all the BasisFunction subclasses.
 
-    arma::Mat<int> qnums; //!< Quantum number matrix needed by the variational derivatives.
-
     /*!
      * Overridden superclass method implementing closed form expressions using Hermite polynomials.
      */
@@ -50,6 +48,13 @@ protected:
      */
     void get_qnums();
 
+    /*!
+     * For Quantum Dots, closed form expressions for the matrix elements exist.
+     */
+    double get_coulomb_element(const arma::uvec & qnum_set);
+    
+    double get_sp_energy(int qnum) const;
+    
     //! Method for calculating Hermite polynomials.
     /*!
      * @param n The degree of the Hermite polynomial.

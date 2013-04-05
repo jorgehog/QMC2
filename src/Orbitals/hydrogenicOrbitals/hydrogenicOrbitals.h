@@ -45,6 +45,11 @@ protected:
      */
     double get_dell_alpha_phi(const Walker* walker, int qnum, int i);
 
+    double get_sp_energy(int qnum) const;
+    double get_coulomb_element(const arma::uvec & qnum_set);
+    
+    void get_qnums();
+    
     /*!
      * @return The variational parameter alpha.
      */

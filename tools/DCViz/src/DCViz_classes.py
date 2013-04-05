@@ -209,12 +209,14 @@ class radial_out(DCVizPlotter):
             
             if "dmc" in self.familyFileNames[i]:
                 method = "dmc"
+                dmc = data[i].data
             elif "vmc" in self.familyFileNames[i]:
                 method = "vmc"
+                vmc = data[i].data
             
             r = numpy.linspace(0, edge, data[i].n)
             self.radialFig.plot(r, data[i][0], label=method);
-                        
+        self.radialFig.plot(r, 2*dmc - vmc, "k-")
         self.radialFig.legend()    
         self.radialFig.axes.set_xlim(r[cut], max_edge)
         self.radialFig.set_xlabel('r')

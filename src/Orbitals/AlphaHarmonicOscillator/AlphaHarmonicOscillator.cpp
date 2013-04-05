@@ -6,6 +6,7 @@
  */
 
 #include "../../QMCheaders.h"
+#include "../CoulombElements/coulomb.h"
 
 AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
@@ -108,7 +109,7 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
 }
 
 void AlphaHarmonicOscillator::get_qnums() {
-    qnums = arma::zeros<arma::Mat<int> > (n2, dim);
+    qnums = arma::zeros<arma::imat > (n2, dim);
     double n_x, n_y;
 
     int n_shells = (int) (0.5 * (sqrt(1 + 4 * n_p) - 1));
@@ -147,7 +148,7 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
         return 16 * x2 * x2 - 48 * x2 + 12;
     } else if (n == 5) {
         double x2 = x*x;
-        return 32*x2*x2*x - 160*x2*x + 120*x;
+        return 32 * x2 * x2 * x - 160 * x2 * x + 120 * x;
     } else {
         std::cout << "Unsopported Hermite polynomial level: " << n << std::endl;
         exit(1);
@@ -181,4 +182,67 @@ double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker,
     }
 
     return dalpha;
+}
+
+double AlphaHarmonicOscillator::get_coulomb_element(const arma::uvec& qnum_set) {
+    //Needs transformations to be effective. Simen Kvaal style.
+    using namespace arma;
+
+    int n_x, n_y;
+
+    ivec n_set(4);
+    ivec m_set(4);
+
+    for (int i = 0; i < 4; i++) {
+        n_x = qnums(qnum_set(i), 0);
+        n_y = qnums(qnum_set(i), 1);
+
+        m_set(i) = n_x - n_y;
+        n_set(i) = (n_x + n_y - abs(m_set(i))) / 2;
+
+    }
+//    cout << "q " <<qnum_set.st() << "m " << m_set.st() << "n " << n_set.st() << endl;
+    double element = coulomb(n_set(0), m_set(0),
+            n_set(1), m_set(1),
+            n_set(3), m_set(3),
+            n_set(2), m_set(2));
+//    cout << element << "\n-------" << endl;
+    
+    int n_c=10000000;
+    double a = -3;
+    double b = 3;
+    Diffusion* diff = new Simple(1, 1, 1, 1000, 1);
+    
+    Walker* dummy = new Walker(2, dim);
+    double I = 0;
+    for(int i = 0; i < n_c; i++){
+        dummy->r = a + (b-a)*randu(2, dim);
+        
+        set_qnum_indie_terms(dummy, 0);
+        double local_I = phi(dummy, 0, qnum_set(0))*phi(dummy, 0, qnum_set(2));
+        
+        set_qnum_indie_terms(dummy, 1);
+        local_I*= phi(dummy, 1, qnum_set(1))*phi(dummy, 1, qnum_set(3));
+        
+        I += local_I/dummy->calc_r_rel(0, 1);
+        
+        
+    }
+    
+    I *= (b - a)/n_c;
+    if (I < 1E-2){
+        I = 0;
+    }
+//    cout << I << "  " << element << endl;
+    
+    return I;
+    
+}
+
+double AlphaHarmonicOscillator::get_sp_energy(int qnum) const {
+    int n_x = qnums(qnum, 0);
+    int n_y = qnums(qnum, 1);
+
+    return w * (n_x + n_y + 1);
+
 }

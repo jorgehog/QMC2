@@ -8,6 +8,8 @@
 #ifndef ORBITALS_H
 #define	ORBITALS_H
 
+#include "../HartreeFock/HartreeFock.h"
+
 /*! \brief Superclass for the single particle orbital classes.
  * Handles everything specific regarding choice of single particle basis.
  */
@@ -24,6 +26,8 @@ protected:
     double h; //!< The step length for finite difference schemes.
     double h2;
     double two_h;
+
+    arma::imat qnums; //!< Quantum number matrix needed by Hartree-Fock and the variational derivatives.
 
     BasisFunctions** basis_functions; //!< A vector maping a quantum number index to a single particle wave function.
     BasisFunctions*** dell_basis_functions; //!< A maxtrix maping a quantum number- and dimension index to a single particle wave function derivative.
@@ -77,9 +81,15 @@ protected:
      */
     void testDell(const Walker* walker, int particle, int q_num, int d);
 
-    friend class Minimizer;
-    friend class ASGD;
-    friend class stdoutASGD;
+    //! Method for calculating the anti-symmetrized Coulumb matrix elements
+    /*!
+     * Used by Hartree Fock
+     */
+
+    virtual double get_coulomb_element(const arma::uvec & qnum_set);
+    virtual double get_sp_energy(int qnum) const;
+    
+
 
 public:
 
@@ -87,6 +97,7 @@ public:
     Orbitals();
 
     //! Calculates single particle wave function terms which are independent of the quantum numbers.
+
     /*!
      * If a term in the single particle functions are independent of the quantum number,
      * this function can be overridden to calculate them beforehand (for each particle), 
@@ -118,7 +129,11 @@ public:
     void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;
     }
-
+    
+    friend class HartreeFock;
+    friend class Minimizer;
+    friend class ASGD;
+    friend class stdoutASGD;
 };
 
 
