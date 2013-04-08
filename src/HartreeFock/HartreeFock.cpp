@@ -18,7 +18,7 @@ class Walker;
 
 HartreeFock::HartreeFock(int m, Orbitals* sp_basis, double thresh) {
 
-    this->thresh = 1E-6;
+    this->thresh = 1E-12;
 
     assert(m / 2 <= sp_basis->max_implemented);
 
@@ -58,10 +58,8 @@ void HartreeFock::run_method() {
 
         make_Hamiltonian();
 
-        std::cout << H_hf << std::endl;
-
         arma::eig_sym(e_HF, C, H_hf);
-        C = C.st();
+        C = C.t();
         sort();
 
         e_new = e_HF(0);
@@ -73,27 +71,24 @@ void HartreeFock::run_method() {
     double E_hf = calc_HF_E();
 
     std::cout << "fin " << E_hf << std::endl;
+    std::cout << C << std::endl;
     C.resize(n_p, m);
     std::cout << C << std::endl;
 
     double E = 0;
     for (int p = 0; p < n_p; p++) {
         for (int i = 0; i < m; i++) {
-                E += C(p, i) * C(p, i) * e_sp(i / 2);
+            E += C(p, i) * C(p, i) * e_sp(i / 2);
         }
     }
-    
-    for (int a = 0; a < n_p; a++) {
-        for (int b = 0; b < n_p; b++) {
-            for (int c = 0; c < n_p; c++) {
-                for (int d = 0; d < n_p; d++) {
-                    for (int i = 0; i < m; i++) {
-                        for (int j = 0; j < m; j++) {
-                            for (int k = 0; k < m; k++) {
-                                for (int l = 0; l < m; l++) {
-                                    E += 0.25*C(a, i)*C(b, j)*C(c, k)*C(d, l)*get_V(i, j, k, l);
-                                }
-                            }
+
+    for (int c = 0; c < n_p; c++) {
+        for (int d = 0; d < n_p; d++) {
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < m; j++) {
+                    for (int k = 0; k < m; k++) {
+                        for (int l = 0; l < m; l++) {
+                            E += 0.5 * C(c, i) * C(d, j) * C(c, k) * C(d, l) * get_V(i, j, k, l);
                         }
                     }
                 }
@@ -158,13 +153,15 @@ double HartreeFock::calc_HF_E() {
                 for (b = 0; b < m; b++) {
                     for (g = 0; g < m; g++) {
                         for (d = 0; d < m; d++) {
-                            E_hf += C(i, a) * C(j, b) * C(i, g) * C(j, d) * get_V(a, b, g, d);
+                            E_hf += 0.5*C(i, a) * C(j, b) * C(i, g) * C(j, d) * get_V(a, b, g, d);
                         }
                     }
                 }
             }
         }
     }
+
+    return E_hf;
 }
 
 void HartreeFock::make_Hamiltonian() {

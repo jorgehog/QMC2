@@ -124,9 +124,9 @@ double hydrogenicOrbitals::get_coulomb_element(const arma::uvec& qnum_set) {
     int Mleft = qnums(qnum_set(0), 2) + qnums(qnum_set(1), 2);
     int Mright = qnums(qnum_set(2), 2) + qnums(qnum_set(3), 2);
 
-//    if (Mleft != Mright) {
-//        return 0;
-//    }
+    if (Mleft != Mright) {
+        return 0;
+    }
 //
 //    arma::vec N(4);
 //    N.zeros();
