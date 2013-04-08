@@ -30,8 +30,11 @@ ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size
 double ExpandedBasis::phi(const Walker* walker, int particle, int q_num) {
 
     double value = 0;
-    for (int m = 0; m < basis_size; m++) {
-        value += coeffs(particle, m) * basis->phi(walker, particle, q_num);
+
+    //Dividing basis_size by half assuming a two-level system.
+    //In case of Bosons, expanding s.p. w.f. does not make sence.
+    for (int m = 0; m < basis_size / 2; m++) {
+        value += coeffs(q_num, m) * basis->phi(walker, particle, m);
     }
 
     return value;
