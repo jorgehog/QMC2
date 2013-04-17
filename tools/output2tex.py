@@ -10,7 +10,7 @@ def getVmcE(path):
     stdoutRaw = stdout.read()
     stdout.close()
     
-    pattern = "VMC energy: (\d+\.?\d*)"
+    pattern = "VMC energy: (\-?\d+\.?\d*)"
     
     r = re.findall(pattern, stdoutRaw)
     
@@ -25,7 +25,7 @@ def getDmcE(path):
     stdoutRaw = stdout.read()
     stdout.close()
     
-    pattern = "dmcE:\s*(\d+\.?\d*).+\|\s*100\.?[0]*%"
+    pattern = "dmcE:\s*(\-?\d+\.?\d*).+\|\s*100\.?[0]*%"
     
     r = re.findall(pattern, stdoutRaw)
     

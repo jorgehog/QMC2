@@ -7,10 +7,10 @@ Created on Mon Oct  8 13:05:51 2012
 
 from pyLibQMC import paths
 
-validation = False
+validation = True
 fullruns = False
 test = False
-abel = True
+abel = False
 
 if test:
     wList = [0.5,1]
@@ -44,13 +44,12 @@ n_c=100
 
 if validation:
 
-    wList = [0.5,1]
-    npList = [2,6,12, 20, 30]
+    npList = [2,4,10]
 
     rawFile = """general:
 n_p = __NP__
-systemConstant = __W__
 use_coulomb = 0
+system=Atoms
 doVMC = 1
 doDMC = 1
 doMIN = 1
@@ -68,20 +67,16 @@ MIN:
 SGDsamples=2000
 n_c_SGD=400
 therm=10000
-n_c=100
-
-
 """
 
-    for w in wList:
-        for np in npList:
-                filename = "test_np%d_w%s.ini" % (np, str(w).replace(".", ""))
-                iniFile = rawFile.replace("__NP__", str(np))
-                iniFile = iniFile.replace("__W__", str(w))
+  
+    for np in npList:
+            filename = "test_Atoms_np%d.ini" % (np)
+            iniFile = rawFile.replace("__NP__", str(np))
             
-                outFile = open(paths.iniFilePath + "/" + filename, 'w')
-                outFile.write(iniFile)
-                outFile.close()
+            outFile = open(paths.iniFilePath + "/" + filename, 'w')
+            outFile.write(iniFile)
+            outFile.close()
                 
                 
 if fullruns:

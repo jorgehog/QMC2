@@ -108,16 +108,16 @@ int main(int argc, char** argv) {
     }
     //
 
-    generalParams.n_p = 2;
-    generalParams.dim = 3;
-    generalParams.systemConstant = generalParams.n_p;
-    variationalParams.alpha = 1;
-    srand(time(NULL));
-    Orbitals* sp = new hydrogenicOrbitals(generalParams, variationalParams);
-    HartreeFock* hf = new HartreeFock(4, sp);
-    hf->run_method();
-    
-    exit(0);
+//    generalParams.n_p = 2;
+//    generalParams.dim = 3;
+//    generalParams.systemConstant = generalParams.n_p;
+//    variationalParams.alpha = 1;
+//    srand(time(NULL));
+//    Orbitals* sp = new hydrogenicOrbitals(generalParams, variationalParams);
+//    HartreeFock* hf = new HartreeFock(4, sp);
+//    hf->run_method();
+//    
+//    exit(0);
     
     parseCML(argc, argv,
             vmcParams,

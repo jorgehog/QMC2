@@ -166,25 +166,31 @@ class DMC_OUT(DCVizPlotter):
         t = numpy.linspace(0, self.dt*(len(E) - 1), len(E))
         N_plot, E_plot = self.N_plot, self.E_plot
         
+        lw=2
         
         # E PLOTS
-        E_plot.plot(t, E, 'b', label="dmc E")
-        E_plot.plot(t, ET, 'r', label="trial E")
+        E_plot.plot(t, E, 'k--', label="dmc E", linewidth=lw)
+        E_plot.plot(t, ET, '#008000', label="trial E", linewidth=lw)
         
-        E_plot.legend(loc=4)
+        E_plot.legend()
         E_plot.set_title('Energy convergeance')
         E_plot.set_xlabel(r'$\tau = n*\delta \tau$ [s]')
         E_plot.set_ylabel(r'E [Ha]')
         E_plot.ticklabel_format(useOffset=False, axis='y')
         
+        E_plot.axes.get_yaxis().get_label().set_fontsize(20)
+        E_plot.axes.get_xaxis().get_label().set_fontsize(20)
+        
         # N PLOTS
-        N_plot.plot(t, N, 'b')
-        N_plot.plot(t, Navg, 'r')
+        N_plot.plot(t, N, '#008000', linewidth=lw)
+        N_plot.plot(t, Navg, 'k--', linewidth=lw)
         
         N_plot.set_ylabel(r"N_W($\tau$)")
         N_plot.axes.get_xaxis().set_visible(False)
         N_plot.set_title('Walker population')
         N_plot.ticklabel_format(useOffset=False, axis='y')
+        
+        N_plot.axes.get_yaxis().get_label().set_fontsize(20)
 
 class radial_out(DCVizPlotter):
     
@@ -309,7 +315,9 @@ class MIN_OUT(DCVizPlotter):
         param_plot.set_ylabel(r'$\alpha_i$')
         #param_plot.set_title('Variational parameters')
         param_plot.axes.get_xaxis().set_visible(False)
-        param_plot.legend()
+        
+        if n_params > 1:
+            param_plot.legend()
         param_plot.axes.get_yaxis().get_label().set_fontsize(30)
         param_plot.axes.get_xaxis().get_label().set_fontsize(30)
         param_plot.axes.get_yaxis().labelpad = 20

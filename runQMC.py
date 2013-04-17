@@ -468,7 +468,9 @@ def consistencyCheck(cmlArgs):
     #No col -> no jast and alpha=1
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
         cmlArgs[cmlMAPg['use_jastrow']] = "0"
-        cmlArgs[cmlMAPvp['alpha']] = "1"
+        
+        if (cmlArgs[cmlMAPm['alpha']] == "def"):
+            cmlArgs[cmlMAPvp['alpha']] = "1"
         
     return cmlArgs
             

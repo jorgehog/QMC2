@@ -5,10 +5,6 @@ from sympy import (diff,
                    cos, 
                    exp, 
                    sympify, 
-                   ratsimp, 
-                   pi, 
-                   cancel, 
-                   sqf, 
                    printing,
                    Symbol)
                    
@@ -20,7 +16,6 @@ sys.path.append(os.getcwd())
 
 from orbitalsGenerator_super import (orbitalGenerator,
                                      x, y, z, 
-                                     x2, y2, z2,
                                      theta, phi, 
                                      r2d, r3d, r, r_2d,
                                      k)
@@ -121,72 +116,9 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         
 
     def simplifyLocal(self, expr, qNums, subs=True):
-   
-           
-   
-#        generic = self.genericFactor(qNums)
-#        expr = expr.collect(generic)/generic
-#        
-#        expr = expr.subs(r2d, r_2d).subs(r3d, r)
-#       
-#       
-#        expr = ratsimp(expr)
-#        expr = expr.factor(pi) 
-#        
-#    
-#        numer, denom = expr.as_numer_denom()
-#        
-#       
-#        numer = numer.subs(x*x, x2).subs(y*y, y2).subs(z*z, z2)
-#
-#
-#        numFac = numer.as_independent(x2, y2, z2, x, y, z, r, r_2d)[0]     
-#        if numFac != 0:
-#            numer = cancel(numer/numFac)
-#        else:
-#            numFac = 1
-#
-#     
-#        numer = sqf(numer)                
-#        numer = self.factorRadiiTerms(numer)
-#
-#    
-#        if r_2d in numer:
-#
-#            numer = numer.subs(r**2, r_2d**2 + z2).collect(r_2d)
-#            numer = numer.subs(z2, r**2 - r_2d**2)
-#        
-#            numer = numer.expand()
-#            terms = numer.as_ordered_terms()
-#            for term in terms:
-#                tmp = numer
-#                numer = numer.subs(term, term.subs(r**2, r_2d**2 + z2)).expand().collect(r_2d)
-#              
-#                if len(str(numer)) > len(str(tmp)):
-#                    numer = tmp
-#           
-#            tmp = numer
-#            numer = numer.subs(z2, r**2 - r_2d**2)
-#                
-#            if len(str(numer)) > len(str(tmp)):
-#                numer = tmp
-#
-#            numer = numer.factor(r_2d)
-#  
-#        
-#        else:
-#            numer = numer.factor(r)
-#
-#
-#        expr = numFac*numer/denom*self.genericFactor(qNums)  
-#        
-#        expr = expr.subs(x2, x*x).subs(y2, y*y).subs(z2, z*z)
-        
-        expr = expr.factor().collect(k).subs(r3d, r).subs(x**2 + y**2 + z**2, r*r).factor()
-#        if not subs:
-#            expr = expr.subs(r_2d, r2d).subs(r, r3d)
             
-        
+        expr = expr.factor().collect(k).subs(r3d, r).subs(x**2 + y**2 + z**2, r*r).factor()
+
         if not subs:
             expr = expr.subs(r, r3d)
         

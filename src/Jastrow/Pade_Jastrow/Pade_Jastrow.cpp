@@ -43,7 +43,7 @@ void Pade_Jastrow::initialize() {
         }
     }
 
-    
+
 }
 
 double Pade_Jastrow::get_val(const Walker* walker) const {
@@ -85,8 +85,7 @@ void Pade_Jastrow::get_dJ_matrix(Walker* walker, int i) const {
 
 void Pade_Jastrow::get_grad(Walker* walker) const {
     double sum;
-    using namespace std;
-    cout << setprecision(10);
+
     for (int i = 0; i < n_p; i++) {
         for (int k = 0; k < dim; k++) {
 
@@ -100,7 +99,7 @@ void Pade_Jastrow::get_grad(Walker* walker) const {
             }
 
             walker->jast_grad(i, k) = sum;
-          
+
         }
     }
 
@@ -111,7 +110,8 @@ void Pade_Jastrow::get_grad(const Walker* walker_pre, Walker* walker_post, int p
 
     for (int i = 0; i < p; i++) {
         for (int k = 0; k < dim; k++) {
-            walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
+            walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k)
+                    + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
         }
     }
 
@@ -127,12 +127,13 @@ void Pade_Jastrow::get_grad(const Walker* walker_pre, Walker* walker_post, int p
         }
 
         walker_post->jast_grad(p, k) = sum;
-     
+
     }
 
     for (int i = p + 1; i < n_p; i++) {
         for (int k = 0; k < dim; k++) {
-            walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
+            walker_post->jast_grad(i, k) = walker_pre->jast_grad(i, k) 
+                    + walker_post->dJ(i, p, k) - walker_pre->dJ(i, p, k);
         }
     }
 
@@ -162,11 +163,11 @@ double Pade_Jastrow::get_lapl_sum(Walker * walker) const {
     for (k = 0; k < n_p; k++) {
         for (j = k + 1; j < n_p; j++) {
             b_kj = 1 + beta * walker->r_rel(k, j);
-            
+
             factor = a(k, j) / (walker->r_rel(k, j) * b_kj * b_kj * b_kj);
-            
-            dim_term = (dim - 1) + beta*walker->r_rel(k, j)*(dim - 3);
-            
+
+            dim_term = (dim - 1) + beta * walker->r_rel(k, j)*(dim - 3);
+
             sum2 += factor*dim_term;
         }
 
