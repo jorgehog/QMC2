@@ -209,7 +209,6 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
         s << path << "walker_positions/dist_rawdata_" << name << ".arma";
         dist.load(s.str());
         s.str(std::string());
-
         n = dist.n_rows / n_nodes;
         dim = dist.n_cols;
 
@@ -234,9 +233,9 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
             MPI_Scatter(dist.colptr(i), n, MPI_DOUBLE, raw_data.colptr(i), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         }
 
-        dist.clear();
+        dist.reset();
         dist = raw_data;
-        raw_data.clear();
+        raw_data.reset();
 
     } else {
 
@@ -248,7 +247,7 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
     }
 
 #endif
-
+    
     generate_distribution(dist, n_p, bin_edge, N, true);
 
 }

@@ -155,7 +155,7 @@ class Blocking(DCVizPlotter):
 class DMC_OUT(DCVizPlotter):
     
     nametag = "DMC_out\.dat"
-    figMap = {"Fig": ["N_plot", "E_plot"]}
+    figMap = {"Fig": ["N_plot"], "Fig2": ["E_plot"]}
     dt = 0.001
         
         
@@ -170,10 +170,11 @@ class DMC_OUT(DCVizPlotter):
         
         # E PLOTS
         E_plot.plot(t, E, 'k--', label="dmc E", linewidth=lw)
-        E_plot.plot(t, ET, '#008000', label="trial E", linewidth=lw)
+        E_plot.plot(t, ET, color="#008000", label="trial E", aa=True
+        )
         
         E_plot.legend()
-        E_plot.set_title('Energy convergeance')
+#        E_plot.set_title('Energy convergeance')
         E_plot.set_xlabel(r'$\tau = n*\delta \tau$ [s]')
         E_plot.set_ylabel(r'E [Ha]')
         E_plot.ticklabel_format(useOffset=False, axis='y')
@@ -182,12 +183,12 @@ class DMC_OUT(DCVizPlotter):
         E_plot.axes.get_xaxis().get_label().set_fontsize(20)
         
         # N PLOTS
-        N_plot.plot(t, N, '#008000', linewidth=lw)
+        N_plot.plot(t, N, '#008000')
         N_plot.plot(t, Navg, 'k--', linewidth=lw)
         
         N_plot.set_ylabel(r"N_W($\tau$)")
         N_plot.axes.get_xaxis().set_visible(False)
-        N_plot.set_title('Walker population')
+#        N_plot.set_title('Walker population')
         N_plot.ticklabel_format(useOffset=False, axis='y')
         
         N_plot.axes.get_yaxis().get_label().set_fontsize(20)
@@ -201,11 +202,12 @@ class radial_out(DCVizPlotter):
     isFamilyMember=True
     
     def plot(self, data):
-        
-        cut = data[0].n/20     
-        cut= 0
+             
+        cut= 1
+        xScale = 0.75
         print data[0].n
-        
+        color = ['#008000', "0.5"]
+        style = ['-', '-.']
         max_edge = 0        
         for i in range(len(data)):
 
@@ -221,13 +223,16 @@ class radial_out(DCVizPlotter):
                 vmc = data[i].data
             
             r = numpy.linspace(0, edge, data[i].n)
-            self.radialFig.plot(r, data[i][0], label=method);
-        self.radialFig.plot(r, 2*dmc - vmc, "k-")
+            self.radialFig.plot(r, data[i][0], style[i%2], label=method.upper(), color=color[i%2]);
+        self.radialFig.plot(r, 2*dmc - vmc, "k--", label="Pure")
         self.radialFig.legend()    
-        self.radialFig.axes.set_xlim(r[cut], max_edge)
+        self.radialFig.axes.set_xlim(r[cut], xScale*max_edge)
         self.radialFig.set_xlabel('r')
-        self.radialFig.set_ylabel(r'$|\psi(r)|^2$')
+        self.radialFig.set_ylabel(r'$\rho(r)$')
+        self.radialFig.axes.set_ybound(0)
         
+        self.radialFig.axes.get_yaxis().get_label().set_fontsize(30)
+        self.radialFig.axes.get_xaxis().get_label().set_fontsize(30)
         
         
 
@@ -237,15 +242,40 @@ class dist_out(DCVizPlotter):
     figMap = {"fig1": ["subfigHist2d"]}
 
     armaBin = True
+    isFamilyMember = True
         
+
+    
     def plot(self, data):
     
-        print self.filepath
-        print re.findall("edge(\d+\.?\d*)\.arma", self.filepath)
-        edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.filepath)[0])
+        edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
+    
+        if len(data) == 1:
+            dist = data[0].data
+        elif len(data) == 2:
+            
+            edge_2 = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[1])[0])
+        
+            if edge != edge_2:
+                raise Exception("Bin edges does not match. %s != %s" % (edge, edge_2))
+            
+            for i in range(2):
+                if "vmc" in self.familyFileNames[i]:
+                    vmcDist = data[i].data
+                elif "dmc" in self.familyFileNames[i]:
+                    dmcDist = data[i].data
+            
+            try:
+                dist = 2*dmcDist - vmcDist
+                print "success!", dmcDist.sum()*(edge/100)**2, vmcDist.sum()*(edge/100)**2 
+            except:
+                raise Exception("Supplied dist files does not match a VMC+DMC pair.")
+        else:
+            raise Exception("More than two distributions loaded in given folder.")
+        
         
         extent = [-edge, edge, -edge, edge]
-        im = self.subfigHist2d.imshow(data.data, extent=extent)
+        im = self.subfigHist2d.imshow(dist, extent=extent)
         self.subfigHist2d.set_ylabel(r'y')
         self.subfigHist2d.set_xlabel(r'x')
         self.fig1.colorbar(im)
