@@ -21,12 +21,13 @@ def stripPath(s0, s1):
 
 def getClassFiles():
     classes = []
+    ignore = ["HartreeFock.cpp", "Bosons.cpp"]
 
     for dirPath, dirname, filenames in os.walk(paths.src):
         for filename in filenames:
             p = re.findall("(.+\.cpp)", filename)
             
-            if p:
+            if p and filename not in ignore:
                 classes.append(pjoin(dirPath, filename))
     
     return classes

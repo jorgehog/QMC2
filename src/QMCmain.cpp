@@ -6,7 +6,7 @@
  */
 
 #include "QMCheaders.h"
-#include "HartreeFock/HartreeFock.h"
+//#include "HartreeFock/HartreeFock.h"
 
 /*
  * 
