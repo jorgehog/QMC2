@@ -398,7 +398,7 @@ class DCVizPlotter:
         i = 0
         for fig in zip(*self.figures)[0]:
             
-            figname = fname.split(".")[0] + "_" + str(i) + ".png"
+            figname = ".".join(fname.split(".")[0:-1]) + "_" + str(i) + ".png"
             figpath = pjoin(dirpath, figname)
             fig.savefig(figpath)
 

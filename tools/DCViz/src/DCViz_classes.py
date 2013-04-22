@@ -14,6 +14,7 @@ except:
 
 from matplotlib import rc, pylab, colors, ticker, cm
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.ndimage import zoom
 
 #~ Paths include
 classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -204,15 +205,25 @@ class radial_out(DCVizPlotter):
     
     def plot(self, data):
              
-        cut= 1
+        cut=5
         xScale = 0.75
         print data[0].n
+        
         color = ['#008000', "0.5"]
         style = ['-', '-.']
-        max_edge = 0        
+        max_edge = 0   
+        maxCut = 0
+        yMax = 0.1        
+        
+        vmc=None
+        dmc=None
+        
+        pureOnly = True
+
         for i in range(len(data)):
 
             edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
+            
             if edge > max_edge:
                 max_edge = edge;
             
@@ -224,12 +235,31 @@ class radial_out(DCVizPlotter):
                 vmc = data[i].data
             
             r = numpy.linspace(0, edge, data[i].n)
-            self.radialFig.plot(r, data[i][0], style[i%2], label=method.upper(), color=color[i%2]);
-        self.radialFig.plot(r, 2*dmc - vmc, "k--", label="Pure")
-        self.radialFig.legend()    
-        self.radialFig.axes.set_xlim(r[cut], xScale*max_edge)
+            
+            if r[cut] > maxCut:
+                maxCut = r[cut]            
+            
+            if not pureOnly:
+                self.radialFig.plot(r, data[i][0], style[i%2], label=method.upper(), color=color[i%2]);
+           
+            if vmc is not None and dmc is not None:
+                if pureOnly:
+                    pureC = color[0]
+                else:
+                    pureC = 'k--'
+                self.radialFig.plot(r, 2*dmc - vmc, pureC, label="Pure")
+                vmc = None
+                dmc = None
+        
+        if not pureOnly:
+            self.radialFig.legend()    
+        self.radialFig.axes.set_xlim(maxCut, xScale*max_edge)
         self.radialFig.set_xlabel('r')
         self.radialFig.set_ylabel(r'$\rho(r)$')
+#        locator = self.radialFig.axes.get_yaxis().get_major_locator()
+#        self.radialFig.axes.set_ylim(locator.autoscale()/2)
+        if yMax is not None:
+            self.radialFig.set_ylim(0, yMax)
         self.radialFig.axes.set_ybound(0)
         
         self.radialFig.axes.get_yaxis().get_label().set_fontsize(30)
@@ -240,7 +270,8 @@ class radial_out(DCVizPlotter):
 class dist_out(DCVizPlotter):
     
     nametag = "dist_out.+\.arma"
-    figMap = {"fig1": ["subfig0", "subfig1"]}
+#    figMap = {"fig1": ["subfig0", "subfig1"]}
+    figMap = {"fig1": [], "fig2":["subfig1"]}
 
     armaBin = True
     isFamilyMember = True
@@ -249,7 +280,7 @@ class dist_out(DCVizPlotter):
     
     def plot(self, data):
         
-        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
+#        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
         
         edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
     
@@ -269,7 +300,8 @@ class dist_out(DCVizPlotter):
                     dmcDist = data[i].data
             
             try:
-                dist = 2*dmcDist - vmcDist
+                dist = dmcDist
+#                dist = 2*dmcDist - vmcDist
                 print "success!", dmcDist.sum()*(edge/100)**2, vmcDist.sum()*(edge/100)**2 
             except:
                 raise Exception("Supplied dist files does not match a VMC+DMC pair.")
@@ -284,7 +316,7 @@ class dist_out(DCVizPlotter):
         x, y = numpy.meshgrid(crit, crit)
         dist = dist[x, y]
         
-        ax = Axes3D(self.fig1, self.subfig0.get_position())
+        ax = Axes3D(self.fig1)#, self.subfig0.get_position())
         
         r = numpy.linspace(-edge, edge, origLen)
         
@@ -295,18 +327,26 @@ class dist_out(DCVizPlotter):
 
         ax.plot_surface(X, Y, dist, rstride=1, cstride=1, cmap=C, linewidth=0)
 
-        cset = ax.contour(X, Y, dist, zdir='y', offset=-X[0, 0], color='#008000', levels=[0])        
+        cset = ax.contour(X, Y, dist, zdir='x', offset=ax.get_xlim()[0]*1.05, color='#008000', levels=[0])        
         
         ax.set_zlim(0, dist.max())
 
         ax.set_ylabel('y')
         ax.set_xlabel('x')
-        ax.view_init(60, -120)
+        ax.view_init(30, -65)
+#        ax.view_init(0, 90)
         
+#        print dist.shape
+#        dist = zoom(dist, 3)
 #        extent = [-newEdge, newEdge, -newEdge, newEdge]
-        self.subfig1.axes.contour(X, Y, dist, zdir='z', cmap=C)
-        self.subfig0.axes.get_xaxis().set_visible(False)
-        self.subfig0.axes.get_yaxis().set_visible(False)
+        self.subfig1.axes.contourf(X, Y, dist, zdir='z', cmap=C)
+        self.subfig1.set_xlabel('x')
+        self.subfig1.set_ylabel('y', rotation=0)
+        self.subfig1.axes.get_yaxis().get_label().set_fontsize(20)
+        self.subfig1.axes.get_xaxis().get_label().set_fontsize(20)
+        
+#        self.subfig0.axes.get_xaxis().set_visible(False)
+#        self.subfig0.axes.get_yaxis().set_visible(False)
         
         
 #        self.subfigHist3D.set_ylabel(r'y')
