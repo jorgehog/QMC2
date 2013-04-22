@@ -27,8 +27,13 @@ def recalcVMCdist(VMC_raw_path, VMC_raw_name, n_p, bin_edge, N, n_cores, MPI_fla
 
 def main():
         
+    skipDMC = False
     stdoutToFile, MPI_flag, openGUI, n_cores = parseCML(sys.argv)
     print "MPI Nodes: ", n_cores
+
+    if "-skipDMC" in sys.argv:
+        skipDMC=True
+        sys.argv.remove("-skipDMC")
 
     if len(sys.argv) < 3:
         sys.exit("Sufficinet cml args not supplied. (VMC rawdata, DMC dist file)")
@@ -83,8 +88,10 @@ def main():
         
     shutil.copy(pjoin(VMC_raw_path, new_VMC_dist), new_path)
     shutil.copy(pjoin(VMC_raw_path, new_VMC_dist_rad), new_path)
-    shutil.copy(pjoin(DMC_dist_path, DMC_dist_rad), new_path)
-    shutil.copy(DMC_dist, new_path)    
+    
+    if not skipDMC:
+        shutil.copy(pjoin(DMC_dist_path, DMC_dist_rad), new_path)
+        shutil.copy(DMC_dist, new_path)    
     
 
     
