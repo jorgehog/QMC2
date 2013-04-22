@@ -469,7 +469,7 @@ def consistencyCheck(cmlArgs):
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
         cmlArgs[cmlMAPg['use_jastrow']] = "0"
         
-        if (cmlArgs[cmlMAPm['alpha']] == "def"):
+        if (cmlArgs[cmlMAPvp['alpha']] == "def"):
             cmlArgs[cmlMAPvp['alpha']] = "1"
         
     return cmlArgs

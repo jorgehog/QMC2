@@ -12,7 +12,8 @@ except:
     print "\n" 
     sys.exit(1)
 
-from matplotlib import rc, pylab, colors, ticker
+from matplotlib import rc, pylab, colors, ticker, cm
+from mpl_toolkits.mplot3d import Axes3D
 
 #~ Paths include
 classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -239,15 +240,17 @@ class radial_out(DCVizPlotter):
 class dist_out(DCVizPlotter):
     
     nametag = "dist_out.+\.arma"
-    figMap = {"fig1": ["subfigHist2d"]}
+    figMap = {"fig1": ["subfig0", "subfig1"]}
 
     armaBin = True
     isFamilyMember = True
         
-
+    stack = "H"
     
     def plot(self, data):
-    
+        
+        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
+        
         edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
     
         if len(data) == 1:
@@ -274,11 +277,41 @@ class dist_out(DCVizPlotter):
             raise Exception("More than two distributions loaded in given folder.")
         
         
-        extent = [-edge, edge, -edge, edge]
-        im = self.subfigHist2d.imshow(dist, extent=extent)
-        self.subfigHist2d.set_ylabel(r'y')
-        self.subfigHist2d.set_xlabel(r'x')
-        self.fig1.colorbar(im)
+        origLen = len(dist)
+        distMid = dist[origLen/2, :]
+        crit = numpy.where(distMid > 0.1*distMid.max())[0]
+
+        x, y = numpy.meshgrid(crit, crit)
+        dist = dist[x, y]
+        
+        ax = Axes3D(self.fig1, self.subfig0.get_position())
+        
+        r = numpy.linspace(-edge, edge, origLen)
+        
+        X, Y = numpy.meshgrid(r, r)
+        X = X[x, y]
+        Y = Y[x, y]
+        C = cm.Greens
+
+        ax.plot_surface(X, Y, dist, rstride=1, cstride=1, cmap=C, linewidth=0)
+
+        cset = ax.contour(X, Y, dist, zdir='y', offset=-X[0, 0], color='#008000', levels=[0])        
+        
+        ax.set_zlim(0, dist.max())
+
+        ax.set_ylabel('y')
+        ax.set_xlabel('x')
+        ax.view_init(60, -120)
+        
+#        extent = [-newEdge, newEdge, -newEdge, newEdge]
+        self.subfig1.axes.contour(X, Y, dist, zdir='z', cmap=C)
+        self.subfig0.axes.get_xaxis().set_visible(False)
+        self.subfig0.axes.get_yaxis().set_visible(False)
+        
+        
+#        self.subfigHist3D.set_ylabel(r'y')
+#        self.subfigHist3D.set_xlabel(r'x')
+#        self.fig1.colorbar(im)
 
 #        self.subfigDist1d.set_ylabel(r'$|P(r)|^2$')
         

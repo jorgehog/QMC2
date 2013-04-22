@@ -80,6 +80,7 @@ class DCVizPlotter:
 
     parent = None
     
+    stack = "V"
     
     canStart = False
     
@@ -193,6 +194,9 @@ class DCVizPlotter:
     
     def set_figures(self):
         
+        if self.stack not in ["H", "V"]:
+            self.Error("Invalid stack argument %s. (Choose either H or V)" % self.stack)
+        
         s = ""
         i = 0
         self.figures = []
@@ -204,7 +208,11 @@ class DCVizPlotter:
             nFigs = len(subFigs)
             
             for j in range(nFigs):
-                s += "self.%s = self.%s.add_subplot(%d, 1, %d); " % (subFigs[j], fig, nFigs, j+1)
+                
+                if self.stack == "V":
+                    s += "self.%s = self.%s.add_subplot(%d, 1, %d); " % (subFigs[j], fig, nFigs, j+1)
+                else:
+                    s += "self.%s = self.%s.add_subplot(1, %d, %d); " % (subFigs[j], fig, nFigs, j+1)
                 s += "self.add_subfigure(self.%s, self.i%s); " % (subFigs[j], fig)
             
             i += 1
