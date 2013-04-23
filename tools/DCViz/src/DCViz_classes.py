@@ -14,7 +14,6 @@ except:
 
 from matplotlib import rc, pylab, colors, ticker, cm
 from mpl_toolkits.mplot3d import Axes3D
-from scipy.ndimage import zoom
 
 #~ Paths include
 classes_thisDir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
