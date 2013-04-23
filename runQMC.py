@@ -237,7 +237,7 @@ def parseFiles(openGUI, codename):
 
 def valConvert(val):
     
-    if re.findall("\d+\.?\d*[E/e][+\-]?\d+", val):
+    if re.findall("\d+\.?\d*[Ee][+\-]?\d+", val):
         suff, expo = re.findall("(\d+\.?\d*)[Ee]([+\-]?\d+)", val)[0]
         
         val = str(float(suff)*10**int(expo));
