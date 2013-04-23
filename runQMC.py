@@ -463,7 +463,14 @@ def consistencyCheck(cmlArgs):
             cmlArgs[cmlMAPvp['alpha']] = str(alpha)
         if cmlArgs[cmlMAPvp['beta']] == "def":
             cmlArgs[cmlMAPvp['beta']] = str(beta)
-            
+    else:
+        
+        alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
+        
+        if not alpha == 0 and not beta == 0:
+            cmlArgs[cmlMAPm['alpha']] = str(alpha)
+            cmlArgs[cmlMAPm['beta']] = str(beta)
+        
      
     #No col -> no jast and alpha=1
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
