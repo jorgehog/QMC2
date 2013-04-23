@@ -75,12 +75,24 @@ def mainToFile(path):
     modes = autodetectModes()
     for root, dirs, files in os.walk(path):
     
+        init = True    
+    
         for outfile in files:
             matchedMode = matchMode(modes, pjoin(root, outfile), silent=True)
-            
+
             if matchedMode is None:
                 continue
             
+            if matchedMode.isFamilyMember:
+                if init:
+                    thisTag = matchedMode.nametag
+                else:
+                    if re.findall(thisTag, outfile):
+                        continue
+            
+            
+            
+            init = False
             plotTool = matchedMode(pjoin(root, outfile), toFile=True)
             plotTool.mainloop()
             

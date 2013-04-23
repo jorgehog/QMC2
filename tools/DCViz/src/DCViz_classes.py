@@ -213,7 +213,14 @@ class radial_out(DCVizPlotter):
         style = ['-', '-.']
         max_edge = 0   
         maxCut = 0
-        yMax = 0.1        
+        
+        path, name = os.path.split(self.filepath)
+        
+        try:
+            yFile = open(os.path.join(path, "yMin.dat"), 'r')
+            yMax = float(yFile.read())
+        except:
+            yMax = None
         
         vmc=None
         dmc=None
