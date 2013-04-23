@@ -83,19 +83,9 @@ void DMC::output() {
 
 void DMC::Evolve_walker(int k, double GB) {
 
-//    if (GB > 10) {
-//        std::cout << "danger!" << GB << std::endl;
-//
-//        GB = 10;
-//    }
-
     int branch_mean = int(GB + sampling->call_RNG());
 
-
-    //    bool E_cut_cond = (local_E < E_T - 1 / get_sampling_ptr()->get_std());
-    //    E_cut_cond = E_cut_cond || (local_E > E_T + 1 / get_sampling_ptr()->get_std());
-
-    if (branch_mean == 0) { //|| E_cut_cond) {
+    if (branch_mean == 0) { 
         original_walkers[k]->kill();
     } else {
 
@@ -135,9 +125,7 @@ void DMC::iterate_walker(int k, int n_b) {
         original_walkers[k]->set_E(local_E);
 
         double GB = sampling->get_branching_Gfunc(local_E, local_E_prev, E_T);
-//        if (GB > 10) {
-//            std::cout << local_E << " " << local_E_prev << "  " << E_T << std::endl;
-//        }
+
         Evolve_walker(k, GB);
 
         if (original_walkers[k]->is_dead()) {
@@ -155,7 +143,7 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, 10);
+            iterate_walker(k, block_size);
         }
 
         bury_the_dead();
@@ -194,7 +182,6 @@ void DMC::run_method() {
 
     finalize_output();
     get_accepted_ratio();
-    //    error_estimator->normalize();
     estimate_error();
 }
 
