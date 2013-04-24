@@ -284,6 +284,7 @@ class dist_out(DCVizPlotter):
         
     stack = "H"
     
+    dmcOnly = True
     def plot(self, data):
         
 #        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
@@ -297,7 +298,8 @@ class dist_out(DCVizPlotter):
             edge_2 = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[1])[0])
         
             if edge != edge_2:
-                raise Exception("Bin edges does not match. %s != %s" % (edge, edge_2))
+                print "Bin edges does not match. %s != %s" % (edge, edge_2)
+                dmcOnly = True
             
             for i in range(2):
                 if "vmc" in self.familyFileNames[i]:
@@ -306,9 +308,11 @@ class dist_out(DCVizPlotter):
                     dmcDist = data[i].data
             
             try:
-                dist = dmcDist
-#                dist = 2*dmcDist - vmcDist
-                print "success!", dmcDist.sum()*(edge/100)**2, vmcDist.sum()*(edge/100)**2 
+                if dmcOnly:
+                    dist = dmcDist
+                else:
+                    dist = 2*dmcDist - vmcDist
+                    print "pure success!", dmcDist.sum()*(edge/100)**2, vmcDist.sum()*(edge/100)**2 
             except:
                 raise Exception("Supplied dist files does not match a VMC+DMC pair.")
         else:
