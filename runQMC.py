@@ -272,8 +272,8 @@ def varParameterMap(n_p, dim, systemConstant, system):
                 alpha = 0.86;
                 beta = 0.079;
             elif w == 0.001:
-                alpha=0.7;
-                beta=0.036;
+                alpha=0.71;
+                beta=0.031;
             else:
                 print "No saved parameters for (n_p, w) = ", n_p, " ", w 
 
@@ -470,11 +470,14 @@ def consistencyCheck(cmlArgs):
             cmlArgs[cmlMAPvp['beta']] = str(beta)
     else:
         
-        alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
+        if cmlArgs[cmlMAPm['alpha']] == 'def' and cmlArgs[cmlMAPm['beta']] == 'def':
+            alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
+            if not alpha == 0 and not beta == 0:
+                cmlArgs[cmlMAPm['alpha']] = str(alpha)
+                cmlArgs[cmlMAPm['beta']] = str(beta)
         
-        if not alpha == 0 and not beta == 0:
-            cmlArgs[cmlMAPm['alpha']] = str(alpha)
-            cmlArgs[cmlMAPm['beta']] = str(beta)
+        
+            
         
      
     #No col -> no jast and alpha=1
