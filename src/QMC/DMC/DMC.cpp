@@ -305,7 +305,7 @@ void DMC::normalize_population() {
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
     uvec snw = sort_index(n_w_list, 1); //enables us to index n_w as decreasing
 
-    s << n_w_list.st() << endl;
+//    s << n_w_list.st() << endl;
 
     //Start iterating sending from highest to lowest. When root or dest reaches the average
     //value they are shifted to the second highest/lowest. Process continues untill root
@@ -353,20 +353,20 @@ void DMC::normalize_population() {
     if (test.max() < sendcount_thresh) {
         test.reset();
         swap_map.reset();
-        s.str(std::string());
+//        s.str(std::string());
         return;
     }
 
-    s << n_w_list.st() << endl;
-    std_out->cout(s);
+//    s << n_w_list.st() << endl;
+//    std_out->cout(s);
 
     for (int root = 0; root < n_nodes; root++) {
         for (int dest = 0; dest < n_nodes; dest++) {
             if (swap_map(root, dest) != 0) {
 
-                s << "node" << root << " sends ";
-                s << swap_map(root, dest) << " walkers to node " << dest;
-                std_out->cout(s);
+//                s << "node" << root << " sends ";
+//                s << swap_map(root, dest) << " walkers to node " << dest;
+//                std_out->cout(s);
 
                 for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
                     switch_souls(root, n_w - 1, dest, n_w);
@@ -377,8 +377,8 @@ void DMC::normalize_population() {
         }
     }
 
-    s << endl;
-    std_out->cout(s);
+//    s << endl;
+//    std_out->cout(s);
 
     test.reset();
     swap_map.reset();

@@ -224,7 +224,7 @@ class radial_out(DCVizPlotter):
         vmc=None
         dmc=None
         
-        pureOnly = True
+        pureOnly = False
 
         for i in range(len(data)):
 
@@ -285,6 +285,8 @@ class dist_out(DCVizPlotter):
     stack = "H"
     
     dmcOnly = True
+    vmcOnly = False
+    
     def plot(self, data):
         
 #        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
@@ -307,14 +309,17 @@ class dist_out(DCVizPlotter):
                 elif "dmc" in self.familyFileNames[i]:
                     dmcDist = data[i].data
             
-            try:
-                if dmcOnly:
-                    dist = dmcDist
-                else:
+#            try:
+            if self.dmcOnly:
+                dist = dmcDist
+            elif self.vmcOnly:
+                dist = vmcDist
+            else:
+                try:
                     dist = 2*dmcDist - vmcDist
                     print "pure success!", dmcDist.sum()*(edge/100)**2, vmcDist.sum()*(edge/100)**2 
-            except:
-                raise Exception("Supplied dist files does not match a VMC+DMC pair.")
+                except:
+                    raise Exception("Supplied dist files does not match a VMC+DMC pair.")
         else:
             raise Exception("More than two distributions loaded in given folder.")
         
