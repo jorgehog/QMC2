@@ -12,7 +12,8 @@ Harmonic_osc::Harmonic_osc(GeneralParams & gP)
 : Potential(gP.n_p, gP.dim) {
 
     this->w = gP.systemConstant;
-
+    name = "Oscillator";
+    
 }
 
 

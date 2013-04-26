@@ -13,7 +13,7 @@ AtomCore::AtomCore(GeneralParams & gP)
 : Potential(gP.n_p, gP.dim) {
 
     this->Z = (int) gP.systemConstant;
-
+    name = "Core";
 }
 
 

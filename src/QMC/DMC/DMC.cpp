@@ -14,6 +14,8 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
 
     block_size = dP.n_b;
     thermalization = dP.therm;
+    
+    thermalized = false;
 
     sampling->set_dt(dP.dt);
 
@@ -96,6 +98,8 @@ void DMC::Evolve_walker(int k, double GB) {
 
         E += GB * local_E;
         samples++;
+        
+        if (thermalized) update_subsamples(GB);
 
     }
 }
@@ -103,18 +107,20 @@ void DMC::Evolve_walker(int k, double GB) {
 void DMC::update_energies() {
 
     node_comm();
-
+    
     E_T = E / samples;
     dmc_E_unscaled += E_T;
     dmc_E = dmc_E_unscaled / cycle;
+    
+    push_subsamples();
 
 }
 
-void DMC::iterate_walker(int k, int n_b) {
+void DMC::iterate_walker(int k) {
 
     copy_walker(original_walkers[k], trial_walker);
 
-    for (int b = 0; b < n_b; b++) {
+    for (int b = 0; b < block_size; b++) {
 
         double local_E_prev = original_walkers[k]->get_E();
 
@@ -143,7 +149,7 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, block_size);
+            iterate_walker(k);
         }
 
         bury_the_dead();
@@ -156,8 +162,8 @@ void DMC::run_method() {
     }
 
     normalize_population();
-
-    E_T = dmc_E;
+    
+    thermalized = true;
     dmc_E = dmc_E_unscaled = 0;
 
     for (cycle = 1; cycle <= n_c; cycle++) {
@@ -165,7 +171,7 @@ void DMC::run_method() {
         reset_parameters();
 
         for (int k = 0; k < n_w_last; k++) {
-            iterate_walker(k, block_size);
+            iterate_walker(k);
         }
 
         error_estimator->update_data(E / samples);
@@ -180,6 +186,7 @@ void DMC::run_method() {
 
     }
 
+    dump_subsamples(true);
     finalize_output();
     get_accepted_ratio();
     estimate_error();

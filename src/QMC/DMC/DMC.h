@@ -15,6 +15,8 @@
 class DMC : public QMC {
 protected:
 
+    bool thermalized; //!< Flag used to indicate whether to start sampling or not.
+    
     int n_w_last; //!< The amount of walkers at the time the walker loop was initiated.
     int n_w_tot; //!< The total number of walkers across all nodes.
     arma::uvec n_w_list; //!< List of the number of walkers of each node.
@@ -38,10 +40,10 @@ protected:
 
     //! Method for iterating a walker one time step.
     /*!
-     * @param n_b The number of block samples used in the iteration.
+     * @param thermalized Flag to indicate whether to start sampling or not.
      * @param k The index of the walker.
      */
-    void iterate_walker(int k, int n_b = 1);
+    void iterate_walker(int k);
 
     //! Method for the birth/death process of a walker.
     /*!

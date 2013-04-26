@@ -9,13 +9,19 @@
 
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool dist_out)
 : QMC(gP, vP.n_c, sO, pp, n_w) {
-
+    
+    output_tresh = n_c/100;
+    
+    if (output_tresh == 0) {
+        output_tresh = 1;
+    }
+    
     original_walker = new Walker(n_p, dim);
 
     dist_tresh = 25;
     pop_tresh = n_c / n_w;
     offset = n_c - n_w*pop_tresh;
-
+    
     last_walker = 0;
 
     vmc_E = 0;
@@ -41,7 +47,7 @@ void VMC::set_trial_positions() {
 
 void VMC::save_distribution() {
     using namespace arma;
-    
+
     if (cycle % dist_tresh == 0) {
         dist(span(last_inserted, last_inserted + n_p - 1), span()) = original_walker->r;
         last_inserted += n_p;
@@ -49,7 +55,7 @@ void VMC::save_distribution() {
 }
 
 void VMC::store_walkers() {
-    
+
     if ((cycle > offset) && (cycle % pop_tresh == 0)) {
         copy_walker(original_walker, original_walkers[last_walker]);
         original_walkers[last_walker]->set_E(local_E);
@@ -76,25 +82,21 @@ void VMC::run_method() {
 
         vmc_E += local_E;
 
+
+        output();
+        update_subsamples();
         dump_output();
         error_estimator->update_data(local_E);
         store_walkers();
-
-        if (is_master) {
-            if (cycle % 10000 == 0) {
-                std::cout << "\rVMC progress: " << (double) cycle / n_c * 100 << "%";
-                std::cout.flush();
-            }
-        }
-
     }
-
-    if (is_master) std::cout << "done" << std::endl;
 
     node_comm();
     scale_values();
+
     output();
+    dump_subsamples();
     get_accepted_ratio();
+
     finalize_output();
     estimate_error();
 }
@@ -102,8 +104,17 @@ void VMC::run_method() {
 void VMC::output() {
     using namespace std;
 
-    s << "VMC energy: " << get_energy() << endl;
-    std_out->cout(s);
+    if (is_master) {
+        if (cycle % output_tresh == 0) {
+            cout << "\rVMC energy: " << vmc_E / cycle << "  " << (double) cycle / n_c * 100 << "%";
+            cout.flush();
+        }
+        if (cycle > n_c) {
+            cout << endl;
+            cout << setprecision(6) << fixed;
+            cout << "Final VMC energy: " << vmc_E << endl;
+        }
+    }
 
 }
 

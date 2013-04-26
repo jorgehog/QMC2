@@ -36,7 +36,7 @@ void selectSystem(GeneralParams & gP,
 int main(int argc, char** argv) {
 
     using namespace std;
-
+    
     //Setting up parallel parameters
     struct ParParams parParams;
 

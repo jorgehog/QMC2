@@ -59,6 +59,40 @@ QMC::QMC() {
 
 }
 
+void QMC::update_subsamples(double weight) {
+    kinetic_sampler.update_mean(weight);
+    system->update_potential_samples(weight);
+}
+
+void QMC::push_subsamples(){
+    kinetic_sampler.push_mean();
+    system->push_potential_samples();
+}
+
+void QMC::dump_subsamples(bool mean_of_means) {
+
+    using namespace std;
+
+    s << "Kinetic " << setprecision(6) << fixed;
+    if (mean_of_means){
+        s << kinetic_sampler.extract_mean_of_means();
+    } else {
+        s << kinetic_sampler.extract_mean();
+    }
+    
+    s << endl;
+    
+    s << system->dump_samples(mean_of_means) << endl;
+
+    if (is_master) {
+        cout << setprecision(6) << fixed;
+        cout << s.str();
+    }
+
+    s.str(string());
+
+}
+
 void QMC::add_output(OutputHandler* output_handler) {
     output_handler->set_qmc_ptr(this);
     this->output_handler.push_back(output_handler);
@@ -123,9 +157,9 @@ bool QMC::metropolis_test(double A) {
     double r = sampling->call_RNG();
 
     if (r <= A) {
-//        if (!system->allow_transition()) {
-//            std::cout << "move " << total_samples << " rejected due to fixed node" << std::endl;
-//        }
+        //        if (!system->allow_transition()) {
+        //            std::cout << "move " << total_samples << " rejected due to fixed node" << std::endl;
+        //        }
         return true;
 
     } else {
@@ -227,12 +261,7 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
 
 }
 
-double QMC::calculate_local_energy(const Walker* walker) const {
-    //    std::cout <<  get_KE(walker) <<"  " <<system->get_potential_energy(walker) << std::endl;
-    return get_KE(walker) + system->get_potential_energy(walker);
-}
-
-double QMC::get_KE(const Walker* walker) const {
+double QMC::get_KE(const Walker* walker) {
     int i, j;
     double xterm, e_kinetic;
 
@@ -244,10 +273,11 @@ double QMC::get_KE(const Walker* walker) const {
         }
     }
 
-    e_kinetic = 2 * xterm + walker->lapl_sum;
+    e_kinetic = -xterm - 0.5 * walker->lapl_sum;
 
+    kinetic_sampler.queue_value(e_kinetic);
 
-    return -0.5 * e_kinetic;
+    return e_kinetic;
 }
 
 void QMC::get_QF(Walker* walker) const {

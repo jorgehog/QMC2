@@ -110,6 +110,12 @@ public:
      */
     virtual bool allow_transition() = 0;
 
+    void update_potential_samples(double weight = 1.0);
+    
+    void push_potential_samples();
+    
+    std::string dump_samples(bool mean_of_means = false);
+    
     Orbitals* get_orbital_ptr() {
         return orbital;
     }

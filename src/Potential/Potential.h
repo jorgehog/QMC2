@@ -14,10 +14,15 @@
  */
 class Potential {
 protected:
+
     int n_p;
     int dim;
 
+    std::string name;
+
 public:
+
+
     Potential(int n_p, int dim);
     Potential();
 
@@ -28,6 +33,12 @@ public:
      * @return The potential energy.
      */
     virtual double get_pot_E(const Walker* walker) const = 0;
+
+    Sampler pot_sampler;
+    
+    std::string get_name(){
+        return name;
+    }
 
 };
 

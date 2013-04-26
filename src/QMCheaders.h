@@ -179,6 +179,7 @@ public:
     }
 };
 
+#include "Sampler/Sampler.h"
 #include "Walker/Walker.h"
 
 class Minimizer;

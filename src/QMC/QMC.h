@@ -19,7 +19,8 @@ protected:
 
     STDOUT* std_out; //!< Output object. Wraps and replaces std::cout.
     std::stringstream s;
-
+    int output_tresh;
+    
     std::string runpath; //!< The directory which the simulation is set to run.
 
     std::string dist_path; //!< The path where the distribution are saved.
@@ -55,6 +56,8 @@ protected:
     Sampling *sampling; //!< The Sampling object.
     System *system; //!< The system object.
     ErrorEstimator* error_estimator; //!< The error estimator.
+
+    Sampler kinetic_sampler;
 
     std::vector<OutputHandler*> output_handler; //!< Can hold stdoutDMC (in case of DMC), Distribution, both or none.
 
@@ -117,7 +120,13 @@ protected:
     void calculate_energy_necessities(Walker* walker) const;
 
     //! Method for calculating the kinetic energy of a walker.
-    double get_KE(const Walker* walker) const;
+    double get_KE(const Walker* walker);
+
+    void update_subsamples(double weight = 1.0);
+    
+    void push_subsamples();
+    
+    void dump_subsamples(bool mean_of_means = false);
 
     //! Method for storing positional data.
     /*!
@@ -221,10 +230,13 @@ public:
     }
 
     //! Method for calculating the local energy.
+
     /*!
      * \see get_KE(), System::get_potential_energy()
      */
-    double calculate_local_energy(const Walker* walker) const;
+    double calculate_local_energy(const Walker* walker) {
+        return get_KE(walker) + system->get_potential_energy(walker);
+    }
 
     //! Method for calculating the acceptance ratio.
     void get_accepted_ratio();

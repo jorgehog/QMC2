@@ -208,10 +208,11 @@ class radial_out(DCVizPlotter):
         xScale = 0.75
         print data[0].n
         
-        color = ['#008000', "0.5"]
-        style = ['-', '-.']
+        color = ['#008000', "0.5", "k", '#008000']
+        style = ['-', '-.', '--', '.']
         max_edge = 0   
         maxCut = 0
+        j = 0
         
         path, name = os.path.split(self.filepath)
         
@@ -225,10 +226,20 @@ class radial_out(DCVizPlotter):
         dmc=None
         
         pureOnly = False
+        superPose = False
+        
+        if superPose:
+            yMax = 1.2
 
         for i in range(len(data)):
-
-            edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
+            
+            if not "0.01" in self.familyFileNames[i]:
+                continue
+            
+            if superPose:
+                edge = 1
+            else:
+                edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
             
             if edge > max_edge:
                 max_edge = edge;
@@ -236,29 +247,58 @@ class radial_out(DCVizPlotter):
             if "dmc" in self.familyFileNames[i]:
                 method = "dmc"
                 dmc = data[i].data
+
+                if superPose:
+                    dmc = dmc/dmc[cut:].max()
+                
+                last = dmc
+                
             elif "vmc" in self.familyFileNames[i]:
                 method = "vmc"
                 vmc = data[i].data
-            
+
+                if superPose:
+                    vmc = vmc/vmc[cut:].max()
+                
+                last = vmc
+                
+                
             r = numpy.linspace(0, edge, data[i].n)
             
             if r[cut] > maxCut:
                 maxCut = r[cut]            
             
             if not pureOnly:
-                self.radialFig.plot(r, data[i][0], style[i%2], label=method.upper(), color=color[i%2]);
+                self.radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
            
             if vmc is not None and dmc is not None:
                 if pureOnly:
-                    pureC = color[0]
+                    pureC = color[j%len(color)]
+                    pureS = style[j%len(color)]
+                    j += 1
+                    pLabel=None
+
+                    if superPose:
+                        pLabel = re.findall("out_(.+?)[vd]mc", self.familyFileNames[i])[0]
+                        pLabel = re.sub("(\d)c(\d)", "\g<1> \g<2>", pLabel)
+                        pLabel = re.sub("QDots\d+", "", pLabel)
+                    
                 else:
-                    pureC = 'k--'
-                self.radialFig.plot(r, 2*dmc - vmc, pureC, label="Pure")
+                    pureC = 'k'
+                    pureS = "--"
+                    pLabel= "Pure"
+                    
+                pure = 2*dmc - vmc
+
+                if superPose:
+                    pure = pure/pure[cut:].max()
+                
+                self.radialFig.plot(r, pure, pureS, color=pureC, label=pLabel)
                 vmc = None
                 dmc = None
         
-        if not pureOnly:
-            self.radialFig.legend()    
+#        if not pureOnly:
+        self.radialFig.legend()    
         self.radialFig.axes.set_xlim(maxCut, xScale*max_edge)
         self.radialFig.set_xlabel('r')
         self.radialFig.set_ylabel(r'$\rho(r)$')
