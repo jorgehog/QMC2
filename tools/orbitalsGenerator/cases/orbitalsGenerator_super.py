@@ -11,6 +11,7 @@ from sympy import (sympify,
                    
 import re as regxp
 from math import ceil
+from subprocess import call
 
 import sys, os
 from os.path import join as pjoin
@@ -56,6 +57,9 @@ class orbitalGenerator(object):
         if toCPP:
             self.initCPPbasis()
             self.cppBasis.make(self)
+
+    def extraToFile(self, path):
+        return;        
         
     def initCPPbasis(self):
         raise NotImplementedError("initCPPbasis not in class " + self.__class__.__name__)        
@@ -460,6 +464,11 @@ class orbitalGenerator(object):
         with open(pjoin(path, '%s.tex' % self.name), 'w') as f:
              f.write(self.getTeX())
              f.close()
+        
+        cwd = os.getcwd()
+        os.chdir(path)
+        call(["pdflatex", pjoin(path, '%s.tex' % self.name)])
+        os.chdir(cwd)
 
     def makeCPP(self):
         self.setupSuperclass()

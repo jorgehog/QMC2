@@ -786,5 +786,257 @@ public:
     -------------------------  END 20  -------------------------
 */
 
+class HarmonicOscillator_21 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_21(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_21_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_21_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_21_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_21_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_21 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_21(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 21  -------------------------
+*/
+
+class HarmonicOscillator_22 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_22(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_22_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_22_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_22_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_22_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_22 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_22(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 22  -------------------------
+*/
+
+class HarmonicOscillator_23 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_23(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_23_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_23_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_23_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_23_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_23 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_23(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 23  -------------------------
+*/
+
+class HarmonicOscillator_24 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_24(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_24_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_24_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_24_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_24_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_24 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_24(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 24  -------------------------
+*/
+
+class HarmonicOscillator_25 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_25(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_25_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_25_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_25_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_25_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_25 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_25(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 25  -------------------------
+*/
+
+class HarmonicOscillator_26 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_26(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_26_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_26_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_26_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_26_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_26 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_26(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 26  -------------------------
+*/
+
+class HarmonicOscillator_27 : public HarmonicOscillator {
+public:
+
+    HarmonicOscillator_27(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_27_x : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_27_x(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_HarmonicOscillator_27_y : public HarmonicOscillator {
+public:
+
+    dell_HarmonicOscillator_27_y(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_HarmonicOscillator_27 : public HarmonicOscillator {
+public:
+
+    lapl_HarmonicOscillator_27(double* k, double* k2, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 27  -------------------------
+*/
+
 
 #endif /* HARMONICOSCILLATOR_H */

@@ -20,6 +20,7 @@ class HOOrbitals(orbitalGenerator):
         self.Hy = []        
         
         self.nShells = int(0.5*(sqrt(1 + 4*self.maxImplemented) - 1))
+
         for i in range(self.nShells):
             self.Hx.append(hermite(i, k*x))
             self.Hy.append(hermite(i, k*y))

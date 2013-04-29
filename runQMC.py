@@ -456,37 +456,37 @@ def consistencyCheck(cmlArgs):
         elif system == "Atoms":
             systemConstant = n_p
             cmlArgs[cmlMAPg['systemConstant']] = str(n_p)
-        
+  
+  
+    alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
+
+    #No col -> no jast and alpha=1
+    if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
+        cmlArgs[cmlMAPg['use_jastrow']] = "0"
+    
+        if (cmlArgs[cmlMAPvp['alpha']] == "def" or cmlArgs[cmlMAPvp['alpha']] == "0"):
+            alpha=1
+            cmlArgs[cmlMAPvp['alpha']] = "1"
+                 
          
   
-    #no minimization initialized -> get param set. Overritten if specified.
-    if (cmlArgs[cmlMAPg['doMIN']]=="0" or cmlArgs[cmlMAPg['doMIN']]=="def"):
- 
-        alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
-
-        if cmlArgs[cmlMAPvp['alpha']] == "def":
-            cmlArgs[cmlMAPvp['alpha']] = str(alpha)
-        if cmlArgs[cmlMAPvp['beta']] == "def":
+    if cmlArgs[cmlMAPvp['alpha']] == "def":
+        cmlArgs[cmlMAPvp['alpha']] = str(alpha)
+    if cmlArgs[cmlMAPvp['beta']] == "def":
             cmlArgs[cmlMAPvp['beta']] = str(beta)
-    else:
-        
+   
+    #In case of minimization, we set the inital params equal to the saved if any.
+    if cmlArgs[cmlMAPg['doMIN']]=="1":
         if cmlArgs[cmlMAPm['alpha']] == 'def' and cmlArgs[cmlMAPm['beta']] == 'def':
-            alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
             if not alpha == 0 and not beta == 0:
                 cmlArgs[cmlMAPm['alpha']] = str(alpha)
                 cmlArgs[cmlMAPm['beta']] = str(beta)
         
-        
+    
             
         
      
-    #No col -> no jast and alpha=1
-    if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
-        cmlArgs[cmlMAPg['use_jastrow']] = "0"
-        
-        if (cmlArgs[cmlMAPvp['alpha']] == "def"):
-            cmlArgs[cmlMAPvp['alpha']] = "1"
-        
+
     return cmlArgs
             
         

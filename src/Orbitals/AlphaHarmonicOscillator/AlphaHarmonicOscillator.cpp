@@ -41,6 +41,13 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     basis_functions[18] = new HarmonicOscillator_18(k, k2, exp_factor);
     basis_functions[19] = new HarmonicOscillator_19(k, k2, exp_factor);
     basis_functions[20] = new HarmonicOscillator_20(k, k2, exp_factor);
+    basis_functions[21] = new HarmonicOscillator_21(k, k2, exp_factor);
+    basis_functions[22] = new HarmonicOscillator_22(k, k2, exp_factor);
+    basis_functions[23] = new HarmonicOscillator_23(k, k2, exp_factor);
+    basis_functions[24] = new HarmonicOscillator_24(k, k2, exp_factor);
+    basis_functions[25] = new HarmonicOscillator_25(k, k2, exp_factor);
+    basis_functions[26] = new HarmonicOscillator_26(k, k2, exp_factor);
+    basis_functions[27] = new HarmonicOscillator_27(k, k2, exp_factor);
 
     dell_basis_functions[0][0] = new dell_HarmonicOscillator_0_x(k, k2, exp_factor);
     dell_basis_functions[1][0] = new dell_HarmonicOscillator_0_y(k, k2, exp_factor);
@@ -84,7 +91,22 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     dell_basis_functions[1][19] = new dell_HarmonicOscillator_19_y(k, k2, exp_factor);
     dell_basis_functions[0][20] = new dell_HarmonicOscillator_20_x(k, k2, exp_factor);
     dell_basis_functions[1][20] = new dell_HarmonicOscillator_20_y(k, k2, exp_factor);
+    dell_basis_functions[0][21] = new dell_HarmonicOscillator_21_x(k, k2, exp_factor);
+    dell_basis_functions[1][21] = new dell_HarmonicOscillator_21_y(k, k2, exp_factor);
+    dell_basis_functions[0][22] = new dell_HarmonicOscillator_22_x(k, k2, exp_factor);
+    dell_basis_functions[1][22] = new dell_HarmonicOscillator_22_y(k, k2, exp_factor);
+    dell_basis_functions[0][23] = new dell_HarmonicOscillator_23_x(k, k2, exp_factor);
+    dell_basis_functions[1][23] = new dell_HarmonicOscillator_23_y(k, k2, exp_factor);
+    dell_basis_functions[0][24] = new dell_HarmonicOscillator_24_x(k, k2, exp_factor);
+    dell_basis_functions[1][24] = new dell_HarmonicOscillator_24_y(k, k2, exp_factor);
+    dell_basis_functions[0][25] = new dell_HarmonicOscillator_25_x(k, k2, exp_factor);
+    dell_basis_functions[1][25] = new dell_HarmonicOscillator_25_y(k, k2, exp_factor);
+    dell_basis_functions[0][26] = new dell_HarmonicOscillator_26_x(k, k2, exp_factor);
+    dell_basis_functions[1][26] = new dell_HarmonicOscillator_26_y(k, k2, exp_factor);
+    dell_basis_functions[0][27] = new dell_HarmonicOscillator_27_x(k, k2, exp_factor);
+    dell_basis_functions[1][27] = new dell_HarmonicOscillator_27_y(k, k2, exp_factor);
 
+    
     lapl_basis_functions[0] = new lapl_HarmonicOscillator_0(k, k2, exp_factor);
     lapl_basis_functions[1] = new lapl_HarmonicOscillator_1(k, k2, exp_factor);
     lapl_basis_functions[2] = new lapl_HarmonicOscillator_2(k, k2, exp_factor);
@@ -106,6 +128,13 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     lapl_basis_functions[18] = new lapl_HarmonicOscillator_18(k, k2, exp_factor);
     lapl_basis_functions[19] = new lapl_HarmonicOscillator_19(k, k2, exp_factor);
     lapl_basis_functions[20] = new lapl_HarmonicOscillator_20(k, k2, exp_factor);
+    lapl_basis_functions[21] = new lapl_HarmonicOscillator_21(k, k2, exp_factor);
+    lapl_basis_functions[22] = new lapl_HarmonicOscillator_22(k, k2, exp_factor);
+    lapl_basis_functions[23] = new lapl_HarmonicOscillator_23(k, k2, exp_factor);
+    lapl_basis_functions[24] = new lapl_HarmonicOscillator_24(k, k2, exp_factor);
+    lapl_basis_functions[25] = new lapl_HarmonicOscillator_25(k, k2, exp_factor);
+    lapl_basis_functions[26] = new lapl_HarmonicOscillator_26(k, k2, exp_factor);
+    lapl_basis_functions[27] = new lapl_HarmonicOscillator_27(k, k2, exp_factor);
 }
 
 void AlphaHarmonicOscillator::get_qnums() {
@@ -201,42 +230,42 @@ double AlphaHarmonicOscillator::get_coulomb_element(const arma::uvec& qnum_set) 
         n_set(i) = (n_x + n_y - abs(m_set(i))) / 2;
 
     }
-//    cout << "q " <<qnum_set.st() << "m " << m_set.st() << "n " << n_set.st() << endl;
+    //    cout << "q " <<qnum_set.st() << "m " << m_set.st() << "n " << n_set.st() << endl;
     double element = coulomb(n_set(0), m_set(0),
             n_set(1), m_set(1),
             n_set(3), m_set(3),
             n_set(2), m_set(2));
-//    cout << element << "\n-------" << endl;
-    
-    int n_c=10000000;
+    //    cout << element << "\n-------" << endl;
+
+    int n_c = 10000000;
     double a = -3;
     double b = 3;
     Diffusion* diff = new Simple(1, 1, 1, 1000, 1);
-    
+
     Walker* dummy = new Walker(2, dim);
     double I = 0;
-    for(int i = 0; i < n_c; i++){
-        dummy->r = a + (b-a)*randu(2, dim);
-        
+    for (int i = 0; i < n_c; i++) {
+        dummy->r = a + (b - a) * randu(2, dim);
+
         set_qnum_indie_terms(dummy, 0);
-        double local_I = phi(dummy, 0, qnum_set(0))*phi(dummy, 0, qnum_set(2));
-        
+        double local_I = phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(2));
+
         set_qnum_indie_terms(dummy, 1);
-        local_I*= phi(dummy, 1, qnum_set(1))*phi(dummy, 1, qnum_set(3));
-        
-        I += local_I/dummy->calc_r_rel(0, 1);
-        
-        
+        local_I *= phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(3));
+
+        I += local_I / dummy->calc_r_rel(0, 1);
+
+
     }
-    
-    I *= (b - a)/n_c;
-    if (I < 1E-2){
+
+    I *= (b - a) / n_c;
+    if (I < 1E-2) {
         I = 0;
     }
-//    cout << I << "  " << element << endl;
-    
+    //    cout << I << "  " << element << endl;
+
     return I;
-    
+
 }
 
 double AlphaHarmonicOscillator::get_sp_energy(int qnum) const {
