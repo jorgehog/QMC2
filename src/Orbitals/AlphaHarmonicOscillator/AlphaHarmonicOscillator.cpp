@@ -106,7 +106,7 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     dell_basis_functions[0][27] = new dell_HarmonicOscillator_27_x(k, k2, exp_factor);
     dell_basis_functions[1][27] = new dell_HarmonicOscillator_27_y(k, k2, exp_factor);
 
-    
+
     lapl_basis_functions[0] = new lapl_HarmonicOscillator_0(k, k2, exp_factor);
     lapl_basis_functions[1] = new lapl_HarmonicOscillator_1(k, k2, exp_factor);
     lapl_basis_functions[2] = new lapl_HarmonicOscillator_2(k, k2, exp_factor);
@@ -178,6 +178,10 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
     } else if (n == 5) {
         double x2 = x*x;
         return 32 * x2 * x2 * x - 160 * x2 * x + 120 * x;
+    } else if (n == 6) {
+        double x2 = x*x;
+        double x4 = x2*x2;
+        return 64*x4*x2 - 480*x4 + 720*x2 - 120;
     } else {
         std::cout << "Unsopported Hermite polynomial level: " << n << std::endl;
         exit(1);
