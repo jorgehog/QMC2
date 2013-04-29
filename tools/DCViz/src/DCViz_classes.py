@@ -409,7 +409,62 @@ class dist_out(DCVizPlotter):
 #        self.fig1.colorbar(im)
 
 #        self.subfigDist1d.set_ylabel(r'$|P(r)|^2$')
+
+
+class E_vs_w(DCVizPlotter):
+    
+    nametag = "E\_vs\_w\.dat"
+    figMap = {"f2":["s2", "se2"], 
+              "f6":["s6", "se6"], 
+            "f12":["s12", "se12"], 
+            "f20":["s20", "se20"], 
+            "f30":["s30", "se30"], 
+            "f42":["s42", "se42"]}
+ 
+    def plot(self, data):
         
+        N, W, E, E_K, E_O, E_C = data
+        
+        I = {"2": [-1, -1], "6": [-1, -1], "12": [-1, -1], "20": [-1, -1], "30": [-1, -1], "42": [-1, -1]}
+        
+        k = 0
+        for n_p in N:
+            i = str(int(n_p))
+            if I[i][0] == -1:
+                I[i][0] = k
+           
+            I[i][1] = k
+            
+            k+=1
+         
+        for N in ["2", "6", "12", "20", "30", "42"]:
+            i1 = I[N][0]
+            i2 = I[N][1]+1
+
+            w = W[i1:i2][numpy.where(E[i1:i2] < 1000)]
+            e = E[i1:i2][numpy.where(E[i1:i2] < 1000)]
+            ek =E_K[i1:i2][numpy.where(E[i1:i2] < 1000)]
+            eo = E_O[i1:i2][numpy.where(E[i1:i2] < 1000)]
+            ec = E_C[i1:i2][numpy.where(E[i1:i2] < 1000)]
+
+            subfig = eval("self.s%s" % N)
+            subfig2 = eval("self.se%s" % N)
+
+            subfig.plot(w, ek/e, "*", color='#008000', label="Ekin/E")
+            subfig.plot(w, eo/e, "^", color='#008000', label="Eosc/E")
+            subfig.plot(w, ec/e, ".", color='#008000', label="Ecol/E")
+            subfig.set_title("N = %s" % N)     
+            subfig.legend()
+            subfig.set_ylim([0, 1])
+            subfig.set_ylabel("$\omega$")
+            
+            subfig2.plot(w, e/w, "+", color='#008000', label="E/$\omega$")
+            subfig2.plot(w, ek/w, "*", color='#008000', label="Ekin/$\omega$")
+            subfig2.plot(w, eo/w, "^", color='#008000', label="Eosc/$\omega$")
+            subfig2.plot(w, ec/w, ".", color='#008000', label="Ecol/$\omega$")
+            subfig2.legend()
+            subfig.set_ylabel("$\omega$")
+ 
 class testBinFile(DCVizPlotter):
     
     nametag = "testBin.+\.arma"
