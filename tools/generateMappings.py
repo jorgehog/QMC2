@@ -6,7 +6,7 @@ raw = mainCppFile.read()
 mainCppFile.close()
 
 generateSTDOUTtests = True
-generateCMLMaps = False
+generateCMLMaps = True
 
 
 if generateSTDOUTtests:

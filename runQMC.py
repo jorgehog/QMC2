@@ -16,7 +16,6 @@ try:
 except:
     print "Unable to detect pyside. GUI not supported."
 
-
 cmlMAPo = {"dist_out"      : 0,
            "dmc_out"       : 1,
            "ASGD_out"      : 2}
@@ -48,11 +47,12 @@ cmlMAPm = {"SGDsamples"    : 23,
            "n_w"           : 24,
            "therm"         : 25,
            "n_c_SGD"       : 26,
-           "alpha"         : 27,
-           "beta"          : 28}
+           "max_step"      : 27,
+           "alpha"         : 28,
+           "beta"          : 29}
 
-cmlMAPvp = {"alpha"         : 29,
-            "beta"          : 30}
+cmlMAPvp = {"alpha"         : 30,
+            "beta"          : 31}
 
 
 def dumpStrList(aList):
@@ -704,14 +704,14 @@ def getJobFlag(argv):
 
 def main():
     
-#    if not consistentMap():
-#        print "The map is inconsistent with the C++ reader."
-#        ans = raw_input("Proceed? [y]/n")
-#        if ans in ["n", "no"]:
-#            sys.exit(1)
-#
-#    else:
-#        print "Map consistent"
+    if not consistentMap():
+        print "The map is inconsistent with the C++ reader."
+        ans = raw_input("Proceed? [y]/n")
+        if ans in ["n", "no"]:
+            sys.exit(1)
+
+    else:
+        print "Map consistent"
     
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
     codename = getCodename(sys.argv)

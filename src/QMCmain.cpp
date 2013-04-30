@@ -36,7 +36,7 @@ void selectSystem(GeneralParams & gP,
 int main(int argc, char** argv) {
 
     using namespace std;
-    
+
     //Setting up parallel parameters
     struct ParParams parParams;
 
@@ -108,17 +108,17 @@ int main(int argc, char** argv) {
     }
     //
 
-//    generalParams.n_p = 2;
-//    generalParams.dim = 3;
-//    generalParams.systemConstant = generalParams.n_p;
-//    variationalParams.alpha = 1;
-//    srand(time(NULL));
-//    Orbitals* sp = new hydrogenicOrbitals(generalParams, variationalParams);
-//    HartreeFock* hf = new HartreeFock(4, sp);
-//    hf->run_method();
-//    
-//    exit(0);
-    
+    //    generalParams.n_p = 2;
+    //    generalParams.dim = 3;
+    //    generalParams.systemConstant = generalParams.n_p;
+    //    variationalParams.alpha = 1;
+    //    srand(time(NULL));
+    //    Orbitals* sp = new hydrogenicOrbitals(generalParams, variationalParams);
+    //    HartreeFock* hf = new HartreeFock(4, sp);
+    //    hf->run_method();
+    //    
+    //    exit(0);
+
     parseCML(argc, argv,
             vmcParams,
             dmcParams,
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
 
         }
 
-//        int DMCerrorN = dmcParams.n_c;
+        //        int DMCerrorN = dmcParams.n_c;
         if (generalParams.do_blocking) {
 
             ErrorEstimator* blocking = new Blocking(dmcParams.n_c,
@@ -265,7 +265,7 @@ void parseCML(int argc, char** argv,
         ParParams & parParams) {
 
 
-    int n_args = 32;
+    int n_args = 33;
 
     //Default values:
 
@@ -336,16 +336,20 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[3]) != 0) outputParams.ASGD_out = (bool)atoi(argv[3]);
 
 
+
         if (def.compare(argv[4]) != 0) generalParams.runpath = argv[4];
         if (def.compare(argv[5]) != 0) generalParams.n_p = atoi(argv[5]);
         if (def.compare(argv[6]) != 0) generalParams.dim = atoi(argv[6]);
         if (def.compare(argv[7]) != 0) generalParams.systemConstant = atof(argv[7]);
 
+
         if (def.compare(argv[8]) != 0) generalParams.random_seed = atoi(argv[8]);
+
 
         if (def.compare(argv[9]) != 0) generalParams.doMIN = (bool)atoi(argv[9]);
         if (def.compare(argv[10]) != 0) generalParams.doVMC = (bool)atoi(argv[10]);
         if (def.compare(argv[11]) != 0) generalParams.doDMC = (bool)atoi(argv[11]);
+
 
 
         if (def.compare(argv[12]) != 0) generalParams.use_coulomb = (bool)atoi(argv[12]);
@@ -353,12 +357,15 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[14]) != 0) generalParams.do_blocking = (bool)atoi(argv[14]);
 
 
+
         if (def.compare(argv[15]) != 0) generalParams.sampling = argv[15];
         if (def.compare(argv[16]) != 0) generalParams.system = argv[16];
 
 
+
         if (def.compare(argv[17]) != 0) vmcParams.n_c = atoi(argv[17]);
         if (def.compare(argv[18]) != 0) vmcParams.dt = atof(argv[18]);
+
 
 
         if (def.compare(argv[19]) != 0) dmcParams.dt = atof(argv[19]);
@@ -368,16 +375,20 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[23]) != 0) dmcParams.therm = atoi(argv[23]);
 
 
+
         if (def.compare(argv[24]) != 0) minimizerParams.SGDsamples = atoi(argv[24]);
         if (def.compare(argv[25]) != 0) minimizerParams.n_w = atoi(argv[25]);
         if (def.compare(argv[26]) != 0) minimizerParams.therm = atoi(argv[26]);
         if (def.compare(argv[27]) != 0) minimizerParams.n_c_SGD = atoi(argv[27]);
-        if (def.compare(argv[28]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[28]);
-        if (def.compare(argv[29]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[29]);
+        if (def.compare(argv[28]) != 0) minimizerParams.max_step = atof(argv[28]);
+        if (def.compare(argv[29]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[29]);
+        if (def.compare(argv[30]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[30]);
 
 
-        if (def.compare(argv[30]) != 0) variationalParams.alpha = atof(argv[30]);
-        if (def.compare(argv[31]) != 0) variationalParams.beta = atof(argv[31]);
+
+        if (def.compare(argv[31]) != 0) variationalParams.alpha = atof(argv[31]);
+        if (def.compare(argv[32]) != 0) variationalParams.beta = atof(argv[32]);
+
 
         int vmc_dt_loc = 18;
 
@@ -389,6 +400,8 @@ void parseCML(int argc, char** argv,
             }
         }
 
+    } else {
+        std::cout << "insufficient CML arguments. Attempting execution..." << std::endl;
     }
 
 
@@ -441,10 +454,12 @@ void parseCML(int argc, char** argv,
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
-    bool initOut = false;
+    bool initOut = true;
     if (initOut) {
         if (parParams.is_master) {
             if (n_args == argc) {
+
+                std::cout << n_args << " =? " << argc << std::endl;
                 std::cout << " 1" << " outputParams.dist_out           " << " = " << outputParams.dist_out << "   " << argv[1] << std::endl;
                 std::cout << " 2" << " outputParams.dmc_out            " << " = " << outputParams.dmc_out << "   " << argv[2] << std::endl;
                 std::cout << " 3" << " outputParams.ASGD_out           " << " = " << outputParams.ASGD_out << "   " << argv[3] << std::endl;
@@ -472,10 +487,12 @@ void parseCML(int argc, char** argv,
                 std::cout << "25" << " minimizerParams.n_w             " << " = " << minimizerParams.n_w << "   " << argv[25] << std::endl;
                 std::cout << "26" << " minimizerParams.therm           " << " = " << minimizerParams.therm << "   " << argv[26] << std::endl;
                 std::cout << "27" << " minimizerParams.n_c_SGD         " << " = " << minimizerParams.n_c_SGD << "   " << argv[27] << std::endl;
-                std::cout << "28" << " minimizerParams.alpha           " << " = " << minimizerParams.alpha << "   " << argv[28] << std::endl;
-                std::cout << "29" << " minimizerParams.beta            " << " = " << minimizerParams.beta << "   " << argv[29] << std::endl;
-                std::cout << "30" << " variationalParams.alpha         " << " = " << variationalParams.alpha << "   " << argv[30] << std::endl;
-                std::cout << "31" << " variationalParams.beta          " << " = " << variationalParams.beta << "   " << argv[31] << std::endl;
+                std::cout << "28" << " minimizerParams.max_step        " << " = " << minimizerParams.max_step << "   " << argv[28] << std::endl;
+                std::cout << "29" << " minimizerParams.alpha           " << " = " << minimizerParams.alpha << "   " << argv[29] << std::endl;
+                std::cout << "30" << " minimizerParams.beta            " << " = " << minimizerParams.beta << "   " << argv[30] << std::endl;
+                std::cout << "31" << " variationalParams.alpha         " << " = " << variationalParams.alpha << "   " << argv[31] << std::endl;
+                std::cout << "32" << " variationalParams.beta          " << " = " << variationalParams.beta << "   " << argv[32] << std::endl;
+
             } else {
                 std::cout << " 1" << " outputParams.dist_out           " << " = " << outputParams.dist_out << std::endl;
                 std::cout << " 2" << " outputParams.dmc_out            " << " = " << outputParams.dmc_out << std::endl;
