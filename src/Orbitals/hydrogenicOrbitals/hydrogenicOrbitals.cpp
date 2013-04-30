@@ -20,7 +20,8 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     this->exp_factor_n1 = new double();
     this->exp_factor_n2 = new double();
     this->exp_factor_n3 = new double();
-    
+    this->exp_factor_n4 = new double();
+
     this->Z = (int) gP.systemConstant;
     set_parameter(vP.alpha, 0);
 
@@ -40,6 +41,10 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     basis_functions[11] = new hydrogenic_11(k, k2, r22d, r2d, exp_factor_n3);
     basis_functions[12] = new hydrogenic_12(k, k2, r22d, r2d, exp_factor_n3);
     basis_functions[13] = new hydrogenic_13(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[14] = new hydrogenic_14(k, k2, r22d, r2d, exp_factor_n4);
+    basis_functions[15] = new hydrogenic_15(k, k2, r22d, r2d, exp_factor_n4);
+    basis_functions[16] = new hydrogenic_16(k, k2, r22d, r2d, exp_factor_n4);
+    basis_functions[17] = new hydrogenic_17(k, k2, r22d, r2d, exp_factor_n4);
 
     dell_basis_functions[0][0] = new dell_hydrogenic_0_x(k, k2, r22d, r2d, exp_factor_n1);
     dell_basis_functions[1][0] = new dell_hydrogenic_0_y(k, k2, r22d, r2d, exp_factor_n1);
@@ -83,6 +88,18 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     dell_basis_functions[0][13] = new dell_hydrogenic_13_x(k, k2, r22d, r2d, exp_factor_n3);
     dell_basis_functions[1][13] = new dell_hydrogenic_13_y(k, k2, r22d, r2d, exp_factor_n3);
     dell_basis_functions[2][13] = new dell_hydrogenic_13_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][14] = new dell_hydrogenic_14_x(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[1][14] = new dell_hydrogenic_14_y(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[2][14] = new dell_hydrogenic_14_z(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[0][15] = new dell_hydrogenic_15_x(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[1][15] = new dell_hydrogenic_15_y(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[2][15] = new dell_hydrogenic_15_z(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[0][16] = new dell_hydrogenic_16_x(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[1][16] = new dell_hydrogenic_16_y(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[2][16] = new dell_hydrogenic_16_z(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[0][17] = new dell_hydrogenic_17_x(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[1][17] = new dell_hydrogenic_17_y(k, k2, r22d, r2d, exp_factor_n4);
+    dell_basis_functions[2][17] = new dell_hydrogenic_17_z(k, k2, r22d, r2d, exp_factor_n4);
 
     lapl_basis_functions[0] = new lapl_hydrogenic_0(k, k2, r22d, r2d, exp_factor_n1);
     lapl_basis_functions[1] = new lapl_hydrogenic_1(k, k2, r22d, r2d, exp_factor_n2);
@@ -98,13 +115,21 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     lapl_basis_functions[11] = new lapl_hydrogenic_11(k, k2, r22d, r2d, exp_factor_n3);
     lapl_basis_functions[12] = new lapl_hydrogenic_12(k, k2, r22d, r2d, exp_factor_n3);
     lapl_basis_functions[13] = new lapl_hydrogenic_13(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[14] = new lapl_hydrogenic_14(k, k2, r22d, r2d, exp_factor_n4);
+    lapl_basis_functions[15] = new lapl_hydrogenic_15(k, k2, r22d, r2d, exp_factor_n4);
+    lapl_basis_functions[16] = new lapl_hydrogenic_16(k, k2, r22d, r2d, exp_factor_n4);
+    lapl_basis_functions[17] = new lapl_hydrogenic_17(k, k2, r22d, r2d, exp_factor_n4);
+
 }
 
 void hydrogenicOrbitals::set_qnum_indie_terms(const Walker* walker, int i) {
 
-    *exp_factor_n1 = exp(-(*k) * walker->get_r_i(i));
-    if (n_p > 2) *exp_factor_n2 = exp(-(*k) * walker->get_r_i(i) / 2);
-    if (n_p > 10) *exp_factor_n3 = exp(-(*k) * walker->get_r_i(i) / 3);
+    double kr = -(*k) * walker->get_r_i(i);
+
+    *exp_factor_n1 = exp(kr);
+    if (n_p > 2) *exp_factor_n2 = exp(kr / 2);
+    if (n_p > 10) *exp_factor_n3 = exp(kr / 3);
+    if (n_p > 28) *exp_factor_n4 = exp(kr / 4);
 
 }
 
@@ -195,6 +220,30 @@ double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, in
         //-Z*r/3
 
         dphi = -Z * walker->get_r_i(i) / 3;
+
+    } else if (qnum == 14) {
+
+        //-Z*r*(k^3*r^3 - 36*k^2*r^2 + 336*k*r - 768)/(4*(k^3*r^3 - 24*k^2*r^2 + 144*k*r - 192))
+
+        dphi = -Z * walker->get_r_i(i)*((*k2)*(*k) * walker->get_r_i2(i) * walker->get_r_i(i) - 36 * (*k2) * walker->get_r_i2(i) + 336 * (*k) * walker->get_r_i(i) - 768) / (4 * ((*k2)*(*k) * walker->get_r_i2(i) * walker->get_r_i(i) - 24 * (*k2) * walker->get_r_i2(i) + 144 * (*k) * walker->get_r_i(i) - 192));
+
+    } else if (qnum == 15) {
+
+        //-Z*r*(k*r - 20)*(k*r - 8)/(4*(k^2*r^2 - 20*k*r + 80))
+
+        dphi = -Z * walker->get_r_i(i)*((*k) * walker->get_r_i(i) - 20)*((*k) * walker->get_r_i(i) - 8) / (4 * ((*k2) * walker->get_r_i2(i) - 20 * (*k) * walker->get_r_i(i) + 80));
+
+    } else if (qnum == 16) {
+
+        //-Z*r*(k*r - 20)*(k*r - 8)/(4*(k^2*r^2 - 20*k*r + 80))
+
+        dphi = -Z * walker->get_r_i(i)*((*k) * walker->get_r_i(i) - 20)*((*k) * walker->get_r_i(i) - 8) / (4 * ((*k2) * walker->get_r_i2(i) - 20 * (*k) * walker->get_r_i(i) + 80));
+
+    } else if (qnum == 17) {
+
+        //-Z*r*(k*r - 20)*(k*r - 8)/(4*(k^2*r^2 - 20*k*r + 80))
+
+        dphi = -Z * walker->get_r_i(i)*((*k) * walker->get_r_i(i) - 20)*((*k) * walker->get_r_i(i) - 8) / (4 * ((*k2) * walker->get_r_i2(i) - 20 * (*k) * walker->get_r_i(i) + 80));
 
     } else {
         std::cout << "qnum level " << qnum << " not implemented in dalpha hydro" << std::endl;

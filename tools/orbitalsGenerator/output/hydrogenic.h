@@ -650,5 +650,181 @@ public:
     -------------------------  END 13  -------------------------
 */
 
+class hydrogenic_14 : public hydrogenic {
+public:
+
+    hydrogenic_14(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_14_x : public hydrogenic {
+public:
+
+    dell_hydrogenic_14_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_14_y : public hydrogenic {
+public:
+
+    dell_hydrogenic_14_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_14_z : public hydrogenic {
+public:
+
+    dell_hydrogenic_14_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_hydrogenic_14 : public hydrogenic {
+public:
+
+    lapl_hydrogenic_14(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 14  -------------------------
+*/
+
+class hydrogenic_15 : public hydrogenic {
+public:
+
+    hydrogenic_15(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_15_x : public hydrogenic {
+public:
+
+    dell_hydrogenic_15_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_15_y : public hydrogenic {
+public:
+
+    dell_hydrogenic_15_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_15_z : public hydrogenic {
+public:
+
+    dell_hydrogenic_15_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_hydrogenic_15 : public hydrogenic {
+public:
+
+    lapl_hydrogenic_15(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 15  -------------------------
+*/
+
+class hydrogenic_16 : public hydrogenic {
+public:
+
+    hydrogenic_16(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_16_x : public hydrogenic {
+public:
+
+    dell_hydrogenic_16_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_16_y : public hydrogenic {
+public:
+
+    dell_hydrogenic_16_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_16_z : public hydrogenic {
+public:
+
+    dell_hydrogenic_16_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_hydrogenic_16 : public hydrogenic {
+public:
+
+    lapl_hydrogenic_16(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 16  -------------------------
+*/
+
+class hydrogenic_17 : public hydrogenic {
+public:
+
+    hydrogenic_17(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_17_x : public hydrogenic {
+public:
+
+    dell_hydrogenic_17_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_17_y : public hydrogenic {
+public:
+
+    dell_hydrogenic_17_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class dell_hydrogenic_17_z : public hydrogenic {
+public:
+
+    dell_hydrogenic_17_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+class lapl_hydrogenic_17 : public hydrogenic {
+public:
+
+    lapl_hydrogenic_17(double* k, double* k2, double* r22d, double* r2d, double* exp_factor);
+    virtual double eval(const Walker* walker, int i);
+
+};
+
+/*
+    -------------------------  END 17  -------------------------
+*/
+
 
 #endif /* HYDROGENIC_H */

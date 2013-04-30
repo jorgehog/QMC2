@@ -92,6 +92,30 @@ double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, in
         
         dphi = -Z*walker->get_r_i(i)/3;
         
+    } else if (qnum == 14) {    
+    
+        //-Z*r*(k^3*r^3 - 36*k^2*r^2 + 336*k*r - 768)/(4*(k^3*r^3 - 24*k^2*r^2 + 144*k*r - 192))
+        
+        dphi = -Z*walker->get_r_i(i)*((*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 36*(*k2)*walker->get_r_i2(i) + 336*(*k)*walker->get_r_i(i) - 768)/(4*((*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 24*(*k2)*walker->get_r_i2(i) + 144*(*k)*walker->get_r_i(i) - 192));
+        
+    } else if (qnum == 15) {    
+    
+        //-Z*r*(k*r - 20)*(k*r - 8)/(4*(k^2*r^2 - 20*k*r + 80))
+        
+        dphi = -Z*walker->get_r_i(i)*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80));
+        
+    } else if (qnum == 16) {    
+    
+        //-Z*r*(k*r - 20)*(k*r - 8)/(4*(k^2*r^2 - 20*k*r + 80))
+        
+        dphi = -Z*walker->get_r_i(i)*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80));
+        
+    } else if (qnum == 17) {    
+    
+        //-Z*r*(k*r - 20)*(k*r - 8)/(4*(k^2*r^2 - 20*k*r + 80))
+        
+        dphi = -Z*walker->get_r_i(i)*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80));
+        
     }
     
     return dphi;

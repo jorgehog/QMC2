@@ -424,6 +424,122 @@ lapl_hydrogenic_13::lapl_hydrogenic_13(double* k, double* k2, double* r22d, doub
     -------------------------  END 13  -------------------------
 */
 
+hydrogenic_14::hydrogenic_14(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_14_x::dell_hydrogenic_14_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_14_y::dell_hydrogenic_14_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_14_z::dell_hydrogenic_14_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+lapl_hydrogenic_14::lapl_hydrogenic_14(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+/*
+    -------------------------  END 14  -------------------------
+*/
+
+hydrogenic_15::hydrogenic_15(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_15_x::dell_hydrogenic_15_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_15_y::dell_hydrogenic_15_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_15_z::dell_hydrogenic_15_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+lapl_hydrogenic_15::lapl_hydrogenic_15(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+/*
+    -------------------------  END 15  -------------------------
+*/
+
+hydrogenic_16::hydrogenic_16(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_16_x::dell_hydrogenic_16_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_16_y::dell_hydrogenic_16_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_16_z::dell_hydrogenic_16_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+lapl_hydrogenic_16::lapl_hydrogenic_16(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+/*
+    -------------------------  END 16  -------------------------
+*/
+
+hydrogenic_17::hydrogenic_17(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_17_x::dell_hydrogenic_17_x(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_17_y::dell_hydrogenic_17_y(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+dell_hydrogenic_17_z::dell_hydrogenic_17_z(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+lapl_hydrogenic_17::lapl_hydrogenic_17(double* k, double* k2, double* r22d, double* r2d, double* exp_factor)
+: hydrogenic(k, k2, r22d, r2d, exp_factor) {
+
+}
+
+/*
+    -------------------------  END 17  -------------------------
+*/
+
 
 
 /*
@@ -1330,5 +1446,249 @@ double lapl_hydrogenic_13::eval(const Walker* walker, int i) {
 
 /*
     -------------------------  END 13  -------------------------
+*/
+
+double hydrogenic_14::eval(const Walker* walker, int i) {
+    
+    //(k^3*r^3 - 24*k^2*r^2 + 144*k*r - 192)*exp(-k*r/4)
+    
+    psi = (*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 24*(*k2)*walker->get_r_i2(i) + 144*(*k)*walker->get_r_i(i) - 192;
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_14_x::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    
+    //-k*x*(k^3*r^3 - 36*k^2*r^2 + 336*k*r - 768)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*x*((*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 36*(*k2)*walker->get_r_i2(i) + 336*(*k)*walker->get_r_i(i) - 768)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_14_y::eval(const Walker* walker, int i) {
+
+    y = walker->r(i, 1);
+    
+    //-k*y*(k^3*r^3 - 36*k^2*r^2 + 336*k*r - 768)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*y*((*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 36*(*k2)*walker->get_r_i2(i) + 336*(*k)*walker->get_r_i(i) - 768)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_14_z::eval(const Walker* walker, int i) {
+
+    z = walker->r(i, 2);
+    
+    //-k*z*(k^3*r^3 - 36*k^2*r^2 + 336*k*r - 768)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*z*((*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 36*(*k2)*walker->get_r_i2(i) + 336*(*k)*walker->get_r_i(i) - 768)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double lapl_hydrogenic_14::eval(const Walker* walker, int i) {
+    
+    //k*(k*r - 32)*(k^3*r^3 - 24*k^2*r^2 + 144*k*r - 192)*exp(-k*r/4)/(16*r)
+    
+    psi = (*k)*((*k)*walker->get_r_i(i) - 32)*((*k2)*(*k)*walker->get_r_i2(i)*walker->get_r_i(i) - 24*(*k2)*walker->get_r_i2(i) + 144*(*k)*walker->get_r_i(i) - 192)/(16*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+/*
+    -------------------------  END 14  -------------------------
+*/
+
+double hydrogenic_15::eval(const Walker* walker, int i) {
+
+    z = walker->r(i, 2);
+    
+    //z*(k^2*r^2 - 20*k*r + 80)*exp(-k*r/4)
+    
+    psi = z*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80);
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_15_x::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    z = walker->r(i, 2);
+    
+    //-k*x*z*(k*r - 20)*(k*r - 8)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*x*z*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_15_y::eval(const Walker* walker, int i) {
+
+    y = walker->r(i, 1);
+    z = walker->r(i, 2);
+    
+    //-k*y*z*(k*r - 20)*(k*r - 8)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*y*z*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_15_z::eval(const Walker* walker, int i) {
+
+    z = walker->r(i, 2);
+
+    z2 = z*z;
+    
+    //(4*k^2*r^3 - 80*k*r^2 - k*z^2*(k*r - 20)*(k*r - 8) + 320*r)*exp(-k*r/4)/(4*r)
+    
+    psi = (4*(*k2)*walker->get_r_i2(i)*walker->get_r_i(i) - 80*(*k)*walker->get_r_i2(i) - (*k)*z2*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8) + 320*walker->get_r_i(i))/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double lapl_hydrogenic_15::eval(const Walker* walker, int i) {
+
+    z = walker->r(i, 2);
+    
+    //k*z*(k*r - 32)*(k^2*r^2 - 20*k*r + 80)*exp(-k*r/4)/(16*r)
+    
+    psi = (*k)*z*((*k)*walker->get_r_i(i) - 32)*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80)/(16*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+/*
+    -------------------------  END 15  -------------------------
+*/
+
+double hydrogenic_16::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    
+    //x*(k^2*r^2 - 20*k*r + 80)*exp(-k*r/4)
+    
+    psi = x*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80);
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_16_x::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+
+    x2 = x*x;
+    
+    //(4*k^2*r^3 - 80*k*r^2 - k*x^2*(k*r - 20)*(k*r - 8) + 320*r)*exp(-k*r/4)/(4*r)
+    
+    psi = (4*(*k2)*walker->get_r_i2(i)*walker->get_r_i(i) - 80*(*k)*walker->get_r_i2(i) - (*k)*x2*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8) + 320*walker->get_r_i(i))/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_16_y::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    y = walker->r(i, 1);
+    
+    //-k*x*y*(k*r - 20)*(k*r - 8)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*x*y*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_16_z::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    z = walker->r(i, 2);
+    
+    //-k*x*z*(k*r - 20)*(k*r - 8)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*x*z*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double lapl_hydrogenic_16::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    
+    //k*x*(k*r - 32)*(k^2*r^2 - 20*k*r + 80)*exp(-k*r/4)/(16*r)
+    
+    psi = (*k)*x*((*k)*walker->get_r_i(i) - 32)*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80)/(16*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+/*
+    -------------------------  END 16  -------------------------
+*/
+
+double hydrogenic_17::eval(const Walker* walker, int i) {
+
+    y = walker->r(i, 1);
+    
+    //y*(k^2*r^2 - 20*k*r + 80)*exp(-k*r/4)
+    
+    psi = y*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80);
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_17_x::eval(const Walker* walker, int i) {
+
+    x = walker->r(i, 0);
+    y = walker->r(i, 1);
+    
+    //-k*x*y*(k*r - 20)*(k*r - 8)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*x*y*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_17_y::eval(const Walker* walker, int i) {
+
+    y = walker->r(i, 1);
+
+    y2 = y*y;
+    
+    //(4*k^2*r^3 - 80*k*r^2 - k*y^2*(k*r - 20)*(k*r - 8) + 320*r)*exp(-k*r/4)/(4*r)
+    
+    psi = (4*(*k2)*walker->get_r_i2(i)*walker->get_r_i(i) - 80*(*k)*walker->get_r_i2(i) - (*k)*y2*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8) + 320*walker->get_r_i(i))/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double dell_hydrogenic_17_z::eval(const Walker* walker, int i) {
+
+    y = walker->r(i, 1);
+    z = walker->r(i, 2);
+    
+    //-k*y*z*(k*r - 20)*(k*r - 8)*exp(-k*r/4)/(4*r)
+    
+    psi = -(*k)*y*z*((*k)*walker->get_r_i(i) - 20)*((*k)*walker->get_r_i(i) - 8)/(4*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+double lapl_hydrogenic_17::eval(const Walker* walker, int i) {
+
+    y = walker->r(i, 1);
+    
+    //k*y*(k*r - 32)*(k^2*r^2 - 20*k*r + 80)*exp(-k*r/4)/(16*r)
+    
+    psi = (*k)*y*((*k)*walker->get_r_i(i) - 32)*((*k2)*walker->get_r_i2(i) - 20*(*k)*walker->get_r_i(i) + 80)/(16*walker->get_r_i(i));
+    return psi*(*exp_factor);
+    
+}
+
+/*
+    -------------------------  END 17  -------------------------
 */
 

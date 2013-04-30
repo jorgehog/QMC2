@@ -167,8 +167,8 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
     
     def check(self, expr, expr_orig):
         from sympy import pi
-        expr_1 = expr.subs(r, r3d).expand().subs(x, pi).subs(y, pi).subs(z, pi).subs(k, pi)
-        expr_2 = expr_orig.subs(r, r3d).expand().subs(x, pi).subs(y, pi).subs(z, pi).subs(k, pi)
+        expr_1 = expr.subs(r, r3d).expand().subs(x, pi/2).subs(y, pi/3).subs(z, pi/4).subs(k, pi)
+        expr_2 = expr_orig.subs(r, r3d).expand().subs(x, pi/2).subs(y, pi/3).subs(z, pi/4).subs(k, pi)
         
         if expr_1.evalf() != expr_2.evalf():
             print "FAIL"
@@ -227,7 +227,12 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
                  for m in mList:
                      self.stateMap[i] = [n, l, m]
                      i += 1
-                    
+        
+        
+        for i in range(len(self.stateMap)):
+            if i >= self.maxImplemented/2:
+                self.stateMap.pop(i)
+ 
         
     def setupOrbitals(self):
         
