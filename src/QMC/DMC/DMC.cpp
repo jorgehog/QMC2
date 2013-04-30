@@ -216,13 +216,13 @@ void DMC::bury_the_dead() {
     int i = 0;
     int k = 0;
 
-
     while (k < newborn && i < n_w_last) {
         if (original_walkers[i]->is_dead()) {
 
             copy_walker(original_walkers[last_alive], original_walkers[i]);
-            delete original_walkers[last_alive];
-            original_walkers[last_alive] = new Walker(n_p, dim, false);
+            original_walkers[last_alive]->kill();
+//            delete original_walkers[last_alive];
+//            original_walkers[last_alive] = new Walker(n_p, dim, false);
             last_alive--;
             k++;
         }
@@ -242,10 +242,17 @@ void DMC::bury_the_dead() {
             //Finds last living walker and deletes any dead walkers at array end
             while (original_walkers[last_alive]->is_dead()) {
 
-                delete original_walkers[last_alive];
-                original_walkers[last_alive] = new Walker(n_p, dim, false);
+//                delete original_walkers[last_alive];
+//                original_walkers[last_alive] = new Walker(n_p, dim, false);
+                original_walkers[last_alive]->kill();
                 i++;
                 last_alive--;
+                
+                //if all the walkers are dead
+                if (last_alive == -1){
+                    n_w = 0;
+                    return;
+                }
             }
 
             //Find the first dead walker
@@ -258,8 +265,9 @@ void DMC::bury_the_dead() {
             if (first_dead < last_alive) {
 
                 copy_walker(original_walkers[last_alive], original_walkers[first_dead]);
-                delete original_walkers[last_alive];
-                original_walkers[last_alive] = new Walker(n_p, dim, false);
+//                delete original_walkers[last_alive];
+//                original_walkers[last_alive] = new Walker(n_p, dim, false);
+                original_walkers[last_alive]->kill();
 
                 i++;
                 last_alive--;
@@ -288,7 +296,14 @@ void DMC::node_comm() {
 #else
     n_w_tot = n_w;
 #endif
-//    if (is_master) std::cout << n_w_list.st() << std::endl;
+
+    if (n_w_tot == 0){
+        if (is_master){
+            std::cout << "All walkers dead. Exiting..." << std::endl;
+            exit(1);
+        }
+    }
+
 }
 
 void DMC::switch_souls(int root, int root_id, int dest, int dest_id) {
