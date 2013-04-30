@@ -21,6 +21,8 @@ protected:
     int n_w_tot; //!< The total number of walkers across all nodes.
     arma::uvec n_w_list; //!< List of the number of walkers of each node.
 
+    bool force_comm; //!< Flag set true if population should be renormalized.
+    
     int deaths; //< The number of walkers who died the last cycle.
 
     int block_size; //< The number of block samples for each walker for each cycle.
