@@ -413,6 +413,8 @@ class dist_out(DCVizPlotter):
 
 class E_vs_w(DCVizPlotter):
     
+    stack = "H"    
+    
     nametag = "E\_vs\_w\.dat"
     figMap = {"f2":["s2", "se2"], 
               "f6":["s6", "se6"], 
@@ -463,6 +465,7 @@ class E_vs_w(DCVizPlotter):
             subfig2.plot(w, eo/w, "^", color='#008000', label="Eosc/$\omega$")
             subfig2.plot(w, ec/w, ".", color='#008000', label="Ecol/$\omega$")
             subfig2.legend()
+            subfig2.axes.set_ybound(0)
             subfig.set_ylabel("$\omega$")
  
 class testBinFile(DCVizPlotter):

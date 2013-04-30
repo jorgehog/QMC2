@@ -35,7 +35,7 @@ class hydrogenicOrbitals(orbitalGenerator):
         while nShells*(nShells+1)*(2*nShells+1)/6 < self.maxImplemented/2:
             nShells += 1
         self.nShells = nShells
-
+        print nShells
         self.R = {}
         self.S = {}        
         for n in range(1, nShells+1):
