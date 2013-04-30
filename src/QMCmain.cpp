@@ -454,7 +454,7 @@ void parseCML(int argc, char** argv,
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
-    bool initOut = true;
+    bool initOut = false;
     if (initOut) {
         if (parParams.is_master) {
             if (n_args == argc) {
