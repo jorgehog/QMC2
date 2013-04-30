@@ -20,7 +20,9 @@ protected:
     STDOUT* std_out; //!< Output object. Wraps and replaces std::cout.
     std::stringstream s;
     int output_tresh;
-    
+
+    int n_w_size; //!< The total number of allocated walkers.
+
     std::string runpath; //!< The directory which the simulation is set to run.
 
     std::string dist_path; //!< The path where the distribution are saved.
@@ -123,9 +125,9 @@ protected:
     double get_KE(const Walker* walker);
 
     void update_subsamples(double weight = 1.0);
-    
+
     void push_subsamples();
-    
+
     void dump_subsamples(bool mean_of_means = false);
 
     //! Method for storing positional data.

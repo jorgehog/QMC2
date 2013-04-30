@@ -17,12 +17,13 @@ QMC::QMC(GeneralParams & gP, int n_c,
     dim = gP.dim;
     this->n_c = n_c;
     this->n_w = n_w;
+    n_w_size = K*n_w;
 
     n2 = n_p / 2;
 
     trial_walker = new Walker(n_p, dim);
-    original_walkers = new Walker*[K * n_w];
-    for (int i = 0; i < K * n_w; i++) {
+    original_walkers = new Walker*[n_w_size];
+    for (int i = 0; i < n_w_size; i++) {
         original_walkers[i] = new Walker(n_p, dim);
     }
 

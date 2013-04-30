@@ -102,6 +102,8 @@ protected:
     //! Method for evening out the number of walkers on each node.
     void normalize_population();
 
+    //! Method which deletes all walkers.
+    void free_walkers();
 
 public:
 

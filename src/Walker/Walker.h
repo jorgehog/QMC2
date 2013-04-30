@@ -30,8 +30,6 @@ public:
      */
     Walker(int n_p, int dim, bool alive = true);
     
-    ~Walker();
-    
     double spatial_ratio; //!< The ratio of the spatial wave function (stored in the newest walker).
     double lapl_sum; //!< The sum of the Laplacians of all particles.
     double E; //!< The energy of the given configuration (stored to speed up DMC).

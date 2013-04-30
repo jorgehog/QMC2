@@ -28,7 +28,9 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
         E_T = vmc->get_energy();
         for (int i = 0; i < n_w; i++) {
             copy_walker(vmc->original_walkers[i], original_walkers[i]);
+            delete vmc->original_walkers[i];
         }
+        delete [] vmc->original_walkers;
 
     } else {
         set_trial_positions();
@@ -187,6 +189,8 @@ void DMC::run_method() {
 
     }
 
+    free_walkers();
+    sleep(10);
     dump_subsamples(true);
     finalize_output();
     get_accepted_ratio();
@@ -330,7 +334,7 @@ void DMC::normalize_population() {
     if (!(cycle % check_thresh == 0) && !force_comm) return;
 
     force_comm = false;
-    
+
     int avg = n_w_tot / n_nodes;
 
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
@@ -416,4 +420,15 @@ void DMC::normalize_population() {
     MPI_Barrier(MPI_COMM_WORLD);
 
 #endif
+}
+
+void DMC::free_walkers() {
+
+    delete trial_walker;
+    for (int i = 0; i < n_w_size; i++) {
+        delete original_walkers[i];
+    }
+
+    delete [] original_walkers;
+
 }
