@@ -19,7 +19,8 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
 
     this->exp_factor_n1 = new double();
     this->exp_factor_n2 = new double();
-
+    this->exp_factor_n3 = new double();
+    
     this->Z = (int) gP.systemConstant;
     set_parameter(vP.alpha, 0);
 
@@ -30,6 +31,15 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     basis_functions[2] = new hydrogenic_2(k, k2, r22d, r2d, exp_factor_n2);
     basis_functions[3] = new hydrogenic_3(k, k2, r22d, r2d, exp_factor_n2);
     basis_functions[4] = new hydrogenic_4(k, k2, r22d, r2d, exp_factor_n2);
+    basis_functions[5] = new hydrogenic_5(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[6] = new hydrogenic_6(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[7] = new hydrogenic_7(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[8] = new hydrogenic_8(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[9] = new hydrogenic_9(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[10] = new hydrogenic_10(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[11] = new hydrogenic_11(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[12] = new hydrogenic_12(k, k2, r22d, r2d, exp_factor_n3);
+    basis_functions[13] = new hydrogenic_13(k, k2, r22d, r2d, exp_factor_n3);
 
     dell_basis_functions[0][0] = new dell_hydrogenic_0_x(k, k2, r22d, r2d, exp_factor_n1);
     dell_basis_functions[1][0] = new dell_hydrogenic_0_y(k, k2, r22d, r2d, exp_factor_n1);
@@ -46,18 +56,55 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     dell_basis_functions[0][4] = new dell_hydrogenic_4_x(k, k2, r22d, r2d, exp_factor_n2);
     dell_basis_functions[1][4] = new dell_hydrogenic_4_y(k, k2, r22d, r2d, exp_factor_n2);
     dell_basis_functions[2][4] = new dell_hydrogenic_4_z(k, k2, r22d, r2d, exp_factor_n2);
+    dell_basis_functions[0][5] = new dell_hydrogenic_5_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][5] = new dell_hydrogenic_5_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][5] = new dell_hydrogenic_5_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][6] = new dell_hydrogenic_6_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][6] = new dell_hydrogenic_6_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][6] = new dell_hydrogenic_6_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][7] = new dell_hydrogenic_7_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][7] = new dell_hydrogenic_7_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][7] = new dell_hydrogenic_7_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][8] = new dell_hydrogenic_8_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][8] = new dell_hydrogenic_8_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][8] = new dell_hydrogenic_8_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][9] = new dell_hydrogenic_9_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][9] = new dell_hydrogenic_9_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][9] = new dell_hydrogenic_9_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][10] = new dell_hydrogenic_10_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][10] = new dell_hydrogenic_10_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][10] = new dell_hydrogenic_10_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][11] = new dell_hydrogenic_11_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][11] = new dell_hydrogenic_11_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][11] = new dell_hydrogenic_11_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][12] = new dell_hydrogenic_12_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][12] = new dell_hydrogenic_12_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][12] = new dell_hydrogenic_12_z(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[0][13] = new dell_hydrogenic_13_x(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[1][13] = new dell_hydrogenic_13_y(k, k2, r22d, r2d, exp_factor_n3);
+    dell_basis_functions[2][13] = new dell_hydrogenic_13_z(k, k2, r22d, r2d, exp_factor_n3);
 
     lapl_basis_functions[0] = new lapl_hydrogenic_0(k, k2, r22d, r2d, exp_factor_n1);
     lapl_basis_functions[1] = new lapl_hydrogenic_1(k, k2, r22d, r2d, exp_factor_n2);
     lapl_basis_functions[2] = new lapl_hydrogenic_2(k, k2, r22d, r2d, exp_factor_n2);
     lapl_basis_functions[3] = new lapl_hydrogenic_3(k, k2, r22d, r2d, exp_factor_n2);
     lapl_basis_functions[4] = new lapl_hydrogenic_4(k, k2, r22d, r2d, exp_factor_n2);
+    lapl_basis_functions[5] = new lapl_hydrogenic_5(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[6] = new lapl_hydrogenic_6(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[7] = new lapl_hydrogenic_7(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[8] = new lapl_hydrogenic_8(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[9] = new lapl_hydrogenic_9(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[10] = new lapl_hydrogenic_10(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[11] = new lapl_hydrogenic_11(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[12] = new lapl_hydrogenic_12(k, k2, r22d, r2d, exp_factor_n3);
+    lapl_basis_functions[13] = new lapl_hydrogenic_13(k, k2, r22d, r2d, exp_factor_n3);
 }
 
 void hydrogenicOrbitals::set_qnum_indie_terms(const Walker* walker, int i) {
 
     *exp_factor_n1 = exp(-(*k) * walker->get_r_i(i));
-    *exp_factor_n2 = exp(-(*k) * walker->get_r_i(i) / 2);
+    if (n_p > 2) *exp_factor_n2 = exp(-(*k) * walker->get_r_i(i) / 2);
+    if (n_p > 10) *exp_factor_n3 = exp(-(*k) * walker->get_r_i(i) / 3);
 
 }
 
@@ -95,6 +142,62 @@ double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, in
 
         dphi = -Z * walker->get_r_i(i) / 2;
 
+    } else if (qnum == 5) {
+
+        //-Z*r*(2*k^2*r^2 - 30*k*r + 81)/(3*(2*k^2*r^2 - 18*k*r + 27))
+
+        dphi = -Z * walker->get_r_i(i)*(2 * (*k2) * walker->get_r_i2(i) - 30 * (*k) * walker->get_r_i(i) + 81) / (3 * (2 * (*k2) * walker->get_r_i2(i) - 18 * (*k) * walker->get_r_i(i) + 27));
+
+    } else if (qnum == 6) {
+
+        //-Z*r*(k*r - 9)/(3*(k*r - 6))
+
+        dphi = -Z * walker->get_r_i(i)*((*k) * walker->get_r_i(i) - 9) / (3 * ((*k) * walker->get_r_i(i) - 6));
+
+    } else if (qnum == 7) {
+
+        //-Z*r*(k*r - 9)/(3*(k*r - 6))
+
+        dphi = -Z * walker->get_r_i(i)*((*k) * walker->get_r_i(i) - 9) / (3 * ((*k) * walker->get_r_i(i) - 6));
+
+    } else if (qnum == 8) {
+
+        //-Z*r*(k*r - 9)/(3*(k*r - 6))
+
+        dphi = -Z * walker->get_r_i(i)*((*k) * walker->get_r_i(i) - 9) / (3 * ((*k) * walker->get_r_i(i) - 6));
+
+    } else if (qnum == 9) {
+
+        //-Z*r/3
+
+        dphi = -Z * walker->get_r_i(i) / 3;
+
+    } else if (qnum == 10) {
+
+        //-Z*r/3
+
+        dphi = -Z * walker->get_r_i(i) / 3;
+
+    } else if (qnum == 11) {
+
+        //-Z*r/3
+
+        dphi = -Z * walker->get_r_i(i) / 3;
+
+    } else if (qnum == 12) {
+
+        //-Z*r*(x - y)*(x + y)/(3*(x^2 - y^2))
+
+        dphi = -Z * walker->get_r_i(i) / 3;
+
+    } else if (qnum == 13) {
+
+        //-Z*r/3
+
+        dphi = -Z * walker->get_r_i(i) / 3;
+
+    } else {
+        std::cout << "qnum level " << qnum << " not implemented in dalpha hydro" << std::endl;
     }
 
     return dphi;
@@ -127,90 +230,90 @@ double hydrogenicOrbitals::get_coulomb_element(const arma::uvec& qnum_set) {
     if (Mleft != Mright) {
         return 0;
     }
-//
-//    arma::vec N(4);
-//    N.zeros();
-//
-//    int n_c = 1000000;
-//    int m = qnum_set.min();
-//    //    double L = -0.2*(Z<11) - 0.2*(Z < 5) + 0.6*(Z < 3);
-//    double L = 5;
-//    double a = -L;
-//    double b = L;
-//
-//    Walker* dummy = new Walker(2, dim);
-//    double I = 0;
-//    double r_rel;
-//    int x = 0;
-//
-//    for (int i = 0; i < n_c; i++) {
-//
-//        dummy->r = a + (b - a) * arma::randu(2, dim);
-//        r_rel = dummy->calc_r_rel(0, 1);
-//        if (r_rel < 1E-3) {
-//            x++;
-//            continue;
-//        }
-//        dummy->calc_r_i2();
-//        set_qnum_indie_terms(dummy, 0);
-//        double local_I = phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(2));
-//
-//        set_qnum_indie_terms(dummy, 1);
-//        local_I *= phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(3));
-//
-//        I += local_I / r_rel;
-//
-//
-//    }
-//
-//    I *= pow((b - a), 2 * dim) / (n_c - x);
-//    //    double L = -0.5*(Z<11) - 1*(Z < 5) + 2*(Z < 3);
-//
-//    L = 3;
-//    a = -L;
-//    b = L;
-//
-//    for (int i = 0; i < n_c; i++) {
-//
-//        dummy->r = a + (b - a) * arma::randu(2, dim);
-//        dummy->calc_r_i2();
-//        set_qnum_indie_terms(dummy, 0);
-//
-//        N(0) += phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(0));
-//        N(2) += phi(dummy, 0, qnum_set(2)) * phi(dummy, 0, qnum_set(2));
-//
-//        set_qnum_indie_terms(dummy, 1);
-//
-//        N(1) += phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(1));
-//        N(3) += phi(dummy, 1, qnum_set(3)) * phi(dummy, 1, qnum_set(3));
-//
-//    }
-//
-//    N *= pow((b - a), dim) / n_c;
-//    N = arma::ones<arma::vec > (4) / arma::sqrt(N);
-//    std::cout << N << std::endl; a = -L;
-//    b = L;
-//
-//    for (int i = 0; i < n_c; i++) {
-//
-//        dummy->r = a + (b - a) * arma::randu(2, dim);
-//        dummy->calc_r_i2();
-//        set_qnum_indie_terms(dummy, 0);
-//
-//        N(0) += phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(0));
-//        N(2) += phi(dummy, 0, qnum_set(2)) * phi(dummy, 0, qnum_set(2));
-//
-//        set_qnum_indie_terms(dummy, 1);
-//
-//        N(1) += phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(1));
-//        N(3) += phi(dummy, 1, qnum_set(3)) * phi(dummy, 1, qnum_set(3));
-//
-//    }
-//
-//    N *= pow((b - a), dim) / n_c;
-//    N = arma::ones<arma::vec > (4) / arma::sqrt(N);
-//    std::cout << N << std::endl;
-//
+    //
+    //    arma::vec N(4);
+    //    N.zeros();
+    //
+    //    int n_c = 1000000;
+    //    int m = qnum_set.min();
+    //    //    double L = -0.2*(Z<11) - 0.2*(Z < 5) + 0.6*(Z < 3);
+    //    double L = 5;
+    //    double a = -L;
+    //    double b = L;
+    //
+    //    Walker* dummy = new Walker(2, dim);
+    //    double I = 0;
+    //    double r_rel;
+    //    int x = 0;
+    //
+    //    for (int i = 0; i < n_c; i++) {
+    //
+    //        dummy->r = a + (b - a) * arma::randu(2, dim);
+    //        r_rel = dummy->calc_r_rel(0, 1);
+    //        if (r_rel < 1E-3) {
+    //            x++;
+    //            continue;
+    //        }
+    //        dummy->calc_r_i2();
+    //        set_qnum_indie_terms(dummy, 0);
+    //        double local_I = phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(2));
+    //
+    //        set_qnum_indie_terms(dummy, 1);
+    //        local_I *= phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(3));
+    //
+    //        I += local_I / r_rel;
+    //
+    //
+    //    }
+    //
+    //    I *= pow((b - a), 2 * dim) / (n_c - x);
+    //    //    double L = -0.5*(Z<11) - 1*(Z < 5) + 2*(Z < 3);
+    //
+    //    L = 3;
+    //    a = -L;
+    //    b = L;
+    //
+    //    for (int i = 0; i < n_c; i++) {
+    //
+    //        dummy->r = a + (b - a) * arma::randu(2, dim);
+    //        dummy->calc_r_i2();
+    //        set_qnum_indie_terms(dummy, 0);
+    //
+    //        N(0) += phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(0));
+    //        N(2) += phi(dummy, 0, qnum_set(2)) * phi(dummy, 0, qnum_set(2));
+    //
+    //        set_qnum_indie_terms(dummy, 1);
+    //
+    //        N(1) += phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(1));
+    //        N(3) += phi(dummy, 1, qnum_set(3)) * phi(dummy, 1, qnum_set(3));
+    //
+    //    }
+    //
+    //    N *= pow((b - a), dim) / n_c;
+    //    N = arma::ones<arma::vec > (4) / arma::sqrt(N);
+    //    std::cout << N << std::endl; a = -L;
+    //    b = L;
+    //
+    //    for (int i = 0; i < n_c; i++) {
+    //
+    //        dummy->r = a + (b - a) * arma::randu(2, dim);
+    //        dummy->calc_r_i2();
+    //        set_qnum_indie_terms(dummy, 0);
+    //
+    //        N(0) += phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(0));
+    //        N(2) += phi(dummy, 0, qnum_set(2)) * phi(dummy, 0, qnum_set(2));
+    //
+    //        set_qnum_indie_terms(dummy, 1);
+    //
+    //        N(1) += phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(1));
+    //        N(3) += phi(dummy, 1, qnum_set(3)) * phi(dummy, 1, qnum_set(3));
+    //
+    //    }
+    //
+    //    N *= pow((b - a), dim) / n_c;
+    //    N = arma::ones<arma::vec > (4) / arma::sqrt(N);
+    //    std::cout << N << std::endl;
+    //
 
     //    std::cout << qnum_set << std::endl;
     //    std::cout << I << std::endl;
@@ -389,10 +492,10 @@ double hydrogenicOrbitals::get_coulomb_element(const arma::uvec& qnum_set) {
     else if (n1 == 3 && n2 == 3 && n3 == 1 && n4 == 4) return (30254432256 * Z) / 41426511213649.0;
     else if (n1 == 3 && n2 == 3 && n3 == 2 && n4 == 1) return (1216512 * sqrt(2) * Z) / 815730721.0;
     else if (n1 == 3 && n2 == 3 && n3 == 2 && n4 == 2) return (73008 * Z) / 9765625.0;
-    else if (n1 == 3 && n2 == 3 && n3 == 2 && n4 == 3) return (6890942464 * sqrt(2/3.0) * Z) / 1210689028125.0;
+    else if (n1 == 3 && n2 == 3 && n3 == 2 && n4 == 3) return (6890942464 * sqrt(2 / 3.0) * Z) / 1210689028125.0;
     else if (n1 == 3 && n2 == 3 && n3 == 2 && n4 == 4) return (69158928384 * sqrt(2) * Z) / 34271896307633.0;
     else if (n1 == 3 && n2 == 3 && n3 == 3 && n4 == 1) return (617 * Z) / (314928 * sqrt(3));
-    else if (n1 == 3 && n2 == 3 && n3 == 3 && n4 == 2) return (6890942464 * sqrt(2/3.0) * Z) / 1210689028125.0;
+    else if (n1 == 3 && n2 == 3 && n3 == 3 && n4 == 2) return (6890942464 * sqrt(2 / 3.0) * Z) / 1210689028125.0;
     else if (n1 == 3 && n2 == 3 && n3 == 3 && n4 == 3) return (17 * Z) / 2567.0;
     else if (n1 == 3 && n2 == 3 && n3 == 3 && n4 == 4) return (2486755845603328 * Z) / (158298797548828125 * sqrt(3));
     else if (n1 == 3 && n2 == 3 && n3 == 4 && n4 == 1) return (30254432256 * Z) / 41426511213649.0;

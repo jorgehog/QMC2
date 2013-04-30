@@ -44,7 +44,7 @@ n_c=100
 
 if validation:
 
-    npList = [2,4,10]
+    npList = range(2, 29, 2)
 
     rawFile = """general:
 n_p = __NP__
@@ -52,15 +52,14 @@ use_coulomb = 0
 system=Atoms
 doVMC = 1
 doDMC = 1
-doMIN = 1
 
 VMC:
-n_c = 1E6
+n_c = 1E5
 
 DMC:
-n_b=50
-therm=100
-n_c=100
+n_b=10
+therm=10
+n_c=10
 
 
 MIN:

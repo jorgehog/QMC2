@@ -6,7 +6,8 @@ from sympy import (diff,
                    exp, 
                    sympify, 
                    printing,
-                   Symbol)
+                   Symbol,
+                   Wild)
                    
 from sympy.physics.hydrogen import R_nl
 import sys, os
@@ -19,6 +20,8 @@ from orbitalsGenerator_super import (orbitalGenerator,
                                      theta, phi, 
                                      r2d, r3d, r, r_2d,
                                      k)
+
+w = Wild('w1')
 
 class hydrogenicOrbitals(orbitalGenerator):
     
@@ -75,6 +78,8 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
 
         func = func.subs(sin(2*phi), sympify(2)*z*r2d/r3d**2)
         func = func.subs(cos(2*phi), 1 - r2d**2/r3d**2)
+        func = func.subs(cos(2*theta), (x**2 - y**2)/r2d**2)
+        func = func.subs(sin(2*theta), sympify(2)*x*y/r2d**2)
 
         func = func.subs(cos(theta), x/r2d)
         func = func.subs(sin(theta), y/r2d)
@@ -116,14 +121,96 @@ $$m = -l,\, (-l + 1),\, ...,\, (l-1),\, l$$
         
 
     def simplifyLocal(self, expr, qNums, subs=True):
-            
+         
+        expr_orig = expr
+                   
         expr = expr.factor().collect(k).subs(r3d, r).subs(x**2 + y**2 + z**2, r*r).factor()
+        expr = self.chooseBestSub(expr, x**2, r**2 - y**2 - z**2)
+        expr = self.chooseBestSub(expr, y**2, r**2 - x**2 - z**2)
+        expr = self.chooseBestSub(expr, z**2, r**2 - x**2 - y**2)
+        
+        expr = self.chooseBest(expr, w*k)
+        expr = self.chooseBest(expr, w*k*r)
 
+        
+        expIn = False
+        if self.genericFactor(qNums) in expr:
+            noExp = expr/self.genericFactor(qNums)
+            expIn = True
+        else:
+            noExp = expr
+            
+        noExp1 = self.choosebestFac(noExp, k)
+        noExp2 = self.choosebestFac(noExp, z**2)
+        noExp2 = self.choosebestFac(noExp2, y**2)
+        noExp2 = self.choosebestFac(noExp2, x**2)
+        
+        if len(str(noExp1).replace("(", "").replace(")", "").replace("**2", "")) < len(str(noExp2).replace("(", "").replace(")", "").replace("**2", "")):
+            noExp = noExp1
+        else:
+            noExp = noExp2
+#        noExp = self.choosebestFac(noExp)
+        
+        
+        if expIn:
+            expr = noExp*self.genericFactor(qNums)
+        
+            
         if not subs:
             expr = expr.subs(r, r3d)
         
-        return expr    
+        expr = expr.subs((x+y)*(x-y), (x**2 - y**2))
+
+        self.check(expr, expr_orig)        
         
+        return expr
+    
+    def check(self, expr, expr_orig):
+        from sympy import pi
+        expr_1 = expr.subs(r, r3d).expand().subs(x, pi).subs(y, pi).subs(z, pi).subs(k, pi)
+        expr_2 = expr_orig.subs(r, r3d).expand().subs(x, pi).subs(y, pi).subs(z, pi).subs(k, pi)
+        
+        if expr_1.evalf() != expr_2.evalf():
+            print "FAIL"
+            print expr_orig, "\n", expr, "\n---------------------\n"
+            raw_input()
+    
+    def choosebestFac(self, expr, fac=sympify(1)):
+
+        expr, denom = expr.as_numer_denom()        
+
+        try:
+            expr = expr.collect(fac)
+        except:
+            pass
+        
+        for subExpr in expr.as_ordered_terms():
+            try:
+                expr2 = subExpr.factor(fac)
+            except:
+                continue
+     
+            if str(expr2) != str(subExpr):
+                if len(str(expr2).replace("(", "").replace(")", "").replace("**2", "")) < len(str(expr).replace("(", "").replace(")", "").replace("**2", "")):
+                    expr = expr.subs(subExpr, expr2)
+   
+        return expr/denom
+    
+    def chooseBestSub(self, expr, sub1, sub2):
+        
+        expr2 = expr.subs(sub1, sub2).factor()
+        
+        if len(str(expr2).replace("(", "").replace(")", "").replace("**2", "")) < len(str(expr).replace("(", "").replace(")", "").replace("**2", "")):
+            return expr2
+        return expr.factor()
+    
+    def chooseBest(self, expr, collector):
+        
+        expr2 = expr.collect(collector).subs(r3d, r).subs(x**2 + y**2 + z**2, r*r).factor()
+        
+        if len(str(expr2).replace("(", "").replace(")", "")) < len(str(expr).replace("(", "").replace(")", "")):
+            return expr2
+        return expr.factor()
     
     def makeStateMap(self):
                 

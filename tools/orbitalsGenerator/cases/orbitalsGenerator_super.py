@@ -290,7 +290,7 @@ class orbitalGenerator(object):
             simple = self.simplifyLocal(self.orbitals[i], qNums, subs=False)
 
             numer, denom = simple.as_numer_denom()
-            numer = numer.factor()
+            numer = self.simplifyLocal(numer, qNums, subs=False)
             
             if numer != 1:
       
@@ -308,7 +308,8 @@ class orbitalGenerator(object):
                
                 if numFac != 1 and (numFac not in denom.as_ordered_terms() or singleFactor):
                     denom = denom/numFac
-
+            
+            numer = self.simplifyLocal(numer, qNums, subs=False)
             self.orbitals[i] = numer/denom
       
                 
