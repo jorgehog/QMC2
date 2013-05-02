@@ -406,8 +406,8 @@ def varParameterMap(n_p, dim, systemConstant, system):
         Z = systemConstant
 
         if Z == n_p == 2:
-            alpha = 0.918918
-            beta = 0.35639
+            alpha = 0.922925
+            beta = 0.3477
         elif Z == n_p == 4:
             alpha = 0.975
             beta = 0.12
@@ -556,7 +556,8 @@ def generateJobScript(Args, path, n_cores):
         superName = os.path.split(superDir)[1]   
         subdirNew = "$SCRATCH/" + superName + "/" + subdir
         
-        rawJob = rawJob.replace("__codeName__", "QMC_ABEL_" + subdir)
+        rawJob = rawJob.replace("__dirName__", subdir)
+        rawJob = rawJob.replace("__codeName__", subdir)
         rawJob = rawJob.replace("__nCpus__", str(n_cores))
         rawJob = rawJob.replace("__superDir__", superDir)
         rawJob = rawJob.replace("__superName__", superName)
