@@ -216,6 +216,7 @@ class DCVizPlotter:
                 s += "self.add_subfigure(self.%s, self.i%s); " % (subFigs[j], fig)
             
             i += 1
+
         exec(s)
       
       

@@ -204,7 +204,7 @@ class radial_out(DCVizPlotter):
     
     def plot(self, data):
              
-        cut=5
+        cut=0
         xScale = 0.75
         print data[0].n
         
@@ -228,13 +228,22 @@ class radial_out(DCVizPlotter):
         pureOnly = False
         superPose = False
         
+        proj = "yz"
+        
+        data2 = []    
+        for i in range(len(data)):
+            if proj in self.familyFileNames[i]:
+                data2.append(data[i])
+        data = data2
+        
+        if proj == "":
+            proj = "xy"
+            
+        
         if superPose:
             yMax = 1.2
 
         for i in range(len(data)):
-            
-            if not "0.01" in self.familyFileNames[i]:
-                continue
             
             if superPose:
                 edge = 1
@@ -262,7 +271,7 @@ class radial_out(DCVizPlotter):
                 
                 last = vmc
                 
-                
+  
             r = numpy.linspace(0, edge, data[i].n)
             
             if r[cut] > maxCut:
@@ -300,7 +309,7 @@ class radial_out(DCVizPlotter):
 #        if not pureOnly:
         self.radialFig.legend()    
         self.radialFig.axes.set_xlim(maxCut, xScale*max_edge)
-        self.radialFig.set_xlabel('r')
+        self.radialFig.set_xlabel('$r = \sqrt(%s^2 + %s^2)$' % (proj[0], proj[1]))
         self.radialFig.set_ylabel(r'$\rho(r)$')
 #        locator = self.radialFig.axes.get_yaxis().get_major_locator()
 #        self.radialFig.axes.set_ylim(locator.autoscale()/2)
@@ -317,31 +326,77 @@ class dist_out(DCVizPlotter):
     
     nametag = "dist_out.+\.arma"
 #    figMap = {"fig1": ["subfig0", "subfig1"]}
-    figMap = {"fig1": [], "fig2":["subfig1"]}
+    figMap = {"fig_xy": [], "fig_xz": [], "fig_yz": [], 
+              "s_fig_xy": ["subfig_xy"], 
+              "s_fig_xz": ["subfig_xz"], 
+              "s_fig_yz": ["subfig_yz"]}
 
     armaBin = True
     isFamilyMember = True
         
     stack = "H"
     
-    dmcOnly = True
+    dmcOnly = False
     vmcOnly = False
     
     def plot(self, data):
+
+        PROJ = []        
+        for proj in ["xy", "xz", "yz"]:
+            for name in self.familyFileNames:
+                if proj in name and proj not in PROJ:
+                    PROJ.append(proj)
         
+        oldData = False
+        if len(PROJ) == 0:
+            print "Assuming old xy data"
+            PROJ = "xy"
+            oldData = True
+        
+        figures = []
+        for proj in ["xy", "xz", "yz"]:
+                if proj in PROJ:
+                    print "running proj: ", proj
+                    self.plot_proj(data, proj, oldData)
+                    figures.append([eval("self.fig_%s" % proj)])
+                    figures.append([eval("self.s_fig_%s" % proj)])
+                else:
+                    print "Skipping proj: ", proj 
+                    
+        self.figures = figures
+        
+    def plot_proj(self, all_data, proj, oldData=False):
+        
+        
+        data = []    
+        
+        if oldData:
+            proj = ""
+            
+        for i in range(len(all_data)):
+            if proj in self.familyFileNames[i]:
+                data.append(all_data[i])
+
+        if oldData:
+            proj = "xy"
+
+        fig1 = eval("self.fig_%s" % proj)
+        subfig1 = eval("self.subfig_%s" % proj)
+
 #        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
         
         edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
     
         if len(data) == 1:
+            print "length 1 data"
             dist = data[0].data
         elif len(data) == 2:
-            
+            print "len2 data"
             edge_2 = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[1])[0])
         
             if edge != edge_2:
                 print "Bin edges does not match. %s != %s" % (edge, edge_2)
-                dmcOnly = True
+                self.dmcOnly = True
             
             for i in range(2):
                 if "vmc" in self.familyFileNames[i]:
@@ -371,7 +426,7 @@ class dist_out(DCVizPlotter):
         x, y = numpy.meshgrid(crit, crit)
         dist = dist[x, y]
         
-        ax = Axes3D(self.fig1)#, self.subfig0.get_position())
+        ax = Axes3D(fig1)#, self.subfig0.get_position())
         
         r = numpy.linspace(-edge, edge, origLen)
         
@@ -386,19 +441,19 @@ class dist_out(DCVizPlotter):
         
         ax.set_zlim(0, dist.max())
 
-        ax.set_ylabel('y')
-        ax.set_xlabel('x')
+        ax.set_ylabel(proj[0])
+        ax.set_xlabel(proj[1])
         ax.view_init(30, -65)
 #        ax.view_init(0, 90)
         
 #        print dist.shape
 #        dist = zoom(dist, 3)
 #        extent = [-newEdge, newEdge, -newEdge, newEdge]
-        self.subfig1.axes.contourf(X, Y, dist, zdir='z', cmap=C)
-        self.subfig1.set_xlabel('x')
-        self.subfig1.set_ylabel('y', rotation=0)
-        self.subfig1.axes.get_yaxis().get_label().set_fontsize(20)
-        self.subfig1.axes.get_xaxis().get_label().set_fontsize(20)
+        subfig1.axes.contourf(X, Y, dist, zdir='z', cmap=C)
+        subfig1.set_xlabel(proj[0])
+        subfig1.set_ylabel(proj[1], rotation=0)
+        subfig1.axes.get_yaxis().get_label().set_fontsize(20)
+        subfig1.axes.get_xaxis().get_label().set_fontsize(20)
         
 #        self.subfig0.axes.get_xaxis().set_visible(False)
 #        self.subfig0.axes.get_yaxis().set_visible(False)

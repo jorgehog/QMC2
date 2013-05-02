@@ -41,7 +41,7 @@ public:
      * @param n The number of samples used to calculate the local mean.
      * @param n_tot The total number of samples on all nodes. Calculated if not supplied.
      */
-    double combine_mean(double mean, int n, int n_tot = 0);
+    static double combine_mean(double mean, int n, int n_tot = 0);
     
     //! Calculates the combined variance of n_nodes variances.
     /*!

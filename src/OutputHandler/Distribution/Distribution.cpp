@@ -23,8 +23,18 @@ void Distribution::finalize() {
     //scrap out all the over-allocated space (DMC)
     qmc->dist.resize(qmc->last_inserted, dim);
 
-    generate_distribution(qmc->dist, qmc->n_p);
+    if (dim == 3) {
+        axes = xy;
+        generate_distribution(qmc->dist, qmc->n_p);
+        axes = xz;
+        generate_distribution(qmc->dist, qmc->n_p);
+        axes = yz;
+        generate_distribution(qmc->dist, qmc->n_p);
+    } else {
+        generate_distribution(qmc->dist, qmc->n_p);
+    }
 
+    qmc->dist.reset();
 }
 
 void Distribution::generate_distribution(arma::mat & dist,
@@ -35,14 +45,46 @@ void Distribution::generate_distribution(arma::mat & dist,
 
     using namespace arma;
 
+    uvec ax(2);
+    std::string tag;
+
+    if (dim == 2) {
+        //2D -> xy projection
+        ax <<  0 << endr << 1 << endr;
+        tag = "_xy";
+
+    } else {
+        //3D -> xy, xz or yz projection.
+
+        if (axes == xy) {
+            ax << 0 << endr << 1 << endr;
+            tag = "_xy";
+
+        } else if (axes == xz) {
+            ax << 0 << endr << 2 << endr;
+            tag = "_xz";
+
+        } else if (axes == yz) {
+            ax << 1 << endr << 2 << endr;
+            tag = "_yz";
+
+        } else {
+            cout << "Undefined axes projection." << endl;
+        }
+
+    }
+
     int x_i, y_i, r_i, n, n_tot;
     double x, y, r, dr, dr_R, stretch, mean_r;
+
+
 
     umat distribution = zeros<umat > (N, N);
     uvec radial_dist = zeros<uvec > (N);
     mat tot_dist;
 
-    vec R = arma::sqrt(sum(dist % dist, 1));
+    vec R = arma::sqrt(dist.col(ax(0)) % dist.col(ax(0)) + dist.col(ax(1)) % dist.col(ax(1)));
+    //    vec R = arma::sqrt(sum(dist % dist, 1));
 
     n = dist.n_rows;
 
@@ -61,7 +103,7 @@ void Distribution::generate_distribution(arma::mat & dist,
         stretch = 3;
 
         //calculate the bin edge and size based on the mean radius
-        mean_r = qmc->error_estimator->combine_mean(mean(R), n, n_tot);
+        mean_r = ErrorEstimator::combine_mean(mean(R), n, n_tot);
         bin_edge = stretch*mean_r;
         //        if (node==0) cout << "pre " << mean_r << endl;
     }
@@ -70,8 +112,8 @@ void Distribution::generate_distribution(arma::mat & dist,
 
     for (int ni = 0; ni < n; ni++) {
 
-        x = dist(ni, 0);
-        y = dist(ni, 1);
+        x = dist(ni, ax(0));
+        y = dist(ni, ax(1));
 
         x_i = (N / 2 + int(x / dr))*(x > 0) + (N / 2 + int(x / dr) - 1)*(x <= 0);
         y_i = (N / 2 + int(y / dr))*(y > 0) + (N / 2 + int(y / dr) - 1)*(y <= 0);
@@ -152,7 +194,6 @@ void Distribution::generate_distribution(arma::mat & dist,
 #endif
 
     n_list.reset();
-    dist.reset();
     R.reset();
 
     if (node == 0) {
@@ -167,11 +208,11 @@ void Distribution::generate_distribution(arma::mat & dist,
         normalized_dist *= n_p / (accu(normalized_dist) * dr * dr);
 
         //project out a symmetric axis and normalize (skip singularity)
-        normalized_radd(span(1, N-1)) /= radial_axis(span(1, N-1));
+        normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
         normalized_radd(0) = normalized_radd(1);
-        
-//        cout << normalized_radd.max()/(2*datum::pi*accu(normalized_radd)*dr_R) << endl;
-        normalized_radd /= (2*datum::pi*accu(normalized_radd)*dr_R);
+
+        //        cout << normalized_radd.max()/(2*datum::pi*accu(normalized_radd)*dr_R) << endl;
+        normalized_radd /= (2 * datum::pi * accu(normalized_radd) * dr_R);
 
         if (!rerun) {
             s << path << "walker_positions/dist_rawdata_" << name << ".arma";
@@ -180,12 +221,12 @@ void Distribution::generate_distribution(arma::mat & dist,
             s.str(std::string());
         }
 
-        s << path << "walker_positions/dist_out_" << name << "_edge" << bin_edge << ".arma";
+        s << path << "walker_positions/dist_out_" << name << tag << "_edge" << bin_edge << ".arma";
         normalized_dist.save(s.str());
         normalized_dist.reset();
         s.str(std::string());
 
-        s << path << "walker_positions/radial_out_" << name << "_edge" << bin_edge << ".arma";
+        s << path << "walker_positions/radial_out_" << name << tag << "_edge" << bin_edge << ".arma";
         normalized_radd.save(s.str());
         normalized_radd.reset();
         s.str(std::string());
@@ -198,7 +239,7 @@ void Distribution::generate_distribution(arma::mat & dist,
 
 }
 
-void Distribution::rerun(int n_p, int N, double bin_edge) {
+void Distribution::rerun(int n_p, int N, double bin_edge_xy, double bin_edge_xz, double bin_edge_yz) {
 
     using namespace arma;
 
@@ -247,8 +288,19 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
     }
 
 #endif
-    
-    generate_distribution(dist, n_p, bin_edge, N, true);
+
+    if (dim == 3) {
+        axes = xy;
+        generate_distribution(dist, n_p, bin_edge_xy, N, true);
+        axes = xz;
+        generate_distribution(dist, n_p, bin_edge_xz, N, true);
+        axes = yz;
+        generate_distribution(dist, n_p, bin_edge_yz, N, true);
+    } else {
+        generate_distribution(dist, n_p, bin_edge_xy, N, true);
+    }
+
+    dist.reset();
 
 }
 
