@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import sys, re, subprocess
+import sys, re, subprocess, os
 from os.path import join as pjoin
 from pyLibQMC import parseCML, paths, misc
 
 sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
-    
+import DCVizWrapper as viz
 try:
     import DCVizWrapper as viz
     canViz = True
@@ -24,21 +24,27 @@ def initRun(n_p, path, name, N, bin_edges, n_cores, mpiFlag, openGUI):
 
     subprocess.call(args)
     
-    PROJ = ["_xy", "_xz", "_yz"]
-    for i, bin_edge in enumerate(bin_edges):
 
-        proj = PROJ[i]
-        if len(bin_edges) == 1:
-            proj = ""
         
-        outPath = "%swalker_positions/__type___out_%s%s_edge%s.arma" % (path, name, proj, bin_edge)
+    outPath = "%swalker_positions/__type___out_%s_xy_edge%s.arma" % (path, name, bin_edges[0])
+    dist_path = outPath.replace("__type__", "dist")
+    radial_path = outPath.replace("__type__", "radial")
+    
+    if not os.path.exists(dist_path):
+        print dist_path
+        outPath = outPath.replace("_xy", "")
         
         dist_path = outPath.replace("__type__", "dist")
         radial_path = outPath.replace("__type__", "radial")
+        
+        if not os.path.exists(dist_path):
+            print dist_path
+            print "something went wrong..."
     
-        if canViz and openGUI:
-            viz.main(dist_path, False)
-            viz.main(radial_path, False)
+
+    if canViz and openGUI:
+        viz.main(dist_path, False)
+        viz.main(radial_path, False)
 
 
 def main():

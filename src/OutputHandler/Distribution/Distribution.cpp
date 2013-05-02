@@ -50,7 +50,7 @@ void Distribution::generate_distribution(arma::mat & dist,
 
     if (dim == 2) {
         //2D -> xy projection
-        ax <<  0 << endr << 1 << endr;
+        ax << 0 << endr << 1 << endr;
         tag = "_xy";
 
     } else {
@@ -209,6 +209,9 @@ void Distribution::generate_distribution(arma::mat & dist,
 
         //project out a symmetric axis and normalize (skip singularity)
         normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
+        if (dim == 3) {
+            normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
+        }
         normalized_radd(0) = normalized_radd(1);
 
         //        cout << normalized_radd.max()/(2*datum::pi*accu(normalized_radd)*dr_R) << endl;

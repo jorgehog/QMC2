@@ -197,16 +197,42 @@ class DMC_OUT(DCVizPlotter):
 class radial_out(DCVizPlotter):
     
     nametag = "radial_out.+\.arma"
-    figMap = {"fig1": ["radialFig"]}
+    figMap = {"fig_xy": ["s_fig_xy"], "fig_xz": ["s_fig_xz"], "fig_yz": ["s_fig_yz"]}
     
     armaBin = True
     isFamilyMember=True
     
     def plot(self, data):
+
+        PROJ = []        
+        for proj in ["xy", "xz", "yz"]:
+            for name in self.familyFileNames:
+                if proj in name and proj not in PROJ:
+                    PROJ.append(proj)
+        
+        oldData = False
+        if len(PROJ) == 0:
+            print "Assuming old xy data"
+            PROJ = "xy"
+            oldData = True
+        
+        figures = []
+        for proj in ["xy", "xz", "yz"]:
+                if proj in PROJ:
+                    print "running proj: ", proj
+                    self.plot_proj(data, proj, oldData)
+                    figures.append([eval("self.fig_%s" % proj)])
+#                    figures.append([eval("self.s_fig_%s" % proj)])
+                else:
+                    print "Skipping proj: ", proj 
+                    
+        self.figures = figures    
+    
+    def plot_proj(self, all_data, proj, oldData):
              
-        cut=0
+        cut=2
         xScale = 0.75
-        print data[0].n
+   
         
         color = ['#008000', "0.5", "k", '#008000']
         style = ['-', '-.', '--', '.']
@@ -227,18 +253,24 @@ class radial_out(DCVizPlotter):
         
         pureOnly = False
         superPose = False
+   
+        data = []    
+        familyFileNames = []        
         
-        proj = "yz"
-        
-        data2 = []    
-        for i in range(len(data)):
-            if proj in self.familyFileNames[i]:
-                data2.append(data[i])
-        data = data2
-        
-        if proj == "":
-            proj = "xy"
+        if oldData:
+            proj = ""
             
+        for i in range(len(all_data)):
+            if proj in self.familyFileNames[i]:
+                data.append(all_data[i])
+                familyFileNames.append(self.familyFileNames[i])
+
+        if oldData:
+            proj = "xy"
+        
+        radialFig = eval("self.s_fig_%s" % proj)        
+        
+        print data[0].n
         
         if superPose:
             yMax = 1.2
@@ -248,12 +280,12 @@ class radial_out(DCVizPlotter):
             if superPose:
                 edge = 1
             else:
-                edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
+                edge = float(re.findall("edge(\d+\.?\d*)\.arma", familyFileNames[i])[0])
             
             if edge > max_edge:
                 max_edge = edge;
             
-            if "dmc" in self.familyFileNames[i]:
+            if "dmc" in familyFileNames[i]:
                 method = "dmc"
                 dmc = data[i].data
 
@@ -262,7 +294,7 @@ class radial_out(DCVizPlotter):
                 
                 last = dmc
                 
-            elif "vmc" in self.familyFileNames[i]:
+            elif "vmc" in familyFileNames[i]:
                 method = "vmc"
                 vmc = data[i].data
 
@@ -278,7 +310,7 @@ class radial_out(DCVizPlotter):
                 maxCut = r[cut]            
             
             if not pureOnly:
-                self.radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
+                radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
            
             if vmc is not None and dmc is not None:
                 if pureOnly:
@@ -288,7 +320,7 @@ class radial_out(DCVizPlotter):
                     pLabel=None
 
                     if superPose:
-                        pLabel = re.findall("out_(.+?)[vd]mc", self.familyFileNames[i])[0]
+                        pLabel = re.findall("out_(.+?)[vd]mc", familyFileNames[i])[0]
                         pLabel = re.sub("(\d)c(\d)", "\g<1> \g<2>", pLabel)
                         pLabel = re.sub("QDots\d+", "", pLabel)
                     
@@ -302,23 +334,24 @@ class radial_out(DCVizPlotter):
                 if superPose:
                     pure = pure/pure[cut:].max()
                 
-                self.radialFig.plot(r, pure, pureS, color=pureC, label=pLabel)
+                radialFig.plot(r, pure, pureS, color=pureC, label=pLabel)
                 vmc = None
                 dmc = None
+           
         
 #        if not pureOnly:
-        self.radialFig.legend()    
-        self.radialFig.axes.set_xlim(maxCut, xScale*max_edge)
-        self.radialFig.set_xlabel('$r = \sqrt(%s^2 + %s^2)$' % (proj[0], proj[1]))
-        self.radialFig.set_ylabel(r'$\rho(r)$')
+        radialFig.legend()    
+        radialFig.axes.set_xlim(maxCut, xScale*max_edge)
+        radialFig.set_xlabel('$r = \sqrt(%s^2 + %s^2)$' % (proj[0], proj[1]))
+        radialFig.set_ylabel(r'$\rho(r)$')
 #        locator = self.radialFig.axes.get_yaxis().get_major_locator()
 #        self.radialFig.axes.set_ylim(locator.autoscale()/2)
         if yMax is not None:
-            self.radialFig.set_ylim(0, yMax)
-        self.radialFig.axes.set_ybound(0)
+            radialFig.set_ylim(0, yMax)
+        radialFig.axes.set_ybound(0)
         
-        self.radialFig.axes.get_yaxis().get_label().set_fontsize(30)
-        self.radialFig.axes.get_xaxis().get_label().set_fontsize(30)
+        radialFig.axes.get_yaxis().get_label().set_fontsize(30)
+        radialFig.axes.get_xaxis().get_label().set_fontsize(30)
         
         
 
@@ -336,7 +369,7 @@ class dist_out(DCVizPlotter):
         
     stack = "H"
     
-    dmcOnly = False
+    dmcOnly = True
     vmcOnly = False
     
     def plot(self, data):
@@ -369,6 +402,7 @@ class dist_out(DCVizPlotter):
         
         
         data = []    
+        familyFileNames = []
         
         if oldData:
             proj = ""
@@ -376,6 +410,7 @@ class dist_out(DCVizPlotter):
         for i in range(len(all_data)):
             if proj in self.familyFileNames[i]:
                 data.append(all_data[i])
+                familyFileNames.append(self.familyFileNames[i])
 
         if oldData:
             proj = "xy"
@@ -385,23 +420,23 @@ class dist_out(DCVizPlotter):
 
 #        self.fig1.set_size_inches(self.fig1.get_size_inches()*numpy.array([2, 1]), forward=True)        
         
-        edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
+        edge = float(re.findall("_edge(.+?)\.arma", familyFileNames[0])[0])    
     
         if len(data) == 1:
             print "length 1 data"
             dist = data[0].data
         elif len(data) == 2:
             print "len2 data"
-            edge_2 = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[1])[0])
+            edge_2 = float(re.findall("_edge(.+?)\.arma", familyFileNames[1])[0])
         
             if edge != edge_2:
                 print "Bin edges does not match. %s != %s" % (edge, edge_2)
                 self.dmcOnly = True
             
             for i in range(2):
-                if "vmc" in self.familyFileNames[i]:
+                if "vmc" in familyFileNames[i]:
                     vmcDist = data[i].data
-                elif "dmc" in self.familyFileNames[i]:
+                elif "dmc" in familyFileNames[i]:
                     dmcDist = data[i].data
             
 #            try:
@@ -414,9 +449,9 @@ class dist_out(DCVizPlotter):
                     dist = 2*dmcDist - vmcDist
                     print "pure success!", dmcDist.sum()*(edge/100)**2, vmcDist.sum()*(edge/100)**2 
                 except:
-                    raise Exception("Supplied dist files does not match a VMC+DMC pair.")
+                    raise Exception("Supplied dist files does not match a VMC+DMC pair:  \n%s \n%s" % (familyFileNames[0], familyFileNames[1]))
         else:
-            raise Exception("More than two distributions loaded in given folder.")
+            raise Exception("More than two distributions loaded in given folder")
         
         
         origLen = len(dist)
