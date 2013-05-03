@@ -63,6 +63,9 @@ def main(path, dynamic):
         
     modes = autodetectModes()
     matchedMode = matchMode(modes, path)
+    
+    if not matchedMode:
+        return;
         
     if dynamic:
         terminalTracker("DCViz", "Interrupt dynamic mode with CTRL+C")

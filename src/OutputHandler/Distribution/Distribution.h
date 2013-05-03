@@ -48,9 +48,6 @@ private:
 
     std::string name;
 
-    enum axes_proj {
-        xy, xz, yz
-    } axes ;
 
     //! Method for generating the one-body density and projected one-axis distribution.
     /*! 
@@ -60,7 +57,13 @@ private:
      * @param N Number of mesh points used in the histogram.
      * @param bin_edge The Cartesian position of the end points of the histogram. 
      */
-    void generate_distribution(arma::mat & dist,
+    void generate_distribution2D(arma::mat & dist,
+            int n_p,
+            double bin_edge = 0,
+            int N = 200,
+            bool rerun = false);
+
+    void generate_distribution3D(arma::mat & dist,
             int n_p,
             double bin_edge = 0,
             int N = 200,

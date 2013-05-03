@@ -197,41 +197,14 @@ class DMC_OUT(DCVizPlotter):
 class radial_out(DCVizPlotter):
     
     nametag = "radial_out.+\.arma"
-    figMap = {"fig_xy": ["s_fig_xy"], "fig_xz": ["s_fig_xz"], "fig_yz": ["s_fig_yz"]}
+    figMap = {"fig1":["radialFig"]}
     
     armaBin = True
     isFamilyMember=True
     
     def plot(self, data):
-
-        PROJ = []        
-        for proj in ["xy", "xz", "yz"]:
-            for name in self.familyFileNames:
-                if proj in name and proj not in PROJ:
-                    PROJ.append(proj)
-        
-        oldData = False
-        if len(PROJ) == 0:
-            print "Assuming old xy data"
-            PROJ = "xy"
-            oldData = True
-        
-        figures = []
-        for proj in ["xy", "xz", "yz"]:
-                if proj in PROJ:
-                    print "running proj: ", proj
-                    self.plot_proj(data, proj, oldData)
-                    figures.append([eval("self.fig_%s" % proj)])
-#                    figures.append([eval("self.s_fig_%s" % proj)])
-                else:
-                    print "Skipping proj: ", proj 
-                    
-        self.figures = figures    
-    
-    def plot_proj(self, all_data, proj, oldData):
-             
-        cut=2
-        xScale = 0.75
+        cut=0
+        xScale = 1
    
         
         color = ['#008000', "0.5", "k", '#008000']
@@ -252,25 +225,9 @@ class radial_out(DCVizPlotter):
         dmc=None
         
         pureOnly = False
-        superPose = False
-   
-        data = []    
-        familyFileNames = []        
-        
-        if oldData:
-            proj = ""
-            
-        for i in range(len(all_data)):
-            if proj in self.familyFileNames[i]:
-                data.append(all_data[i])
-                familyFileNames.append(self.familyFileNames[i])
-
-        if oldData:
-            proj = "xy"
-        
-        radialFig = eval("self.s_fig_%s" % proj)        
-        
-        print data[0].n
+        superPose = False  
+        dmcEdge = None
+        vmcEdge = None
         
         if superPose:
             yMax = 1.2
@@ -280,23 +237,26 @@ class radial_out(DCVizPlotter):
             if superPose:
                 edge = 1
             else:
-                edge = float(re.findall("edge(\d+\.?\d*)\.arma", familyFileNames[i])[0])
+                edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
+                print "n_p= ", data[i].data.sum()*edge/(data[i].n-1), "?"
             
             if edge > max_edge:
                 max_edge = edge;
             
-            if "dmc" in familyFileNames[i]:
+            if "dmc" in self.familyFileNames[i]:
                 method = "dmc"
                 dmc = data[i].data
+                dmcEdge = edge;
 
                 if superPose:
                     dmc = dmc/dmc[cut:].max()
                 
                 last = dmc
                 
-            elif "vmc" in familyFileNames[i]:
+            elif "vmc" in self.familyFileNames[i]:
                 method = "vmc"
                 vmc = data[i].data
+                vmcEdge = edge
 
                 if superPose:
                     vmc = vmc/vmc[cut:].max()
@@ -310,9 +270,14 @@ class radial_out(DCVizPlotter):
                 maxCut = r[cut]            
             
             if not pureOnly:
-                radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
+                self.radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
            
             if vmc is not None and dmc is not None:
+                if vmcEdge != dmcEdge:
+                    print "Warning. Ploting pure dist for mismatching edges. %f != %f" % (vmcEdge, dmcEdge)
+                else:
+                    print "Pure success"
+                    
                 if pureOnly:
                     pureC = color[j%len(color)]
                     pureS = style[j%len(color)]
@@ -320,7 +285,7 @@ class radial_out(DCVizPlotter):
                     pLabel=None
 
                     if superPose:
-                        pLabel = re.findall("out_(.+?)[vd]mc", familyFileNames[i])[0]
+                        pLabel = re.findall("out_(.+?)[vd]mc", self.familyFileNames[i])[0]
                         pLabel = re.sub("(\d)c(\d)", "\g<1> \g<2>", pLabel)
                         pLabel = re.sub("QDots\d+", "", pLabel)
                     
@@ -334,30 +299,30 @@ class radial_out(DCVizPlotter):
                 if superPose:
                     pure = pure/pure[cut:].max()
                 
-                radialFig.plot(r, pure, pureS, color=pureC, label=pLabel)
+                self.radialFig.plot(r, pure, pureS, color=pureC, label=pLabel)
                 vmc = None
                 dmc = None
            
         
 #        if not pureOnly:
-        radialFig.legend()    
-        radialFig.axes.set_xlim(maxCut, xScale*max_edge)
-        radialFig.set_xlabel('$r = \sqrt(%s^2 + %s^2)$' % (proj[0], proj[1]))
-        radialFig.set_ylabel(r'$\rho(r)$')
+        self.radialFig.legend()    
+        self.radialFig.axes.set_xlim(maxCut, xScale*max_edge)
+        self.radialFig.set_xlabel('r')
+        self.radialFig.set_ylabel(r'$\rho(r)$')
 #        locator = self.radialFig.axes.get_yaxis().get_major_locator()
 #        self.radialFig.axes.set_ylim(locator.autoscale()/2)
         if yMax is not None:
-            radialFig.set_ylim(0, yMax)
-        radialFig.axes.set_ybound(0)
+            self.radialFig.set_ylim(0, yMax)
+        self.radialFig.axes.set_ybound(0)
         
-        radialFig.axes.get_yaxis().get_label().set_fontsize(30)
-        radialFig.axes.get_xaxis().get_label().set_fontsize(30)
+        self.radialFig.axes.get_yaxis().get_label().set_fontsize(30)
+        self.radialFig.axes.get_xaxis().get_label().set_fontsize(30)
         
         
 
 class dist_out(DCVizPlotter):
     
-    nametag = "dist_out.+\.arma"
+    nametag = "dist_out.+\.arma$"
 #    figMap = {"fig1": ["subfig0", "subfig1"]}
     figMap = {"fig_xy": [], "fig_xz": [], "fig_yz": [], 
               "s_fig_xy": ["subfig_xy"], 
