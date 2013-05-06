@@ -40,7 +40,7 @@ public:
      * @param N Number of mesh points used in the histogram.
      * @param bin_edge The Cartesian position of the end points of the histogram. 
      */
-    void rerun(int n_p, int N, double bin_edge_xy, double bin_edge_xz = 0, double bin_edge_yz = 0);
+    void rerun(int n_p, int N, double bin_edge = 0);
 
 private:
 

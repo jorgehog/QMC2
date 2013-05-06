@@ -95,16 +95,14 @@ int main(int argc, char** argv) {
     //
 
     //Test for rerunning distribution
-    //argv = [x-name, "redist", n_p, path, name, N, bin_edge1, din_edge2, bin_edge3?
+    //argv = [x-name, "redist", n_p, path, name, N, bin_edge?
     string rerun_dist = "redist";
     if (rerun_dist.compare(argv[1]) == 0) {
         Distribution* redist = new Distribution(parParams, argv[3], argv[4]);
         
         if (argc == 7) {
             redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]));
-        } else if (argc == 9) {
-            redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]), atof(argv[7]), atof(argv[8]));
-        }
+        } 
         
 #ifdef MPI_ON
         MPI_Finalize();

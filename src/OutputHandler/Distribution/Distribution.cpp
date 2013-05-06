@@ -409,7 +409,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
 
 }
 
-void Distribution::rerun(int n_p, int N, double bin_edge_xy, double bin_edge_xz, double bin_edge_yz) {
+void Distribution::rerun(int n_p, int N, double bin_edge) {
 
     using namespace arma;
 
@@ -460,18 +460,9 @@ void Distribution::rerun(int n_p, int N, double bin_edge_xy, double bin_edge_xz,
 #endif
 
     if (dim == 3) {
-
-        vec3 a;
-        a(0) = bin_edge_xy;
-        a(1) = bin_edge_xz;
-        a(2) = bin_edge_yz;
-
-        double bin_edge = a.max();
-        a.reset();
-
         generate_distribution3D(dist, n_p, bin_edge, N, true);
     } else {
-        generate_distribution2D(dist, n_p, bin_edge_xy, N, true);
+        generate_distribution2D(dist, n_p, bin_edge, N, true);
     }
 
     dist.reset();
