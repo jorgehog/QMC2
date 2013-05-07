@@ -496,9 +496,9 @@ def dumpJobScript(nBlocks, maxBlockSize, minBlockSize,
     rawJob = rawJob.replace("__homeScratch__", path)
     rawJob = rawJob.replace("__code__", pjoin(paths.programPath, misc.QMC2programName))
     rawJob = rawJob.replace("__args__", args)
-    rawJob = rawJob.replace(" > __subDir__/stdout.txt", "")
+    rawJob = rawJob.replace(" >  __superDir__/__dirName__/stdout.txt", "")
     rawJob = rawJob.replace("__exec__", misc.QMC2programName)
-    rawJob = rawJob.replace("__dirName__", mainDir)
+    rawJob = rawJob.replace(r"#SBATCH --output=__superDir__/__dirName__/slurm_out.txt", "")
     
     with open(pjoin(
                 paths.CODE, 
