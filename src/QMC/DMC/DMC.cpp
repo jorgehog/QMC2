@@ -190,11 +190,10 @@ void DMC::run_method() {
     }
 
     free_walkers();
-    sleep(10);
+    estimate_error();
     dump_subsamples(true);
     finalize_output();
     get_accepted_ratio();
-    estimate_error();
 }
 
 void DMC::save_distribution() {

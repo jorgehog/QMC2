@@ -126,6 +126,8 @@ void Blocking::get_initial_error() {
     double var = arma::var(data);
     double mean = arma::mean(data);
     var = combine_variance(var, mean);
+    mean = combine_mean(mean, data.n_elem);
+    if (is_master) std::cout << "Initial mean: " << mean << std::endl;
     if (is_master) std::cout << "Initial stddev: " << sqrt(var / (n_nodes * n_c - 1)) << std::endl;
 }
 

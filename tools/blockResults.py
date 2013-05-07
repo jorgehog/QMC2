@@ -498,6 +498,7 @@ def dumpJobScript(nBlocks, maxBlockSize, minBlockSize,
     rawJob = rawJob.replace("__args__", args)
     rawJob = rawJob.replace(" > __subDir__/stdout.txt", "")
     rawJob = rawJob.replace("__exec__", misc.QMC2programName)
+    rawJob = rawJob.replace("__dirName__", mainDir)
     
     with open(pjoin(
                 paths.CODE, 
