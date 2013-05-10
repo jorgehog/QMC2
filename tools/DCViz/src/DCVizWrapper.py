@@ -75,6 +75,9 @@ def main(path, dynamic):
 
 def mainToFile(path):
     
+    if not os.path.isdir(path):
+        raise Exception("Supplied path must be to a directory.")
+    
     modes = autodetectModes()
     for root, dirs, files in os.walk(path):
     

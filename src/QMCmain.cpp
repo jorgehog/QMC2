@@ -109,6 +109,16 @@ int main(int argc, char** argv) {
 #endif
         return 0;
     }
+    
+//    generalParams.n_p=2;
+//    generalParams.dim=3;
+//    generalParams.systemConstant = generalParams.n_p;
+//    variationalParams.alpha = 0.6425;
+//    variationalParams.beta = 0.28;
+//    double* R;
+//    *R = 1.4;
+//    
+//    Orbitals* 
     //
 
     //    generalParams.n_p = 2;
@@ -581,7 +591,7 @@ void selectSystem(GeneralParams & gP,
 
     } else if (gP.system == "Atoms") {
 
-        sO.SP_basis = new hydrogenicOrbitals(gP, vP);
+        sO.SP_basis = new hydrogenicOrbitals(gP, vP, gP.n_p);
 
         sO.onebody_pot = new AtomCore(gP);
 

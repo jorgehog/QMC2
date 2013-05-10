@@ -21,7 +21,7 @@ public:
      * to save CPU-time.
      * \see Orbitals::set_qnum_indie_terms()
      */
-    void set_qnum_indie_terms(const Walker * walker, int i) {
+    void set_qnum_indie_terms(Walker * walker, int i) {
         *exp_factor = exp(-0.5 * (*k2) * walker->get_r_i2(i));
     }
 

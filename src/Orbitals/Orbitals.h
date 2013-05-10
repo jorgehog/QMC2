@@ -104,7 +104,7 @@ public:
      * and rather extract the value instead of recalculating.
      * @param i Particle number.
      */
-    virtual void set_qnum_indie_terms(const Walker* walker, int i) {
+    virtual void set_qnum_indie_terms(Walker* walker, int i) {
     };
 
     //! Calculates the single particle wave function for a given walker's particle.

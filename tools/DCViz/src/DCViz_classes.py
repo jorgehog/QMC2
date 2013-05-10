@@ -436,17 +436,17 @@ class E_vs_w(DCVizPlotter):
     
     nametag = "E\_vs\_w\.dat"
     figMap = {
-#              "f2":["s2", "se2"],
+              "f2":["s2", "se2"],
               "g2" : ["sg2"],
-#              "f6":["s6", "se6"],
+              "f6":["s6", "se6"],
               "g6" : ["sg6"],
-#              "f12":["s12", "se12"],
+              "f12":["s12", "se12"],
               "g12" : ["sg12"], 
-#              "f20":["s20", "se20"], 
+              "f20":["s20", "se20"], 
               "g20" : ["sg20"],            
-#              "f30":["s30", "se30"], 
+              "f30":["s30", "se30"], 
               "g30" : ["sg30"],            
-#              "f42":["s42", "se42"],
+              "f42":["s42", "se42"],
               "g42": ["sg42"]
               }
               
@@ -479,26 +479,29 @@ class E_vs_w(DCVizPlotter):
             eo = E_O[i1:i2][numpy.where(E[i1:i2] < 1000)]
             ec = E_C[i1:i2][numpy.where(E[i1:i2] < 1000)]
 
-#            subfig = eval("self.s%s" % N)
-#            subfig2 = eval("self.se%s" % N)
+            subfig = eval("self.s%s" % N)
+            subfig2 = eval("self.se%s" % N)
             subfigG = eval("self.sg%s" % N)
 #            subfigG = eval("self.sg%s" % "")
 #            
-#            subfig.plot(w, ek/e, "*", color='#008000', label="Ekin/E")
-#            subfig.plot(w, eo/e, "^", color='#008000', label="Eosc/E")
-#            subfig.plot(w, ec/e, ".", color='#008000', label="Ecol/E")
+ 
+
+            subfig.plot(w, ec/e, ".", color='#008000', label="Ecol/E")
+            subfig.plot(w, eo/e, "^", color='#008000', label="Eosc/E")
+            subfig.plot(w, ek/e, "*", color='#008000', label="Ekin/E")
 #            subfig.set_title("N = %s" % N)     
-#            subfig.legend()
-#            subfig.set_ylim([0, 1])
-#            subfig.set_ylabel("$\omega$")
-#            
-#            subfig2.plot(w, e/w, "+", color='#008000', label="E/$\omega$")
-#            subfig2.plot(w, ek/w, "*", color='#008000', label="Ekin/$\omega$")
-#            subfig2.plot(w, eo/w, "^", color='#008000', label="Eosc/$\omega$")
-#            subfig2.plot(w, ec/w, ".", color='#008000', label="Ecol/$\omega$")
-#            subfig2.legend()
-#            subfig2.axes.set_ybound(0)
-#            subfig.set_ylabel("$\omega$")
+            subfig.legend()
+            subfig.set_ylim([0, 1])
+            subfig.set_xlabel("$\omega$")
+            
+            subfig2.plot(w, e/w, "+", color='#008000', label="E/$\omega$")
+            subfig2.plot(w, ec/w, ".", color='#008000', label="Ecol/$\omega$")
+            subfig2.plot(w, eo/w, "^", color='#008000', label="Eosc/$\omega$")
+            subfig2.plot(w, ek/w, "*", color='#008000', label="Ekin/$\omega$")
+         
+            subfig2.legend()
+            subfig2.axes.set_ybound(0)
+            subfig2.set_xlabel("$\omega$")
 
             Vtot = (eo + ec)
          
@@ -513,10 +516,10 @@ class E_vs_w(DCVizPlotter):
             ek /= np**alpha
             Vtot /= np**beta
             
-            subfigG.plot(Vtot, ek, "*")
-            subfigG.set_ylabel("Ekin/N^%f" % alpha)
-            subfigG.set_xlabel("(Eosc + Ecol)/N^%f" % beta)
-            subfigG.set_title("N = %s" % N)
+            subfigG.plot(Vtot, ek, "o", color="0.5", mfc="None", label="QMC Result")
+            subfigG.set_ylabel("Ekin/N^%.2f" % alpha)
+            subfigG.set_xlabel("(Eosc + Ecol)/N^%.2f" % beta)
+#            subfigG.set_title("N = %s" % N)
                         
             from scipy.stats import linregress as l2
             n = len(ek)
@@ -527,14 +530,16 @@ class E_vs_w(DCVizPlotter):
             slope, intercept, r_value, p_value, std_err = l2(Vtot[treshHigh:], ek[treshHigh:])
             lFit = intercept + slope*Vtot
 
-            subfigG.plot(Vtot, lFit, 'r-', label=r"r2 = %g. a = %f" % (r_value**2, slope))
+            subfigG.plot(Vtot, lFit, '-', color='#008000', label=r"r2 = %g. a = %f" % (r_value**2, slope))
             
             slope, intercept, r_value, p_value, std_err = l2(Vtot[:treshLow], ek[:treshLow]) 
             lFit = intercept + slope*Vtot
 
-            subfigG.plot(Vtot, lFit, '--', color="#008000", label=r"r2 = %g. a = %f" % (r_value**2, slope))
+            subfigG.plot(Vtot, lFit, 'k--', label=r"r2 = %g. a = %f" % (r_value**2, slope), linewidth=2)
             
             subfigG.legend(loc=2)
+            subfigG.axes.set_ybound(0)
+            subfigG.axes.set_xbound(0)
     
         
 class testBinFile(DCVizPlotter):

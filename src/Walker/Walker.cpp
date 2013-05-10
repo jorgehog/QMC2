@@ -23,6 +23,7 @@ Walker::Walker(int n_p, int dim, bool alive) {
     spatial_grad = zeros<mat > (n_p, dim);
 
     r2 = zeros(1, n_p);
+    abs_r = zeros(1, n_p);
 
     lapl_sum = 0;
     spatial_ratio = 0;

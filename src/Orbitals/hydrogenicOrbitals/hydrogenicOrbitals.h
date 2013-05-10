@@ -14,16 +14,17 @@
  */
 class hydrogenicOrbitals : public Orbitals {
 public:
-    hydrogenicOrbitals(GeneralParams &, VariationalParams &);
+    hydrogenicOrbitals(GeneralParams &, VariationalParams &, int n_p);
 
     /*!
      * Calculates the exponential terms exp(-r/n) for all needed n once pr. particle
      * to save CPU-time. 
      * \see Orbitals::set_qnum_indie_terms()
      */
-    void set_qnum_indie_terms(const Walker * walker, int i);
+    void set_qnum_indie_terms(Walker * walker, int i);
 
     friend class ExpandedBasis;
+    friend class DiAtomic;
 
 protected:
 

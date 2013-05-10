@@ -7,8 +7,8 @@
 
 #include "../../QMCheaders.h"
 
-hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
-: Orbitals(gP.n_p, gP.dim) {
+hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP, int n_p)
+: Orbitals(n_p, gP.dim) {
 
     this->alpha = new double();
     this->k = new double();
@@ -22,7 +22,7 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     this->exp_factor_n3 = new double();
     this->exp_factor_n4 = new double();
 
-    this->Z = (int) gP.systemConstant;
+    this->Z = n_p;
     set_parameter(vP.alpha, 0);
 
     get_qnums();
@@ -122,8 +122,10 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
 
 }
 
-void hydrogenicOrbitals::set_qnum_indie_terms(const Walker* walker, int i) {
+void hydrogenicOrbitals::set_qnum_indie_terms(Walker* walker, int i) {
 
+    walker->calc_r_i(i);
+    
     double kr = -(*k) * walker->get_r_i(i);
 
     *exp_factor_n1 = exp(kr);

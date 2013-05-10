@@ -197,6 +197,7 @@ class QMC;
 #include "Orbitals/Orbitals.h"
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
+#include "Orbitals/DiAtomic/DiAtomic.h"
 #include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
 //#include "HartreeFock/HartreeFock.h"
@@ -205,6 +206,7 @@ class QMC;
 #include "Potential/Coulomb/Coulomb.h"
 #include "Potential/Harmonic_osc/Harmonic_osc.h"
 #include "Potential/AtomCore/AtomCore.h"
+#include "Potential/DiAtomCore/DiAtomCore.h"
 
 #include "Jastrow/Jastrow.h"
 #include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
