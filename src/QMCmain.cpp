@@ -108,6 +108,7 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    /*
     generalParams.n_p = 2;
     generalParams.dim = 3;
     generalParams.systemConstant = generalParams.n_p;
@@ -149,8 +150,7 @@ int main(int argc, char** argv) {
     
     MPI_Finalize();
     exit(0);
-
-    
+*/
     
     //
     
@@ -174,8 +174,29 @@ int main(int argc, char** argv) {
 	     outputParams,
 	     parParams);
 
-    selectSystem(generalParams, systemObjects, variationalParams, parParams);
+    //selectSystem(generalParams, systemObjects, variationalParams, parParams);
     
+    generalParams.n_p = 2;
+    generalParams.dim = 3;
+    generalParams.systemConstant = generalParams.n_p;
+    generalParams.random_seed = 12345678;
+    variationalParams.alpha = 1.285;
+    variationalParams.beta = 0.28;
+    double* R = new double(1.4);
+
+    Orbitals* molecule = new DiAtomic(generalParams, variationalParams, R);
+    System* system = new Fermions(generalParams, molecule);
+    system->add_potential(new Coulomb(generalParams));
+    system->add_potential(new DiAtomCore(generalParams, R));
+    Jastrow* jastrow = new Pade_Jastrow(generalParams, variationalParams);
+    Sampling* sampler = new Importance(generalParams);
+    
+    systemObjects.SYSTEM = system;
+    systemObjects.jastrow = jastrow;
+    systemObjects.SP_basis = molecule;
+    systemObjects.sample_method = sampler;
+
+
     Minimizer* minimizer;
     VMC* vmc;
     DMC* dmc;
@@ -292,7 +313,30 @@ int main(int argc, char** argv) {
             outputParams,
             parParams);
 
-    selectSystem(generalParams, systemObjects, variationalParams, parParams);
+    //selectSystem(generalParams, systemObjects, variationalParams, parParams);
+
+    //FORCE MOL
+    generalParams.n_p = 2;
+    generalParams.dim = 3;
+    generalParams.systemConstant = generalParams.n_p;
+  
+    variationalParams.alpha = 1.285;
+    variationalParams.beta = 0.28;
+    double* R = new double(1.4);
+
+    Orbitals* molecule = new DiAtomic(generalParams, variationalParams, R);
+    System* system = new Fermions(generalParams, molecule);
+    system->add_potential(new Coulomb(generalParams));
+    system->add_potential(new DiAtomCore(generalParams, R));
+    Jastrow* jastrow = new Pade_Jastrow(generalParams, variationalParams);
+    Sampling* sampler = new Importance(generalParams);
+    
+    systemObjects.SYSTEM = system;
+    systemObjects.jastrow = jastrow;
+    systemObjects.SP_basis = molecule;
+    systemObjects.sample_method = sampler;
+    //
+
 
     Minimizer* minimizer;
     VMC* vmc;
