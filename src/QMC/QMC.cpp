@@ -229,7 +229,7 @@ void QMC::diffuse_walker(Walker* original, Walker* trial) {
 
         set_spin_state(particle);
         sampling->update_pos(original, trial, particle);
-
+        
         //        test_gradients(trial);
 
         double A = get_acceptance_ratio(original, trial, particle);

@@ -39,7 +39,7 @@ public:
     void get_spatial_grad(Walker* walker, int particle) const;
     void get_spatial_grad_full(Walker* walker) const;
     double get_spatial_ratio(const Walker* walker_post, const Walker* walker_pre, int particle);
-    double get_spatial_lapl_sum(const Walker* walker) const;
+    double get_spatial_lapl_sum(Walker* walker) const;
 
     //! Fixed node approximation.
     bool allow_transition() {

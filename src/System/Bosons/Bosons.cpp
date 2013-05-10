@@ -58,7 +58,7 @@ double Bosons::get_spatial_ratio(const Walker* walker_pre, const Walker* walker_
     return s_ratio;
 }
 
-double Bosons::get_spatial_lapl_sum(const Walker* walker) const {
+double Bosons::get_spatial_lapl_sum(Walker* walker) const {
 
     double sum = 0;
     for (int i = 0; i < n_p; i++) {

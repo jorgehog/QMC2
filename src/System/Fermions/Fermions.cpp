@@ -104,7 +104,7 @@ void Fermions::update_inverse(const Walker* walker_old, Walker* walker_new, int 
 
 }
 
-double Fermions::get_spatial_lapl_sum(const Walker* walker) const {
+double Fermions::get_spatial_lapl_sum(Walker* walker) const {
     int i, j;
     double sum;
 

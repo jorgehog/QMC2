@@ -97,28 +97,179 @@ int main(int argc, char** argv) {
     //Test for rerunning distribution
     //argv = [x-name, "redist", n_p, path, name, N, bin_edge?
     string rerun_dist = "redist";
-    if (rerun_dist.compare(argv[1]) == 0) {
+    if ((argc == 7) && (rerun_dist.compare(argv[1]) == 0)) {
         Distribution* redist = new Distribution(parParams, argv[3], argv[4]);
-        
-        if (argc == 7) {
-            redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]));
-        } 
-        
+
+        redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]));
+
 #ifdef MPI_ON
         MPI_Finalize();
 #endif
         return 0;
     }
+
+    generalParams.n_p = 2;
+    generalParams.dim = 3;
+    generalParams.systemConstant = generalParams.n_p;
+    generalParams.random_seed = 12345678;
+    variationalParams.alpha = 1.285;
+    variationalParams.beta = 0.28;
+    double* R = new double(1.4);
+
+    Orbitals* molecule = new DiAtomic(generalParams, variationalParams, R);
+    System* system = new Fermions(generalParams, molecule);
+    system->add_potential(new Coulomb(generalParams));
+    system->add_potential(new DiAtomCore(generalParams, R));
+    Jastrow* jastrow = new Pade_Jastrow(generalParams, variationalParams);
+    Sampling* sampler = new Importance(generalParams);
     
-//    generalParams.n_p=2;
-//    generalParams.dim=3;
-//    generalParams.systemConstant = generalParams.n_p;
-//    variationalParams.alpha = 0.6425;
-//    variationalParams.beta = 0.28;
-//    double* R;
-//    *R = 1.4;
-//    
-//    Orbitals* 
+    systemObjects.SYSTEM = system;
+    systemObjects.jastrow = jastrow;
+    systemObjects.SP_basis = molecule;
+    systemObjects.sample_method = sampler;
+    
+    vmcParams.n_c = (int) 1E6/4;
+    vmcParams.dt = 0.005;
+    
+    dmcParams.n_w = 250;
+    dmcParams.dt = 0.001;
+    dmcParams.n_c = 1000;
+    dmcParams.therm = 1000;
+    dmcParams.n_b = 100;
+    
+    outputParams.dist_out = false;
+    
+    VMC* vmc_ = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, outputParams.dist_out);
+    vmc_->set_error_estimator(new SimpleVar(parParams));
+    vmc_->run_method();
+    
+    DMC* dmc_ = new DMC(generalParams, dmcParams,  systemObjects, parParams, vmc_, outputParams.dist_out);
+    dmc_->set_error_estimator(new SimpleVar(parParams));
+    dmc_->run_method();
+    
+    MPI_Finalize();
+    exit(0);
+
+    
+    
+    //
+    
+    //    generalParams.n_p = 2;
+    //    generalParams.dim = 3;
+    //    generalParams.systemConstant = generalParams.n_p;
+    //    variationalParams.alpha = 1;
+    //    srand(time(NULL));
+    //    Orbitals* sp = new hydrogenicOrbitals(generalParams, variationalParams);
+    //    HartreeFock* hf = new HartreeFock(4, sp);
+    //    hf->run_method();
+    //    
+    //    exit(0);
+    /*
+    parseCML(argc, argv,
+	     vmcParams,
+	     dmcParams,
+	     variationalParams,
+	     generalParams,
+	     minimizerParams,
+	     outputParams,
+	     parParams);
+
+    selectSystem(generalParams, systemObjects, variationalParams, parParams);
+    
+    Minimizer* minimizer;
+    VMC* vmc;
+    DMC* dmc;
+    
+    std::stringstream name;
+    
+    if (generalParams.doVMC) {
+      
+      vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, outputParams.dist_out);
+      
+      if (generalParams.doMIN) {
+	
+	minimizer = new ASGD(vmc, minimizerParams, parParams);
+	
+	if (outputParams.ASGD_out && parParams.is_master) {
+	  OutputHandler* ASGDout = new stdoutASGD(generalParams.runpath);
+	  minimizer->add_output(ASGDout);
+	}
+	
+	
+	int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
+	for (int i = 0; i < N; i++) {
+	  if (generalParams.do_blocking) {
+	    
+	    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples,
+						    parParams,
+						    "blocking_MIN_out" + TOSTR(i),
+						    generalParams.runpath);
+	    
+	    minimizer->add_error_estimator(blocking);
+	  } else {
+	    minimizer->add_error_estimator(new SimpleVar(parParams));
+	  }
+	}
+	
+	if (parParams.is_master) t.tic();
+	minimizer->minimize();
+	if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
+      }
+      
+      
+      
+      if (outputParams.dist_out) {
+	
+	name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
+	name << "vmc";
+	
+	OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath, name.str());
+	vmc->add_output(dist_vmc);
+	
+	name.str(std::string());
+	name.clear();
+	
+      }
+      
+      
+      if (generalParams.do_blocking) {
+	
+	ErrorEstimator* blocking = new Blocking(vmcParams.n_c,
+						parParams,
+						"blocking_VMC_out",
+						generalParams.runpath);
+	
+	vmc->set_error_estimator(blocking);
+      } else {
+	vmc->set_error_estimator(new SimpleVar(parParams));
+      }
+      
+      
+      if (parParams.is_master) t.tic();
+      vmc->run_method();
+      if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
+      
+    }
+    
+    if (generalParams.doDMC) {
+      
+      dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc, outputParams.dist_out);
+      
+      if (outputParams.dmc_out && parParams.is_master) {
+	
+	OutputHandler* DMCout = new stdoutDMC(generalParams.runpath);
+	dmc->add_output(DMCout);
+      }
+      
+      if (outputParams.dist_out) {
+	
+	name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
+	name << "dmc";
+	
+	OutputHandler* dist_dmc = new Distr
+	  */      
+      
+      
     //
 
     //    generalParams.n_p = 2;
@@ -151,123 +302,123 @@ int main(int argc, char** argv) {
 
     if (generalParams.doVMC) {
 
-        vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, outputParams.dist_out);
+      vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, outputParams.dist_out);
+      
+      if (generalParams.doMIN) {
+	
+	minimizer = new ASGD(vmc, minimizerParams, parParams);
 
-        if (generalParams.doMIN) {
-
-            minimizer = new ASGD(vmc, minimizerParams, parParams);
-
-            if (outputParams.ASGD_out && parParams.is_master) {
-                OutputHandler* ASGDout = new stdoutASGD(generalParams.runpath);
-                minimizer->add_output(ASGDout);
-            }
-
-
-            int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
-            for (int i = 0; i < N; i++) {
-                if (generalParams.do_blocking) {
-
-                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples,
-                            parParams,
-                            "blocking_MIN_out" + TOSTR(i),
-                            generalParams.runpath);
-
-                    minimizer->add_error_estimator(blocking);
-                } else {
-                    minimizer->add_error_estimator(new SimpleVar(parParams));
-                }
-            }
-
-            if (parParams.is_master) t.tic();
-            minimizer->minimize();
-            if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
-        }
-
-
-
-        if (outputParams.dist_out) {
-
-            name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
-            name << "vmc";
-
-            OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath, name.str());
-            vmc->add_output(dist_vmc);
-
-            name.str(std::string());
-            name.clear();
-
-        }
+	if (outputParams.ASGD_out && parParams.is_master) {
+	  OutputHandler* ASGDout = new stdoutASGD(generalParams.runpath);
+	  minimizer->add_output(ASGDout);
+	}
+	
+	
+	int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
+	for (int i = 0; i < N; i++) {
+	  if (generalParams.do_blocking) {
+	    
+	    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples,
+						    parParams,
+						    "blocking_MIN_out" + TOSTR(i),
+						    generalParams.runpath);
+	    
+	    minimizer->add_error_estimator(blocking);
+	  } else {
+	    minimizer->add_error_estimator(new SimpleVar(parParams));
+	  }
+	}
+	
+	if (parParams.is_master) t.tic();
+	minimizer->minimize();
+	if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
+      }
 
 
-        if (generalParams.do_blocking) {
 
-            ErrorEstimator* blocking = new Blocking(vmcParams.n_c,
-                    parParams,
-                    "blocking_VMC_out",
-                    generalParams.runpath);
+      if (outputParams.dist_out) {
+	
+	name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
+	name << "vmc";
+	
+	OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath, name.str());
+	vmc->add_output(dist_vmc);
+	
+	name.str(std::string());
+	name.clear();
 
-            vmc->set_error_estimator(blocking);
-        } else {
-            vmc->set_error_estimator(new SimpleVar(parParams));
-        }
+      }
+      
 
-
-        if (parParams.is_master) t.tic();
-        vmc->run_method();
-        if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
-
+      if (generalParams.do_blocking) {
+	
+	ErrorEstimator* blocking = new Blocking(vmcParams.n_c,
+						parParams,
+						"blocking_VMC_out",
+						generalParams.runpath);
+	
+	vmc->set_error_estimator(blocking);
+      } else {
+	vmc->set_error_estimator(new SimpleVar(parParams));
+      }
+      
+      
+      if (parParams.is_master) t.tic();
+      vmc->run_method();
+      if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
+      
     }
-
+    
     if (generalParams.doDMC) {
-
-        dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc, outputParams.dist_out);
-
-        if (outputParams.dmc_out && parParams.is_master) {
-
-            OutputHandler* DMCout = new stdoutDMC(generalParams.runpath);
-            dmc->add_output(DMCout);
-        }
-
-        if (outputParams.dist_out) {
-
-            name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
-            name << "dmc";
-
-            OutputHandler* dist_dmc = new Distribution(parParams, generalParams.runpath, name.str());
-            dmc->add_output(dist_dmc);
-
-            name.str(std::string());
-            name.clear();
-
-        }
-
-        //        int DMCerrorN = dmcParams.n_c;
-        if (generalParams.do_blocking) {
-
-            ErrorEstimator* blocking = new Blocking(dmcParams.n_c,
-                    parParams,
-                    "blocking_DMC_out",
-                    generalParams.runpath);
-
-            dmc->set_error_estimator(blocking);
-        } else {
-            dmc->set_error_estimator(new SimpleVar(parParams));
-        }
-
-        if (parParams.is_master) t.tic();
-        dmc->run_method();
-        if (parParams.is_master) cout << "---DMC time: " << t.toc() << " s---\n" << endl;
+      
+      dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc, outputParams.dist_out);
+      
+      if (outputParams.dmc_out && parParams.is_master) {
+	
+	OutputHandler* DMCout = new stdoutDMC(generalParams.runpath);
+	dmc->add_output(DMCout);
+      }
+      
+      if (outputParams.dist_out) {
+	
+	name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
+	name << "dmc";
+	
+	OutputHandler* dist_dmc = new Distribution(parParams, generalParams.runpath, name.str());
+	dmc->add_output(dist_dmc);
+	
+	name.str(std::string());
+	name.clear();
+	
+      }
+      
+      //        int DMCerrorN = dmcParams.n_c;
+      if (generalParams.do_blocking) {
+	
+	ErrorEstimator* blocking = new Blocking(dmcParams.n_c,
+						parParams,
+						"blocking_DMC_out",
+						generalParams.runpath);
+	
+	dmc->set_error_estimator(blocking);
+      } else {
+	dmc->set_error_estimator(new SimpleVar(parParams));
+      }
+      
+      if (parParams.is_master) t.tic();
+      dmc->run_method();
+      if (parParams.is_master) cout << "---DMC time: " << t.toc() << " s---\n" << endl;
     }
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
-
+    
 #ifdef MPI_ON
     MPI_Finalize();
 #endif
-
+    
     return 0;
-}
-
+    }
+    
 void parseCML(int argc, char** argv,
         VMCparams & vmcParams,
         DMCparams & dmcParams,

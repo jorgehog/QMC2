@@ -42,7 +42,6 @@ VMC::~VMC() {
 
 void VMC::set_trial_positions() {
     sampling->set_trial_pos(original_walker);
-
 }
 
 void VMC::save_distribution() {

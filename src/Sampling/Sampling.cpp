@@ -29,9 +29,9 @@ void Sampling::set_trial_pos(Walker* walker) {
 
     set_trial_states(walker);
 
-    walker->make_rel_matrix();
-
     qmc->get_system_ptr()->initialize(walker);
+
+    walker->make_rel_matrix();
 
     qmc->get_jastrow_ptr()->get_dJ_matrix(walker);
 

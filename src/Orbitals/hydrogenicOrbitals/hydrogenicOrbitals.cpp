@@ -23,6 +23,7 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     this->exp_factor_n4 = new double();
 
     this->Z = n_p;
+    
     set_parameter(vP.alpha, 0);
 
     get_qnums();

@@ -95,7 +95,7 @@ public:
     virtual void get_spatial_grad_full(Walker* walker) const = 0;
 
     //! Method for calculating the sum of all Laplacians for a given walker.
-    virtual double get_spatial_lapl_sum(const Walker* walker) const = 0;
+    virtual double get_spatial_lapl_sum(Walker* walker) const = 0;
 
     //! Method for copying the system specific parts of a walker.
     /*!

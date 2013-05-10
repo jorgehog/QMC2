@@ -13,7 +13,7 @@
 class AtomCore : public Potential {
 protected:
     int Z; //!< The core charge.
-
+    
 public:
 
     AtomCore(GeneralParams &);

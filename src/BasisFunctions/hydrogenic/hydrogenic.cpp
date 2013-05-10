@@ -552,6 +552,7 @@ double hydrogenic_0::eval(const Walker* walker, int i) {
     //exp(-k*r)
     
     psi = 1;
+    //std::cout << "hydro 0  " << psi << " " << *exp_factor << std::endl;
     return psi*(*exp_factor);
     
 }
@@ -563,6 +564,7 @@ double dell_hydrogenic_0_x::eval(const Walker* walker, int i) {
     //-k*x*exp(-k*r)/r
     
     psi = -(*k)*x/walker->get_r_i(i);
+    //std::cout << "hydro 0_dx  " << psi << " " << *exp_factor << std::endl;
     return psi*(*exp_factor);
     
 }
@@ -574,6 +576,7 @@ double dell_hydrogenic_0_y::eval(const Walker* walker, int i) {
     //-k*y*exp(-k*r)/r
     
     psi = -(*k)*y/walker->get_r_i(i);
+    //std::cout << "hydro 0_dy  " << psi << " " << *exp_factor << std::endl;
     return psi*(*exp_factor);
     
 }
@@ -585,6 +588,7 @@ double dell_hydrogenic_0_z::eval(const Walker* walker, int i) {
     //-k*z*exp(-k*r)/r
     
     psi = -(*k)*z/walker->get_r_i(i);
+    //std::cout << "hydro 0_dz  " << psi << " " << *exp_factor << std::endl;
     return psi*(*exp_factor);
     
 }
@@ -594,6 +598,7 @@ double lapl_hydrogenic_0::eval(const Walker* walker, int i) {
     //k*(k*r - 2)*exp(-k*r)/r
     
     psi = (*k)*((*k)*walker->get_r_i(i) - 2)/walker->get_r_i(i);
+    //std::cout << "hydro 0_lapl  " << psi << " " << *exp_factor << std::endl;
     return psi*(*exp_factor);
     
 }
