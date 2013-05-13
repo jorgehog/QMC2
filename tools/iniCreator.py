@@ -14,10 +14,10 @@ abel = False
 minMol = True
 
 if minMol:
-    np = 8
+    np = 16
     
     Rmin = 1.
-    Rmax = 5.
+    Rmax = 10.
     N = 21
     dR = (Rmax - Rmin)/(N-1)
     Rl = [Rmin + i*dR for i in range(N)]
@@ -30,10 +30,11 @@ doVMC=1
 R = __R__
 
 MIN:
-    SGDsamples=5000
-    n_c_SGD=1000
+SGDsamples=5000
+n_c_SGD=1000
+
 VMC:
-    n_c=1E7
+n_c=1E7
 """
 
     for R in Rl:
