@@ -131,12 +131,12 @@ int main(int argc, char** argv) {
             parParams);
 //
 //    generalParams.system = "Diatom";
-//    generalParams.n_p = 8;
+//    generalParams.n_p = 16;
 //    generalParams.dim = 3;
 //    variationalParams.alpha = 1;
+//    variationalParams.beta = 0.5;
 //    generalParams.doVMC = true;
 //    generalParams.systemConstant = generalParams.n_p;
-//    generalParams.R = 350;
     
     selectSystem(generalParams, systemObjects, variationalParams, parParams);
 

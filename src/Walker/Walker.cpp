@@ -69,11 +69,6 @@ double Walker::calc_r_rel(int i, int j) const {
     r_ij = 0;
     for (int k = 0; k < dim; k++) {
         tmp = (r(i, k) - r(j, k));
-//        
-//        if (k == 0 && ((i < n2 && j >= n2)) || (i >= n2 && j < n2)){
-//            tmp += 1.4;
-//        }
-        
         r_ij += tmp*tmp;
     }
     r_ij = sqrt(r_ij);

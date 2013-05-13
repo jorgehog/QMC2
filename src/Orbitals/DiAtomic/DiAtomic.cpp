@@ -78,6 +78,9 @@ double DiAtomic::get_variational_derivative(const Walker* walker, int n) {
 }
 
 double DiAtomic::phi(const Walker* walker, int particle, int q_num) {
+   
+    (void) walker;
+    
     return nucleus1->phi(walker_nucleus1, particle, q_num) +
             nucleus2->phi(walker_nucleus2, particle, q_num);
 }

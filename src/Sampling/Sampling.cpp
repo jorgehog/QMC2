@@ -26,7 +26,7 @@ void Sampling::set_trial_pos(Walker* walker) {
     }
 
     walker->calc_r_i2();
-
+    
     set_trial_states(walker);
 
     qmc->get_system_ptr()->initialize(walker);
