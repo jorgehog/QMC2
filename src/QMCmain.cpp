@@ -129,14 +129,19 @@ int main(int argc, char** argv) {
             minimizerParams,
             outputParams,
             parParams);
-
+//
+//    generalParams.system = "Diatom";
+//    generalParams.n_p = 8;
+//    generalParams.dim = 3;
+//    variationalParams.alpha = 1;
+//    generalParams.doVMC = true;
+//    generalParams.systemConstant = generalParams.n_p;
+//    generalParams.R = 350;
+    
     selectSystem(generalParams, systemObjects, variationalParams, parParams);
 
     //FORCE MOL
-    //    generalParams.n_p = 2;
-    //    generalParams.dim = 3;
-    //    generalParams.doVMC = true;
-    //    generalParams.systemConstant = generalParams.n_p;
+    
     //
     //    variationalParams.alpha = 1.285;
     //    //    variationalParams.alpha = 0.82125;
@@ -583,7 +588,7 @@ void selectSystem(GeneralParams & gP,
         system->add_potential(new DiAtomCore(gP));
 
         sO.SYSTEM = system;
-        
+
 
     } else {
         if (pp.is_master) std::cout << "unknown system" << std::endl;

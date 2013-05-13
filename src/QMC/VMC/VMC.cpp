@@ -66,12 +66,14 @@ void VMC::store_walkers() {
 void VMC::run_method() {
 
     set_trial_positions();
+    
     copy_walker(original_walker, trial_walker);
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
     }
-
+    
+    
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         diffuse_walker(original_walker, trial_walker);
@@ -81,12 +83,12 @@ void VMC::run_method() {
 
         vmc_E += local_E;
 
-
         output();
         update_subsamples();
         dump_output();
         error_estimator->update_data(local_E);
         store_walkers();
+        
     }
 
     node_comm();

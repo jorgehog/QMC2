@@ -72,14 +72,6 @@ double DiAtomic::get_variational_derivative(const Walker* walker, int n) {
     
     walker_nucleus1->phi = walker_nucleus2->phi = walker->phi;
     walker_nucleus1->inv = walker_nucleus2->inv = walker->inv;
-    
-//    walker_nucleus1->print();
-//    walker_nucleus2->print();
-//    std::cout << nucleus1->Z << std::endl;
-//    std::cout << nucleus2->Z << std::endl;
-    
-//    std::cout << nucleus1->get_variational_derivative(walker_nucleus1, n) << "    " <<
-//            nucleus2->get_variational_derivative(walker_nucleus2, n) << std::endl;
         
     return nucleus1->get_variational_derivative(walker_nucleus1, n) +
             nucleus2->get_variational_derivative(walker_nucleus2, n);
