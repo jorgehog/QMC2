@@ -9,7 +9,7 @@
 
 Jastrow::Jastrow(int n_p, int dim) {
     this->n_p = n_p;
-    this->n2 = n_p / 2;
+    this->n2 = ceil(n_p / 2.0);
     this->dim = dim;
 }
 

@@ -10,7 +10,7 @@
 
 class DiAtomCore : public Potential {
 public:
-    DiAtomCore(GeneralParams & gp, double* R);
+    DiAtomCore(GeneralParams & gp);
     
     double get_pot_E(const Walker* walker) const;
     

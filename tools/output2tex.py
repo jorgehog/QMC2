@@ -5,6 +5,22 @@ from os.path import join as pjoin
 
 
 
+def getR(path):
+    for filename in os.listdir(path):
+        if not os.path.isdir(pjoin(path, filename)):
+            if filename.split(".")[1] == "ini":
+                ininame = filename
+    
+    ini = open(pjoin(path, ininame), 'r')
+    iniRaw = ini.read()
+    ini.close()
+    
+    R = None
+    if re.findall("R\s*=\s*(.+)[\n$]", iniRaw):
+        R = re.findall("R\s*=\s*(.+)[\n$]", iniRaw)[0]
+        
+    return R
+
 def getVmcE(path):
     stdout = open(pjoin(path, "stdout.txt"), 'r')
     stdoutRaw = stdout.read()
@@ -210,7 +226,7 @@ def getMap(runpath):
     mapVarPattern = "doMIN\s*=\s*1"
     notMapBetaPattern = "use_coulomb\s*=\s*0|use_jastrow\s*=\s*0"
     mapVMCPattern = "doVMC\s*=\s*1"
-    mapDMCPattern = "doDMC\s*=\s*1"
+    mapDMCPattern = "doDMC\s*=\s*1"    
     
     mapping = ['n_p', 'sc']
    
@@ -224,6 +240,8 @@ def getMap(runpath):
                 iniRaw = ini.read()
                 ini.close()
                 
+                if re.findall("system\s*=\s*Diatom\s*", iniRaw):
+                    mapR = True
                 if re.findall(mapVarPattern, iniRaw):
                     mapVarPar = True
                 if re.findall(mapVMCPattern, iniRaw):
@@ -233,6 +251,8 @@ def getMap(runpath):
                 if not re.findall(notMapBetaPattern, iniRaw):
                     mapBeta = True
 
+                if mapR:
+                    mapping.append('R')
                 if mapVMC:
                     mapping.append('E_VMC')
                 if mapDMC:
@@ -292,6 +312,7 @@ def main():
         runparam['alpha'] = getAlpha(runpath)
         runparam['beta'] = getBeta(runpath)
         runparam['system'] = getSystem(runpath)
+        runparam['R'] = getR(runpath)
         runparam['mapping'] = getMap(runpath) 
   
     

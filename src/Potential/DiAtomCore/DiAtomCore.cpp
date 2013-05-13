@@ -7,11 +7,11 @@
 
 #include "../../QMCheaders.h"
 
-DiAtomCore::DiAtomCore(GeneralParams& gp, double* R) :
+DiAtomCore::DiAtomCore(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){
     
     this->Z = gp.n_p/2; 
-    this->R = R;
+    this->R = &(gp.R);
     
     name = "DiAtomCore";
     
@@ -33,7 +33,7 @@ double DiAtomCore::get_pot_E(const Walker* walker) const {
 //        e_pot -= 2*Z*shared/sqrt(shared*shared - com_corr*com_corr);
     }
 
-    e_pot += 1./(*R);
+    e_pot += Z*Z/(*R);
     
     return e_pot;
     

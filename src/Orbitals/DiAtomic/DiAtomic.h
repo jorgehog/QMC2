@@ -11,7 +11,7 @@
 class DiAtomic : public Orbitals {
 public:
 
-    DiAtomic(GeneralParams & gP, VariationalParams & vP, double* R);
+    DiAtomic(GeneralParams & gP, VariationalParams & vP);
 
     /*!
      * Calculates the exponential terms exp(-r/n) for all needed n once pr. particle
@@ -30,6 +30,8 @@ protected:
     Walker* walker_nucleus1;
     Walker* walker_nucleus2;
 
+    double getAlpha(VariationalParams & vP, double k0);
+    
     ///! Sums contrib from nucleus1 and 2 in their mass center coordinates.
     double get_variational_derivative(const Walker* walker, int n);
 

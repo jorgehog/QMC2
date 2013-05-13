@@ -24,35 +24,36 @@ cmlMAPg = {"runpath"       : 3,
            "n_p"           : 4,
            "dim"           : 5,
            "systemConstant" : 6,
-           "random_seed"   : 7,
-           "doMIN"         : 8,
-           "doVMC"         : 9,
-           "doDMC"         : 10,
-           "use_coulomb"   : 11,
-           "use_jastrow"   : 12,
-           "do_blocking"   : 13,
-           "sampling"      : 14,
-           "system"        : 15}
+           "R"             : 7,
+           "random_seed"   : 8,
+           "doMIN"         : 9,
+           "doVMC"         : 10,
+           "doDMC"         : 11,
+           "use_coulomb"   : 12,
+           "use_jastrow"   : 13,
+           "do_blocking"   : 14,
+           "sampling"      : 15,
+           "system"        : 16}
 
-cmlMAPv = {"n_c"           : 16,
-           "dt"            : 17}
+cmlMAPv = {"n_c"           : 17,
+           "dt"            : 18}
 
-cmlMAPd = {"dt"            : 18,
-           "n_b"           : 19,
-           "n_w"           : 20,
-           "n_c"           : 21,
-           "therm"         : 22}
+cmlMAPd = {"dt"            : 19,
+           "n_b"           : 20,
+           "n_w"           : 21,
+           "n_c"           : 22,
+           "therm"         : 23}
 
-cmlMAPm = {"SGDsamples"    : 23,
-           "n_w"           : 24,
-           "therm"         : 25,
-           "n_c_SGD"       : 26,
-           "max_step"      : 27,
-           "alpha"         : 28,
-           "beta"          : 29}
+cmlMAPm = {"SGDsamples"    : 24,
+           "n_w"           : 25,
+           "therm"         : 26,
+           "n_c_SGD"       : 27,
+           "max_step"      : 28,
+           "alpha"         : 29,
+           "beta"          : 30}
 
-cmlMAPvp = {"alpha"         : 30,
-            "beta"          : 31}
+cmlMAPvp = {"alpha"         : 31,
+            "beta"          : 32}
 
 
 def dumpStrList(aList):
@@ -398,7 +399,7 @@ def varParameterMap(n_p, dim, systemConstant, system):
         else:
             print "\n\nNo saved parameters for n_p=", n_p , "\n"
             
-        return alpha, beta
+        return alpha, beta, 0
         
         
     elif dim==3 and system == "Atoms":
@@ -432,8 +433,22 @@ def varParameterMap(n_p, dim, systemConstant, system):
             print "\n\nNo saved parameters for n_p=", n_p , "\n"
             return 0, 0
         
-        return alpha, beta
+        return alpha, beta, 0
         
+    elif system == "Diatom":
+    
+        if n_p == 2:
+#             alpha = 1.35618
+             alpha = 1.285
+             beta = 0.28
+             R = 1.4
+    
+        else:
+            print "\n\nNo saved parameters for n_p=", n_p , "\n"
+            return 0, 0, 0
+        
+        return alpha, beta, R
+    
     else:        
         print "\n\nUnknown type ", system, "with dim=", dim, "\n"
         return None
@@ -460,7 +475,7 @@ def consistencyCheck(cmlArgs):
     else:
         if system == "QDots":
             dim = 2
-        elif system == "Atoms":
+        elif system in ["Atoms", "Diatom"]:
             dim = 3
             cmlArgs[cmlMAPg['dim']] = "3"
         else:
@@ -472,12 +487,12 @@ def consistencyCheck(cmlArgs):
     else:
         if system == "QDots":
             systemConstant = 1.0
-        elif system == "Atoms":
+        elif system in ["Atoms", "Diatom"]:
             systemConstant = n_p
             cmlArgs[cmlMAPg['systemConstant']] = str(n_p)
   
   
-    alpha, beta = varParameterMap(n_p, dim, systemConstant, system)
+    alpha, beta, R = varParameterMap(n_p, dim, systemConstant, system)
 
     #No col -> no jast and alpha=1
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
@@ -493,6 +508,8 @@ def consistencyCheck(cmlArgs):
         cmlArgs[cmlMAPvp['alpha']] = str(alpha)
     if cmlArgs[cmlMAPvp['beta']] == "def":
             cmlArgs[cmlMAPvp['beta']] = str(beta)
+    if cmlArgs[cmlMAPg['R']] == "def":
+        cmlArgs[cmlMAPg['R']] = str(R)
    
     #In case of minimization, we set the inital params equal to the saved if any.
     if cmlArgs[cmlMAPg['doMIN']]=="1":

@@ -9,7 +9,7 @@
 
 System::System(int n_p, int dim, Orbitals* orbital) {
     this->n_p = n_p;
-    n2 = n_p / 2;
+    n2 = ceil(n_p / 2.0);
     this->dim = dim;
 
     this->orbital = orbital;

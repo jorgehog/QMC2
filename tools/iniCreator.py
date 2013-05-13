@@ -7,11 +7,46 @@ Created on Mon Oct  8 13:05:51 2012
 
 from pyLibQMC import paths
 
-validation = True
+validation = False
 fullruns = False
 test = False
 abel = False
+minMol = True
 
+if minMol:
+    np = 8
+    
+    Rmin = 1.
+    Rmax = 5.
+    N = 21
+    dR = (Rmax - Rmin)/(N-1)
+    Rl = [Rmin + i*dR for i in range(N)]
+    
+    rawFile = """general:
+n_p = __NP__
+system=Diatom
+doMIN=1
+doVMC=1
+R = __R__
+
+MIN:
+    SGDsamples=5000
+    n_c_SGD=1000
+VMC:
+    n_c=1E7
+"""
+
+    for R in Rl:
+        filename = "minMol_np%s_R%s.ini" % (np, str(R).replace(".", ""))
+        iniFile = rawFile.replace("__NP__", str(np))
+        iniFile = iniFile.replace("__R__", str(R))
+        
+        outFile = open(paths.iniFilePath + "/" + filename, 'w')
+        outFile.write(iniFile)
+        outFile.close()
+        
+        
+        
 if test:
     wList = [0.5,1]
     npList = [2]

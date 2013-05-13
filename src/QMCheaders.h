@@ -85,6 +85,8 @@ struct GeneralParams {
      */
     double systemConstant; 
 
+    double R; //! Center of mass coordinate for diatmic systems.
+    
     bool doMIN; 
     bool doVMC;
     bool doDMC;

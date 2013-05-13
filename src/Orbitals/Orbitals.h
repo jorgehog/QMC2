@@ -96,8 +96,7 @@ public:
     Orbitals(int n_p, int dim);
     Orbitals();
 
-    //! Calculates single particle wave function terms which are independent of the quantum numbers.
-
+    //! Calculates single particle wave function terms which are independent of the quantum numbers
     /*!
      * If a term in the single particle functions are independent of the quantum number,
      * this function can be overridden to calculate them beforehand (for each particle), 

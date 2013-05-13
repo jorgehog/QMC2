@@ -12,7 +12,7 @@ Walker::Walker(int n_p, int dim, bool alive) {
 
     this->dim = dim;
     this->n_p = n_p;
-    this->n2 = n_p / 2;
+    this->n2 = ceil(n_p / 2.0);
 
     is_murdered = !alive;
 
@@ -84,6 +84,7 @@ void Walker::print(std::string header) const {
     cout << "r\n" << this->r << endl;
     cout << "r_rel\n" << this->r_rel << endl;
     cout << "r2\n" << this->r2 << endl;
+    cout << "r\n" << this->abs_r << endl;
     cout << "S grad\n" << this->spatial_grad << endl;
 
     cout << "J grad\n" << this->jast_grad << endl;
