@@ -430,6 +430,19 @@ class dist_out(DCVizPlotter):
 #        self.subfigDist1d.set_ylabel(r'$|P(r)|^2$')
 
 
+class R_vs_E(DCVizPlotter):
+    
+    nametag = "R\_vs\_E\.dat"
+    
+    figMap = {"fig":["sfig"]}
+
+    def plot(self, data):
+        R, E = data
+        
+        self.sfig.plot(R, E)
+        
+        
+
 class E_vs_w(DCVizPlotter):
     
     stack = "H"    
