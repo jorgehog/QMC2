@@ -25,6 +25,10 @@ doMIN = 1
 VMC:
 n_c=1E7
 
+MIN:
+n_c_SGD=2000
+SGDsamples=4000
+
 DMC:
 therm=1000
 n_c=1000
