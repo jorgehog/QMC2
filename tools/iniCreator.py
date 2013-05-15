@@ -15,7 +15,7 @@ minMol = False
 Mol = True
 
 if Mol:   
-    npList = [8, 10, 12, 14, 16]
+    npList = [6, 8, 10, 12, 14, 16]
     
     rawFile = """general:
 n_p = __NP__
