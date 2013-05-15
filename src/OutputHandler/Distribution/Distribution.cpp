@@ -18,14 +18,11 @@ void Distribution::dump() {
 
 void Distribution::finalize() {
 
-    using namespace arma;
-
     //scrap out all the over-allocated space (DMC)
     qmc->dist.resize(qmc->last_inserted, dim);
 
     if (dim == 3) {
         generate_distribution3D(qmc->dist, qmc->n_p);
-
     } else {
         generate_distribution2D(qmc->dist, qmc->n_p);
     }
