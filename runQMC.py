@@ -444,33 +444,37 @@ def varParameterMap(n_p, dim, systemConstant, system):
              R = 1.4
         elif n_p == 6:
             R = 5.051
-            alpha = 0.5
-            beta = 0.5
+            alpha = 0.95
+            beta = 0.3568
             
         elif n_p == 8:
             R= 4.63    
-            alpha = 0.5
-            beta = 0.5
+            alpha = 1.026
+            beta = 0.207
 
         elif n_p==10:
             R = 3.005
-            alpha = 0.5
-            beta = 0.5
+            alpha = 1.032
+            beta = 0.2565
             
         elif n_p==12:
             R = 2.3481
-            alpha = 0.5
-            beta = 0.5
+            alpha = 1.0367
+            beta = 0.2565
             
         elif n_p==14:
             R = 2.068
-            alpha = 0.5
-            beta = 0.5            
+            alpha = 1.0367
+            beta = 0.324            
         
         elif n_p == 16:
             R = 2.282  
-            alpha = 0.5
-            beta = 0.5           
+            alpha = 1.020
+            beta = 0.3638
+        elif n_p == 18:
+            R = 2.68
+            alpha = 1.020
+            beta = 0.3638
 
         
 
