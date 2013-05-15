@@ -11,7 +11,37 @@ validation = False
 fullruns = False
 test = False
 abel = False
-minMol = True
+minMol = False
+Mol = True
+
+if Mol:   
+    wList = [0.1, 0.28, 0.5, 1]
+    npList = [42]
+    
+    rawFile = """general:
+n_p = __NP__
+systemConstant = __W__
+doVMC = 1
+doDMC = 1
+do_blocking=1
+
+VMC:
+n_c=1E3
+
+DMC:
+n_c=3000
+n_w=100
+"""
+
+    for w in wList:
+        for np in npList:
+            filename = "fullRun_np%d_w%s.ini" % (np, str(w).replace(".", ""))
+            iniFile = rawFile.replace("__NP__", str(np))
+            iniFile = iniFile.replace("__W__", str(w))
+            
+            outFile = open(paths.iniFilePath + "/" + filename, 'w')
+            outFile.write(iniFile)
+            outFile.close()
 
 if minMol:
     np = 16

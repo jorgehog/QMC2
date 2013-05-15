@@ -262,7 +262,7 @@ double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, in
 }
 
 double hydrogenicOrbitals::get_variational_derivative(const Walker* walker, int n, const Walker* walker2) {
-    double dalpha, dell_alpha_phi;
+    double dalpha, dell_alpha_phi, phi_wf;
 
     dalpha = 0;
 
@@ -271,14 +271,15 @@ double hydrogenicOrbitals::get_variational_derivative(const Walker* walker, int 
 
             if (diatomic) {
                 int sign = minusPower(qnum);
-                dell_alpha_phi = get_dell_alpha_phi(walker, qnum/2, i) +
-                        sign*get_dell_alpha_phi(walker2, qnum/2, i);
+                dell_alpha_phi = get_dell_alpha_phi(walker, qnum / 2, i) +
+                        sign * get_dell_alpha_phi(walker2, qnum / 2, i);
+                phi_wf = walker->phi(i, qnum/2) + sign * walker2->phi(i, qnum/2);
             } else {
                 dell_alpha_phi = get_dell_alpha_phi(walker, qnum, i);
-
+                phi_wf = walker->phi(i, qnum);
             }
 
-            dalpha += walker->inv(qnum, i) * dell_alpha_phi * walker->phi(i, qnum);
+            dalpha += walker->inv(qnum, i) * dell_alpha_phi * phi_wf;
 
         }
     }
