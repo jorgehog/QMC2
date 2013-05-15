@@ -15,29 +15,26 @@ minMol = False
 Mol = True
 
 if Mol:   
-    wList = [0.1, 0.28, 0.5, 1]
-    npList = [42]
+    npList = [8, 10, 12, 14, 16]
     
     rawFile = """general:
 n_p = __NP__
-systemConstant = __W__
-doVMC = 1
-doDMC = 1
-do_blocking=1
+system = Diatom
+doMIN = 1
 
 VMC:
-n_c=1E3
+n_c=1E7
 
 DMC:
-n_c=3000
-n_w=100
+therm=1000
+n_c=1000
+n_w=12000
+dt = 0.0001
 """
 
-    for w in wList:
-        for np in npList:
-            filename = "fullRun_np%d_w%s.ini" % (np, str(w).replace(".", ""))
+    for np in npList:
+            filename = "MOL_MIN_np%d.ini" % (np)
             iniFile = rawFile.replace("__NP__", str(np))
-            iniFile = iniFile.replace("__W__", str(w))
             
             outFile = open(paths.iniFilePath + "/" + filename, 'w')
             outFile.write(iniFile)
