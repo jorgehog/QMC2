@@ -473,7 +473,7 @@ def varParameterMap(n_p, dim, systemConstant, system):
             beta = 0.3638
         elif n_p == 18:
             R = 2.68
-            alpha = 1.020
+            alpha = 1.023
             beta = 0.3638
 
         

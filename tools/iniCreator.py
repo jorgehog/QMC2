@@ -20,14 +20,11 @@ if Mol:
     rawFile = """general:
 n_p = __NP__
 system = Diatom
-doMIN = 1
+doVMC = 1
+doDMC = 1
 
 VMC:
 n_c=1E7
-
-MIN:
-n_c_SGD=2000
-SGDsamples=4000
 
 DMC:
 therm=1000
