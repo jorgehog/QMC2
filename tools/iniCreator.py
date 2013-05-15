@@ -22,6 +22,7 @@ n_p = __NP__
 system = Diatom
 doVMC = 1
 doDMC = 1
+do_blocking=1
 
 VMC:
 n_c=1E7
