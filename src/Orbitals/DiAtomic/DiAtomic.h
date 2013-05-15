@@ -30,6 +30,7 @@ protected:
     Walker* walker_nucleus1;
     Walker* walker_nucleus2;
 
+
     double getAlpha(VariationalParams & vP, double k0);
     
     ///! Sums contrib from nucleus1 and 2 in their mass center coordinates.

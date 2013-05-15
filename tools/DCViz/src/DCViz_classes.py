@@ -441,9 +441,9 @@ class R_vs_E(DCVizPlotter):
         
         R, E = zip(*sorted(zip(R, E), key=lambda x: x[0]))
         
-        self.sfig.plot(R, E, '*')
+        self.sfig.plot(R, E, '*', color='#008000')
         self.sfig.set_xlabel("R")
-        self.sfig.set_ylabel("<V>")
+        self.sfig.set_ylabel(r"$\langle V\rangle$", rotation=0)
         
         
 

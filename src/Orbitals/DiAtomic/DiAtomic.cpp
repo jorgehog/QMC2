@@ -12,7 +12,7 @@ DiAtomic::DiAtomic(GeneralParams& gP, VariationalParams& vP)
 
     this->R = &(gP.R);
 
-//    vP.alpha = getAlpha(vP, n_p / 2.0);
+    //    vP.alpha = getAlpha(vP, n_p / 2.0);
 
     nucleus1 = new hydrogenicOrbitals(gP, vP, gP.n_p / 2);
     nucleus2 = new hydrogenicOrbitals(gP, vP, gP.n_p / 2);
@@ -69,28 +69,36 @@ void DiAtomic::set_qnum_indie_terms(Walker* walker, int i) {
 }
 
 double DiAtomic::get_variational_derivative(const Walker* walker, int n) {
-    
+
     walker_nucleus1->phi = walker_nucleus2->phi = walker->phi;
     walker_nucleus1->inv = walker_nucleus2->inv = walker->inv;
-        
-    return nucleus1->get_variational_derivative(walker_nucleus1, n) +
-            nucleus2->get_variational_derivative(walker_nucleus2, n);
+
+    return nucleus1->get_variational_derivative(walker_nucleus1, n, walker_nucleus2);
 }
 
 double DiAtomic::phi(const Walker* walker, int particle, int q_num) {
-   
+
     (void) walker;
-    
-    return nucleus1->phi(walker_nucleus1, particle, q_num) +
-            nucleus2->phi(walker_nucleus2, particle, q_num);
+    int sign = hydrogenicOrbitals::minusPower(q_num);
+
+    return nucleus1->phi(walker_nucleus1, particle, q_num/2) +
+            sign * nucleus2->phi(walker_nucleus2, particle, q_num/2);
 }
 
 double DiAtomic::del_phi(const Walker* walker, int particle, int q_num, int d) {
-    return nucleus1->del_phi(walker_nucleus1, particle, q_num, d) +
-            nucleus2->del_phi(walker_nucleus2, particle, q_num, d);
+
+    (void) walker;
+    int sign = hydrogenicOrbitals::minusPower(q_num);
+
+    return nucleus1->del_phi(walker_nucleus1, particle, q_num/2, d) +
+            sign * nucleus2->del_phi(walker_nucleus2, particle, q_num/2, d);
 }
 
 double DiAtomic::lapl_phi(const Walker* walker, int particle, int q_num) {
-    return nucleus1->lapl_phi(walker_nucleus1, particle, q_num) +
-            nucleus2->lapl_phi(walker_nucleus2, particle, q_num);
+
+    (void) walker;
+    int sign = hydrogenicOrbitals::minusPower(q_num);
+
+    return nucleus1->lapl_phi(walker_nucleus1, particle, q_num/2) +
+            sign * nucleus2->lapl_phi(walker_nucleus2, particle, q_num/2);
 }
