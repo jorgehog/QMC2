@@ -16,24 +16,25 @@ Mol = False
 QD_3D = True
 
 if QD_3D:
-    wList = [0.28, 0.1]
+    wList = [0.28, 0.1, 1]
     npList = [2, 8, 20]
     
     rawFile = """general:
 n_p = __NP__
 systemConstant = __W__
-doMIN=1
 doVMC=1
+doDMC=1
 system=QDots3D
+do_blocking=1
 
-MIN:
-alpha=1
-beta=0.4
-n_c_SGD=1200
-SGDsamples=3000
 
 VMC:
 n_c=1E7
+
+DMC:
+therm=2000
+n_c=2000
+n_w=12000
 """
 
     for w in wList:
