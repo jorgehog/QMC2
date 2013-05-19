@@ -360,8 +360,7 @@ class dist_out(DCVizPlotter):
         
             if edge != edge_2:
                 print "Bin edges does not match. %s != %s" % (edge, edge_2)
-                self.dmcOnly = True
-            
+
             for i in range(2):
                 if "vmc" in self.familyFileNames[i]:
                     vmcDist = data[i].data

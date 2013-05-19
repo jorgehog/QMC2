@@ -194,6 +194,7 @@ class QMC;
 
 #include "BasisFunctions/BasisFunctions.h"
 #include "BasisFunctions/HarmonicOscillator/HarmonicOscillator.h"
+#include "BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.h"
 #include "BasisFunctions/hydrogenic/hydrogenic.h"
 
 #include "Orbitals/Orbitals.h"

@@ -35,7 +35,6 @@ protected:
     double *alpha; //!< Pointer to the variational parameter alpha. Shared address with all the BasisFunction subclasses.
     double *k; //!< Pointer to sqrt(alpha*w). Shared address with all the BasisFunction subclasses.
     double *k2; //!< Pointer to alpha*w. Shared address with all the BasisFunction subclasses.
-    double *w_over_a; //TRASH
 
     double *exp_factor; //!< Pointer to a factor precalculated by set_qnum_indie_terms(). Shared address with all the BasisFunction subclasses.
 
@@ -50,7 +49,10 @@ protected:
      * Calculates the quantum numbers of the oscillator and stores them in the matrix qnums.
      */
     void get_qnums();
-
+    void get_qnums3D();
+    
+    void setup_basis();
+    void setup_basis3D();
     /*!
      * For Quantum Dots, closed form expressions for the matrix elements exist.
      */

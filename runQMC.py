@@ -498,9 +498,27 @@ def varParameterMap(n_p, systemConstant, system, R):
             return 1, 0.4, R            
             
         return alpha, beta, R
+        
+    elif system == "QDots3D":
+        
+        w = systemConstant
+
+        alpha = 1
+        beta = 0.4        
+        
+        if n_p == 2:
+            if w == 1:
+                alpha = 1
+                beta = 0.4
+            else:
+                print "No saved parameters for (n_p, w) = ", n_p, " ", w 
+        else:
+            print "\n\nNo saved parameters for n_p=", n_p , "\n"
+    
+        return alpha, beta, 0    
     
     else:        
-        print "\n\nUnknown type ", system, "with dim=", dim, "\n"
+        print "\n\nUnknown type ", system, "\n"
         return None
 
 
@@ -522,7 +540,7 @@ def consistencyCheck(cmlArgs):
     if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
         systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
     else:
-        if system in ["QDots", "DoubleWell"]:
+        if system in ["QDots", "QDots3D", "DoubleWell"]:
             systemConstant = 1.0
         elif system in ["Atoms", "Diatom"]:
             systemConstant = n_p
@@ -534,7 +552,8 @@ def consistencyCheck(cmlArgs):
             R = 3
         else:
             R = float(cmlArgs[cmlMAPg['R']])
-    
+    else:
+        R = None
   
   
     alpha, beta, R = varParameterMap(n_p, systemConstant, system, R)

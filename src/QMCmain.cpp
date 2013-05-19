@@ -519,6 +519,16 @@ void selectSystem(GeneralParams & gP,
         sO.SYSTEM = new Fermions(gP, sO.SP_basis);
         sO.SYSTEM->add_potential(sO.onebody_pot);
 
+    } else if (gP.system == "QDots3D") {
+
+        gP.dim = 3;
+
+        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
+
+        sO.onebody_pot = new Harmonic_osc(gP);
+
+        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+        sO.SYSTEM->add_potential(sO.onebody_pot);
 
     } else if (gP.system == "Atoms") {
 

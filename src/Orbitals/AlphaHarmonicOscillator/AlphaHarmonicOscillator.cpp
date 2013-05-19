@@ -18,7 +18,205 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
 
     this->w = gP.systemConstant;
     set_parameter(vP.alpha, 0);
-    get_qnums();
+
+    qnums = arma::zeros<arma::imat > (n2, dim);
+
+    if (dim == 2) {
+        get_qnums();
+        setup_basis();
+    } else if (dim == 3) {
+        get_qnums3D();
+        setup_basis3D();
+    }
+}
+
+void AlphaHarmonicOscillator::setup_basis3D() {
+
+    basis_functions[0] = new HarmonicOscillator3D_0(k, k2, exp_factor);
+    basis_functions[1] = new HarmonicOscillator3D_1(k, k2, exp_factor);
+    basis_functions[2] = new HarmonicOscillator3D_2(k, k2, exp_factor);
+    basis_functions[3] = new HarmonicOscillator3D_3(k, k2, exp_factor);
+    basis_functions[4] = new HarmonicOscillator3D_4(k, k2, exp_factor);
+    basis_functions[5] = new HarmonicOscillator3D_5(k, k2, exp_factor);
+    basis_functions[6] = new HarmonicOscillator3D_6(k, k2, exp_factor);
+    basis_functions[7] = new HarmonicOscillator3D_7(k, k2, exp_factor);
+    basis_functions[8] = new HarmonicOscillator3D_8(k, k2, exp_factor);
+    basis_functions[9] = new HarmonicOscillator3D_9(k, k2, exp_factor);
+    basis_functions[10] = new HarmonicOscillator3D_10(k, k2, exp_factor);
+    basis_functions[11] = new HarmonicOscillator3D_11(k, k2, exp_factor);
+    basis_functions[12] = new HarmonicOscillator3D_12(k, k2, exp_factor);
+    basis_functions[13] = new HarmonicOscillator3D_13(k, k2, exp_factor);
+    basis_functions[14] = new HarmonicOscillator3D_14(k, k2, exp_factor);
+    basis_functions[15] = new HarmonicOscillator3D_15(k, k2, exp_factor);
+    basis_functions[16] = new HarmonicOscillator3D_16(k, k2, exp_factor);
+    basis_functions[17] = new HarmonicOscillator3D_17(k, k2, exp_factor);
+    basis_functions[18] = new HarmonicOscillator3D_18(k, k2, exp_factor);
+    basis_functions[19] = new HarmonicOscillator3D_19(k, k2, exp_factor);
+
+    dell_basis_functions[0][0] = new dell_HarmonicOscillator3D_0_x(k, k2, exp_factor);
+    dell_basis_functions[1][0] = new dell_HarmonicOscillator3D_0_y(k, k2, exp_factor);
+    dell_basis_functions[2][0] = new dell_HarmonicOscillator3D_0_z(k, k2, exp_factor);
+    dell_basis_functions[0][1] = new dell_HarmonicOscillator3D_1_x(k, k2, exp_factor);
+    dell_basis_functions[1][1] = new dell_HarmonicOscillator3D_1_y(k, k2, exp_factor);
+    dell_basis_functions[2][1] = new dell_HarmonicOscillator3D_1_z(k, k2, exp_factor);
+    dell_basis_functions[0][2] = new dell_HarmonicOscillator3D_2_x(k, k2, exp_factor);
+    dell_basis_functions[1][2] = new dell_HarmonicOscillator3D_2_y(k, k2, exp_factor);
+    dell_basis_functions[2][2] = new dell_HarmonicOscillator3D_2_z(k, k2, exp_factor);
+    dell_basis_functions[0][3] = new dell_HarmonicOscillator3D_3_x(k, k2, exp_factor);
+    dell_basis_functions[1][3] = new dell_HarmonicOscillator3D_3_y(k, k2, exp_factor);
+    dell_basis_functions[2][3] = new dell_HarmonicOscillator3D_3_z(k, k2, exp_factor);
+    dell_basis_functions[0][4] = new dell_HarmonicOscillator3D_4_x(k, k2, exp_factor);
+    dell_basis_functions[1][4] = new dell_HarmonicOscillator3D_4_y(k, k2, exp_factor);
+    dell_basis_functions[2][4] = new dell_HarmonicOscillator3D_4_z(k, k2, exp_factor);
+    dell_basis_functions[0][5] = new dell_HarmonicOscillator3D_5_x(k, k2, exp_factor);
+    dell_basis_functions[1][5] = new dell_HarmonicOscillator3D_5_y(k, k2, exp_factor);
+    dell_basis_functions[2][5] = new dell_HarmonicOscillator3D_5_z(k, k2, exp_factor);
+    dell_basis_functions[0][6] = new dell_HarmonicOscillator3D_6_x(k, k2, exp_factor);
+    dell_basis_functions[1][6] = new dell_HarmonicOscillator3D_6_y(k, k2, exp_factor);
+    dell_basis_functions[2][6] = new dell_HarmonicOscillator3D_6_z(k, k2, exp_factor);
+    dell_basis_functions[0][7] = new dell_HarmonicOscillator3D_7_x(k, k2, exp_factor);
+    dell_basis_functions[1][7] = new dell_HarmonicOscillator3D_7_y(k, k2, exp_factor);
+    dell_basis_functions[2][7] = new dell_HarmonicOscillator3D_7_z(k, k2, exp_factor);
+    dell_basis_functions[0][8] = new dell_HarmonicOscillator3D_8_x(k, k2, exp_factor);
+    dell_basis_functions[1][8] = new dell_HarmonicOscillator3D_8_y(k, k2, exp_factor);
+    dell_basis_functions[2][8] = new dell_HarmonicOscillator3D_8_z(k, k2, exp_factor);
+    dell_basis_functions[0][9] = new dell_HarmonicOscillator3D_9_x(k, k2, exp_factor);
+    dell_basis_functions[1][9] = new dell_HarmonicOscillator3D_9_y(k, k2, exp_factor);
+    dell_basis_functions[2][9] = new dell_HarmonicOscillator3D_9_z(k, k2, exp_factor);
+    dell_basis_functions[0][10] = new dell_HarmonicOscillator3D_10_x(k, k2, exp_factor);
+    dell_basis_functions[1][10] = new dell_HarmonicOscillator3D_10_y(k, k2, exp_factor);
+    dell_basis_functions[2][10] = new dell_HarmonicOscillator3D_10_z(k, k2, exp_factor);
+    dell_basis_functions[0][11] = new dell_HarmonicOscillator3D_11_x(k, k2, exp_factor);
+    dell_basis_functions[1][11] = new dell_HarmonicOscillator3D_11_y(k, k2, exp_factor);
+    dell_basis_functions[2][11] = new dell_HarmonicOscillator3D_11_z(k, k2, exp_factor);
+    dell_basis_functions[0][12] = new dell_HarmonicOscillator3D_12_x(k, k2, exp_factor);
+    dell_basis_functions[1][12] = new dell_HarmonicOscillator3D_12_y(k, k2, exp_factor);
+    dell_basis_functions[2][12] = new dell_HarmonicOscillator3D_12_z(k, k2, exp_factor);
+    dell_basis_functions[0][13] = new dell_HarmonicOscillator3D_13_x(k, k2, exp_factor);
+    dell_basis_functions[1][13] = new dell_HarmonicOscillator3D_13_y(k, k2, exp_factor);
+    dell_basis_functions[2][13] = new dell_HarmonicOscillator3D_13_z(k, k2, exp_factor);
+    dell_basis_functions[0][14] = new dell_HarmonicOscillator3D_14_x(k, k2, exp_factor);
+    dell_basis_functions[1][14] = new dell_HarmonicOscillator3D_14_y(k, k2, exp_factor);
+    dell_basis_functions[2][14] = new dell_HarmonicOscillator3D_14_z(k, k2, exp_factor);
+    dell_basis_functions[0][15] = new dell_HarmonicOscillator3D_15_x(k, k2, exp_factor);
+    dell_basis_functions[1][15] = new dell_HarmonicOscillator3D_15_y(k, k2, exp_factor);
+    dell_basis_functions[2][15] = new dell_HarmonicOscillator3D_15_z(k, k2, exp_factor);
+    dell_basis_functions[0][16] = new dell_HarmonicOscillator3D_16_x(k, k2, exp_factor);
+    dell_basis_functions[1][16] = new dell_HarmonicOscillator3D_16_y(k, k2, exp_factor);
+    dell_basis_functions[2][16] = new dell_HarmonicOscillator3D_16_z(k, k2, exp_factor);
+    dell_basis_functions[0][17] = new dell_HarmonicOscillator3D_17_x(k, k2, exp_factor);
+    dell_basis_functions[1][17] = new dell_HarmonicOscillator3D_17_y(k, k2, exp_factor);
+    dell_basis_functions[2][17] = new dell_HarmonicOscillator3D_17_z(k, k2, exp_factor);
+    dell_basis_functions[0][18] = new dell_HarmonicOscillator3D_18_x(k, k2, exp_factor);
+    dell_basis_functions[1][18] = new dell_HarmonicOscillator3D_18_y(k, k2, exp_factor);
+    dell_basis_functions[2][18] = new dell_HarmonicOscillator3D_18_z(k, k2, exp_factor);
+    dell_basis_functions[0][19] = new dell_HarmonicOscillator3D_19_x(k, k2, exp_factor);
+    dell_basis_functions[1][19] = new dell_HarmonicOscillator3D_19_y(k, k2, exp_factor);
+    dell_basis_functions[2][19] = new dell_HarmonicOscillator3D_19_z(k, k2, exp_factor);
+
+    lapl_basis_functions[0] = new lapl_HarmonicOscillator3D_0(k, k2, exp_factor);
+    lapl_basis_functions[1] = new lapl_HarmonicOscillator3D_1(k, k2, exp_factor);
+    lapl_basis_functions[2] = new lapl_HarmonicOscillator3D_2(k, k2, exp_factor);
+    lapl_basis_functions[3] = new lapl_HarmonicOscillator3D_3(k, k2, exp_factor);
+    lapl_basis_functions[4] = new lapl_HarmonicOscillator3D_4(k, k2, exp_factor);
+    lapl_basis_functions[5] = new lapl_HarmonicOscillator3D_5(k, k2, exp_factor);
+    lapl_basis_functions[6] = new lapl_HarmonicOscillator3D_6(k, k2, exp_factor);
+    lapl_basis_functions[7] = new lapl_HarmonicOscillator3D_7(k, k2, exp_factor);
+    lapl_basis_functions[8] = new lapl_HarmonicOscillator3D_8(k, k2, exp_factor);
+    lapl_basis_functions[9] = new lapl_HarmonicOscillator3D_9(k, k2, exp_factor);
+    lapl_basis_functions[10] = new lapl_HarmonicOscillator3D_10(k, k2, exp_factor);
+    lapl_basis_functions[11] = new lapl_HarmonicOscillator3D_11(k, k2, exp_factor);
+    lapl_basis_functions[12] = new lapl_HarmonicOscillator3D_12(k, k2, exp_factor);
+    lapl_basis_functions[13] = new lapl_HarmonicOscillator3D_13(k, k2, exp_factor);
+    lapl_basis_functions[14] = new lapl_HarmonicOscillator3D_14(k, k2, exp_factor);
+    lapl_basis_functions[15] = new lapl_HarmonicOscillator3D_15(k, k2, exp_factor);
+    lapl_basis_functions[16] = new lapl_HarmonicOscillator3D_16(k, k2, exp_factor);
+    lapl_basis_functions[17] = new lapl_HarmonicOscillator3D_17(k, k2, exp_factor);
+    lapl_basis_functions[18] = new lapl_HarmonicOscillator3D_18(k, k2, exp_factor);
+    lapl_basis_functions[19] = new lapl_HarmonicOscillator3D_19(k, k2, exp_factor);
+
+}
+
+void AlphaHarmonicOscillator::get_qnums3D() {
+
+    qnums(0, 0) = 0;
+    qnums(0, 1) = 0;
+    qnums(0, 2) = 0;
+
+    if (n_p == 2) return;
+
+    qnums(1, 0) = 0;
+    qnums(1, 1) = 0;
+    qnums(1, 2) = 1;
+    qnums(2, 0) = 0;
+    qnums(2, 1) = 1;
+    qnums(2, 2) = 0;
+    qnums(3, 0) = 1;
+    qnums(3, 1) = 0;
+    qnums(3, 2) = 0;
+
+    if (n_p == 8) return;
+
+    qnums(4, 0) = 0;
+    qnums(4, 1) = 0;
+    qnums(4, 2) = 2;
+    qnums(5, 0) = 0;
+    qnums(5, 1) = 1;
+    qnums(5, 2) = 1;
+    qnums(6, 0) = 0;
+    qnums(6, 1) = 2;
+    qnums(6, 2) = 0;
+    qnums(7, 0) = 1;
+    qnums(7, 1) = 0;
+    qnums(7, 2) = 1;
+    qnums(8, 0) = 1;
+    qnums(8, 1) = 1;
+    qnums(8, 2) = 0;
+    qnums(9, 0) = 2;
+    qnums(9, 1) = 0;
+    qnums(9, 2) = 0;
+
+    if (n_p == 20) return;
+
+    qnums(10, 0) = 0;
+    qnums(10, 1) = 0;
+    qnums(10, 2) = 3;
+    qnums(11, 0) = 0;
+    qnums(11, 1) = 1;
+    qnums(11, 2) = 2;
+    qnums(12, 0) = 0;
+    qnums(12, 1) = 2;
+    qnums(12, 2) = 1;
+    qnums(13, 0) = 0;
+    qnums(13, 1) = 3;
+    qnums(13, 2) = 0;
+    qnums(14, 0) = 1;
+    qnums(14, 1) = 0;
+    qnums(14, 2) = 2;
+    qnums(15, 0) = 1;
+    qnums(15, 1) = 1;
+    qnums(15, 2) = 1;
+    qnums(16, 0) = 1;
+    qnums(16, 1) = 2;
+    qnums(16, 2) = 0;
+    qnums(17, 0) = 2;
+    qnums(17, 1) = 0;
+    qnums(17, 2) = 1;
+    qnums(18, 0) = 2;
+    qnums(18, 1) = 1;
+    qnums(18, 2) = 0;
+    qnums(19, 0) = 3;
+    qnums(19, 1) = 0;
+    qnums(19, 2) = 0;
+
+    if (n_p != 40) {
+        std::cout << "Quantum dots open shell symmetry broken or N > 40" << std::endl;
+        exit(1);
+    }
+
+}
+
+void AlphaHarmonicOscillator::setup_basis() {
 
     basis_functions[0] = new HarmonicOscillator_0(k, k2, exp_factor);
     basis_functions[1] = new HarmonicOscillator_1(k, k2, exp_factor);
@@ -135,10 +333,10 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     lapl_basis_functions[25] = new lapl_HarmonicOscillator_25(k, k2, exp_factor);
     lapl_basis_functions[26] = new lapl_HarmonicOscillator_26(k, k2, exp_factor);
     lapl_basis_functions[27] = new lapl_HarmonicOscillator_27(k, k2, exp_factor);
+
 }
 
 void AlphaHarmonicOscillator::get_qnums() {
-    qnums = arma::zeros<arma::imat > (n2, dim);
     double n_x, n_y;
 
     int n_shells = (int) (0.5 * (sqrt(1 + 4 * n_p) - 1));
@@ -188,39 +386,10 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
     }
 }
 
-//double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker, int n) {
-//    double dalpha, sq_w_over_a, exp_fac, H_fac, rij;
-//    int nij;
-//
-//    dalpha = 0;
-//    sq_w_over_a = (*k) / (*alpha);
-//
-//    for (int i = 0; i < n_p; i++) {
-//        exp_fac = -0.5 * w * walker->get_r_i2(i);
-//
-//        for (int qnum = 0; qnum < n2; qnum++) {
-//
-//            H_fac = 0;
-//            for (int j = 0; j < dim; j++) {
-//                rij = walker->r(i, j);
-//                nij = qnums(qnum, j);
-//
-//                H_fac += rij * nij * H(nij - 1, (*k) * rij) / H(nij, (*k) * rij);
-//            }
-//            H_fac *= sq_w_over_a;
-//
-//
-//            dalpha += walker->inv(qnum, i)*(H_fac + exp_fac) * walker->phi(i, qnum);
-//        }
-//    }
-//
-//    return dalpha;
-//}
-
-double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_num){
+double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_num) {
 
     int nij, rij;
-    
+
     double H_fac = 0;
     for (int j = 0; j < dim; j++) {
         rij = walker->r(p, j);
@@ -230,7 +399,7 @@ double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_
     }
     H_fac *= (*k) / (*alpha);
 
-    return H_fac -0.5 * w * walker->get_r_i2(p);
+    return H_fac - 0.5 * w * walker->get_r_i2(p);
 
 }
 
