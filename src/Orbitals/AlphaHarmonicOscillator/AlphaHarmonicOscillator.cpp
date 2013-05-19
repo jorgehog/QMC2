@@ -388,15 +388,18 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
 
 double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_num) {
 
-    int nij, rij;
+    int nij;
+    double rij;
 
     double H_fac = 0;
     for (int j = 0; j < dim; j++) {
+
         rij = walker->r(p, j);
         nij = qnums(q_num, j);
 
         H_fac += rij * nij * H(nij - 1, (*k) * rij) / H(nij, (*k) * rij);
     }
+
     H_fac *= (*k) / (*alpha);
 
     return H_fac - 0.5 * w * walker->get_r_i2(p);
