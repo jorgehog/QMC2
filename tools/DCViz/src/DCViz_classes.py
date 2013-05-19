@@ -237,7 +237,9 @@ class radial_out(DCVizPlotter):
         
         if superPose:
             yMax = 1.2
-
+        print self.familyFileNames
+        print len(data)
+        
         for i in range(len(data)):
             
             if superPose:
@@ -264,10 +266,11 @@ class radial_out(DCVizPlotter):
                 method = "vmc"
                 vmc = data[i].data
                 vmcEdge = edge
-
+                
+          
                 if superPose:
                     vmc = vmc/vmc[cut:].max()
-                
+     
                 last = vmc
                 
                 
@@ -278,9 +281,10 @@ class radial_out(DCVizPlotter):
             
             if not pureOnly:
                 if "QDots3D" in self.familyFileNames[i]:
-                    last /= r**2
+                    r.resize((data[i].n, 1))
+                    last = last/r**2
                     last[0] = last[1]
-                    
+           
                 self.radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
            
             if vmc is not None and dmc is not None:
