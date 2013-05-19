@@ -489,6 +489,11 @@ def varParameterMap(n_p, systemConstant, system, R):
             alpha = 1.36139
             beta = 0.206428
         
+        elif n_p == 2 and R == 2:
+            alpha = 1.18491
+            beta = 0.268434
+
+        
         else:
             print "\n\nNo saved parameters for n_p=", n_p , "R=", R, "\n"
             return 1, 0.4, R            
