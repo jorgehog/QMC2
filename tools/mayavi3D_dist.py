@@ -75,7 +75,7 @@ def main():
 
     data = loadArmaCube(path)
     
-    if "Atoms" in path:
+    if "Atoms" in path or "QDots3D" in path:
         data = earthSpherify(data)
     elif "Diatom" in path:
         data = sliceXZ(data)
