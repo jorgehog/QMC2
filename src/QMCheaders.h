@@ -8,7 +8,7 @@
 #ifndef QMCHEADERS_H
 #define	QMCHEADERS_H
 
-#define ARMA_NO_DEBUG
+//#define ARMA_NO_DEBUG
 #define MPI_ON
 
 #ifdef MPI_ON
@@ -199,7 +199,7 @@ class QMC;
 #include "Orbitals/Orbitals.h"
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
-#include "Orbitals/DiAtomic/DiAtomic.h"
+#include "Orbitals/DiTransform/DiTransform.h"
 #include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
 //#include "HartreeFock/HartreeFock.h"
@@ -209,6 +209,7 @@ class QMC;
 #include "Potential/Harmonic_osc/Harmonic_osc.h"
 #include "Potential/AtomCore/AtomCore.h"
 #include "Potential/DiAtomCore/DiAtomCore.h"
+#include "Potential/DoubleWell/DoubleWell.h"
 
 #include "Jastrow/Jastrow.h"
 #include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"

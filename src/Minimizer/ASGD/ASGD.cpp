@@ -27,13 +27,13 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
 
     walkers = new Walker*[n_walkers];
     trial_walkers = new Walker*[n_walkers];
-    
+
     for (int i = 0; i < n_walkers; i++) {
         walkers[i] = new Walker(vmc->n_p, vmc->dim);
         trial_walkers[i] = new Walker(vmc->n_p, vmc->dim);
     }
- 
-    
+
+
     gradient = zeros(1, Nparams);
     gradient_local = zeros(1, Nparams);
 
@@ -45,21 +45,19 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
 
 void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
-    for (int alpha = 0; alpha < Nspatial_params; alpha++) {
 
-        double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker, alpha);
+    double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker);
 
-        gradient_local(alpha) += e_local * dalpha;
-        gradient(alpha) += dalpha;
+    gradient_local(0) += e_local * dalpha;
+    gradient(0) += dalpha;
 
-    }
 
     for (int beta = 0; beta < Njastrow_params; beta++) {
 
         double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(walker, beta);
 
-        gradient_local(Nspatial_params + beta) += e_local*dbeta;
-        gradient(Nspatial_params + beta) += dbeta;
+        gradient_local(1 + beta) += e_local*dbeta;
+        gradient(1 + beta) += dbeta;
 
     }
 
@@ -74,8 +72,8 @@ void ASGD::get_total_grad() {
 #endif
     E /= scale;
 
-    gradient_tot = 2 * (gradient_local - gradient * E)/scale;
-    
+    gradient_tot = 2 * (gradient_local - gradient * E) / scale;
+
     for (int i = 0; i < Nparams; i++) {
         error_estimators.at(i)->update_data(gradient_tot(i));
     }
@@ -85,15 +83,15 @@ void ASGD::get_total_grad() {
     gradient_tot /= n_nodes;
 #endif
 
-    
+
 }
 
 void ASGD::minimize() {
-    
+
     thermalize_walkers();
-    
+
     for (sample = 1; sample <= SGDsamples; sample++) {
-    
+
         E = 0;
         gradient = arma::zeros(1, Nparams);
         gradient_local = arma::zeros(1, Nparams);
@@ -105,7 +103,7 @@ void ASGD::minimize() {
             vmc->get_sampling_ptr()->get_necessities(walkers[k]);
 
             for (int cycle = 0; cycle < n_c_SGD; cycle++) {
-                
+
                 vmc->diffuse_walker(walkers[k], trial_walkers[k]);
 
                 vmc->calculate_energy_necessities(walkers[k]);

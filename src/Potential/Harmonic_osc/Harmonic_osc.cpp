@@ -22,8 +22,8 @@ double Harmonic_osc::get_pot_E(const Walker* walker) const {
     double e_potential = 0;
 
     for (int i = 0; i < n_p; i++) {
-        e_potential += 0.5 * w * w * walker->get_r_i2(i);
+        e_potential += walker->get_r_i2(i);
     }
 
-    return e_potential;
+    return 0.5 * w * w * e_potential;
 }

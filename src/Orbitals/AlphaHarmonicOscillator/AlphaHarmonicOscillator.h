@@ -26,6 +26,7 @@ public:
     }
 
     friend class ExpandedBasis;
+    friend class DiTransform;
 
 protected:
 
@@ -41,7 +42,9 @@ protected:
     /*!
      * Overridden superclass method implementing closed form expressions using Hermite polynomials.
      */
-    double get_variational_derivative(const Walker* walker, int n);
+    //    double get_variational_derivative(const Walker* walker, int n);
+
+    double get_dell_alpha_phi(Walker* walker, int p, int q_num);
 
     /*!
      * Calculates the quantum numbers of the oscillator and stores them in the matrix qnums.
@@ -52,9 +55,9 @@ protected:
      * For Quantum Dots, closed form expressions for the matrix elements exist.
      */
     double get_coulomb_element(const arma::uvec & qnum_set);
-    
+
     double get_sp_energy(int qnum) const;
-    
+
     //! Method for calculating Hermite polynomials.
     /*!
      * @param n The degree of the Hermite polynomial.

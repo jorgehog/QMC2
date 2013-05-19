@@ -62,6 +62,13 @@ def earthSpherify(data):
     
     return data;
 
+def sliceXZ(data):
+    n, m, l = data.shape
+
+    data[:, l/2:, :] = 0;
+
+    return data
+
 def main():
 
     path = parseCML()
@@ -70,6 +77,8 @@ def main():
     
     if "Atoms" in path:
         data = earthSpherify(data)
+    elif "Diatom" in path:
+        data = sliceXZ(data)
     
     mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0, vmax=1)
     mlab.show()

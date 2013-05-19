@@ -129,39 +129,9 @@ int main(int argc, char** argv) {
             minimizerParams,
             outputParams,
             parParams);
-//
-//    generalParams.system = "Diatom";
-//    generalParams.n_p = 16;
-//    generalParams.dim = 3;
-//    variationalParams.alpha = 1;
-//    variationalParams.beta = 0.5;
-//    generalParams.doVMC = true;
-//    generalParams.systemConstant = generalParams.n_p;
-    
-    selectSystem(generalParams, systemObjects, variationalParams, parParams);
 
-    //FORCE MOL
-    
-    //
-    //    variationalParams.alpha = 1.285;
-    //    //    variationalParams.alpha = 0.82125;
-    //    //    variationalParams.beta = 0.28;
-    //    variationalParams.beta = 0.14;
-    //    double* R = new double(1.4);
-    //    //    double * R = new double(4.63);
-    //
-    //    Orbitals* molecule = new DiAtomic(generalParams, variationalParams, R);
-    //    System* system = new Fermions(generalParams, molecule);
-    //    system->add_potential(new Coulomb(generalParams));
-    //    system->add_potential(new DiAtomCore(generalParams, R));
-    //    Jastrow* jastrow = new Pade_Jastrow(generalParams, variationalParams);
-    //    Sampling* sampler = new Importance(generalParams);
-    //
-    //    systemObjects.SYSTEM = system;
-    //    systemObjects.jastrow = jastrow;
-    //    systemObjects.SP_basis = molecule;
-    //    systemObjects.sample_method = sampler;
-    //
+
+    selectSystem(generalParams, systemObjects, variationalParams, parParams);
 
 
     Minimizer* minimizer;
@@ -538,6 +508,57 @@ void selectSystem(GeneralParams & gP,
         VariationalParams & vP,
         ParParams & pp) {
 
+    if (gP.system == "QDots") {
+
+        gP.dim = 2;
+
+        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
+
+        sO.onebody_pot = new Harmonic_osc(gP);
+
+        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+        sO.SYSTEM->add_potential(sO.onebody_pot);
+
+
+    } else if (gP.system == "Atoms") {
+
+        gP.dim = 3;
+
+        sO.SP_basis = new hydrogenicOrbitals(gP, vP);
+
+        sO.onebody_pot = new AtomCore(gP);
+
+        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+
+        sO.SYSTEM->add_potential(sO.onebody_pot);
+
+
+    } else if (gP.system == "Diatom") {
+
+        gP.dim = 3;
+
+        sO.SP_basis = new DiTransform(gP, vP);
+
+        System* system = new Fermions(gP, sO.SP_basis);
+        system->add_potential(new DiAtomCore(gP));
+
+        sO.SYSTEM = system;
+
+    } else if (gP.system == "DoubleWell") {
+
+        gP.dim = 2;
+
+        sO.SP_basis = new DiTransform(gP, vP);
+
+        System* system = new Fermions(gP, sO.SP_basis);
+        system->add_potential(new DoubleWell(gP));
+
+        sO.SYSTEM = system;
+
+    } else {
+        if (pp.is_master) std::cout << "unknown system" << std::endl;
+        if (pp.is_master) exit(1);
+    }
 
     if (gP.sampling == "IS") {
         sO.sample_method = new Importance(gP);
@@ -560,40 +581,7 @@ void selectSystem(GeneralParams & gP,
 
     }
 
-    if (gP.system == "QDots") {
-        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
 
-        sO.onebody_pot = new Harmonic_osc(gP);
-
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-        sO.SYSTEM->add_potential(sO.onebody_pot);
-
-
-    } else if (gP.system == "Atoms") {
-
-        sO.SP_basis = new hydrogenicOrbitals(gP, vP, gP.n_p);
-
-        sO.onebody_pot = new AtomCore(gP);
-
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-
-        sO.SYSTEM->add_potential(sO.onebody_pot);
-
-
-    } else if (gP.system == "Diatom") {
-
-        sO.SP_basis = new DiAtomic(gP, vP);
-
-        System* system = new Fermions(gP, sO.SP_basis);
-        system->add_potential(new DiAtomCore(gP));
-
-        sO.SYSTEM = system;
-
-
-    } else {
-        if (pp.is_master) std::cout << "unknown system" << std::endl;
-        if (pp.is_master) exit(1);
-    }
 
     if (gP.use_coulomb) {
         sO.SYSTEM->add_potential(new Coulomb(gP));

@@ -247,9 +247,9 @@ def valConvert(val):
         
         
 
-def varParameterMap(n_p, dim, systemConstant, system):
+def varParameterMap(n_p, systemConstant, system):
     
-    if dim == 2 and system == "QDots":
+    if system == "QDots":
         
         w = systemConstant
         
@@ -402,7 +402,7 @@ def varParameterMap(n_p, dim, systemConstant, system):
         return alpha, beta, 0
         
         
-    elif dim==3 and system == "Atoms":
+    elif system == "Atoms":
 
         Z = systemConstant
 
@@ -438,8 +438,7 @@ def varParameterMap(n_p, dim, systemConstant, system):
     elif system == "Diatom":
     
         if n_p == 2:
-#             alpha = 1.35618
-             alpha = 1.285
+             alpha = 1.35618
              beta = 0.28
              R = 1.4
         elif n_p == 6:
@@ -484,6 +483,14 @@ def varParameterMap(n_p, dim, systemConstant, system):
         
         return alpha, beta, R
     
+    elif system == "DoubleWell":
+        if n_p== 2:
+            R = 1
+            alpha=1
+            beta=0.5
+        
+        return alpha, beta, R
+    
     else:        
         print "\n\nUnknown type ", system, "with dim=", dim, "\n"
         return None
@@ -503,31 +510,31 @@ def consistencyCheck(cmlArgs):
     else:
         n_p = 2
     
-    #If no dim is specified, we choose 3 for atoms, 2 for qdots etc.
-    #NOTE n_p=3 is not standard, so def on dim with atoms is segFault material
-    if (cmlArgs[cmlMAPg['dim']] != "def"):
-        dim = int(cmlArgs[cmlMAPg['dim']])
-    else:
-        if system == "QDots":
-            dim = 2
-        elif system in ["Atoms", "Diatom"]:
-            dim = 3
-            cmlArgs[cmlMAPg['dim']] = "3"
-        else:
-            raise NotImplementedError("System %s is not implemented." % system)
+#    #If no dim is specified, we choose 3 for atoms, 2 for qdots etc.
+#    #NOTE n_p=3 is not standard, so def on dim with atoms is segFault material
+#    if (cmlArgs[cmlMAPg['dim']] != "def"):
+#        dim = int(cmlArgs[cmlMAPg['dim']])
+#    else:
+#        if system == "QDots":
+#            dim = 2
+#        elif system in ["Atoms", "Diatom"]:
+#            dim = 3
+#            cmlArgs[cmlMAPg['dim']] = "3"
+#        else:
+#            raise NotImplementedError("System %s is not implemented." % system)
 
     #if no systemConstant is selected, we set it to 1 for qdots, and 2 for atoms etc.
     if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
         systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
     else:
-        if system == "QDots":
+        if system in ["QDots", "DoubleWell"]:
             systemConstant = 1.0
         elif system in ["Atoms", "Diatom"]:
             systemConstant = n_p
             cmlArgs[cmlMAPg['systemConstant']] = str(n_p)
   
   
-    alpha, beta, R = varParameterMap(n_p, dim, systemConstant, system)
+    alpha, beta, R = varParameterMap(n_p, systemConstant, system)
 
     #No col -> no jast and alpha=1
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):

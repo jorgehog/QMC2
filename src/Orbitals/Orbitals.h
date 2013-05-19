@@ -52,7 +52,9 @@ protected:
      * Can be overridden to evaluate a closed form expression.
      * @param n Index of the sought variational parameter.
      */
-    virtual double get_variational_derivative(const Walker* walker, int n);
+    double get_variational_derivative(Walker* walker);
+
+    virtual double get_dell_alpha_phi(Walker* walker, int p, int q_num);
 
     //! Method for calculating the single particle derivative using a finite difference scheme.
     /*!
@@ -88,7 +90,7 @@ protected:
 
     virtual double get_coulomb_element(const arma::uvec & qnum_set);
     virtual double get_sp_energy(int qnum) const;
-    
+
 
 
 public:
@@ -97,6 +99,7 @@ public:
     Orbitals();
 
     //! Calculates single particle wave function terms which are independent of the quantum numbers
+
     /*!
      * If a term in the single particle functions are independent of the quantum number,
      * this function can be overridden to calculate them beforehand (for each particle), 
@@ -128,11 +131,12 @@ public:
     void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;
     }
-    
+
     friend class HartreeFock;
     friend class Minimizer;
     friend class ASGD;
     friend class stdoutASGD;
+    friend class DiTransform;
 };
 
 

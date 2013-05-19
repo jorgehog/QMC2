@@ -7,7 +7,7 @@
 
 #include "../../QMCheaders.h"
 
-hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP, int N)
+hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
 
     this->alpha = new double();
@@ -22,17 +22,11 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
     this->exp_factor_n3 = new double();
     this->exp_factor_n4 = new double();
 
-    this->Z = N;
+    this->Z = n_p;
 
     set_parameter(vP.alpha, 0);
 
     get_qnums();
-
-    if (gP.system == "Diatom") {
-        diatomic = true;
-    } else {
-        diatomic = false;
-    }
 
     basis_functions[0] = new hydrogenic_0(k, k2, r22d, r2d, exp_factor_n1);
     basis_functions[1] = new hydrogenic_1(k, k2, r22d, r2d, exp_factor_n2);
@@ -141,7 +135,7 @@ void hydrogenicOrbitals::set_qnum_indie_terms(Walker* walker, int i) {
 
 }
 
-double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, int i) {
+double hydrogenicOrbitals::get_dell_alpha_phi(Walker* walker, int i, int qnum) {
 
     double dphi;
 
@@ -258,33 +252,6 @@ double hydrogenicOrbitals::get_dell_alpha_phi(const Walker* walker, int qnum, in
     }
 
     return dphi;
-
-}
-
-double hydrogenicOrbitals::get_variational_derivative(const Walker* walker, int n, const Walker* walker2) {
-    double dalpha, dell_alpha_phi, phi_wf;
-
-    dalpha = 0;
-
-    for (int i = 0; i < n_p; i++) {
-        for (int qnum = 0; qnum < n2; qnum++) {
-
-            if (diatomic) {
-                int sign = minusPower(qnum);
-                dell_alpha_phi = get_dell_alpha_phi(walker, qnum / 2, i) +
-                        sign * get_dell_alpha_phi(walker2, qnum / 2, i);
-                phi_wf = walker->phi(i, qnum/2) + sign * walker2->phi(i, qnum/2);
-            } else {
-                dell_alpha_phi = get_dell_alpha_phi(walker, qnum, i);
-                phi_wf = walker->phi(i, qnum);
-            }
-
-            dalpha += walker->inv(qnum, i) * dell_alpha_phi * phi_wf;
-
-        }
-    }
-
-    return dalpha;
 
 }
 

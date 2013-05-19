@@ -83,25 +83,69 @@ double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) {
     return ddiff;
 }
 
-double Orbitals::get_variational_derivative(const Walker* walker, int n) {
+//double Orbitals::get_variational_derivative(const Walker* walker, int n) {
+//
+//    Walker* diff_walker = new Walker(n_p, dim);
+//    diff_walker->r = walker->r;
+//    diff_walker->r2 = walker->r2;
+//
+//    double a = get_parameter(n);
+//    set_parameter(a + h, 0);
+//
+//    qmc->get_sampling_ptr()->set_trial_states(diff_walker);
+//    double phip = qmc->get_system_ptr()->get_spatial_wf(diff_walker);
+//
+//    set_parameter(a - h, 0);
+//    qmc->get_sampling_ptr()->set_trial_states(diff_walker);
+//    double phim = qmc->get_system_ptr()->get_spatial_wf(diff_walker);
+//
+//    set_parameter(a, 0);
+//
+//    return (phip - phim) / (2 * h * qmc->get_system_ptr()->get_spatial_wf(walker));
+//}
 
+double Orbitals::get_variational_derivative(Walker* walker) {
+
+    double dell_alpha = 0;
+
+    //Fermions only
+    for (int i = 0; i < n_p; i++) {
+        for (int j = 0; j < n2; j++) {
+            dell_alpha += walker->phi(i, j) * get_dell_alpha_phi(walker, i, j) * walker->inv(j, i);
+        }
+    }
+
+    return dell_alpha;
+
+}
+
+double Orbitals::get_dell_alpha_phi(Walker* walker, int p, int q_num){
     Walker* diff_walker = new Walker(n_p, dim);
-    diff_walker->r = walker->r;
-    diff_walker->r2 = walker->r2;
 
-    double a = get_parameter(n);
-    set_parameter(a + h, 0);
+    double alpha_orig = get_parameter(0);
 
-    qmc->get_sampling_ptr()->set_trial_states(diff_walker);
-    double phip = qmc->get_system_ptr()->get_spatial_wf(diff_walker);
+    double phi_mid = walker->phi(p, q_num);
 
-    set_parameter(a - h, 0);
-    qmc->get_sampling_ptr()->set_trial_states(diff_walker);
-    double phim = qmc->get_system_ptr()->get_spatial_wf(diff_walker);
+    diff_walker->r.row(p) = walker->r.row(p);
+    diff_walker->r2(p) = walker->r2(p);
 
-    set_parameter(a, 0);
+    set_parameter(alpha_orig + h, 0);
+    set_qnum_indie_terms(diff_walker, p);
+    double phi_plus = phi(diff_walker, p, q_num);
 
-    return (phip - phim) / (2 * h * qmc->get_system_ptr()->get_spatial_wf(walker));
+    set_parameter(alpha_orig - h, 0);
+    set_qnum_indie_terms(diff_walker, p);
+    double phi_minus = phi(diff_walker, p, q_num);
+
+    delete diff_walker;
+    set_parameter(alpha_orig, 0);
+    set_qnum_indie_terms(walker, p);
+
+    
+    
+    return (phi_plus - phi_minus)/(2*h*phi_mid);
+
+
 }
 
 double Orbitals::phi(const Walker* walker, int particle, int q_num) {
@@ -122,11 +166,11 @@ double Orbitals::get_coulomb_element(const arma::uvec & qnum_set) {
     //Do nothing
     return 0;
 }
+
 double Orbitals::get_sp_energy(int qnum) const {
     //Do nothing
     return 0;
 }
-
 
 void Orbitals::testDell(const Walker* walker, int particle, int q_num, int d) {
     double cf = dell_basis_functions[d][q_num]->eval(walker, particle);

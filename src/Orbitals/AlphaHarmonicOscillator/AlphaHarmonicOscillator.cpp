@@ -181,40 +181,57 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
     } else if (n == 6) {
         double x2 = x*x;
         double x4 = x2*x2;
-        return 64*x4*x2 - 480*x4 + 720*x2 - 120;
+        return 64 * x4 * x2 - 480 * x4 + 720 * x2 - 120;
     } else {
         std::cout << "Unsopported Hermite polynomial level: " << n << std::endl;
         exit(1);
     }
 }
 
-double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker, int n) {
-    double dalpha, sq_w_over_a, exp_fac, H_fac, rij;
-    int nij;
+//double AlphaHarmonicOscillator::get_variational_derivative(const Walker* walker, int n) {
+//    double dalpha, sq_w_over_a, exp_fac, H_fac, rij;
+//    int nij;
+//
+//    dalpha = 0;
+//    sq_w_over_a = (*k) / (*alpha);
+//
+//    for (int i = 0; i < n_p; i++) {
+//        exp_fac = -0.5 * w * walker->get_r_i2(i);
+//
+//        for (int qnum = 0; qnum < n2; qnum++) {
+//
+//            H_fac = 0;
+//            for (int j = 0; j < dim; j++) {
+//                rij = walker->r(i, j);
+//                nij = qnums(qnum, j);
+//
+//                H_fac += rij * nij * H(nij - 1, (*k) * rij) / H(nij, (*k) * rij);
+//            }
+//            H_fac *= sq_w_over_a;
+//
+//
+//            dalpha += walker->inv(qnum, i)*(H_fac + exp_fac) * walker->phi(i, qnum);
+//        }
+//    }
+//
+//    return dalpha;
+//}
 
-    dalpha = 0;
-    sq_w_over_a = (*k) / (*alpha);
+double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_num){
 
-    for (int i = 0; i < n_p; i++) {
-        exp_fac = -0.5 * w * walker->get_r_i2(i);
+    int nij, rij;
+    
+    double H_fac = 0;
+    for (int j = 0; j < dim; j++) {
+        rij = walker->r(p, j);
+        nij = qnums(q_num, j);
 
-        for (int qnum = 0; qnum < n2; qnum++) {
-
-            H_fac = 0;
-            for (int j = 0; j < dim; j++) {
-                rij = walker->r(i, j);
-                nij = qnums(qnum, j);
-
-                H_fac += rij * nij * H(nij - 1, (*k) * rij) / H(nij, (*k) * rij);
-            }
-            H_fac *= sq_w_over_a;
-
-
-            dalpha += walker->inv(qnum, i)*(H_fac + exp_fac) * walker->phi(i, qnum);
-        }
+        H_fac += rij * nij * H(nij - 1, (*k) * rij) / H(nij, (*k) * rij);
     }
+    H_fac *= (*k) / (*alpha);
 
-    return dalpha;
+    return H_fac -0.5 * w * walker->get_r_i2(p);
+
 }
 
 double AlphaHarmonicOscillator::get_coulomb_element(const arma::uvec& qnum_set) {
