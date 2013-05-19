@@ -401,16 +401,16 @@ class dist_out(DCVizPlotter):
 
         ax.plot_surface(X, Y, dist, rstride=1, cstride=1, cmap=C, linewidth=0)
 
-        
-        zdir = "x"
-        offset = ax.get_xlim()[0]
-        cset1 = ax.contour(X, Y, dist, zdir=zdir, offset=offset*1.05, color='#008000', levels=[0]) 
-       
+
         if "DoubleWell" in self.familyFileNames[0]:
             zdir = "y"
             offset=-ax.get_ylim()[0]
-            cset2 = ax.contour(X, Y, dist, zdir=zdir, offset=offset*1.05, color='#008000', levels=[0]) 
-
+        else:
+            zdir = "x"
+            offset = ax.get_xlim()[0]
+        
+        cset = ax.contour(X, Y, dist, zdir=zdir, offset=offset*1.05, color='#008000', levels=[0]) 
+           
         ax.set_zlim(0, dist.max())
 
         ax.set_ylabel("x")
