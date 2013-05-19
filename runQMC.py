@@ -489,6 +489,10 @@ def varParameterMap(n_p, systemConstant, system, R):
             alpha = 1.36139
             beta = 0.206428
         
+        else:
+            print "\n\nNo saved parameters for n_p=", n_p , "R=", R, "\n"
+            return 1, 0.4, R            
+            
         return alpha, beta, R
     
     else:        
@@ -523,7 +527,7 @@ def consistencyCheck(cmlArgs):
     #Get the COM distance
     if system in ["Diatom", "DoubleWell"]:
         if cmlArgs[cmlMAPg['R']] == "def":
-            R = "3"
+            R = 3
         else:
             R = cmlArgs[cmlMAPg['R']]
     
