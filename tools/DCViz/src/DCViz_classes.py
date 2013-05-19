@@ -406,7 +406,7 @@ class dist_out(DCVizPlotter):
         offset = ax.get_xlim()[0]
         cset1 = ax.contour(X, Y, dist, zdir=zdir, offset=offset*1.05, color='#008000', levels=[0]) 
        
-       if "DoubleWell" in self.familyFileNames[0]:
+        if "DoubleWell" in self.familyFileNames[0]:
             zdir = "y"
             offset=-ax.get_ylim()[0]
             cset2 = ax.contour(X, Y, dist, zdir=zdir, offset=offset*1.05, color='#008000', levels=[0]) 
