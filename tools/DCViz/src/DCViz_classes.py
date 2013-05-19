@@ -582,7 +582,7 @@ class MIN_OUT(DCVizPlotter):
     
     nametag = "ASGD_out\.dat"
     figMap = {"E_fig"    : ["E_plot"], 
-              "step_fig" : ["step_plot"],051
+              "step_fig" : ["step_plot"],
               "param_fig": ["param_plot", "grad_plot"]}
     
     indexmap = {0: r"\alpha", 1: r"\beta"}
