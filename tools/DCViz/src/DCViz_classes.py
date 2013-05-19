@@ -401,7 +401,12 @@ class dist_out(DCVizPlotter):
 
         ax.plot_surface(X, Y, dist, rstride=1, cstride=1, cmap=C, linewidth=0)
 
-        cset = ax.contour(X, Y, dist, zdir='x', offset=ax.get_xlim()[0]*1.05, color='#008000', levels=[0])        
+        if "QDots" in self.familyFileNames[0]:
+            zdir = "x"
+        elif "DoubleWell" in self.familyFilenames[0]:
+            zdir = "y"
+
+        cset = ax.contour(X, Y, dist, zdir=zdir, offset=ax.get_xlim()[0]*1.05, color='#008000', levels=[0])        
         
         ax.set_zlim(0, dist.max())
 
@@ -577,7 +582,7 @@ class MIN_OUT(DCVizPlotter):
     
     nametag = "ASGD_out\.dat"
     figMap = {"E_fig"    : ["E_plot"], 
-              "step_fig" : ["step_plot"],
+              "step_fig" : ["step_plot"],051
               "param_fig": ["param_plot", "grad_plot"]}
     
     indexmap = {0: r"\alpha", 1: r"\beta"}
