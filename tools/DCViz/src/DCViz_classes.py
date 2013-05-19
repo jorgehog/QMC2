@@ -278,7 +278,7 @@ class radial_out(DCVizPlotter):
             
             if not pureOnly:
                 if "QDots3D" in self.familyFileNames[i]:
-                    last[1:] = last[1:]/(r[1:]**2)
+                    last /= r**2
                     last[0] = last[1]
                     
                 self.radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
