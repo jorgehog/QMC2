@@ -240,7 +240,7 @@ def getMap(runpath):
                 iniRaw = ini.read()
                 ini.close()
                 
-                if re.findall("system\s*=\s*Diatom\s*", iniRaw):
+                if re.findall("system\s*=\s*Diatom\s*", iniRaw) or re.findall("system\s*=\s*DoubleWell\s*", iniRaw):
                     mapR = True
                 if re.findall(mapVarPattern, iniRaw):
                     mapVarPar = True
