@@ -525,7 +525,7 @@ def varParameterMap(n_p, systemConstant, system, R):
             elif w == 0.28:
                 alpha = 0.934927
                 beta = 0.209711
-            elif w == 0.01:
+            elif w == 0.1:
                 alpha = 0.911836
                 beta = 0.132639
 
