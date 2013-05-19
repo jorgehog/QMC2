@@ -247,7 +247,7 @@ def valConvert(val):
         
         
 
-def varParameterMap(n_p, systemConstant, system):
+def varParameterMap(n_p, systemConstant, system, R):
     
     if system == "QDots":
         
@@ -484,10 +484,10 @@ def varParameterMap(n_p, systemConstant, system):
         return alpha, beta, R
     
     elif system == "DoubleWell":
-        if n_p== 2:
-            R = 1
-            alpha=1
-            beta=0.5
+        
+        if n_p== 2 and R == 3:
+            alpha = 1.36139
+            beta = 0.206428
         
         return alpha, beta, R
     
@@ -510,19 +510,6 @@ def consistencyCheck(cmlArgs):
     else:
         n_p = 2
     
-#    #If no dim is specified, we choose 3 for atoms, 2 for qdots etc.
-#    #NOTE n_p=3 is not standard, so def on dim with atoms is segFault material
-#    if (cmlArgs[cmlMAPg['dim']] != "def"):
-#        dim = int(cmlArgs[cmlMAPg['dim']])
-#    else:
-#        if system == "QDots":
-#            dim = 2
-#        elif system in ["Atoms", "Diatom"]:
-#            dim = 3
-#            cmlArgs[cmlMAPg['dim']] = "3"
-#        else:
-#            raise NotImplementedError("System %s is not implemented." % system)
-
     #if no systemConstant is selected, we set it to 1 for qdots, and 2 for atoms etc.
     if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
         systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
@@ -533,8 +520,16 @@ def consistencyCheck(cmlArgs):
             systemConstant = n_p
             cmlArgs[cmlMAPg['systemConstant']] = str(n_p)
   
+    #Get the COM distance
+    if system in ["Diatom", "DoubleWell"]:
+        if cmlArgs[cmlMAPg['R']] == "def":
+            R = "3"
+        else:
+            R = cmlArgs[cmlMAPg['R']]
+    
   
-    alpha, beta, R = varParameterMap(n_p, systemConstant, system)
+  
+    alpha, beta, R = varParameterMap(n_p, systemConstant, system, R)
 
     #No col -> no jast and alpha=1
     if (cmlArgs[cmlMAPg['use_coulomb']] == "0"):
