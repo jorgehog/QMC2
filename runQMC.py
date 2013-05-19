@@ -492,7 +492,6 @@ def varParameterMap(n_p, systemConstant, system, R):
         elif n_p == 2 and R == 2:
             alpha = 1.18491
             beta = 0.268434
-
         
         else:
             print "\n\nNo saved parameters for n_p=", n_p , "R=", R, "\n"
@@ -534,7 +533,7 @@ def consistencyCheck(cmlArgs):
         if cmlArgs[cmlMAPg['R']] == "def":
             R = 3
         else:
-            R = cmlArgs[cmlMAPg['R']]
+            R = float(cmlArgs[cmlMAPg['R']])
     
   
   
