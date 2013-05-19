@@ -222,6 +222,7 @@ def getMap(runpath):
     mapBeta = False
     mapVMC = False
     mapDMC = False
+    mapR = False
     
     mapVarPattern = "doMIN\s*=\s*1"
     notMapBetaPattern = "use_coulomb\s*=\s*0|use_jastrow\s*=\s*0"
