@@ -403,10 +403,12 @@ class dist_out(DCVizPlotter):
 
         if "QDots" in self.familyFileNames[0]:
             zdir = "x"
+            offset = ax.get_xlim()[0]
         elif "DoubleWell" in self.familyFileNames[0]:
             zdir = "y"
+            offset=-ax.get_ylim()[0]
 
-        cset = ax.contour(X, Y, dist, zdir=zdir, offset=ax.get_xlim()[0]*1.05, color='#008000', levels=[0])        
+        cset = ax.contour(X, Y, dist, zdir=zdir, offset=offset*1.05, color='#008000', levels=[0])        
         
         ax.set_zlim(0, dist.max())
 
