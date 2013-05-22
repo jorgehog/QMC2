@@ -14,7 +14,7 @@ def main():
 #    orbitalSet = HO.HOOrbitals(56, toCPP=True)
 #    orbitalSet = hydrogenic.hydrogenicOrbitals(36, toCPP=True)
     orbitalSet = HO_3D.HOOrbitals3D(40, toCPP=True)
-#     
+    orbitalSet.closedFormify()
     orbitalSet.TeXToFile(outPath)
     orbitalSet.CPPToFile(outPath)
     orbitalSet.extraToFile(outPath)

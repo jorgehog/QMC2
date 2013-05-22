@@ -28,11 +28,10 @@ class hydrogenicOrbitals(orbitalGenerator):
     dim = 3
     figsPrPage = 3
     
-    def __init__(self, M, doInit=True, toCPP=False):
+    def __init__(self, M, toCPP=False):
 
-        self.name = "hydrogenic"        
-        
-        self.setMax(M)
+        self.name =        
+        super(hydrogenicOrbitals, self).__init__(M, "hydrogenic", toCPP)
         
         nShells = 0
         while nShells*(nShells+1)*(2*nShells+1)/6 < self.maxImplemented/2:
@@ -53,7 +52,6 @@ class hydrogenicOrbitals(orbitalGenerator):
         
         self.expFactor = exp(-k*r3d)
         
-        super(hydrogenicOrbitals, self).__init__(doInit, toCPP)
 
     def texOrbitalEq(self):
         return r"""

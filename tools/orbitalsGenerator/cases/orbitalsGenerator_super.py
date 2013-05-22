@@ -41,12 +41,15 @@ class orbitalGenerator(object):
     
     cppBasis = CPPBasis()
     
-    def __init__(self, doInit, toCPP):
-        if not doInit:
-            return
-    
+    def __init__(self, M, name = "Unspecified", toCPP):
+        
+        self.name = name
+        self.setMax(M)
+        self.toCPP = toCPP
         self.stateMap = {}
         self.orbitals = [0]*int(ceil(self.maxImplemented/2.))
+    
+    def closedFormify(self):
         
         self.makeStateMap()
         self.setupOrbitals()
@@ -54,7 +57,7 @@ class orbitalGenerator(object):
         self.getGradientsAndLaplacians()
         self.simplify()
         
-        if toCPP:
+        if self.toCPP:
             self.initCPPbasis()
             self.cppBasis.make(self)
 
