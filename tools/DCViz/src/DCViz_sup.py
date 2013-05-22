@@ -316,7 +316,7 @@ class DCVizPlotter:
                 self.sleep()     
             else:
                 if not self.useGUI and not self.toFile:
-                    raw_input("[%s] Press any key to exit" % "DCViz".center(10))
+                    self.stall()
                 break
                 
         if not self.useGUI:
@@ -324,8 +324,32 @@ class DCVizPlotter:
                 self.saveFigs()
             self.close()
         
+    def stall(self):
+        raw_input("[%s] Press any key to exit" % "DCViz".center(10))
+
+    def rawDataAPI(self, data):
+        if self.dynamic:
+            print "[%s] Dynamic mode not supported for direct push mode." % "DCViz".center(10)
+        
+        if self.filepath is None:
+            if toFile is True:
+                print "[%s] A filename needs to be supplied in order to save figures to file." % "DCViz".center(10)
+        else:
+            self.filepath = self.filepath.strip(".png")
+        data = dataGenerator(data)
+        
+        self.manageFigures()
+        self.plot(data)
+        self.showFigures()
+        
+        if self.toFile:
+            self.saveFigs()
+        else:
+            self.stall()
             
+        self.close()
             
+        
     def load_sample(self):
         
         self.reload()
@@ -388,6 +412,7 @@ class DCVizPlotter:
                 self.skippedRows.append(self.file.readline().strip())
               
     def saveFigs(self):
+            
         path, fname = os.path.split(self.filepath)
         
         dirname = "DCViz_out"
@@ -404,7 +429,8 @@ class DCVizPlotter:
             fig.savefig(figpath)
 
             i += 1
-            
+        
+        print "[%s] Figure(s) successfully saved." % "DCViz".center(10)
         
             
     def add_figure(self, fig):

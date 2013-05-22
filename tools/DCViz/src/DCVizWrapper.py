@@ -38,8 +38,11 @@ def autodetectModes():
                               
     return uniqueModes
     
-def matchMode(modes, path, silent=False):
+def matchMode(modes, path, noWarnings=False, silent=False):
     root, name = os.path.split(path)    
+    
+    if modes is None:
+        modes = autodetectModes(path)
     
     matchedMode = None
     for mode in modes:
@@ -48,14 +51,14 @@ def matchMode(modes, path, silent=False):
             break
     
     if matchedMode is None:
-        if not silent:
+        if not noWarnings:
             terminalTracker("Warning", "Found no matching nametags for specified filename")
         return
     
-    terminalTracker("DCViz", "Matched [%s] with [%s]" % (name, str(matchedMode)))
+    if not silent: terminalTracker("DCViz", "Matched [%s] with [%s]" % (name, "".join(str(matchedMode).split(".")[1:])))
     return matchedMode
 
-def main(path, dynamic):
+def main(path, dynamic, toFile=False, silent=False):
     
     if not os.path.exists(path):
         terminalTracker("Warning", "No such file...")
@@ -70,7 +73,7 @@ def main(path, dynamic):
     if dynamic:
         terminalTracker("DCViz", "Interrupt dynamic mode with CTRL+C")
         
-    instance = matchedMode(path, dynamic=dynamic)
+    instance = matchedMode(path, dynamic=dynamic, toFile=toFile)
     instance.mainloop()
 
 def mainToFile(path):
@@ -83,8 +86,8 @@ def mainToFile(path):
     
         init = True    
     
-        for outfile in files:
-            matchedMode = matchMode(modes, pjoin(root, outfile), silent=True)
+        for outfile in sorted(files):
+            matchedMode = matchMode(modes, pjoin(root, outfile), noWarnings=True)
 
             if matchedMode is None:
                 continue
@@ -92,13 +95,16 @@ def mainToFile(path):
             if matchedMode.isFamilyMember:
                 if init:
                     thisTag = matchedMode.nametag
+                    init = False
                 else:
                     if re.findall(thisTag, outfile):
+                        terminalTracker("DCViz", "Family portait already taken, skipping...")                        
                         continue
+                    else:
+                        thisTag = matchedMode.nametag
             
             
             
-            init = False
             plotTool = matchedMode(pjoin(root, outfile), toFile=True)
             plotTool.mainloop()
             

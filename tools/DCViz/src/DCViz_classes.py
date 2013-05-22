@@ -207,6 +207,7 @@ class radial_out(DCVizPlotter):
         cut=0
         xScale = 1
    
+        silent = True
         
         color = ['#008000', "0.5", "k", '#008000']
         style = ['-', '-.', '--', '.']
@@ -236,16 +237,14 @@ class radial_out(DCVizPlotter):
         
         if superPose:
             yMax = 1.2
-        print self.familyFileNames
-        print len(data)
-        
+
         for i in range(len(data)):
             
             if superPose:
                 edge = 1
             else:
                 edge = float(re.findall("edge(\d+\.?\d*)\.arma", self.familyFileNames[i])[0])
-                print "n_p= ", data[i].data.sum()*edge/(data[i].n-1), "?"
+                if not silent: print "n_p= ", data[i].data.sum()*edge/(data[i].n-1), "?"
             
             if edge > max_edge:
                 max_edge = edge;
@@ -356,18 +355,21 @@ class dist_out(DCVizPlotter):
     
         
     def plot(self, data):
-              
+    
+        silent = True
+          
         edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
     
         if len(data) == 1:
-            print "length 1 data"
+            if not silent: print "length 1 data"
             dist = data[0].data
         elif len(data) == 2:
-            print "len2 data"
+            if not silent: print "len2 data"
             edge_2 = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[1])[0])
         
-            if edge != edge_2:
-                print "Bin edges does not match. %s != %s" % (edge, edge_2)
+            if not silent:
+                if edge != edge_2:
+                    print "Bin edges does not match. %s != %s" % (edge, edge_2)
 
             for i in range(2):
                 if "vmc" in self.familyFileNames[i]:
@@ -375,9 +377,15 @@ class dist_out(DCVizPlotter):
                 elif "dmc" in self.familyFileNames[i]:
                     dmcDist = data[i].data
             
-#            try:
+        
             if self.dmcOnly:
-                dist = dmcDist
+                try:
+                    dist = dmcDist
+                except: 
+                    if not silent: print "\n\nWarning: No DMC data found. Attempting to load VMC data.\n\n"
+                   
+                    dist = vmcDist
+                   
             elif self.vmcOnly:
                 dist = vmcDist
             else:
