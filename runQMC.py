@@ -510,6 +510,9 @@ def varParameterMap(n_p, systemConstant, system, R):
             if w == 1:
                 alpha = 1
                 beta = 0.25
+            elif w == 0.5:
+                alpha=0.995197
+                beta=0.202636
             elif w == 0.28:
                 alpha=0.988581
                 beta=0.163395
@@ -522,6 +525,9 @@ def varParameterMap(n_p, systemConstant, system, R):
             if w == 1:
                 alpha = 0.956322  
                 beta = 0.377917
+            elif w == 0.5:
+                alpha=0.944336
+                beta=0.275492
             elif w == 0.28:
                 alpha = 0.934927
                 beta = 0.209711
@@ -537,6 +543,9 @@ def varParameterMap(n_p, systemConstant, system, R):
             if w == 1:
                 alpha = 0.917
                 beta = 0.45
+            elif w == 0.5:
+                alpha=0.904329
+                beta = 0.319537 
             elif w == 0.28:
                 alpha=0.891909
                 beta=0.244056
