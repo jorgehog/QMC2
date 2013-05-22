@@ -22,7 +22,6 @@ sys.path.append(classes_thisDir)
 from DCViz_sup import DCVizPlotter, dataGenerator
 
 try:
-    raise Exception()
     rc('text', usetex=True)
     rc('font', family='serif')
     pylab.title("$\LaTeX$")
