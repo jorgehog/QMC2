@@ -31,8 +31,6 @@ r, r2, r_2d, k, x2, y2, z2 = symbols('r r^2 r_2d k x2 y2 z2', real=True, positiv
 
 class orbitalGenerator(object):
     
-    name = "orbitals"    
-    
     genericFactor = sympify(1)    
     xi = ['x', 'y', 'z']
     xi2 = ['x2', 'y2', 'z2']
@@ -41,25 +39,26 @@ class orbitalGenerator(object):
     
     cppBasis = CPPBasis()
     
-    def __init__(self, M, name = "Unspecified", toCPP):
+    def __init__(self, M, name = "someOrbitals"):
         
         self.name = name
         self.setMax(M)
-        self.toCPP = toCPP
+        
         self.stateMap = {}
         self.orbitals = [0]*int(ceil(self.maxImplemented/2.))
     
     def closedFormify(self):
         
         self.makeStateMap()
+
         self.setupOrbitals()
+        
         self.clearOrbitalNumericFactors()
         self.getGradientsAndLaplacians()
         self.simplify()
-        
-        if self.toCPP:
-            self.initCPPbasis()
-            self.cppBasis.make(self)
+   
+        self.initCPPbasis()
+        self.cppBasis.make(self)
 
     def extraToFile(self, path):
         return;        

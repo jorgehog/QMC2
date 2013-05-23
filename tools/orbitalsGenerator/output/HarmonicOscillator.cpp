@@ -843,9 +843,9 @@ double HarmonicOscillator_3::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //(2*k^2*y^2 - 1)*exp(-k^2*r^2/2)
+    //2*(2*k^2*y^2 - 1)*exp(-k^2*r^2/2)
     
-    H = 2*(*k2)*y2 - 1;
+    H = 4*(*k2)*y2 - 2;
     return H*(*exp_factor);
     
 }
@@ -857,9 +857,9 @@ double dell_HarmonicOscillator_3_x::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //-k^2*x*(2*k^2*y^2 - 1)*exp(-k^2*r^2/2)
+    //-2*k^2*x*(2*k^2*y^2 - 1)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*x*(2*(*k2)*y2 - 1);
+    H = -2*(*k2)*x*(2*(*k2)*y2 - 1);
     return H*(*exp_factor);
     
 }
@@ -870,9 +870,9 @@ double dell_HarmonicOscillator_3_y::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //-k^2*y*(2*k^2*y^2 - 5)*exp(-k^2*r^2/2)
+    //-2*k^2*y*(2*k^2*y^2 - 5)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*y*(2*(*k2)*y2 - 5);
+    H = -2*(*k2)*y*(2*(*k2)*y2 - 5);
     return H*(*exp_factor);
     
 }
@@ -883,9 +883,9 @@ double lapl_HarmonicOscillator_3::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //k^2*(k^2*r^2 - 6)*(2*k^2*y^2 - 1)*exp(-k^2*r^2/2)
+    //2*k^2*(k^2*r^2 - 6)*(2*k^2*y^2 - 1)*exp(-k^2*r^2/2)
     
-    H = (*k2)*((*k2)*walker->get_r_i2(i) - 6)*(2*(*k2)*y2 - 1);
+    H = 2*(*k2)*((*k2)*walker->get_r_i2(i) - 6)*(2*(*k2)*y2 - 1);
     return H*(*exp_factor);
     
 }
@@ -952,9 +952,9 @@ double HarmonicOscillator_5::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //(2*k^2*x^2 - 1)*exp(-k^2*r^2/2)
+    //2*(2*k^2*x^2 - 1)*exp(-k^2*r^2/2)
     
-    H = 2*(*k2)*x2 - 1;
+    H = 4*(*k2)*x2 - 2;
     return H*(*exp_factor);
     
 }
@@ -965,9 +965,9 @@ double dell_HarmonicOscillator_5_x::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //-k^2*x*(2*k^2*x^2 - 5)*exp(-k^2*r^2/2)
+    //-2*k^2*x*(2*k^2*x^2 - 5)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*x*(2*(*k2)*x2 - 5);
+    H = -2*(*k2)*x*(2*(*k2)*x2 - 5);
     return H*(*exp_factor);
     
 }
@@ -979,9 +979,9 @@ double dell_HarmonicOscillator_5_y::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //-k^2*y*(2*k^2*x^2 - 1)*exp(-k^2*r^2/2)
+    //-2*k^2*y*(2*k^2*x^2 - 1)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*y*(2*(*k2)*x2 - 1);
+    H = -2*(*k2)*y*(2*(*k2)*x2 - 1);
     return H*(*exp_factor);
     
 }
@@ -992,9 +992,9 @@ double lapl_HarmonicOscillator_5::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //k^2*(k^2*r^2 - 6)*(2*k^2*x^2 - 1)*exp(-k^2*r^2/2)
+    //2*k^2*(k^2*r^2 - 6)*(2*k^2*x^2 - 1)*exp(-k^2*r^2/2)
     
-    H = (*k2)*((*k2)*walker->get_r_i2(i) - 6)*(2*(*k2)*x2 - 1);
+    H = 2*(*k2)*((*k2)*walker->get_r_i2(i) - 6)*(2*(*k2)*x2 - 1);
     return H*(*exp_factor);
     
 }
@@ -1243,9 +1243,9 @@ double HarmonicOscillator_10::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //(4*k^4*y^4 - 12*k^2*y^2 + 3)*exp(-k^2*r^2/2)
+    //4*(4*k^4*y^4 - 12*k^2*y^2 + 3)*exp(-k^2*r^2/2)
     
-    H = 4*(*k2)*(*k2)*y2*y2 - 12*(*k2)*y2 + 3;
+    H = 16*(*k2)*(*k2)*y2*y2 - 48*(*k2)*y2 + 12;
     return H*(*exp_factor);
     
 }
@@ -1257,9 +1257,9 @@ double dell_HarmonicOscillator_10_x::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //-k^2*x*(4*k^4*y^4 - 12*k^2*y^2 + 3)*exp(-k^2*r^2/2)
+    //-4*k^2*x*(4*k^4*y^4 - 12*k^2*y^2 + 3)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*x*(4*(*k2)*(*k2)*y2*y2 - 12*(*k2)*y2 + 3);
+    H = -4*(*k2)*x*(4*(*k2)*(*k2)*y2*y2 - 12*(*k2)*y2 + 3);
     return H*(*exp_factor);
     
 }
@@ -1270,9 +1270,9 @@ double dell_HarmonicOscillator_10_y::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //-k^2*y*(4*k^4*y^4 - 28*k^2*y^2 + 27)*exp(-k^2*r^2/2)
+    //-4*k^2*y*(4*k^4*y^4 - 28*k^2*y^2 + 27)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*y*(4*(*k2)*(*k2)*y2*y2 - 28*(*k2)*y2 + 27);
+    H = -4*(*k2)*y*(4*(*k2)*(*k2)*y2*y2 - 28*(*k2)*y2 + 27);
     return H*(*exp_factor);
     
 }
@@ -1283,9 +1283,9 @@ double lapl_HarmonicOscillator_10::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //k^2*(k^2*r^2 - 10)*(4*k^4*y^4 - 12*k^2*y^2 + 3)*exp(-k^2*r^2/2)
+    //4*k^2*(k^2*r^2 - 10)*(4*k^4*y^4 - 12*k^2*y^2 + 3)*exp(-k^2*r^2/2)
     
-    H = (*k2)*((*k2)*walker->get_r_i2(i) - 10)*(4*(*k2)*(*k2)*y2*y2 - 12*(*k2)*y2 + 3);
+    H = 4*(*k2)*((*k2)*walker->get_r_i2(i) - 10)*(4*(*k2)*(*k2)*y2*y2 - 12*(*k2)*y2 + 3);
     return H*(*exp_factor);
     
 }
@@ -1484,9 +1484,9 @@ double HarmonicOscillator_14::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //(4*k^4*x^4 - 12*k^2*x^2 + 3)*exp(-k^2*r^2/2)
+    //4*(4*k^4*x^4 - 12*k^2*x^2 + 3)*exp(-k^2*r^2/2)
     
-    H = 4*(*k2)*(*k2)*x2*x2 - 12*(*k2)*x2 + 3;
+    H = 16*(*k2)*(*k2)*x2*x2 - 48*(*k2)*x2 + 12;
     return H*(*exp_factor);
     
 }
@@ -1497,9 +1497,9 @@ double dell_HarmonicOscillator_14_x::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //-k^2*x*(4*k^4*x^4 - 28*k^2*x^2 + 27)*exp(-k^2*r^2/2)
+    //-4*k^2*x*(4*k^4*x^4 - 28*k^2*x^2 + 27)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*x*(4*(*k2)*(*k2)*x2*x2 - 28*(*k2)*x2 + 27);
+    H = -4*(*k2)*x*(4*(*k2)*(*k2)*x2*x2 - 28*(*k2)*x2 + 27);
     return H*(*exp_factor);
     
 }
@@ -1511,9 +1511,9 @@ double dell_HarmonicOscillator_14_y::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //-k^2*y*(4*k^4*x^4 - 12*k^2*x^2 + 3)*exp(-k^2*r^2/2)
+    //-4*k^2*y*(4*k^4*x^4 - 12*k^2*x^2 + 3)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*y*(4*(*k2)*(*k2)*x2*x2 - 12*(*k2)*x2 + 3);
+    H = -4*(*k2)*y*(4*(*k2)*(*k2)*x2*x2 - 12*(*k2)*x2 + 3);
     return H*(*exp_factor);
     
 }
@@ -1524,9 +1524,9 @@ double lapl_HarmonicOscillator_14::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //k^2*(k^2*r^2 - 10)*(4*k^4*x^4 - 12*k^2*x^2 + 3)*exp(-k^2*r^2/2)
+    //4*k^2*(k^2*r^2 - 10)*(4*k^4*x^4 - 12*k^2*x^2 + 3)*exp(-k^2*r^2/2)
     
-    H = (*k2)*((*k2)*walker->get_r_i2(i) - 10)*(4*(*k2)*(*k2)*x2*x2 - 12*(*k2)*x2 + 3);
+    H = 4*(*k2)*((*k2)*walker->get_r_i2(i) - 10)*(4*(*k2)*(*k2)*x2*x2 - 12*(*k2)*x2 + 3);
     return H*(*exp_factor);
     
 }
@@ -1903,9 +1903,9 @@ double HarmonicOscillator_21::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //(8*k^6*y^6 - 60*k^4*y^4 + 90*k^2*y^2 - 15)*exp(-k^2*r^2/2)
+    //8*(8*k^6*y^6 - 60*k^4*y^4 + 90*k^2*y^2 - 15)*exp(-k^2*r^2/2)
     
-    H = 8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 60*(*k2)*(*k2)*y2*y2 + 90*(*k2)*y2 - 15;
+    H = 64*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 480*(*k2)*(*k2)*y2*y2 + 720*(*k2)*y2 - 120;
     return H*(*exp_factor);
     
 }
@@ -1917,9 +1917,9 @@ double dell_HarmonicOscillator_21_x::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //-k^2*x*(8*k^6*y^6 - 60*k^4*y^4 + 90*k^2*y^2 - 15)*exp(-k^2*r^2/2)
+    //-8*k^2*x*(8*k^6*y^6 - 60*k^4*y^4 + 90*k^2*y^2 - 15)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*x*(8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 60*(*k2)*(*k2)*y2*y2 + 90*(*k2)*y2 - 15);
+    H = -8*(*k2)*x*(8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 60*(*k2)*(*k2)*y2*y2 + 90*(*k2)*y2 - 15);
     return H*(*exp_factor);
     
 }
@@ -1930,9 +1930,9 @@ double dell_HarmonicOscillator_21_y::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //-k^2*y*(8*k^6*y^6 - 108*k^4*y^4 + 330*k^2*y^2 - 195)*exp(-k^2*r^2/2)
+    //-8*k^2*y*(8*k^6*y^6 - 108*k^4*y^4 + 330*k^2*y^2 - 195)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*y*(8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 108*(*k2)*(*k2)*y2*y2 + 330*(*k2)*y2 - 195);
+    H = -8*(*k2)*y*(8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 108*(*k2)*(*k2)*y2*y2 + 330*(*k2)*y2 - 195);
     return H*(*exp_factor);
     
 }
@@ -1943,9 +1943,9 @@ double lapl_HarmonicOscillator_21::eval(const Walker* walker, int i) {
 
     y2 = y*y;
     
-    //k^2*(k^2*r^2 - 14)*(8*k^6*y^6 - 60*k^4*y^4 + 90*k^2*y^2 - 15)*exp(-k^2*r^2/2)
+    //8*k^2*(k^2*r^2 - 14)*(8*k^6*y^6 - 60*k^4*y^4 + 90*k^2*y^2 - 15)*exp(-k^2*r^2/2)
     
-    H = (*k2)*((*k2)*walker->get_r_i2(i) - 14)*(8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 60*(*k2)*(*k2)*y2*y2 + 90*(*k2)*y2 - 15);
+    H = 8*(*k2)*((*k2)*walker->get_r_i2(i) - 14)*(8*(*k2)*(*k2)*(*k2)*y2*y2*y2 - 60*(*k2)*(*k2)*y2*y2 + 90*(*k2)*y2 - 15);
     return H*(*exp_factor);
     
 }
@@ -2272,9 +2272,9 @@ double HarmonicOscillator_27::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //(8*k^6*x^6 - 60*k^4*x^4 + 90*k^2*x^2 - 15)*exp(-k^2*r^2/2)
+    //8*(8*k^6*x^6 - 60*k^4*x^4 + 90*k^2*x^2 - 15)*exp(-k^2*r^2/2)
     
-    H = 8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 60*(*k2)*(*k2)*x2*x2 + 90*(*k2)*x2 - 15;
+    H = 64*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 480*(*k2)*(*k2)*x2*x2 + 720*(*k2)*x2 - 120;
     return H*(*exp_factor);
     
 }
@@ -2285,9 +2285,9 @@ double dell_HarmonicOscillator_27_x::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //-k^2*x*(8*k^6*x^6 - 108*k^4*x^4 + 330*k^2*x^2 - 195)*exp(-k^2*r^2/2)
+    //-8*k^2*x*(8*k^6*x^6 - 108*k^4*x^4 + 330*k^2*x^2 - 195)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*x*(8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 108*(*k2)*(*k2)*x2*x2 + 330*(*k2)*x2 - 195);
+    H = -8*(*k2)*x*(8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 108*(*k2)*(*k2)*x2*x2 + 330*(*k2)*x2 - 195);
     return H*(*exp_factor);
     
 }
@@ -2299,9 +2299,9 @@ double dell_HarmonicOscillator_27_y::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //-k^2*y*(8*k^6*x^6 - 60*k^4*x^4 + 90*k^2*x^2 - 15)*exp(-k^2*r^2/2)
+    //-8*k^2*y*(8*k^6*x^6 - 60*k^4*x^4 + 90*k^2*x^2 - 15)*exp(-k^2*r^2/2)
     
-    H = -(*k2)*y*(8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 60*(*k2)*(*k2)*x2*x2 + 90*(*k2)*x2 - 15);
+    H = -8*(*k2)*y*(8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 60*(*k2)*(*k2)*x2*x2 + 90*(*k2)*x2 - 15);
     return H*(*exp_factor);
     
 }
@@ -2312,9 +2312,9 @@ double lapl_HarmonicOscillator_27::eval(const Walker* walker, int i) {
 
     x2 = x*x;
     
-    //k^2*(k^2*r^2 - 14)*(8*k^6*x^6 - 60*k^4*x^4 + 90*k^2*x^2 - 15)*exp(-k^2*r^2/2)
+    //8*k^2*(k^2*r^2 - 14)*(8*k^6*x^6 - 60*k^4*x^4 + 90*k^2*x^2 - 15)*exp(-k^2*r^2/2)
     
-    H = (*k2)*((*k2)*walker->get_r_i2(i) - 14)*(8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 60*(*k2)*(*k2)*x2*x2 + 90*(*k2)*x2 - 15);
+    H = 8*(*k2)*((*k2)*walker->get_r_i2(i) - 14)*(8*(*k2)*(*k2)*(*k2)*x2*x2*x2 - 60*(*k2)*(*k2)*x2*x2 + 90*(*k2)*x2 - 15);
     return H*(*exp_factor);
     
 }

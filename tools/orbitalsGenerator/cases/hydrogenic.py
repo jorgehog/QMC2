@@ -28,10 +28,9 @@ class hydrogenicOrbitals(orbitalGenerator):
     dim = 3
     figsPrPage = 3
     
-    def __init__(self, M, toCPP=False):
-
-        self.name =        
-        super(hydrogenicOrbitals, self).__init__(M, "hydrogenic", toCPP)
+    def __init__(self, M):
+      
+        super(hydrogenicOrbitals, self).__init__(M, "hydrogenic")
         
         nShells = 0
         while nShells*(nShells+1)*(2*nShells+1)/6 < self.maxImplemented/2:

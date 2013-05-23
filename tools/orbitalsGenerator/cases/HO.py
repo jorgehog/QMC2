@@ -11,11 +11,10 @@ class HOOrbitals(orbitalGenerator):
     
     dim = 2
     
-    def __init__(self, M, doInit=True, toCPP=False):
+    def __init__(self, M):
         
-        self.name = "HarmonicOscillator"        
+        super(HOOrbitals, self).__init__(M, "HarmonicOscillator")     
         
-        self.setMax(M)
         self.Hx = []        
         self.Hy = []        
         
@@ -27,11 +26,16 @@ class HOOrbitals(orbitalGenerator):
           
         self.expFactor = exp(-Rational(1,2)*k**2*(x**2 + y**2))
         
-        super(HOOrbitals, self).__init__(doInit, toCPP)
+ 
        
     def simplifyLocal(self, expr, qNums, subs=True):
         expFac = self.genericFactor(qNums, basic=True)
+
+        if expFac not in expr:
+            return expr        
+        
         expr = (expr.collect(expFac)/expFac).expand().collect(k)
+
         expr = expr.factor(k)*expFac
         
         if subs:
@@ -63,7 +67,7 @@ Orbitals are constructed in the following fashion:
 \phi(\vec r)_{n_x, n_y} = H_{n_x}(kx)H_{n_y}(ky)e^{-\frac{1}{2}k^2r^2}
 \end{equation*}   
 
-where $k = \sqrt(\omega\alpha)$, with $\omega$ being the oscillator frequency and $\alpha$ being the variational parameter.  
+where $k = \sqrt{\omega\alpha}$, with $\omega$ being the oscillator frequency and $\alpha$ being the variational parameter.  
 """
         
     def __str__(self):

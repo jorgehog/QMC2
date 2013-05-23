@@ -14,11 +14,11 @@ class HOOrbitals3D(orbitalGenerator):
     
     dim = 3
     
-    def __init__(self, M, doInit=True, toCPP=False):
+    def __init__(self, M):
         
-        self.name = "HarmonicOscillator3D"        
+       
+        super(HOOrbitals3D, self).__init__(M, "HarmonicOscillator3D")
         
-        self.setMax(M)
         self.Hx = []        
         self.Hy = []
         self.Hz = []        
@@ -36,7 +36,7 @@ class HOOrbitals3D(orbitalGenerator):
           
         self.expFactor = exp(-Rational(1,2)*k**2*(x**2 + y**2 + z**2))
         
-        super(HOOrbitals3D, self).__init__(doInit, toCPP)
+  
        
     def simplifyLocal(self, expr, qNums, subs=True):
         
@@ -71,15 +71,19 @@ class HOOrbitals3D(orbitalGenerator):
         states = sorted(states, key=lambda x: sum(x))
         
         for i, p in enumerate(states):
-            print p
+#            print p
             self.stateMap[i] = p
-            if p[1] == p[2] == 0:
-                print
-    
+#            if p[1] == p[2] == 0:
+#                print
+        
+        for p in zip(*states):
+            for q in p:
+                print q, "& ",
+            print
+            
     def setupOrbitals(self):
       
         for i, stateMap in self.stateMap.items():
-    
             nx, ny, nz = stateMap
             
             self.orbitals[i] = self.Hx[nx]*self.Hy[ny]*self.Hz[nz]*self.expFactor
@@ -92,7 +96,7 @@ Orbitals are constructed in the following fashion:
 \phi(\vec r)_{n_x, n_y} = H_{n_x}(kx)H_{n_y}(ky)H_{n_z}(kz)e^{-\frac{1}{2}k^2r^2}
 \end{equation*}   
 
-where $k = \sqrt(\omega\alpha)$, with $\omega$ being the oscillator frequency and $\alpha$ being the variational parameter.  
+where $k = \sqrt{\omega\alpha}$, with $\omega$ being the oscillator frequency and $\alpha$ being the variational parameter.  
 """
         
     def __str__(self):
