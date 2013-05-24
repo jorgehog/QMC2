@@ -63,7 +63,7 @@ def main():
         raise Exception("Distributions does not match. (%s != %s)" % (VMC_name, DMC_name))
     
     n_p = re.findall("(\d+)c\d+", VMC_name)[0]
-    bin_edge = re.findall("dist_out.+?dmc_edge(\d+\.?\d+)\.arma", DMC_dist_name)[0]
+    bin_edge = re.findall("dist_out.+?dmc_edge(\d+\.?\d*)\.arma", DMC_dist_name)[0]
     
 #    print n_p
 #    print bin_edge

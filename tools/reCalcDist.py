@@ -46,7 +46,7 @@ def initRun(n_p, path, name, N, bin_edge, n_cores, mpiFlag, openGUI):
     
 
     if canViz and openGUI:
-        viz.main(dist_path, False)
+        if ending != "arma3D": viz.main(dist_path, False)
         viz.main(radial_path, False)
 
 
