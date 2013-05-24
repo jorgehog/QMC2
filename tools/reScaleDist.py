@@ -44,6 +44,8 @@ def main():
     DMC_dist = sys.argv[2]
     VMC_raw_path, VMC_raw_name = os.path.split(sys.argv[1])
     DMC_dist_path, DMC_dist_name = os.path.split(DMC_dist)
+    ending = re.findall("\.(arma)|\.(arma3D)", DMC_dist_name)[0]    
+    print ending    
     
     if len(sys.argv) > 3:
         N = sys.argv[3]
@@ -72,7 +74,7 @@ def main():
     new_dir = pjoin("OneBodyDensities", DMC_name)
     new_path = pjoin(paths.scratchPath, new_dir)
 
-    new_VMC_dist = "dist_out_%svmc_edge%s.arma" % (VMC_name, bin_edge)
+    new_VMC_dist = "dist_out_%svmc_edge%s.%s" % (VMC_name, bin_edge, ending)
     new_VMC_dist_rad = "radial_out_%svmc_edge%s.arma" % (VMC_name, bin_edge)
     
     DMC_dist_rad = "radial_out_%sdmc_edge%s.arma" % (DMC_name, bin_edge)
