@@ -1,6 +1,6 @@
-import os, re
+import os, re, sys
 
-cwd = os.getcwd()
+cwd = sys.argv[1]
 
 R = []
 pot = []
