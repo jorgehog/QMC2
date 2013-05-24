@@ -44,13 +44,13 @@ def main():
     DMC_dist = sys.argv[2]
     VMC_raw_path, VMC_raw_name = os.path.split(sys.argv[1])
     DMC_dist_path, DMC_dist_name = os.path.split(DMC_dist)
-    ending = re.findall("\.(arma)|\.(arma3D)", DMC_dist_name)[0]    
+    ending = re.findall("\.(arma)$|\.(arma3D)$", DMC_dist_name)[0]    
     
     for entry in ending:
         if entry:
             ending = entry
             break
-    
+    print ending
     if len(sys.argv) > 3:
         N = sys.argv[3]
     else:
