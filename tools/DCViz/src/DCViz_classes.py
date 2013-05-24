@@ -278,7 +278,7 @@ class radial_out(DCVizPlotter):
                 maxCut = r[cut]            
             
             if not pureOnly:
-                if "QDots3D" in self.familyFileNames[i]:
+                if "QDots3D" in self.familyFileNames[i] or "Diatom" in self.familyFileNames[i]:
                     r.resize((data[i].n, 1))
                     last[1:] /= r[1:]**2
                     last[0] = last[1]
