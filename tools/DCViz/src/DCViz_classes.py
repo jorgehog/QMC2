@@ -460,7 +460,7 @@ class dist_out(DCVizPlotter):
 
 class R_vs_E(DCVizPlotter):
     
-    nametag = "R\_vs\_E\.dat"
+    nametag = "R\_vs\_E.*?\.dat"
     
     figMap = {"fig":["sfig"]}
 
