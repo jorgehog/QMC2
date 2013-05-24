@@ -465,9 +465,9 @@ class R_vs_E(DCVizPlotter):
     figMap = {"fig":["sfigE"], "fig2":["sfigV"]}
 
     def plot(self, data):
-        R, E = data
+        R, Ep, Ec, Ek = data
         
-        R, Ep, Ec, Ek = zip(*sorted(zip(R, E), key=lambda x: x[0]))
+        R, Ep, Ec, Ek = zip(*sorted(zip(R, Ep, Ec, Ek), key=lambda x: x[0]))
         
         self.sfigE.plot(R, Ep + Ec + Ek, '*', color='#008000')
         self.sfig.set_xlabel("R")
