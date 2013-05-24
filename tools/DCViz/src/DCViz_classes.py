@@ -462,17 +462,20 @@ class R_vs_E(DCVizPlotter):
     
     nametag = "R\_vs\_E.*?\.dat"
     
-    figMap = {"fig":["sfig"]}
+    figMap = {"fig":["sfigE"], "fig2":["sfigV"]}
 
     def plot(self, data):
         R, E = data
         
-        R, E = zip(*sorted(zip(R, E), key=lambda x: x[0]))
+        R, Ep, Ec, Ek = zip(*sorted(zip(R, E), key=lambda x: x[0]))
         
-        self.sfig.plot(R, E, '*', color='#008000')
+        self.sfigE.plot(R, Ep + Ec + Ek, '*', color='#008000')
+        self.sfig.set_xlabel("R")
+        self.sfig.set_ylabel(r"$\langle E\rangle$", rotation=0)
+        
+        self.sfigE.plot(R, Ep + E, '*', color='#008000')
         self.sfig.set_xlabel("R")
         self.sfig.set_ylabel(r"$\langle V\rangle$", rotation=0)
-        
         
 
 class E_vs_w(DCVizPlotter):
