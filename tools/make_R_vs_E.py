@@ -38,6 +38,6 @@ for dir in os.listdir(cwd):
 
 print i/float(k)*100, "%"
 
-with open("R_vs_E.dat", 'w') as F:
+with open(os.path.join(cwd, "R_vs_E.dat"), 'w') as F:
     F.write(s)
 
