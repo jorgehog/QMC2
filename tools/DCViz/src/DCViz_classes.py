@@ -232,7 +232,7 @@ class radial_out(DCVizPlotter):
         vmcEdge = None
         
         r2 = False
-        if "Atoms" in self.familyFileNames[0] or "Diatom" in self.familyFileNames[0]:
+        if "Atoms" in self.familyFileNames[0]:
             r2 = True
         
         if superPose:
