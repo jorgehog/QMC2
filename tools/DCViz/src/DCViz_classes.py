@@ -477,7 +477,7 @@ class R_vs_E(DCVizPlotter):
         self.sfigE.set_xlabel("R")
         self.sfigE.set_ylabel(r"$\langle E\rangle$", rotation=0)
         
-        self.sfigV.plot(R, Ep + E, '*', color='#008000')
+        self.sfigV.plot(R, Ep + Ec, '*', color='#008000')
         self.sfigV.set_xlabel("R")
         self.sfigV.set_ylabel(r"$\langle V\rangle$", rotation=0)
         
