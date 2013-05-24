@@ -572,7 +572,8 @@ def main():
 
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
     
-    openGUI = openGUI&(not forceTerminal)
+    if not openGUI:
+        forceTerminal = True
 
     makeJobScript = getJobFlag(sys.argv)
 

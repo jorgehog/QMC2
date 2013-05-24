@@ -232,7 +232,7 @@ class radial_out(DCVizPlotter):
         vmcEdge = None
         
         r2 = False
-        if "Atoms" in self.familyFileNames[0]:
+        if "Atoms" in self.familyFileNames[0] or "Diatom" in self.familyFileNames[0]:
             r2 = True
         
         if superPose:
@@ -462,7 +462,8 @@ class R_vs_E(DCVizPlotter):
     
     nametag = "R\_vs\_E.*?\.dat"
     
-    figMap = {"fig":["sfigE"], "fig2":["sfigV"]}
+    figMap = {"fig":["sfigV", "sfigE"]}
+    stack="H"
 
     def plot(self, data):
         R, Ep, Ec, Ek = data
@@ -475,11 +476,12 @@ class R_vs_E(DCVizPlotter):
         
         self.sfigE.plot(R, Ep + Ec + Ek, '*', color='#008000')
         self.sfigE.set_xlabel("R")
-        self.sfigE.set_ylabel(r"$\langle E\rangle$", rotation=0)
+        self.sfigE.set_ylabel(r"$\langle E\rangle$")
         
         self.sfigV.plot(R, Ep + Ec, '*', color='#008000')
         self.sfigV.set_xlabel("R")
-        self.sfigV.set_ylabel(r"$\langle V\rangle$", rotation=0)
+        self.sfigV.set_ylabel(r"$\langle V\rangle$")
+#        self.sfigV.axes.get_xaxis().set_visible(False)
         
 
 class E_vs_w(DCVizPlotter):
