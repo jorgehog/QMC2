@@ -1,4 +1,9 @@
 import os, re, sys
+from pyLibQMC import paths
+
+sys.append(os.path.join(paths.toolspath, "DCViz", "src")
+
+from DCViz_classes import R_vs_E
 
 cwd = sys.argv[1]
 
@@ -41,3 +46,5 @@ print i/float(k)*100, "%"
 with open(os.path.join(cwd, "R_vs_E.dat"), 'w') as F:
     F.write(s)
 
+R_vs_E(os.path.join(cwd, "R_vs_E.dat"))
+R_vs_E.mainloop()
