@@ -46,5 +46,5 @@ print i/float(k)*100, "%"
 with open(os.path.join(cwd, "R_vs_E.dat"), 'w') as F:
     F.write(s)
 
-R_vs_E(os.path.join(cwd, "R_vs_E.dat"))
-R_vs_E.mainloop()
+DCViz = R_vs_E(os.path.join(cwd, "R_vs_E.dat"))
+DCViz.mainloop()
