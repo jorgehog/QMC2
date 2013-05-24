@@ -80,7 +80,7 @@ def main():
     elif "Diatom" in path:
         data = sliceXZ(data)
     
-    mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0.5, vmax=0.8)
+    mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0.2, vmax=1)
     mlab.show()
     
     

@@ -24,11 +24,14 @@ def initRun(n_p, path, name, N, bin_edge, n_cores, mpiFlag, openGUI):
 
     subprocess.call(args)
     
+    ending = "arma"
+    if "Diatom" in name or "QDots3D" in name or "Atoms" in name:
+        ending = "arma3D"
 
         
-    outPath = "%swalker_positions/__type___out_%s_edge%s.arma" % (path, name, bin_edge)
-    dist_path = outPath.replace("__type__", "dist")
-    radial_path = outPath.replace("__type__", "radial")
+    outPath = "%swalker_positions/__type___out_%s_edge%s.__end__" % (path, name, bin_edge)
+    dist_path = outPath.replace("__type__", "dist").replace("__end__", ending)
+    radial_path = outPath.replace("__type__", "radial").replace("__end__", "arma")
     
     if not os.path.exists(dist_path):
         print dist_path
