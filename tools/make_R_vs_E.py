@@ -1,7 +1,7 @@
 import os, re, sys
 from pyLibQMC import paths
 
-sys.append(os.path.join(paths.toolspath, "DCViz", "src")
+sys.append(os.path.join(paths.toolspath, "DCViz", "src"))
 
 from DCViz_classes import R_vs_E
 
