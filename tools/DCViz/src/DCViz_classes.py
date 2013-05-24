@@ -474,12 +474,12 @@ class R_vs_E(DCVizPlotter):
         Ek = numpy.array(Ek)
         
         self.sfigE.plot(R, Ep + Ec + Ek, '*', color='#008000')
-        self.sfig.set_xlabel("R")
-        self.sfig.set_ylabel(r"$\langle E\rangle$", rotation=0)
+        self.sfigE.set_xlabel("R")
+        self.sfigE.set_ylabel(r"$\langle E\rangle$", rotation=0)
         
-        self.sfigE.plot(R, Ep + E, '*', color='#008000')
-        self.sfig.set_xlabel("R")
-        self.sfig.set_ylabel(r"$\langle V\rangle$", rotation=0)
+        self.sfigV.plot(R, Ep + E, '*', color='#008000')
+        self.sfigV.set_xlabel("R")
+        self.sfigV.set_ylabel(r"$\langle V\rangle$", rotation=0)
         
 
 class E_vs_w(DCVizPlotter):
