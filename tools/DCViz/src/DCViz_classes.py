@@ -280,8 +280,13 @@ class radial_out(DCVizPlotter):
             if not pureOnly:
                 if "QDots3D" in self.familyFileNames[i]:
                     r.resize((data[i].n, 1))
-                    last = last/r**2
+                    last[1:] /= r[1:]**2
                     last[0] = last[1]
+                    
+                    if "vmc" in self.familyFileNames[i]:
+                        vmc = last
+                    else:
+                        dmc = last
            
                 self.radialFig.plot(r, last, style[i%2], label=method.upper(), color=color[i%2]);
            

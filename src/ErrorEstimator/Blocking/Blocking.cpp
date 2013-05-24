@@ -123,12 +123,14 @@ void Blocking::block_data(int block_size, double &var, double &mean) {
 }
 
 void Blocking::get_initial_error() {
+    using namespace std;
+    
     double var = arma::var(data);
     double mean = arma::mean(data);
     var = combine_variance(var, mean);
     mean = combine_mean(mean, data.n_elem);
-    if (is_master) std::cout << "Initial mean: " << mean << std::endl;
-    if (is_master) std::cout << "Initial stddev: " << sqrt(var / (n_nodes * n_c - 1)) << std::endl;
+    if (is_master) cout <<"Initial mean: "<< setprecision(6) << fixed  << mean << endl;
+    if (is_master) cout << "Initial stddev: " << sqrt(var / (n_nodes * n_c - 1)) << endl;
 }
 
 void Blocking::get_unique_blocks(arma::Row<int>& block_sizes, int& n) {

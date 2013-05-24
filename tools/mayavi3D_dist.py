@@ -74,13 +74,13 @@ def main():
     path = parseCML()
 
     data = loadArmaCube(path)
-    
+    print data.sum()*(2*49.9667/199.)**2
     if "Atoms" in path or "QDots3D" in path:
         data = earthSpherify(data)
     elif "Diatom" in path:
         data = sliceXZ(data)
     
-    mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0, vmax=0.3)
+    mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0.5, vmax=0.8)
     mlab.show()
     
     
