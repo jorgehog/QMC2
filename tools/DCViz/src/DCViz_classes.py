@@ -468,7 +468,7 @@ class R_vs_E(DCVizPlotter):
         R, Ep, Ec, Ek = data
         
         R, Ep, Ec, Ek = zip(*sorted(zip(R, Ep, Ec, Ek), key=lambda x: x[0]))
-        print R.shape, Ep.shape, Ec.shape, Ek.shape
+        print len(R), len(Ep), len(Ec), len(Ek)
         self.sfigE.plot(R, Ep + Ec + Ek, '*', color='#008000')
         self.sfig.set_xlabel("R")
         self.sfig.set_ylabel(r"$\langle E\rangle$", rotation=0)
