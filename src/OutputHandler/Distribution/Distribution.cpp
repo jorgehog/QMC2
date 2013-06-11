@@ -88,7 +88,23 @@ void Distribution::generate_distribution3D(arma::mat& dist,
         stretch = 3;
 
         //calculate the bin edge and size based on the mean radius
-        mean_r = ErrorEstimator::combine_mean(mean(R), n, n_tot);
+        if (!locked) {
+            mean_r = ErrorEstimator::combine_mean(mean(R), n, n_tot);
+        } else {
+
+            mean_r = 0;
+            int k = 0;
+
+            for (int i = 0; i < n; i++) {
+                if (is_deadlocked(dist, i)) continue;
+
+                mean_r += R(i);
+                k++;
+            }
+
+            mean_r = ErrorEstimator::combine_mean(mean_r / k, n, n_tot);
+
+        }
         bin_edge = stretch*mean_r;
         //        if (node==0) cout << "pre " << mean_r << endl;
     }
@@ -97,6 +113,8 @@ void Distribution::generate_distribution3D(arma::mat& dist,
 
     for (int ni = 0; ni < n; ni++) {
 
+        if (is_deadlocked(dist, ni)) continue;
+        
         x = dist(ni, 0);
         y = dist(ni, 1);
         z = dist(ni, 2);
@@ -120,6 +138,8 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     dr_R = dr / 2;
     for (int ni = 0; ni < n; ni++) {
 
+        if (is_deadlocked(dist, ni)) continue;
+        
         r = R(ni);
 
         r_i = r / dr_R;
@@ -298,19 +318,19 @@ void Distribution::generate_distribution2D(arma::mat & dist,
         if (!locked) {
             mean_r = ErrorEstimator::combine_mean(mean(R), n, n_tot);
         } else {
-            
+
             mean_r = 0;
             int k = 0;
-            
+
             for (int i = 0; i < n; i++) {
                 if (is_deadlocked(dist, i)) continue;
-                
+
                 mean_r += R(i);
                 k++;
             }
-            
-            mean_r = ErrorEstimator::combine_mean(mean_r/k, n, n_tot);
-            
+
+            mean_r = ErrorEstimator::combine_mean(mean_r / k, n, n_tot);
+
         }
         bin_edge = stretch*mean_r;
         //        if (node==0) cout << "pre " << mean_r << endl;

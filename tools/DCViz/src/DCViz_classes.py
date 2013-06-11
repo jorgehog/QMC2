@@ -410,7 +410,7 @@ class dist_out(DCVizPlotter):
         
         
         origLen = len(dist)
-        distMid = dist[origLen/2, :]
+        distMid = dist[:, origLen/2]
         crit = numpy.where(distMid > 0.1*distMid.max())[0]
 
         x, y = numpy.meshgrid(crit, crit)
