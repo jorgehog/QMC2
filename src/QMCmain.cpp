@@ -269,7 +269,7 @@ void parseCML(int argc, char** argv,
         ParParams & parParams) {
 
 
-    int n_args = 34;
+    int n_args = 35;
 
     //Default values:
 
@@ -288,6 +288,7 @@ void parseCML(int argc, char** argv,
     generalParams.do_blocking = false;
     generalParams.system = "QDots";
 
+    generalParams.deadlock = false;
 
     outputParams.dist_out = true;
     outputParams.dmc_out = true;
@@ -340,17 +341,21 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[3]) != 0) outputParams.ASGD_out = (bool)atoi(argv[3]);
 
 
+
         if (def.compare(argv[4]) != 0) generalParams.runpath = argv[4];
         if (def.compare(argv[5]) != 0) generalParams.n_p = atoi(argv[5]);
         if (def.compare(argv[6]) != 0) generalParams.dim = atoi(argv[6]);
         if (def.compare(argv[7]) != 0) generalParams.systemConstant = atof(argv[7]);
         if (def.compare(argv[8]) != 0) generalParams.R = atof(argv[8]);
 
+
         if (def.compare(argv[9]) != 0) generalParams.random_seed = atoi(argv[9]);
+
 
         if (def.compare(argv[10]) != 0) generalParams.doMIN = (bool)atoi(argv[10]);
         if (def.compare(argv[11]) != 0) generalParams.doVMC = (bool)atoi(argv[11]);
         if (def.compare(argv[12]) != 0) generalParams.doDMC = (bool)atoi(argv[12]);
+
 
 
         if (def.compare(argv[13]) != 0) generalParams.use_coulomb = (bool)atoi(argv[13]);
@@ -358,35 +363,43 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[15]) != 0) generalParams.do_blocking = (bool)atoi(argv[15]);
 
 
+
         if (def.compare(argv[16]) != 0) generalParams.sampling = argv[16];
         if (def.compare(argv[17]) != 0) generalParams.system = argv[17];
 
-
-        if (def.compare(argv[18]) != 0) vmcParams.n_c = atoi(argv[18]);
-        if (def.compare(argv[19]) != 0) vmcParams.dt = atof(argv[19]);
+        if (def.compare(argv[18]) != 0) generalParams.deadlock_x = atof(argv[18]);
 
 
-        if (def.compare(argv[20]) != 0) dmcParams.dt = atof(argv[20]);
-        if (def.compare(argv[21]) != 0) dmcParams.n_b = atoi(argv[21]);
-        if (def.compare(argv[22]) != 0) dmcParams.n_w = atoi(argv[22]);
-        if (def.compare(argv[23]) != 0) dmcParams.n_c = atoi(argv[23]);
-        if (def.compare(argv[24]) != 0) dmcParams.therm = atoi(argv[24]);
+
+        if (def.compare(argv[19]) != 0) vmcParams.n_c = atoi(argv[19]);
+        if (def.compare(argv[20]) != 0) vmcParams.dt = atof(argv[20]);
 
 
-        if (def.compare(argv[25]) != 0) minimizerParams.SGDsamples = atoi(argv[25]);
-        if (def.compare(argv[26]) != 0) minimizerParams.n_w = atoi(argv[26]);
-        if (def.compare(argv[27]) != 0) minimizerParams.therm = atoi(argv[27]);
-        if (def.compare(argv[28]) != 0) minimizerParams.n_c_SGD = atoi(argv[28]);
-        if (def.compare(argv[29]) != 0) minimizerParams.max_step = atof(argv[29]);
-        if (def.compare(argv[30]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[30]);
-        if (def.compare(argv[31]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[31]);
+
+        if (def.compare(argv[21]) != 0) dmcParams.dt = atof(argv[21]);
+        if (def.compare(argv[22]) != 0) dmcParams.n_b = atoi(argv[22]);
+        if (def.compare(argv[23]) != 0) dmcParams.n_w = atoi(argv[23]);
+        if (def.compare(argv[24]) != 0) dmcParams.n_c = atoi(argv[24]);
+        if (def.compare(argv[25]) != 0) dmcParams.therm = atoi(argv[25]);
 
 
-        if (def.compare(argv[32]) != 0) variationalParams.alpha = atof(argv[32]);
-        if (def.compare(argv[33]) != 0) variationalParams.beta = atof(argv[33]);
+
+        if (def.compare(argv[26]) != 0) minimizerParams.SGDsamples = atoi(argv[26]);
+        if (def.compare(argv[27]) != 0) minimizerParams.n_w = atoi(argv[27]);
+        if (def.compare(argv[28]) != 0) minimizerParams.therm = atoi(argv[28]);
+        if (def.compare(argv[29]) != 0) minimizerParams.n_c_SGD = atoi(argv[29]);
+        if (def.compare(argv[30]) != 0) minimizerParams.max_step = atof(argv[30]);
+        if (def.compare(argv[31]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[31]);
+        if (def.compare(argv[32]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[32]);
 
 
-        int vmc_dt_loc = 19;
+
+        if (def.compare(argv[33]) != 0) variationalParams.alpha = atof(argv[33]);
+        if (def.compare(argv[34]) != 0) variationalParams.beta = atof(argv[34]);
+
+        int vmc_dt_loc = 20;
+        int deadlock_loc = 18;
+
 
         if (def.compare(argv[vmc_dt_loc]) == 0) {
             if (generalParams.sampling == "IS") {
@@ -395,6 +408,9 @@ void parseCML(int argc, char** argv,
                 vmcParams.dt = 0.5;
             }
         }
+
+        if (def.compare(argv[deadlock_loc]) != 0)
+            generalParams.deadlock = true;
 
     } else {
         std::cout << "insufficient CML arguments. Attempting execution..." << std::endl;

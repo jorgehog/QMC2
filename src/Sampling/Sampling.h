@@ -24,10 +24,21 @@ protected:
      */
     int end;
 
+    bool deadlock; //! If true, a particle is frozen in the simulation.
+    double deadlock_x; //! Position of the frozen particle. y=z=0.
+
+    void set_deadlock(const double deadlock_x);
+
     //!The Diffusion object.
     /*! \see Diffusion */
     Diffusion* diffusion;
     QMC* qmc; //!< The QMC main solver object. Needed to access e.g. the system object.
+
+    friend QMC::QMC(GeneralParams &, int,
+            SystemObjects &,
+            ParParams &,
+            int,
+            int);
 
 public:
 
@@ -88,6 +99,7 @@ public:
     }
 
     //! Calculates the Branching Green's function ratio needed by DMC.
+
     /*! 
      * @param E_x Energy at current time step
      * @param E_y Energy at previous time step
@@ -134,6 +146,7 @@ public:
         this->start = start;
         this->end = end;
     }
+
 
 };
 

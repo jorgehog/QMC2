@@ -54,6 +54,13 @@ QMC::QMC(GeneralParams & gP, int n_c,
     dist_path = runpath + "walker_positions/";
     last_inserted = 0;
 
+    p_start = 0;
+    if (gP.deadlock) {
+        if (is_master) std::cout << "Initializing deadlock at " << gP.deadlock_x << std::endl;
+        p_start = 1;
+        sampling->set_deadlock(gP.deadlock_x); //Allowed since the constructor is a friend of Sampling
+    }
+
 }
 
 QMC::QMC() {
@@ -65,7 +72,7 @@ void QMC::update_subsamples(double weight) {
     system->update_potential_samples(weight);
 }
 
-void QMC::push_subsamples(){
+void QMC::push_subsamples() {
     kinetic_sampler.push_mean();
     system->push_potential_samples();
 }
@@ -75,14 +82,14 @@ void QMC::dump_subsamples(bool mean_of_means) {
     using namespace std;
 
     s << "Kinetic " << setprecision(6) << fixed;
-    if (mean_of_means){
+    if (mean_of_means) {
         s << kinetic_sampler.extract_mean_of_means();
     } else {
         s << kinetic_sampler.extract_mean();
     }
-    
+
     s << endl;
-    
+
     s << system->dump_samples(mean_of_means) << endl;
 
     if (is_master) {
@@ -225,11 +232,11 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 }
 
 void QMC::diffuse_walker(Walker* original, Walker* trial) {
-    for (int particle = 0; particle < n_p; particle++) {
+    for (int particle = p_start; particle < n_p; particle++) {
 
         set_spin_state(particle);
         sampling->update_pos(original, trial, particle);
-        
+
         //        test_gradients(trial);
 
         double A = get_acceptance_ratio(original, trial, particle);

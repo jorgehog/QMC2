@@ -204,8 +204,12 @@ class radial_out(DCVizPlotter):
     familyName = "radial dist"
     
     def plot(self, data):
-        cut=0
+        cut=4
         xScale = 1
+        
+        piFac = 2*3.141592;
+        for d in data:
+            d.data *= piFac
    
         silent = True
         
@@ -218,8 +222,9 @@ class radial_out(DCVizPlotter):
         path, name = os.path.split(self.filepath)
         
         try:
-            yFile = open(os.path.join(path, "yMin.dat"), 'r')
+            yFile = open(os.path.join(path, "yMIN.dat"), 'r')
             yMax = float(yFile.read())
+            print yMax
         except:
             yMax = None
         
@@ -325,6 +330,7 @@ class radial_out(DCVizPlotter):
 #        if not pureOnly:
         self.radialFig.legend()    
         self.radialFig.axes.set_xlim(maxCut, xScale*max_edge)
+#        self.radialFig.axes.set_xlim(maxCut, 5)
         self.radialFig.set_xlabel('r')
         
         if r2:
@@ -355,13 +361,13 @@ class dist_out(DCVizPlotter):
         
     stack = "H"
     
-    dmcOnly = True
-    vmcOnly = False
+    dmcOnly = False
+    vmcOnly = True
     
         
     def plot(self, data):
     
-        silent = True
+        silent = False
           
         edge = float(re.findall("_edge(.+?)\.arma", self.familyFileNames[0])[0])    
     
@@ -462,28 +468,122 @@ class R_vs_E(DCVizPlotter):
     
     nametag = "R\_vs\_E.*?\.dat"
     
-    figMap = {"fig":["sfigV", "sfigE"]}
+#    figMap = {"fig":["sfigV", "sfigE"]}
+    figMap = {"fig":["sfigE"]}
     stack="H"
 
     def plot(self, data):
         R, Ep, Ec, Ek = data
         
         R, Ep, Ec, Ek = zip(*sorted(zip(R, Ep, Ec, Ek), key=lambda x: x[0]))
+      
+        
+#        E = Ep + Ec + Ek
+        
         R = numpy.array(R)
+#        print R.shape        
+#        print E[-1]
+#        i = numpy.where(abs(E) > 2*abs(E[-1]))[0][-1]
+        i = numpy.where(R > 0.5)[0][0]        
+        print i
+#        R = R[i:]
         Ep = numpy.array(Ep)
         Ec = numpy.array(Ec)
         Ek = numpy.array(Ek)
         
-        self.sfigE.plot(R, Ep + Ec + Ek, '*', color='#008000')
+#        self.sfigE.plot(R[i:], (Ep + Ek + Ec)[i:], '*', color='#008000', label=r"$\langle E\rangle$")
+#        self.sfigE.set_xlabel("R")
+#        self.sfigE.legend()
+        
+        LJ = numpy.vectorize(lambda r, eps, sig: 4*eps*(sig**12/r**12 - sig**6/r**6))
+        
+        
+        self.sfigE.plot(R, LJ(R, 1., 1.), color='#008000', label=r"$V(R)$")
         self.sfigE.set_xlabel("R")
-        self.sfigE.set_ylabel(r"$\langle E\rangle$")
+        self.sfigE.set_ylim(-1.5, 2)
+        self.sfigE.axes.set_xbound(0.5)
+        self.sfigE.legend()        
         
-        self.sfigV.plot(R, Ep + Ec, '*', color='#008000')
-        self.sfigV.set_xlabel("R")
-        self.sfigV.set_ylabel(r"$\langle V\rangle$")
+#        self.sfigV.plot(R, Ep + Ec, '*', color='#008000', label=r"$\langle V\rangle$")
+#        self.sfigV.set_xlabel("R")
+#        self.sfigV.set_ylim([-3, -1])
+#        self.sfigV.legend()
+#                
+        
+#        self.sfigV.axes.set_xbound(0.25)
+#        self.sfigE.axes.set_xbound(0.25)
 #        self.sfigV.axes.get_xaxis().set_visible(False)
-        
 
+class Scaling(DCVizPlotter):
+    figMap = {"f1":["fig", "fig2"], "f2":["fig3", "fig4"]}
+    nametag = "scalePlot\.dat"
+    
+    stack = "H"
+    
+    def plot(self, data):
+        
+#        Q2D_N = numpy.array([2, 6, 12, 20, 30, 42, 56])
+#        Q2D_T = numpy.array([0.2, 1.06, 4.13, 12.71, 33.9, 50.76, 107])
+        Q2D_N = numpy.array([2, 6, 12, 20, 30, 42, 56])
+        Q2D_T = numpy.array([0.17, 1.05, 4.42, 13.25, 34.63, 80.24, 165.77])
+        
+#        Q3D_N = numpy.array([2, 8, 20])
+#        Q3D_T = numpy.array([0.38, 2.42, 15.3])
+        Q3D_N = numpy.array([2, 8, 20])
+        Q3D_T = numpy.array([0.38, 2.42, 16.59])
+        
+#        Atoms_N = numpy.array([2, 4, 10, 12, 18, 36])
+#        Atoms_T = numpy.array([0.4, 0.88, 3.92, 5, 13.3, 42.3])
+        Atoms_N = numpy.array([2, 4, 10, 12, 18, 36])
+        Atoms_T = numpy.array([0.42, 0.85, 3.94, 5.67, 13.5, 66])
+        
+#        Molecules_N = numpy.array([2, 6, 8, 10, 12, 14, 16])
+#        Molecules_T = numpy.array([0.47, 2.02, 3.34, 5, 7.33, 10.43, 13.4])
+        Molecules_N = numpy.array([2, 6, 8, 10, 12, 14, 16])
+        Molecules_T = numpy.array([0.49, 2.02, 3.27, 5, 7, 9.42, 12.24])
+        
+        
+        from scipy.stats import linregress as l2
+          
+            
+              
+        
+        toPlot = [[Q2D_N, Q2D_T], [Q3D_N, Q3D_T], [Atoms_N, Atoms_T], [Molecules_N, Molecules_T]]
+        l = ["Qdots 2D", "Qdots 3D", "Atoms", "Molecules"]
+        c = ['#008000', 'k', '0.5', "#008000"]
+        style = ["-*", "-^", "-o", "-d"]        
+        
+        for i, NT in enumerate(toPlot):
+            N, T = NT
+            k = numpy.where(N <= 20)
+            
+            if len(N[k]) != 3:
+                slope, intercept, r_value, p_value, std_err = l2(numpy.log(N[k][1:]), numpy.log(T[k][1:])) 
+            else:
+                r_value = 1
+                slope = (numpy.log(T[k][2]) - numpy.log(T[k][1]))/(numpy.log(N[k][2]) - numpy.log(N[k][1]))
+            print slope, r_value, l[i]
+            
+            self.fig.loglog(N[k], T[k], style[i], color=c[i], label=l[i])     
+            self.fig3.plot(N[k], T[k], style[i], color=c[i], label=l[i])
+        self.fig.legend(loc=2)
+        self.fig.set_ylabel("t[s]")
+        self.fig.set_xlabel("N")
+        self.fig3.legend(loc=2)
+        self.fig3.set_ylabel("t[s]")
+        self.fig3.set_xlabel("N")
+        
+        self.fig2.loglog(Q2D_N, Q2D_T, "-*", color=c[0], label=l[0])
+        self.fig2.loglog(Atoms_N, Atoms_T, "-o", color=c[1], label=l[2])
+        self.fig2.legend(loc=2)
+        self.fig2.set_ylabel("t[s]")
+        self.fig2.set_xlabel("N")
+        
+        self.fig4.plot(Q2D_N, Q2D_T, "-*", color=c[0], label=l[0])
+        self.fig4.plot(Atoms_N, Atoms_T, "-o", color=c[1], label=l[2])       
+        self.fig4.legend(loc=2)
+        self.fig4.set_ylabel("t[s]")
+        self.fig4.set_xlabel("N")
 class E_vs_w(DCVizPlotter):
     
     stack = "H"    

@@ -35,6 +35,8 @@ protected:
     int node;
     int n_nodes;
 
+    int p_start;
+
     int n_c; //!< The number of Monte-Carlo cycles.
     int thermalization; //!< The number of thermalization steps.
     int cycle; //!< The current Monte-Carlo cycle.

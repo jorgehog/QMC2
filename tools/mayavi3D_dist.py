@@ -5,15 +5,21 @@ from mayavi import mlab
 
 
 def parseCML():
-    if len(sys.argv[1]) < 2:
+    if len(sys.argv) == 1:
         raise Exception("Path to 3D file must be given as first cml arg.")
     else:
         path = sys.argv[1]
         
         if not os.path.exists(path):
             raise Exception("%s does not exist on your file system." % path)
+    
+    if len(sys.argv) == 4:
+        vmin, vmax = [float(x) for x in sys.argv[2:]]
+    else:
+        vmin = 0
+        vmax = 1
         
-    return path        
+    return path, vmin, vmax       
         
 def loadArmaCube(path):
     """reading a armadillo binary cube representing a 3D histogram"""
@@ -71,16 +77,26 @@ def sliceXZ(data):
 
 def main():
 
-    path = parseCML()
+    path, vmin, vmax = parseCML()
 
     data = loadArmaCube(path)
+    
+    try:
+        path2 = path.replace("dmc", "vmc")
+        data2 = loadArmaCube(path2)
+        data = 2*data - data2
+        print "Pure success!"
+    except:
+        pass
+    
     print data.sum()*(2*49.9667/199.)**2
     if "Atoms" in path or "QDots3D" in path:
         data = earthSpherify(data)
     elif "Diatom" in path:
         data = sliceXZ(data)
     
-    mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=0.2, vmax=1)
+    data[np.where(data < 0)] = 0
+    mlab.pipeline.volume(mlab.pipeline.scalar_field(data), vmin=vmin, vmax=vmax)
     mlab.show()
     
     

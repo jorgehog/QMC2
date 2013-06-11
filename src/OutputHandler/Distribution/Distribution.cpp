@@ -30,6 +30,28 @@ void Distribution::finalize() {
     qmc->dist.reset();
 }
 
+void Distribution::detect_deadlock(const arma::mat& dist, int n_p, int n) {
+
+    deadlock_x = dist(0, 0);
+    deadlock_y = dist(0, 1);
+
+    if (dim == 3) {
+        deadlock_z = dist(0, 2);
+    }
+    locked = true;
+
+    for (int i = n_p; i < n; i += n_p) {
+
+        if (!is_deadlocked(dist, i)) {
+            locked = false;
+            return;
+        }
+
+    }
+
+    if (node == 0) std::cout << "Detected deadlock at " << deadlock_x << "  " << deadlock_y << "  " << deadlock_z << "  " << std::endl;
+}
+
 void Distribution::generate_distribution3D(arma::mat& dist,
         int n_p,
         double bin_edge,
@@ -58,6 +80,8 @@ void Distribution::generate_distribution3D(arma::mat& dist,
 #else
     n_tot = n;
 #endif
+
+    detect_deadlock(dist, n_p, n);
 
     //On fly calculation during QMC initialized by a binedge 0.
     if (bin_edge == 0) {
@@ -194,14 +218,14 @@ void Distribution::generate_distribution3D(arma::mat& dist,
         vec radial_axis = linspace(0, bin_edge, N);
 
         normalized_dist *= n_p / (accu(normalized_dist) * dr * dr * dr);
-        
+
 
         //project out a symmetric axis and normalize (skip singularity)
-//        normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
-//
-//        normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
-//
-//        normalized_radd(0) = normalized_radd(1);
+        //        normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
+        //
+        //        normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
+        //
+        //        normalized_radd(0) = normalized_radd(1);
 
         //        cout << normalized_radd.max()/(2*datum::pi*accu(normalized_radd)*dr_R) << endl;
         normalized_radd *= n_p / (accu(normalized_radd) * dr_R);
@@ -264,12 +288,30 @@ void Distribution::generate_distribution2D(arma::mat & dist,
     n_tot = n;
 #endif
 
+    detect_deadlock(dist, n_p, n);
+
     //On fly calculation during QMC initialized by a binedge 0.
     if (bin_edge == 0) {
         stretch = 3;
 
         //calculate the bin edge and size based on the mean radius
-        mean_r = ErrorEstimator::combine_mean(mean(R), n, n_tot);
+        if (!locked) {
+            mean_r = ErrorEstimator::combine_mean(mean(R), n, n_tot);
+        } else {
+            
+            mean_r = 0;
+            int k = 0;
+            
+            for (int i = 0; i < n; i++) {
+                if (is_deadlocked(dist, i)) continue;
+                
+                mean_r += R(i);
+                k++;
+            }
+            
+            mean_r = ErrorEstimator::combine_mean(mean_r/k, n, n_tot);
+            
+        }
         bin_edge = stretch*mean_r;
         //        if (node==0) cout << "pre " << mean_r << endl;
     }
@@ -277,6 +319,8 @@ void Distribution::generate_distribution2D(arma::mat & dist,
     dr = 2 * bin_edge / (N - 1);
 
     for (int ni = 0; ni < n; ni++) {
+
+        if (is_deadlocked(dist, ni)) continue;
 
         x = dist(ni, 0);
         y = dist(ni, 1);
@@ -296,6 +340,8 @@ void Distribution::generate_distribution2D(arma::mat & dist,
 
     dr_R = dr / 2;
     for (int ni = 0; ni < n; ni++) {
+
+        if (is_deadlocked(dist, ni)) continue;
 
         r = R(ni);
 
@@ -373,7 +419,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
 
         normalized_dist *= n_p / (accu(normalized_dist) * dr * dr);
 
-//        project out a symmetric axis and normalize(skip singularity)
+        //        project out a symmetric axis and normalize(skip singularity)
         normalized_radd(span(1, N - 1)) /= radial_axis(span(1, N - 1));
 
         normalized_radd(0) = normalized_radd(1);

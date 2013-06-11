@@ -86,6 +86,9 @@ struct GeneralParams {
     double systemConstant; 
 
     double R; //! Center of mass coordinate for diatmic systems.
+
+    bool deadlock; //! If true, freezes one particle;
+    double deadlock_x; //! Position of the locked particle. y=z=0;
     
     bool doMIN; 
     bool doVMC;

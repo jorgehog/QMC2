@@ -48,6 +48,23 @@ private:
 
     std::string name;
 
+    double deadlock_x;
+    double deadlock_y;
+    double deadlock_z;
+
+    bool locked;
+
+    bool is_deadlocked(const arma::mat & dist, int i) const {
+        if (!locked) return false;
+
+        if (dim == 2) {
+            return (dist(i, 0) == deadlock_x)&&(dist(i, 1) == deadlock_y);
+        } else {
+            return (dist(i, 0) == deadlock_x)&&(dist(i, 1) == deadlock_y)&&(dist(i, 2) == deadlock_z);
+        }
+    }
+
+    void detect_deadlock(const arma::mat & dist, int n_p, int n);
 
     //! Method for generating the one-body density and projected one-axis distribution.
     /*! 

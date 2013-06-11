@@ -8,13 +8,27 @@
 #include "../QMCheaders.h"
 
 Sampling::Sampling(int n_p, int dim) {
+
     this->n_p = n_p;
-    this->n2 = ceil(n_p / 2.0);
     this->dim = dim;
+
+    n2 = ceil(n_p / 2.0);
+    deadlock = false;
 }
 
 Sampling::Sampling() {
 
+}
+
+void Sampling::set_deadlock(const double deadlock_x){
+    
+    if (deadlock) {
+        std::cout << "Overriding deadlock detected. Exiting..." << std::endl;
+        exit(1);
+    }
+    
+    deadlock = true;
+    this->deadlock_x = deadlock_x;
 }
 
 void Sampling::set_trial_pos(Walker* walker) {
@@ -25,6 +39,15 @@ void Sampling::set_trial_pos(Walker* walker) {
         }
     }
 
+    //If test on deadlocks. Inefficient, however, trial positions are only set once in VMC.
+    if (deadlock) {
+        walker->r(0, 0) = deadlock_x;
+        
+        for (int j = 1; j < dim; j++){
+            walker->r(0, j) = 0;
+        }
+    }
+    
     walker->calc_r_i2();
     
     set_trial_states(walker);

@@ -33,27 +33,28 @@ cmlMAPg = {"runpath"       : 3,
            "use_jastrow"   : 13,
            "do_blocking"   : 14,
            "sampling"      : 15,
-           "system"        : 16}
+           "system"        : 16,
+           "deadlock_x"    : 17}
 
-cmlMAPv = {"n_c"           : 17,
-           "dt"            : 18}
+cmlMAPv = {"n_c"           : 18,
+           "dt"            : 19}
 
-cmlMAPd = {"dt"            : 19,
-           "n_b"           : 20,
-           "n_w"           : 21,
-           "n_c"           : 22,
-           "therm"         : 23}
+cmlMAPd = {"dt"            : 20,
+           "n_b"           : 21,
+           "n_w"           : 22,
+           "n_c"           : 23,
+           "therm"         : 24}
 
-cmlMAPm = {"SGDsamples"    : 24,
-           "n_w"           : 25,
-           "therm"         : 26,
-           "n_c_SGD"       : 27,
-           "max_step"      : 28,
-           "alpha"         : 29,
-           "beta"          : 30}
+cmlMAPm = {"SGDsamples"    : 25,
+           "n_w"           : 26,
+           "therm"         : 27,
+           "n_c_SGD"       : 28,
+           "max_step"      : 29,
+           "alpha"         : 30,
+           "beta"          : 31}
 
-cmlMAPvp = {"alpha"         : 31,
-            "beta"          : 32}
+cmlMAPvp = {"alpha"         : 32,
+            "beta"          : 33}
 
 
 def dumpStrList(aList):
