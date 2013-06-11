@@ -170,6 +170,7 @@ protected:
      */
     void set_spin_state(int particle) const;
 
+    
     //! Method used for testing the optimized ratio calculation.
     /*!
      * Compares to brute force computation of the wave function values.
@@ -184,6 +185,8 @@ protected:
     void test_gradients(Walker* walker);
 
 
+    
+    
 public:
 
     //! Constructor.
@@ -245,6 +248,9 @@ public:
     //! Method for calculating the acceptance ratio.
     void get_accepted_ratio();
 
+    //! Cleans up initializations which distorts successive use of objects
+    void clean();
+    
     //! Method used for loading the output_handler with objects.
     void add_output(OutputHandler* output_handler);
 

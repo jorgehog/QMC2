@@ -301,6 +301,11 @@ void QMC::get_accepted_ratio() {
     std_out->cout(s);
 }
 
+
+void QMC::clean(){
+    sampling->clear_deadlock();
+}
+
 /*
  
  Test functions

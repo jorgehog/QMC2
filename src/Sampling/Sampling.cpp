@@ -31,6 +31,10 @@ void Sampling::set_deadlock(const double deadlock_x){
     this->deadlock_x = deadlock_x;
 }
 
+void Sampling::clear_deadlock() {
+    deadlock = false;
+}
+
 void Sampling::set_trial_pos(Walker* walker) {
 
     for (int i = 0; i < n_p; i++) {

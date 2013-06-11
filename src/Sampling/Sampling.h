@@ -28,6 +28,7 @@ protected:
     double deadlock_x; //! Position of the frozen particle. y=z=0.
 
     void set_deadlock(const double deadlock_x);
+    void clear_deadlock();
 
     //!The Diffusion object.
     /*! \see Diffusion */
@@ -39,6 +40,8 @@ protected:
             ParParams &,
             int,
             int);
+    
+    friend void QMC::clean();
 
 public:
 

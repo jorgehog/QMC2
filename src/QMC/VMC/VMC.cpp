@@ -100,6 +100,8 @@ void VMC::run_method() {
 
     finalize_output();
     estimate_error();
+    
+    clean();
 }
 
 void VMC::output() {

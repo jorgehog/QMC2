@@ -194,6 +194,7 @@ void DMC::run_method() {
     dump_subsamples(true);
     finalize_output();
     get_accepted_ratio();
+    clean();
 }
 
 void DMC::save_distribution() {
