@@ -361,8 +361,8 @@ class dist_out(DCVizPlotter):
         
     stack = "H"
     
-    dmcOnly = False
-    vmcOnly = True
+    dmcOnly = True
+    vmcOnly = False
     
         
     def plot(self, data):
@@ -424,7 +424,12 @@ class dist_out(DCVizPlotter):
         X = X[x, y]
         Y = Y[x, y]
         C = cm.Greens
-
+        
+        if dist[len(dist)/2:, :].sum() < dist[0:len(dist)/2, :].sum():
+            print "flipping"
+            print dist[:, 0].sum()
+            dist = numpy.flipud(dist)
+            print dist[:, 0].sum()
         ax.plot_surface(X, Y, dist, rstride=1, cstride=1, cmap=C, linewidth=0)
 
 
