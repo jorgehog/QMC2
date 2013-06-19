@@ -6,7 +6,7 @@
  */
 
 #include "Distribution.h"
-#include "../../misc.h"
+#include "../../structs.h"
 
 #include "../../QMC/QMC.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"

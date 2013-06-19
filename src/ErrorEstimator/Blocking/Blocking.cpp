@@ -7,7 +7,7 @@
 
 #include "Blocking.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 #include <iomanip>
 
 

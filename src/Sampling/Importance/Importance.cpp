@@ -7,7 +7,7 @@
 
 #include "Importance.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 
 #include "../../Diffusion/Fokker_Planck/Fokker_Planck.h"
 #include "../../Walker/Walker.h"

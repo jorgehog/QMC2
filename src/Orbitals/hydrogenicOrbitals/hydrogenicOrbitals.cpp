@@ -7,7 +7,7 @@
 
 #include "hydrogenicOrbitals.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 
 #include "../../Walker/Walker.h"
 #include "../../BasisFunctions/hydrogenic/hydrogenic.h"

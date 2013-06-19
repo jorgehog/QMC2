@@ -7,7 +7,7 @@
 
 #include "Fermions.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 #include "../../Orbitals/Orbitals.h"
 
 Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)

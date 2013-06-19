@@ -7,7 +7,7 @@
 
 #include "Bosons.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 #include "../../Orbitals/Orbitals.h"
 
 Bosons::Bosons(GeneralParams & gP, Orbitals* orbital)

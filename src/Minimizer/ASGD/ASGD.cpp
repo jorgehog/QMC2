@@ -7,7 +7,7 @@
 
 #include "ASGD.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 
 #include "../../Walker/Walker.h"
 #include "../../Sampling/Sampling.h"

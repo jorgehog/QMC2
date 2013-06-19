@@ -7,7 +7,7 @@
 
 #include "SimpleVar.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 
 SimpleVar::SimpleVar(ParParams & pp)
 : ErrorEstimator(0, "", "", pp.parallel, pp.node, pp.n_nodes, false) {

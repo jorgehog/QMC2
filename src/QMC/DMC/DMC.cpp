@@ -9,7 +9,7 @@
 
 #include <iomanip>
 
-#include "../../misc.h"
+#include "../../structs.h"
 
 #include "../../System/System.h"
 #include "../../Sampling/Sampling.h"

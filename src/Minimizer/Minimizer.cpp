@@ -7,7 +7,7 @@
 
 #include "Minimizer.h"
 
-#include "../misc.h"
+#include "../structs.h"
 
 #include "../ErrorEstimator/ErrorEstimator.h"
 #include "../OutputHandler/OutputHandler.h"

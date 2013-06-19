@@ -9,7 +9,7 @@
 //#include "HartreeFock/HartreeFock.h"
 
 //#include "defines.h"
-#include "misc.h"
+#include "structs.h"
 
 #include <armadillo>
 #include <iostream>

@@ -8,7 +8,7 @@
 
 #include "Brute_Force.h"
 
-#include "../../misc.h"
+#include "../../structs.h"
 
 #include "../../Diffusion/Simple/Simple.h"
 
