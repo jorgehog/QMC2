@@ -5,7 +5,10 @@
  * Created on October 12, 2012, 2:44 PM
  */
 
-#include "../../QMCheaders.h"
+#include "Fermions.h"
+
+#include "../../misc.h"
+#include "../../Orbitals/Orbitals.h"
 
 Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
 : System(gP.n_p, gP.dim, orbital) {

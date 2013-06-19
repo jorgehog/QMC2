@@ -5,7 +5,9 @@
  * Created on October 30, 2012, 6:13 PM
  */
 
-#include "../../QMCheaders.h"
+#include "SimpleVar.h"
+
+#include "../../misc.h"
 
 SimpleVar::SimpleVar(ParParams & pp)
 : ErrorEstimator(0, "", "", pp.parallel, pp.node, pp.n_nodes, false) {

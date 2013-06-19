@@ -5,7 +5,11 @@
  * Created on October 12, 2012, 2:38 PM
  */
 
-#include "../../QMCheaders.h"
+#include "Pade_Jastrow.h"
+
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
+
 
 Pade_Jastrow::Pade_Jastrow(GeneralParams & gP, VariationalParams & vP)
 : Jastrow(gP.n_p, gP.dim) {

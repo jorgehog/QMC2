@@ -8,6 +8,9 @@
 #ifndef STDOUTASGD_H
 #define	STDOUTASGD_H
 
+#include "../OutputHandler.h"
+#include <armadillo>
+
 /*!
  * \brief Class for handling the output of ASGD. 
  * Ouputs values such as the variational gradients, step length, variational parameters, etc.
@@ -23,9 +26,7 @@ public:
      * Initializes the correct size of the variational gradient once the min
      * pointer has been cast to ASGD.
      */
-    void post_pointer_init(){
-        grad = arma::zeros(asgd->Nparams);
-    }
+    void post_pointer_init();
     
 private:
     

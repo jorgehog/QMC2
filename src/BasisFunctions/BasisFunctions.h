@@ -8,6 +8,8 @@
 #ifndef BASISFUNCTIONS_H
 #define	BASISFUNCTIONS_H
 
+class Walker;
+
 /*! \brief The Superclass shell for orbital basis functions.
  * 
  * Each single particle orbital has it's own implementation as a subclass of this class.

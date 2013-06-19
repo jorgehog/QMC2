@@ -5,7 +5,11 @@
  * Created on October 9, 2012, 5:09 PM
  */
 
-#include "../../QMCheaders.h"
+#include "ExpandedBasis.h"
+
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
+
 
 ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size, std::string coeffPath)
 : Orbitals(gp.n_p, gp.dim) {
@@ -14,16 +18,16 @@ ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size
     this->basis_size = basis_size;
     coeffs = arma::zeros<arma::mat > (n_p, basis_size);
 
-    std::ifstream coeffs_file;
-    coeffs_file.open(coeffPath.c_str());
-
-    for (int i = 0; i < n_p; i++) {
-        for (int m = 0; m < basis_size; m++) {
-            coeffs_file >> coeffs(i, m);
-        }
-    }
-
-    coeffs_file.close();
+//    std::ifstream coeffs_file;
+//    coeffs_file.open(coeffPath.c_str());
+//
+//    for (int i = 0; i < n_p; i++) {
+//        for (int m = 0; m < basis_size; m++) {
+//            coeffs_file >> coeffs(i, m);
+//        }
+//    }
+//
+//    coeffs_file.close();
 
 }
 

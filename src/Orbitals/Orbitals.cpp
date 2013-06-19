@@ -5,8 +5,12 @@
  * Created on 26. juni 2012, 17:41
  */
 
-#include "../QMCheaders.h"
-#include "CoulombElements/coulomb.h"
+#include "Orbitals.h"
+
+#include "../Walker/Walker.h"
+#include "../QMC/QMC.h"
+#include "../BasisFunctions/BasisFunctions.h"
+
 
 Orbitals::Orbitals(int n_p, int dim) {
     this->n_p = n_p;

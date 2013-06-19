@@ -8,7 +8,25 @@
 #ifndef QMC_H
 #define	QMC_H
 
-#include "../QMCheaders.h"
+#include <sstream>
+#include <string>
+#include <vector>
+#include <armadillo>
+
+#include "../Sampler/Sampler.h"
+
+struct GeneralParams;
+struct ParParams;
+struct SystemObjects;
+
+class STDOUT;
+class ErrorEstimator;
+class Walker;
+class System;
+class Jastrow;
+class Sampling;
+class OutputHandler;
+class Orbitals;
 
 /*! \brief The QMC superclass.
  * Holds implementations of general functions for both VMC and DMC in order to
@@ -223,27 +241,21 @@ public:
     /*!
      * \see System::get_spatial_lapl_sum(), Jastrow::get_lapl_sum()
      */
-    void get_laplsum(Walker* walker) const {
-        walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
-    }
+    void get_laplsum(Walker* walker) const;
 
     //! Method for calculating the wave functions value at a given walker's position.
 
     /*!
      * \see System::get_spatial_wf(), Jastrow::get_val()
      */
-    double get_wf_value(const Walker* walker) const {
-        return system->get_spatial_wf(walker) * jastrow->get_val(walker);
-    }
+    double get_wf_value(const Walker* walker) const;
 
     //! Method for calculating the local energy.
 
     /*!
      * \see get_KE(), System::get_potential_energy()
      */
-    double calculate_local_energy(const Walker* walker) {
-        return get_KE(walker) + system->get_potential_energy(walker);
-    }
+    double calculate_local_energy(const Walker* walker);
 
     //! Method for calculating the acceptance ratio.
     void get_accepted_ratio();
@@ -275,9 +287,7 @@ public:
         return jastrow;
     }
 
-    Orbitals* get_orbitals_ptr() const {
-        return system->get_orbital_ptr();
-    }
+    Orbitals* get_orbitals_ptr() const;
 
 
 

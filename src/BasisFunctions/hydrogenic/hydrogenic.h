@@ -3,6 +3,8 @@
 #ifndef HYDROGENIC_H
 #define HYDROGENIC_H 
 
+#include "../BasisFunctions.h"
+
 //Superclass 
 
 class hydrogenic : public BasisFunctions {

@@ -8,6 +8,13 @@
 #ifndef FERMIONS_H
 #define	FERMIONS_H
 
+#include "../System.h"
+
+#include <armadillo>
+#include "../../Walker/Walker.h"
+struct GeneralParams;
+
+
 /*! \brief The Fermion system class. */
 class Fermions : public System {
 protected:

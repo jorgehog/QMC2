@@ -5,7 +5,16 @@
  * Created on October 12, 2012, 2:43 PM
  */
 
-#include "../../QMCheaders.h"
+#include "VMC.h"
+
+#include <iomanip>
+
+#include "../../misc.h"
+
+#include "../../Walker/Walker.h"
+#include "../../Sampling/Sampling.h"
+#include "../../ErrorEstimator/ErrorEstimator.h"
+
 
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool dist_out)
 : QMC(gP, vP.n_c, sO, pp, n_w) {
@@ -21,6 +30,10 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     dist_tresh = 25;
     pop_tresh = n_c / n_w;
     offset = n_c - n_w*pop_tresh;
+    
+//    //ANDERS
+//    offset = n_c*2;
+//    dist_tresh = 25;
 
     last_walker = 0;
 

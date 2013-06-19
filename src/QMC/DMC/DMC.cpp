@@ -5,7 +5,18 @@
  * Created on October 12, 2012, 2:42 PM
  */
 
-#include "../../QMCheaders.h"
+#include "DMC.h"
+
+#include <iomanip>
+
+#include "../../misc.h"
+
+#include "../../System/System.h"
+#include "../../Sampling/Sampling.h"
+#include "../../Walker/Walker.h"
+#include "../../ErrorEstimator/ErrorEstimator.h"
+#include "../VMC/VMC.h"
+
 
 DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc, bool dist_out)
 : QMC(gP, dP.n_c, sO, pp, dP.n_w, K) {
@@ -431,4 +442,8 @@ void DMC::free_walkers() {
 
     delete [] original_walkers;
 
+}
+
+bool DMC::move_autherized(double A) {
+    return metropolis_test(A) & system->allow_transition();
 }

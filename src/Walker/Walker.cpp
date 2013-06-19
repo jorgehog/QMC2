@@ -5,7 +5,8 @@
  * Created on 30. mars 2012, 16:50
  */
 
-#include "../QMCheaders.h"
+#include "Walker.h"
+#include <iostream>
 
 Walker::Walker(int n_p, int dim, bool alive) {
     using namespace arma;

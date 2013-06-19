@@ -8,6 +8,8 @@
 #ifndef STDOUTDMC_H
 #define	STDOUTDMC_H
 
+#include "../OutputHandler.h"
+
 /*! \brief Class for handling the output of DMC.
  * Outputs values such as the trial energy, dmc energy, number of walkers, etc.
  */

@@ -8,6 +8,10 @@
 #ifndef DMC_H
 #define	DMC_H
 
+#include "../QMC.h"
+class VMC;
+struct DMCparams;
+
 /*! \brief Implementation of the Diffusion Monte-Carlo Method.
  * Very little needs to be added when the QMC superclass holds all the
  * general functionality.
@@ -65,9 +69,7 @@ protected:
      * override the metropolis test (fixed node approximation in case of a
      * Fermion system) 
      */
-    bool move_autherized(double A) {
-        return metropolis_test(A) & system->allow_transition();
-    };
+    bool move_autherized(double A);
 
     void reset_parameters() {
         n_w_last = n_w;

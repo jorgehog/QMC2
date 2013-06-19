@@ -3,8 +3,9 @@
 #ifndef HARMONICOSCILLATOR_H
 #define HARMONICOSCILLATOR_H 
 
-//Superclass 
+#include "../BasisFunctions.h"
 
+//Superclass 
 class HarmonicOscillator : public BasisFunctions {
 protected:
 

@@ -5,27 +5,77 @@
  * Created on 13. april 2012, 17:04
  */
 
-#include "QMCheaders.h"
+//#include "QMCheaders.h"
 //#include "HartreeFock/HartreeFock.h"
+
+//#include "defines.h"
+#include "misc.h"
+
+#include <armadillo>
+#include <iostream>
+
+#include "QMC/QMC.h"
+#include "QMC/VMC/VMC.h"
+#include "QMC/DMC/DMC.h"
+
+#include "Minimizer/Minimizer.h"
+#include "Minimizer/ASGD/ASGD.h"
+
+#include "ErrorEstimator/ErrorEstimator.h"
+#include "ErrorEstimator/SimpleVar/SimpleVar.h"
+#include "ErrorEstimator/Blocking/Blocking.h"
+
+#include "OutputHandler/OutputHandler.h"
+#include "OutputHandler/stdoutASGD/stdoutASGD.h"
+#include "OutputHandler/stdoutDMC/stdoutDMC.h"
+#include "OutputHandler/Distribution/Distribution.h"
+
+#include "Orbitals/Orbitals.h"
+#include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
+#include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
+#include "Orbitals/DiTransform/DiTransform.h"
+//#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
+
+#include "Potential/Potential.h"
+#include "Potential/AtomCore/AtomCore.h"
+#include "Potential/Coulomb/Coulomb.h"
+#include "Potential/DiAtomCore/DiAtomCore.h"
+#include "Potential/DoubleWell/DoubleWell.h"
+#include "Potential/Harmonic_osc/Harmonic_osc.h"
+
+#include "System/System.h"
+//#include "System/Bosons/Bosons.h"
+#include "System/Fermions/Fermions.h"
+
+#include "Sampling/Sampling.h"
+#include "Sampling/Brute_Force/Brute_Force.h"
+#include "Sampling/Importance/Importance.h"
+
+#include "Jastrow/Jastrow.h"
+#include "Jastrow/No_Jastrow/No_Jastrow.h"
+#include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
+
+
 
 /*
  * 
  */
+
 
 //! Function for parsing the command line for parameters.
 /*!
  * The command line parameters are set up by the Python script runQMC.
  * Compiling with a different main file is designed to be easy.
  */
-void parseCML(int, char**,
-        VMCparams &,
-        DMCparams &,
-        VariationalParams &,
-        GeneralParams &,
-        MinimizerParams &,
-        OutputParams &,
-        ParParams &
-        );
+void parseCML(int argc, char** argv,
+        VMCparams & vmcParams,
+        DMCparams & dmcParams,
+        VariationalParams & variationalParams,
+        GeneralParams & generalParams,
+        MinimizerParams & minimizerParams,
+        OutputParams & outputParams,
+        ParParams & parParams);
+
 
 //! Function for setting up the system objects.
 void selectSystem(GeneralParams & gP,
@@ -108,18 +158,6 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    //
-
-    //    generalParams.n_p = 2;
-    //    generalParams.dim = 3;
-    //    generalParams.systemConstant = generalParams.n_p;
-    //    variationalParams.alpha = 1;
-    //    srand(time(NULL));
-    //    Orbitals* sp = new hydrogenicOrbitals(generalParams, variationalParams);
-    //    HartreeFock* hf = new HartreeFock(4, sp);
-    //    hf->run_method();
-    //    
-    //    exit(0);
 
     parseCML(argc, argv,
             vmcParams,
@@ -258,6 +296,105 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
+
+
+void selectSystem(GeneralParams & gP,
+        SystemObjects & sO,
+        VariationalParams & vP,
+        ParParams & pp) {
+
+    if (gP.system == "QDots") {
+
+        gP.dim = 2;
+
+        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
+
+        sO.onebody_pot = new Harmonic_osc(gP);
+
+        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+        sO.SYSTEM->add_potential(sO.onebody_pot);
+
+    } else if (gP.system == "QDots3D") {
+
+        gP.dim = 3;
+
+        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
+
+        sO.onebody_pot = new Harmonic_osc(gP);
+
+        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+        sO.SYSTEM->add_potential(sO.onebody_pot);
+
+    } else if (gP.system == "Atoms") {
+
+        gP.dim = 3;
+
+        sO.SP_basis = new hydrogenicOrbitals(gP, vP);
+
+        sO.onebody_pot = new AtomCore(gP);
+
+        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+
+        sO.SYSTEM->add_potential(sO.onebody_pot);
+
+
+    } else if (gP.system == "Diatom") {
+
+        gP.dim = 3;
+
+        sO.SP_basis = new DiTransform(gP, vP);
+
+        System* system = new Fermions(gP, sO.SP_basis);
+        system->add_potential(new DiAtomCore(gP));
+
+        sO.SYSTEM = system;
+
+    } else if (gP.system == "DoubleWell") {
+
+        gP.dim = 2;
+
+        sO.SP_basis = new DiTransform(gP, vP);
+
+        System* system = new Fermions(gP, sO.SP_basis);
+        system->add_potential(new DoubleWell(gP));
+
+        sO.SYSTEM = system;
+
+    } else {
+        if (pp.is_master) std::cout << "unknown system" << std::endl;
+        if (pp.is_master) exit(1);
+    }
+
+    if (gP.sampling == "IS") {
+        sO.sample_method = new Importance(gP);
+
+    } else if (gP.sampling == "BF") {
+        sO.sample_method = new Brute_Force(gP);
+
+    } else {
+
+        if (pp.is_master) std::cout << "unknown sampling method" << std::endl;
+        if (pp.is_master) exit(1);
+    }
+
+
+    if (gP.use_jastrow) {
+        sO.jastrow = new Pade_Jastrow(gP, vP);
+
+    } else {
+        sO.jastrow = new No_Jastrow();
+
+    }
+
+
+
+    if (gP.use_coulomb) {
+        sO.SYSTEM->add_potential(new Coulomb(gP));
+    }
+
+}
+
 
 void parseCML(int argc, char** argv,
         VMCparams & vmcParams,
@@ -517,100 +654,4 @@ void parseCML(int argc, char** argv,
 #ifdef MPI_ON
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
-}
-
-void selectSystem(GeneralParams & gP,
-        SystemObjects & sO,
-        VariationalParams & vP,
-        ParParams & pp) {
-
-    if (gP.system == "QDots") {
-
-        gP.dim = 2;
-
-        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
-
-        sO.onebody_pot = new Harmonic_osc(gP);
-
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-        sO.SYSTEM->add_potential(sO.onebody_pot);
-
-    } else if (gP.system == "QDots3D") {
-
-        gP.dim = 3;
-
-        sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
-
-        sO.onebody_pot = new Harmonic_osc(gP);
-
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-        sO.SYSTEM->add_potential(sO.onebody_pot);
-
-    } else if (gP.system == "Atoms") {
-
-        gP.dim = 3;
-
-        sO.SP_basis = new hydrogenicOrbitals(gP, vP);
-
-        sO.onebody_pot = new AtomCore(gP);
-
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-
-        sO.SYSTEM->add_potential(sO.onebody_pot);
-
-
-    } else if (gP.system == "Diatom") {
-
-        gP.dim = 3;
-
-        sO.SP_basis = new DiTransform(gP, vP);
-
-        System* system = new Fermions(gP, sO.SP_basis);
-        system->add_potential(new DiAtomCore(gP));
-
-        sO.SYSTEM = system;
-
-    } else if (gP.system == "DoubleWell") {
-
-        gP.dim = 2;
-
-        sO.SP_basis = new DiTransform(gP, vP);
-
-        System* system = new Fermions(gP, sO.SP_basis);
-        system->add_potential(new DoubleWell(gP));
-
-        sO.SYSTEM = system;
-
-    } else {
-        if (pp.is_master) std::cout << "unknown system" << std::endl;
-        if (pp.is_master) exit(1);
-    }
-
-    if (gP.sampling == "IS") {
-        sO.sample_method = new Importance(gP);
-
-    } else if (gP.sampling == "BF") {
-        sO.sample_method = new Brute_Force(gP);
-
-    } else {
-
-        if (pp.is_master) std::cout << "unknown sampling method" << std::endl;
-        if (pp.is_master) exit(1);
-    }
-
-
-    if (gP.use_jastrow) {
-        sO.jastrow = new Pade_Jastrow(gP, vP);
-
-    } else {
-        sO.jastrow = new No_Jastrow();
-
-    }
-
-
-
-    if (gP.use_coulomb) {
-        sO.SYSTEM->add_potential(new Coulomb(gP));
-    }
-
 }

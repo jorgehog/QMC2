@@ -5,8 +5,10 @@
  * Created on October 12, 2012, 2:44 PM
  */
 
-#include "../../QMCheaders.h"
 #include "Bosons.h"
+
+#include "../../misc.h"
+#include "../../Orbitals/Orbitals.h"
 
 Bosons::Bosons(GeneralParams & gP, Orbitals* orbital)
 : System(gP.n_p, gP.dim, orbital) {

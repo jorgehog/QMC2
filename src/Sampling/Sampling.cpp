@@ -5,7 +5,13 @@
  * Created on 15. juni 2012, 18:44
  */
 
-#include "../QMCheaders.h"
+
+#include "Sampling.h"
+
+#include "../Walker/Walker.h"
+#include "../System/System.h"
+#include "../Jastrow/Jastrow.h"
+#include "../Orbitals/Orbitals.h"
 
 Sampling::Sampling(int n_p, int dim) {
 

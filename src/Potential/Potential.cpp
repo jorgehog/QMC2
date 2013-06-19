@@ -5,7 +5,7 @@
  * Created on 13. april 2012, 17:21
  */
 
-#include "../QMCheaders.h"
+#include "Potential.h"
 
 Potential::Potential(int n_p, int dim) {
 

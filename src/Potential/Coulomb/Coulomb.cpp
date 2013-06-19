@@ -5,7 +5,11 @@
  * Created on October 12, 2012, 2:41 PM
  */
 
-#include "../../QMCheaders.h"
+#include "Coulomb.h"
+
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
+
 
 Coulomb::Coulomb(GeneralParams & gP)
 : Potential(gP.n_p, gP.dim) {

@@ -5,7 +5,14 @@
  * Created on 30. mars 2012, 16:49
  */
 
-#include "../QMCheaders.h"
+#include "System.h"
+
+#include <math.h>
+#include <sstream>
+#include <iomanip>
+
+#include "../Potential/Potential.h"
+
 
 System::System(int n_p, int dim, Orbitals* orbital) {
     this->n_p = n_p;

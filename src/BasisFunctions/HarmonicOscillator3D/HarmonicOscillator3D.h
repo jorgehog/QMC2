@@ -3,6 +3,8 @@
 #ifndef HARMONICOSCILLATOR3D_H
 #define HARMONICOSCILLATOR3D_H 
 
+#include "../BasisFunctions.h"
+
 //Superclass 
 
 class HarmonicOscillator3D : public BasisFunctions {

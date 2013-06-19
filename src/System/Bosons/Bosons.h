@@ -8,6 +8,10 @@
 #ifndef Bosons_H
 #define	Bosons_H
 
+#include "../System.h"
+#include "../../Walker/Walker.h"
+struct GeneralParams;
+
 /*! \brief The Boson system class. */
 class Bosons : public System {
 protected:

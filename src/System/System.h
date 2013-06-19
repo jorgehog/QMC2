@@ -8,6 +8,13 @@
 #ifndef SYSTEM_H
 #define	SYSTEM_H
 
+#include <vector>
+#include <string>
+
+class Walker;
+class Orbitals;
+class Potential;
+
 /*! \brief The system class separating Fermions and Bosons.
  * Designed to generalize the solver in terms of particle species.
  */

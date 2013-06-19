@@ -8,6 +8,10 @@
 #ifndef DIFFUSION_H
 #define	DIFFUSION_H
 
+#include "../defines.h"
+class QMC;
+class Walker;
+
 /*! \brief Class containing rules for walker movement based on diffusion models.
  * Serves as class member in the Sampling class. Brute force implies the Simple
  * diffusion model, while Importance Sampling implies the Fokker Planck diffusion.
@@ -63,10 +67,7 @@ public:
      * Takes care of consequences. Time step should only be altered using this
      * function.
      */
-    void set_dt(double dt) {
-        this->timestep = dt;
-        this->std = sqrt(2 * D * dt);
-    }
+    void set_dt(double dt);
 
     double get_dt() const {
         return timestep;

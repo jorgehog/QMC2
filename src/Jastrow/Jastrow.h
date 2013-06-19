@@ -8,6 +8,8 @@
 #ifndef JASTROW_H
 #define	JASTROW_H
 
+class Walker;
+
 /*! \brief The class representing the Jastrow correlation functions
  * Holds all data concerning the Jastrow function and it's influence
  * on the QMC algorithm. 

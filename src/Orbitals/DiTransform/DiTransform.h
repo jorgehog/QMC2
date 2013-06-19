@@ -8,6 +8,10 @@
 #ifndef DITRANSFORM_H
 #define	DITRANSFORM_H
 
+#include "../Orbitals.h"
+struct GeneralParams;
+struct VariationalParams;
+
 class DiTransform : public Orbitals {
 public:
 

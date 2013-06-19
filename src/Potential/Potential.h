@@ -8,6 +8,10 @@
 #ifndef POTENTIAL_H
 #define	POTENTIAL_H
 
+#include <string>
+#include "../Sampler/Sampler.h"
+class Walker;
+
 /*! \brief Superclass for potentials. 
  * Potentials are stores in a vector in the system object.
  * \see System::potentials, System::get_potential_energy()

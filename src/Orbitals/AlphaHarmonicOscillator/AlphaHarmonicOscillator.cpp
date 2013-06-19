@@ -5,8 +5,15 @@
  * Created on 26. juni 2012, 17:41
  */
 
-#include "../../QMCheaders.h"
-#include "../CoulombElements/coulomb.h"
+#include "AlphaHarmonicOscillator.h"
+
+#include "../../misc.h"
+
+#include "../../Walker/Walker.h"
+
+#include "../../BasisFunctions/HarmonicOscillator/HarmonicOscillator.h"
+#include "../../BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.h"
+
 
 AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
@@ -406,58 +413,62 @@ double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_
 
 }
 
+void AlphaHarmonicOscillator::set_qnum_indie_terms(Walker* walker, int i) {
+    *exp_factor = exp(-0.5 * (*k2) * walker->get_r_i2(i));
+}
+
 double AlphaHarmonicOscillator::get_coulomb_element(const arma::uvec& qnum_set) {
     //Needs transformations to be effective. Simen Kvaal style.
-    using namespace arma;
-
-    int n_x, n_y;
-
-    ivec n_set(4);
-    ivec m_set(4);
-
-    for (int i = 0; i < 4; i++) {
-        n_x = qnums(qnum_set(i), 0);
-        n_y = qnums(qnum_set(i), 1);
-
-        m_set(i) = n_x - n_y;
-        n_set(i) = (n_x + n_y - abs(m_set(i))) / 2;
-
-    }
-    //    cout << "q " <<qnum_set.st() << "m " << m_set.st() << "n " << n_set.st() << endl;
-    double element = coulomb(n_set(0), m_set(0),
-            n_set(1), m_set(1),
-            n_set(3), m_set(3),
-            n_set(2), m_set(2));
-    //    cout << element << "\n-------" << endl;
-
-    int n_c = 10000000;
-    double a = -3;
-    double b = 3;
-    Diffusion* diff = new Simple(1, 1, 1, 1000, 1);
-
-    Walker* dummy = new Walker(2, dim);
-    double I = 0;
-    for (int i = 0; i < n_c; i++) {
-        dummy->r = a + (b - a) * randu(2, dim);
-
-        set_qnum_indie_terms(dummy, 0);
-        double local_I = phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(2));
-
-        set_qnum_indie_terms(dummy, 1);
-        local_I *= phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(3));
-
-        I += local_I / dummy->calc_r_rel(0, 1);
-
-
-    }
-
-    I *= (b - a) / n_c;
-    if (I < 1E-2) {
-        I = 0;
-    }
-    //    cout << I << "  " << element << endl;
-
-    return I;
+    //    using namespace arma;
+    //
+    //    int n_x, n_y;
+    //
+    //    ivec n_set(4);
+    //    ivec m_set(4);
+    //
+    //    for (int i = 0; i < 4; i++) {
+    //        n_x = qnums(qnum_set(i), 0);
+    //        n_y = qnums(qnum_set(i), 1);
+    //
+    //        m_set(i) = n_x - n_y;
+    //        n_set(i) = (n_x + n_y - abs(m_set(i))) / 2;
+    //
+    //    }
+    //    //    cout << "q " <<qnum_set.st() << "m " << m_set.st() << "n " << n_set.st() << endl;
+    ////    double element = coulomb(n_set(0), m_set(0),
+    ////            n_set(1), m_set(1),
+    ////            n_set(3), m_set(3),
+    ////            n_set(2), m_set(2));
+    //    //    cout << element << "\n-------" << endl;
+    //
+    //    int n_c = 10000000;
+    //    double a = -3;
+    //    double b = 3;
+    //    Diffusion* diff = new Simple(1, 1, 1, 1000, 1);
+    //
+    //    Walker* dummy = new Walker(2, dim);
+    //    double I = 0;
+    //    for (int i = 0; i < n_c; i++) {
+    //        dummy->r = a + (b - a) * randu(2, dim);
+    //
+    //        set_qnum_indie_terms(dummy, 0);
+    //        double local_I = phi(dummy, 0, qnum_set(0)) * phi(dummy, 0, qnum_set(2));
+    //
+    //        set_qnum_indie_terms(dummy, 1);
+    //        local_I *= phi(dummy, 1, qnum_set(1)) * phi(dummy, 1, qnum_set(3));
+    //
+    //        I += local_I / dummy->calc_r_rel(0, 1);
+    //
+    //
+    //    }
+    //
+    //    I *= (b - a) / n_c;
+    //    if (I < 1E-2) {
+    //        I = 0;
+    //    }
+    //    //    cout << I << "  " << element << endl;
+    //
+    //    return I;
 
 }
 

@@ -5,6 +5,8 @@
  * Created on April 4, 2013, 2:46 PM
  */
 
+#include "HartreeFock.h"
+
 #include <armadillo>
 
 class QMC;
@@ -12,7 +14,6 @@ class BasisFunctions;
 class Walker;
 
 #include "../Orbitals/Orbitals.h"
-#include "HartreeFock.h"
 #include <iostream>
 #include <assert.h>
 

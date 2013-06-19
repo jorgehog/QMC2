@@ -5,7 +5,9 @@
  * Created on 3. sept 2012, 13:17
  */
 
-#include "../QMCheaders.h"
+
+#include "OutputHandler.h"
+#include "../defines.h"
 
 OutputHandler::OutputHandler() {
 

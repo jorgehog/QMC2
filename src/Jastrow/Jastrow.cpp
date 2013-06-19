@@ -5,7 +5,8 @@
  * Created on 30. mars 2012, 16:52
  */
 
-#include "../QMCheaders.h"
+#include "Jastrow.h"
+#include "../Walker/Walker.h"
 
 Jastrow::Jastrow(int n_p, int dim) {
     this->n_p = n_p;

@@ -5,7 +5,17 @@
  * Created on 23. August 2012, 16:52
  */
 
-#include "../../QMCheaders.h"
+#include "ASGD.h"
+
+#include "../../misc.h"
+
+#include "../../Walker/Walker.h"
+#include "../../Sampling/Sampling.h"
+#include "../../System/System.h"
+#include "../../ErrorEstimator/ErrorEstimator.h"
+#include "../../Orbitals/Orbitals.h"
+#include "../../Jastrow/Jastrow.h"
+
 
 ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
 : Minimizer(vmc, pp, mP.alpha, mP.beta) {

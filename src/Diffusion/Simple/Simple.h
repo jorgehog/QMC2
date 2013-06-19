@@ -8,6 +8,8 @@
 #ifndef SIMPLE_H
 #define	SIMPLE_H
 
+#include "../Diffusion.h"
+
 /*! \brief Simple Isotropic diffusion model.
  */
 class Simple : public Diffusion {

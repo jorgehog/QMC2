@@ -8,6 +8,11 @@
 #ifndef PADE_JASTROW_H
 #define	PADE_JASTROW_H
 
+#include "../Jastrow.h"
+
+#include <armadillo>
+struct GeneralParams;
+struct VariationalParams;
 
 /*!
  * \brief The Pade Jastrow factor with a single variational parameter.

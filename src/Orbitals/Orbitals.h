@@ -8,7 +8,10 @@
 #ifndef ORBITALS_H
 #define	ORBITALS_H
 
-#include "../HartreeFock/HartreeFock.h"
+#include <armadillo>
+class QMC;
+class BasisFunctions;
+class Walker;
 
 /*! \brief Superclass for the single particle orbital classes.
  * Handles everything specific regarding choice of single particle basis.

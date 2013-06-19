@@ -5,7 +5,12 @@
  * Created on October 12, 2012, 2:43 PM
  */
 
-#include "../../QMCheaders.h"
+
+#include "Brute_Force.h"
+
+#include "../../misc.h"
+
+#include "../../Diffusion/Simple/Simple.h"
 
 
 Brute_Force::Brute_Force(GeneralParams & gP)

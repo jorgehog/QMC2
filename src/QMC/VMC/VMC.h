@@ -8,6 +8,9 @@
 #ifndef VMC_H
 #define	VMC_H
 
+#include "../QMC.h"
+struct VMCparams;
+
 /*! \brief Implementation of the Variational Monte-Carlo Method.
  * Very little needs to be added when the QMC superclass holds all the
  * general functionality.

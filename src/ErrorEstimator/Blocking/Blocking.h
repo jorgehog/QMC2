@@ -8,6 +8,9 @@
 #ifndef BLOCKING_H
 #define	BLOCKING_H
 
+#include "../ErrorEstimator.h"
+struct ParParams;
+
 class Blocking : public ErrorEstimator {
 public:
     

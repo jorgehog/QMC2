@@ -8,9 +8,19 @@
 #ifndef MINIMIZER_H
 #define	MINIMIZER_H
 
+class Jastrow;
+class Orbitals;
+class ErrorEstimator;
+class OutputHandler;
+class STDOUT;
+
+#include "../QMC/VMC/VMC.h"
+#include <vector>
+#include <armadillo>
+#include <string>
+
 /*!\brief Class for minimization methods used to obtain optimal variational parameters.
  */
-
 class Minimizer {
 protected:
     

@@ -5,7 +5,13 @@
  * Created on 26. juni 2012, 17:41
  */
 
-#include "../../QMCheaders.h"
+#include "hydrogenicOrbitals.h"
+
+#include "../../misc.h"
+
+#include "../../Walker/Walker.h"
+#include "../../BasisFunctions/hydrogenic/hydrogenic.h"
+
 
 hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {

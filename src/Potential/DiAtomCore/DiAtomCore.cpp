@@ -5,7 +5,11 @@
  * Created on May 10, 2013, 1:25 PM
  */
 
-#include "../../QMCheaders.h"
+#include "DiAtomCore.h"
+
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
+
 
 DiAtomCore::DiAtomCore(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){

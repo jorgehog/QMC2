@@ -8,6 +8,16 @@
 #ifndef OUTPUTHANDLER_H
 #define	OUTPUTHANDLER_H
 
+#include <string>
+#include <sstream>
+#include <fstream>
+
+class QMC;
+class DMC;
+class VMC;
+class Minimizer;
+class ASGD;
+
 /*! \brief Class for handling output-methods.
  * Designed to avoid rewriting code, as well as avoid if-tests if output is
  * not desired.

@@ -8,6 +8,10 @@
 #ifndef DISTRIBUTION_H
 #define	DISTRIBUTION_H
 
+#include "../OutputHandler.h"
+#include <armadillo>
+struct ParParams;
+
 /*! \brief Class for calculating distribution functions such as the one-body density.
  *  Does not collect data itself, but works merely as a control organ for the QMC class,
  * calling it's methods for storing position data.
@@ -90,9 +94,7 @@ private:
      * In order to calculate the radial distribution, the dimension is needed.
      * \see OutputHandler::post_pointer_init()
      */
-    void post_pointer_init() {
-        this->dim = qmc->dim;
-    }
+    void post_pointer_init();
 
 };
 

@@ -5,7 +5,15 @@
  * Created on 23. august 2012, 16:52
  */
 
-#include "../QMCheaders.h"
+#include "Minimizer.h"
+
+#include "../misc.h"
+
+#include "../ErrorEstimator/ErrorEstimator.h"
+#include "../OutputHandler/OutputHandler.h"
+#include "../Orbitals/Orbitals.h"
+#include "../Jastrow/Jastrow.h"
+
 
 Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha, const arma::rowvec & beta) {
 

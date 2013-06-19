@@ -8,6 +8,9 @@
 #ifndef EXPANDEDBASIS_H
 #define	EXPANDEDBASIS_H
 
+#include "../Orbitals.h"
+struct GeneralParams;
+
 class ExpandedBasis : public Orbitals {
 public:
     ExpandedBasis(GeneralParams & gp, Orbitals* basis, int m, std::string coeffPath);

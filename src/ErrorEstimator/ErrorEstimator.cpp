@@ -5,7 +5,8 @@
  * Created on October 29, 2012, 3:58 PM
  */
 
-#include "../QMCheaders.h"
+#include "ErrorEstimator.h"
+#include "../defines.h"
 
 ErrorEstimator::ErrorEstimator() {
 

@@ -5,7 +5,11 @@
  * Created on October 12, 2012, 2:42 PM
  */
 
-#include "../../QMCheaders.h"
+
+#include "Harmonic_osc.h"
+
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
 
 
 Harmonic_osc::Harmonic_osc(GeneralParams & gP)

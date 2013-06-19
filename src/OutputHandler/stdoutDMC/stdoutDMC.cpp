@@ -5,7 +5,10 @@
  * Created on September 4, 2012, 7:22 PM
  */
 
-#include "../../QMCheaders.h"
+#include "stdoutDMC.h"
+
+#include "../../QMC/DMC/DMC.h"
+
 
 stdoutDMC::stdoutDMC(std::string path, std::string filename)
 : OutputHandler(filename, path, false, 0, 1) {

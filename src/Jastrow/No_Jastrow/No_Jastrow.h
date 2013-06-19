@@ -8,6 +8,7 @@
 #ifndef NO_JASTROW_H
 #define	NO_JASTROW_H
 
+#include "../Jastrow.h"
 
 /*!
  * \brief Class loaded when no correlation factor is used.

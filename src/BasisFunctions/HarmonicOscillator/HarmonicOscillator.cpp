@@ -1,5 +1,6 @@
 
-#include "../../QMCheaders.h"
+#include "HarmonicOscillator.h"
+#include "../../Walker/Walker.h"
 
 
 //Superclass Constructor

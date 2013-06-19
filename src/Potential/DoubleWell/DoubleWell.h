@@ -8,6 +8,9 @@
 #ifndef DOUBLEWELL_H
 #define	DOUBLEWELL_H
 
+#include "../Potential.h"
+struct GeneralParams;
+
 class DoubleWell : public Potential {
 public:
     DoubleWell(GeneralParams & gp);

@@ -8,6 +8,9 @@
 #ifndef COULOMB_H
 #define	COULOMB_H
 
+#include "../Potential.h"
+struct GeneralParams;
+
 /*! \brief Implementation of the Coulomb potential. 1/r_{ij}
  */
 class Coulomb : public Potential {

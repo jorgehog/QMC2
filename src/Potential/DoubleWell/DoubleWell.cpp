@@ -5,7 +5,10 @@
  * Created on May 10, 2013, 1:25 PM
  */
 
-#include "../../QMCheaders.h"
+#include "DoubleWell.h"
+
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
 
 DoubleWell::DoubleWell(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){

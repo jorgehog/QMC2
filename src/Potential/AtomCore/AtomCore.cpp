@@ -5,8 +5,10 @@
  * Created on October 12, 2012, 2:42 PM
  */
 
+#include "AtomCore.h"
 
-#include "../../QMCheaders.h"
+#include "../../misc.h"
+#include "../../Walker/Walker.h"
 
 
 AtomCore::AtomCore(GeneralParams & gP)

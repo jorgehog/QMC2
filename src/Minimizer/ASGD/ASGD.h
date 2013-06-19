@@ -8,6 +8,10 @@
 #ifndef ASGD_H
 #define	ASGD_H
 
+#include "../Minimizer.h"
+class Walker;
+struct MinimizerParams;
+
 /*! \brief Implementation for the Adaptive Stochastic Gradient Descent method (ASGD)
  *  Used to find optimal variational parameters using adaptive step lengths.
  */

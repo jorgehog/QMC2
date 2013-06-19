@@ -8,6 +8,9 @@
 #ifndef FOKKER_PLANCK_H
 #define	FOKKER_PLANCK_H
 
+#include "../Diffusion.h"
+#include "../../Walker/Walker.h"
+
 /*! \brief Anisotropic diffusion by the Fokker-Planck equation.
  */
 class Fokker_Planck : public Diffusion {

@@ -8,6 +8,9 @@
 #ifndef SIMPLEVAR_H
 #define	SIMPLEVAR_H
 
+#include "../ErrorEstimator.h"
+struct ParParams;
+
 /*! \brief Calculates the simple variance of the sampled values.
  */
 class SimpleVar : public ErrorEstimator {

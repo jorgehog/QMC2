@@ -8,6 +8,9 @@
 #ifndef WALKER_H
 #define	WALKER_H
 
+#include <armadillo>
+#include <string>
+
 /*! \brief Class representing a Random Walker.
  * Holds position data, alive state, etc.
  * Designed to lighten function arguments, and ease implementation

@@ -5,7 +5,7 @@
  * Created on 27. juni 2012, 13:17
  */
 
-#include "../QMCheaders.h"
+#include "BasisFunctions.h"
 
 BasisFunctions::BasisFunctions() {
 

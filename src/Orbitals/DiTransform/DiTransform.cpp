@@ -5,7 +5,14 @@
  * Created on May 10, 2013, 1:46 PM
  */
 
-#include "../../QMCheaders.h"
+#include "DiTransform.h"
+
+#include "../../misc.h"
+
+#include "../../Walker/Walker.h"
+#include "../AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
+#include "../hydrogenicOrbitals/hydrogenicOrbitals.h"
+
 
 DiTransform::DiTransform(GeneralParams& gP, VariationalParams& vP)
 : Orbitals(gP.n_p, gP.dim) {

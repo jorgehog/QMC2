@@ -8,6 +8,8 @@
 #ifndef IMPORTANCE_H
 #define	IMPORTANCE_H
 
+#include "../Sampling.h"
+
 /*! \brief Implementation of Importance sampled QMC.
  * Using the Fokker-Planck diffusion class.
  * Introduces the Quantum Force.
@@ -53,11 +55,7 @@ public:
     /*!
      * The gradients and the Quantum force is copied.
      */
-    void copy_walker(const Walker* parent, Walker* child) const {
-        child->jast_grad = parent->jast_grad;
-        child->spatial_grad = parent->spatial_grad;
-        child->qforce = parent->qforce;
-    }
+    void copy_walker(const Walker* parent, Walker* child) const;
 
 
 };

@@ -5,7 +5,13 @@
  * Created on October 12, 2012, 2:43 PM
  */
 
-#include "../../QMCheaders.h"
+#include "Importance.h"
+
+#include "../../misc.h"
+
+#include "../../Diffusion/Fokker_Planck/Fokker_Planck.h"
+#include "../../Walker/Walker.h"
+
 
 Importance::Importance(GeneralParams & gP)
 : Sampling(gP.n_p, gP.dim) {
@@ -30,3 +36,9 @@ void Importance::reset_walker(const Walker* walker_pre, Walker* walker_post, int
     walker_post->spatial_grad(span(start, end), span()) = walker_pre->spatial_grad(span(start, end), span());
     walker_post->jast_grad = walker_pre->jast_grad;
 }
+
+void Importance::copy_walker(const Walker* parent, Walker* child) const {
+        child->jast_grad = parent->jast_grad;
+        child->spatial_grad = parent->spatial_grad;
+        child->qforce = parent->qforce;
+    }

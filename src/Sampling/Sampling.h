@@ -8,6 +8,9 @@
 #ifndef SAMPLING_H
 #define	SAMPLING_H
 
+#include "../Diffusion/Diffusion.h"
+#include "../QMC/QMC.h"
+
 class Sampling {
 protected:
     int n_p;
@@ -110,10 +113,6 @@ public:
      */
     double get_branching_Gfunc(double E_x, double E_y, double E_T) const {
         return exp(-(0.5 * (E_x + E_y) - E_T) * diffusion->get_dt());
-    }
-
-    double get_spatialjast_ratio(const Walker* walker_post, const Walker* walker_pre, int particle) const { //Denne kan vel kastes inn i QMC::calc acc rat?
-        return walker_post->spatial_ratio * qmc->get_jastrow_ptr()->get_j_ratio(walker_post, walker_pre, particle);
     }
 
     void set_qmc_ptr(QMC* qmc) {

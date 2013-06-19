@@ -8,13 +8,16 @@
 #ifndef ERRORESTIMATOR_H
 #define	ERRORESTIMATOR_H
 
+#include <string>
+#include <fstream>
+#include <armadillo>
+
 /*! \brief Class handling error estimations of the QMC methods.
  * The QMC class holds an object of this type, calling the update_data
  * function in order to update the sampling pool.
  * finalize() then either dumps the samples to file for later processing,
  * or calulates an estimate.
  */
-
 class ErrorEstimator {
 public:
 

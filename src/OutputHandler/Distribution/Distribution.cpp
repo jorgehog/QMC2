@@ -5,7 +5,11 @@
  * Created on 3. sept 2012, 13:17
  */
 
-#include "../../QMCheaders.h"
+#include "Distribution.h"
+#include "../../misc.h"
+
+#include "../../QMC/QMC.h"
+#include "../../ErrorEstimator/ErrorEstimator.h"
 
 Distribution::Distribution(ParParams & pp, std::string path, std::string name)
 : OutputHandler("", path, pp.parallel, pp.node, pp.n_nodes) {
@@ -14,6 +18,10 @@ Distribution::Distribution(ParParams & pp, std::string path, std::string name)
 
 void Distribution::dump() {
     qmc->save_distribution();
+}
+
+void Distribution::post_pointer_init() {
+    this->dim = qmc->dim;
 }
 
 void Distribution::finalize() {
@@ -114,7 +122,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     for (int ni = 0; ni < n; ni++) {
 
         if (is_deadlocked(dist, ni)) continue;
-        
+
         x = dist(ni, 0);
         y = dist(ni, 1);
         z = dist(ni, 2);
@@ -139,7 +147,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     for (int ni = 0; ni < n; ni++) {
 
         if (is_deadlocked(dist, ni)) continue;
-        
+
         r = R(ni);
 
         r_i = r / dr_R;

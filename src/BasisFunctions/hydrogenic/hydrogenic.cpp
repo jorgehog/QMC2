@@ -1,6 +1,6 @@
 
-#include "../../QMCheaders.h"
-
+#include "hydrogenic.h"
+#include "../../Walker/Walker.h"
 
 //Superclass Constructor
 hydrogenic::hydrogenic(double* k, double* k2, double* r22d, double* r2d, double* exp_factor) {

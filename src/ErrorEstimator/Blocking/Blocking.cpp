@@ -5,7 +5,11 @@
  * Created on October 29, 2012, 3:58 PM
  */
 
-#include "../../QMCheaders.h"
+#include "Blocking.h"
+
+#include "../../misc.h"
+#include <iomanip>
+
 
 Blocking::Blocking(int n_c, ParParams & pp,
         std::string filename,

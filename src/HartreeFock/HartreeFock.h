@@ -8,6 +8,7 @@
 #ifndef HARTREEFOCK_H
 #define	HARTREEFOCK_H
 
+#include <armadillo>
 class Orbitals;
 
 class HartreeFock {

@@ -8,6 +8,9 @@
 #ifndef DIATOMCORE_H
 #define	DIATOMCORE_H
 
+#include "../Potential.h"
+struct GeneralParams;
+
 class DiAtomCore : public Potential {
 public:
     DiAtomCore(GeneralParams & gp);

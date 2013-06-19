@@ -5,7 +5,19 @@
  * Created on 30. mars 2012, 17:42
  */
 
-#include "../QMCheaders.h"
+#include "QMC.h"
+
+#include <iomanip>
+
+#include "../misc.h"
+
+#include "../Walker/Walker.h"
+#include "../System/System.h"
+#include "../Orbitals/Orbitals.h"
+#include "../Sampling/Sampling.h"
+#include "../OutputHandler/OutputHandler.h"
+#include "../Jastrow/Jastrow.h"
+#include "../ErrorEstimator/ErrorEstimator.h"
 
 QMC::QMC(GeneralParams & gP, int n_c,
         SystemObjects & sO,
@@ -145,7 +157,7 @@ void QMC::get_gradients(Walker* walker) const {
 }
 
 double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_post, int particle) const {
-    double spatial_jast = sampling->get_spatialjast_ratio(walker_post, walker_pre, particle);
+    double spatial_jast = walker_post->spatial_ratio * get_jastrow_ptr()->get_j_ratio(walker_post, walker_pre, particle);
 
     //    test_ratios(walker_pre, walker_post, particle, spatial_jast);
 
@@ -301,8 +313,7 @@ void QMC::get_accepted_ratio() {
     std_out->cout(s);
 }
 
-
-void QMC::clean(){
+void QMC::clean() {
     sampling->clear_deadlock();
 }
 
@@ -373,4 +384,22 @@ void QMC::test_ratios(const Walker* walker_pre, const Walker* walker_post, int p
         std::cout << "ratio fail " << t1 << " " << t2 << " " << t3 << std::endl;
     }
 
+}
+
+//ADD
+
+Orbitals* QMC::get_orbitals_ptr() const {
+    return system->get_orbital_ptr();
+}
+
+double QMC::calculate_local_energy(const Walker* walker) {
+    return get_KE(walker) + system->get_potential_energy(walker);
+}
+
+double QMC::get_wf_value(const Walker* walker) const {
+    return system->get_spatial_wf(walker) * jastrow->get_val(walker);
+}
+
+void QMC::get_laplsum(Walker* walker) const {
+    walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
 }
