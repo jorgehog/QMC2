@@ -14,14 +14,23 @@
 #include "../../System/System.h"
 #include "../../Sampling/Sampling.h"
 #include "../../Walker/Walker.h"
+#include "../../OutputHandler/stdoutDMC/stdoutDMC.h"
+#include "../../OutputHandler/Distribution/Distribution.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../VMC/VMC.h"
 
-
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc, bool dist_out)
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc)
 : QMC(gP, dP.n_c, sO, pp, dP.n_w, K) {
 
+    if (is_master) DMCout = new stdoutDMC(this, gP.runpath);
+
+    std::stringstream name;
+    name << gP.system << gP.n_p << "c" << gP.systemConstant << "dmc";
+    distribution = new Distribution(pp, gP.runpath, name.str());
+
     dist_tresh = 25;
+
+    dist = arma::zeros(n_w * n_p * n_c / dist_tresh, dim);
 
     block_size = dP.n_b;
     thermalization = dP.therm;
@@ -52,9 +61,8 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
 
-    if (dist_out) {
-        dist = arma::zeros(n_w * n_p * n_c / dist_tresh, dim);
-    }
+
+
 
 }
 
@@ -196,14 +204,17 @@ void DMC::run_method() {
         normalize_population();
 
         output();
-        dump_output();
+        save_distribution();
+        if (is_master) DMCout->dump();
 
     }
+
+    if (is_master) DMCout->finalize();
 
     free_walkers();
     estimate_error();
     dump_subsamples(true);
-    finalize_output();
+    finalize_distribution();
     get_accepted_ratio();
     clean();
 }

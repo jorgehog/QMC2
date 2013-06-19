@@ -25,8 +25,8 @@ class Walker;
 class System;
 class Jastrow;
 class Sampling;
-class OutputHandler;
 class Orbitals;
+class Distribution;
 
 /*! \brief The QMC superclass.
  * Holds implementations of general functions for both VMC and DMC in order to
@@ -80,9 +80,7 @@ protected:
     ErrorEstimator* error_estimator; //!< The error estimator.
 
     Sampler kinetic_sampler;
-
-    std::vector<OutputHandler*> output_handler; //!< Can hold stdoutDMC (in case of DMC), Distribution, both or none.
-
+    Distribution* distribution;
 
     //! Method for setting the trial position of the QMC method's walkers.
     /*!
@@ -160,16 +158,9 @@ protected:
     //! Method for performing node communication.
     virtual void node_comm() = 0;
 
-    /*!
-     * Iterates over the output objects in the output_handler vector. No if-tests.
-     */
-    void dump_output();
-
-    /*!
-     * Calls the finalize function for the object in the output_handler vector.
-     */
-    void finalize_output();
-
+    //!Method for calculating the distribution
+    void finalize_distribution();
+    
     /*!
      * Estimates and finalizes the ErrorEstimator object initialized in the error_estimator vector.
      */
@@ -263,11 +254,7 @@ public:
     //! Cleans up initializations which distorts successive use of objects
     void clean();
     
-    //! Method used for loading the output_handler with objects.
-    void add_output(OutputHandler* output_handler);
-
     //! Method for setting the error estimator.
-
     void set_error_estimator(ErrorEstimator* error_estimator) {
         this->error_estimator = error_estimator;
     }
@@ -290,10 +277,6 @@ public:
     Orbitals* get_orbitals_ptr() const;
 
 
-
-
-
-    friend class Distribution;
 
 };
 

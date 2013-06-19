@@ -9,8 +9,6 @@
 
 #include "../structs.h"
 
-#include "../ErrorEstimator/ErrorEstimator.h"
-#include "../OutputHandler/OutputHandler.h"
 #include "../Orbitals/Orbitals.h"
 #include "../Jastrow/Jastrow.h"
 
@@ -64,41 +62,5 @@ void Minimizer::output(std::string message, double number) {
 
     s << endl;
     std_out->cout(s);
-
-}
-
-void Minimizer::add_output(OutputHandler* output_handler) {
-    output_handler->set_min_ptr(this);
-    this->output_handler.push_back(output_handler);
-}
-
-void Minimizer::dump_output() {
-
-    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
-        (*output_obj)->dump();
-    }
-
-}
-
-void Minimizer::finalize_output() {
-
-    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
-        (*output_obj)->finalize();
-    }
-
-}
-
-void Minimizer::error_output() {
-
-    for (int i = 0; i < Nparams; i++) {
-
-        double error = error_estimators.at(i)->estimate_error();
-
-        if (is_master) {
-            if (error != 0) std::cout << "Error" << i << ": " << error << std::endl;
-        }
-
-        error_estimators.at(i)->finalize();
-    }
 
 }

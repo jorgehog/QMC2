@@ -26,10 +26,6 @@ class ASGD;
 class OutputHandler {
 protected:
     
-    bool is_vmc;  //!< Switch used to typecast the QMC object to a VMC object.
-    bool is_dmc;  //!< Switch used to typecast the QMC object to a DMC object.
-    bool is_ASGD; //!< Switch used to typecast the Min object to an ASGD object.
-
     bool parallel;
     int node;
     int n_nodes;
@@ -43,24 +39,11 @@ protected:
 
     std::ofstream file;
 
-    QMC* qmc;
-    DMC* dmc;
-    VMC* vmc;
-    Minimizer* min;
-    ASGD* asgd;
-
     /*!
      * Opens a file with filename at path supplied in constructor.
      * Subclass implementations can call this function. Superclass does not.
      */
     void init_file();
-
-    //! Method for initialization requires once the correct QMC/Min pointer type is set.     
-    /*!
-     * Defaults to nothing.
-     */
-    virtual void post_pointer_init() {
-    };
 
 public:
 
@@ -93,16 +76,6 @@ public:
      * \see Distribution::finalize()
      */
     virtual void finalize();
-
-    /*!
-     * Sets the QMC pointer and typecasts it according to the solver flags.
-     */
-    void set_qmc_ptr(QMC* qmc);
-    
-    /*!
-     * Sets the Min pointer and typecasts it according to the minimizer flags.
-     */
-    void set_min_ptr(Minimizer* min);
 
 };
 

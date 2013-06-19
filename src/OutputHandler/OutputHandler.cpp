@@ -19,9 +19,6 @@ OutputHandler::OutputHandler(std::string filename,
         int node,
         int n_nodes) {
 
-    this->is_dmc = false;
-    this->is_vmc = false;
-
     this->node = node;
     this->n_nodes = n_nodes;
     this->parallel = parallel;
@@ -41,26 +38,6 @@ OutputHandler::OutputHandler(std::string filename,
 void OutputHandler::init_file() {
     use_file = true;
     this->file.open(((path + filename) + ".dat").c_str());
-}
-
-void OutputHandler::set_qmc_ptr(QMC* qmc) {
-    if (this->is_dmc) {
-        dmc = (DMC*) qmc;
-    } else if (this->is_vmc) {
-        vmc = (VMC*) qmc;
-    } else {
-        this->qmc = qmc;
-    }
-    post_pointer_init();
-}
-
-void OutputHandler::set_min_ptr(Minimizer* min) {
-    if (this->is_ASGD) {
-        this->asgd = (ASGD*) min;
-    } else {
-        this->min = min;
-    }
-    post_pointer_init();
 }
 
 void OutputHandler::finalize() {

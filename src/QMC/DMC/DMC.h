@@ -11,6 +11,7 @@
 #include "../QMC.h"
 class VMC;
 struct DMCparams;
+class stdoutDMC;
 
 /*! \brief Implementation of the Diffusion Monte-Carlo Method.
  * Very little needs to be added when the QMC superclass holds all the
@@ -38,6 +39,8 @@ protected:
     double E_T; //!< The trial energy at the current cycle.
     double E; //!< The accumulative energy for each cycle.
 
+    stdoutDMC* DMCout;
+    
     //! Method for setting the trial position of all DMC walkers.
     /*!
      * In case VMC is not run prior to DMC, trial positions must be set. 
@@ -116,10 +119,7 @@ public:
     static const int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
 
     //! Constructor.
-    /*
-     * @param dist_out If true, matrices to hold positional data is initialized.
-     */
-    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc, bool dist_out);
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc);
 
     void run_method();
 

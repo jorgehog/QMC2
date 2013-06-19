@@ -12,15 +12,17 @@
 #include "../../Walker/Walker.h"
 #include "../../Sampling/Sampling.h"
 #include "../../System/System.h"
-#include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../../Orbitals/Orbitals.h"
 #include "../../Jastrow/Jastrow.h"
+#include "../../OutputHandler/stdoutASGD/stdoutASGD.h"
 
 
-ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp)
+ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp, std::string path)
 : Minimizer(vmc, pp, mP.alpha, mP.beta) {
     using namespace arma;
 
+    if (is_master) ASGDout = new stdoutASGD(this, path);
+    
     this->n_c = mP.n_c;
     this->thermalization = mP.therm;
     this->n_c_SGD = mP.n_c_SGD;
@@ -84,9 +86,6 @@ void ASGD::get_total_grad() {
 
     gradient_tot = 2 * (gradient_local - gradient * E) / scale;
 
-    for (int i = 0; i < Nparams; i++) {
-        error_estimators.at(i)->update_data(gradient_tot(i));
-    }
 
 #ifdef MPI_ON
     MPI_Allreduce(MPI_IN_PLACE, gradient_tot.memptr(), Nparams, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -129,16 +128,14 @@ void ASGD::minimize() {
 
         update_parameters();
 
-        dump_output();
+        if (is_master) ASGDout->dump();
 
         output_cycle();
 
     }
 
     output("Finished minimizing. Final parameters:");
-    finalize_output();
-
-    error_output();
+    if (is_master) ASGDout->finalize();
 
     vmc->accepted = 0;
 }

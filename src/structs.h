@@ -91,13 +91,6 @@ struct MinimizerParams {
 
 };
 
-//! Struct used to initialize output parameters.
-struct OutputParams {
-    bool dist_out; //!< If true, distributions are calculated for VMC/DMC.
-    bool dmc_out; //!< If true, DMC outputs data to file each cycle.
-    bool ASGD_out; //!< If true, ASGD outputs data to file each cycle.
-};
-
 //Forward declarations
 class Orbitals;
 class Potential;

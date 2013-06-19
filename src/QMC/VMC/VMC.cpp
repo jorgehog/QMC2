@@ -14,10 +14,21 @@
 #include "../../Walker/Walker.h"
 #include "../../Sampling/Sampling.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"
+#include "../../OutputHandler/Distribution/Distribution.h"
 
-
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool dist_out)
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w)
 : QMC(gP, vP.n_c, sO, pp, n_w) {
+
+    std::stringstream name;
+    name << gP.system << gP.n_p << "c" << gP.systemConstant << "vmc";
+    distribution = new Distribution(pp, gP.runpath, name.str());
+
+    pop_tresh = n_c / n_w;
+    offset = n_c - n_w*pop_tresh;
+    dist_tresh = 25;
+    last_walker = 0;
+
+    dist = arma::zeros(n_c * n_p / dist_tresh, dim);
 
     output_tresh = n_c / 100;
 
@@ -27,24 +38,10 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
 
     original_walker = new Walker(n_p, dim);
 
-    dist_tresh = 25;
-    pop_tresh = n_c / n_w;
-    offset = n_c - n_w*pop_tresh;
-    
-//    //ANDERS
-//    offset = n_c*2;
-//    dist_tresh = 25;
-
-    last_walker = 0;
-
     vmc_E = 0;
     thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
 
     sampling->set_dt(vP.dt);
-
-    if (dist_out) {
-        dist = arma::zeros(n_c * n_p / dist_tresh, dim);
-    }
 
 }
 
@@ -79,14 +76,14 @@ void VMC::store_walkers() {
 void VMC::run_method() {
 
     set_trial_positions();
-    
+
     copy_walker(original_walker, trial_walker);
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
         diffuse_walker(original_walker, trial_walker);
     }
-    
-    
+
+
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         diffuse_walker(original_walker, trial_walker);
@@ -98,10 +95,10 @@ void VMC::run_method() {
 
         output();
         update_subsamples();
-        dump_output();
+        save_distribution();
         error_estimator->update_data(local_E);
         store_walkers();
-        
+
     }
 
     node_comm();
@@ -111,9 +108,9 @@ void VMC::run_method() {
     dump_subsamples();
     get_accepted_ratio();
 
-    finalize_output();
+    finalize_distribution();
     estimate_error();
-    
+
     clean();
 }
 

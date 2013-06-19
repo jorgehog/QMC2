@@ -10,6 +10,7 @@
 
 #include "../Minimizer.h"
 class Walker;
+class stdoutASGD;
 struct MinimizerParams;
 
 /*! \brief Implementation for the Adaptive Stochastic Gradient Descent method (ASGD)
@@ -50,6 +51,8 @@ protected:
     arma::rowvec gradient_old; //!< The previous total gradient.
     arma::rowvec gradient_tot; //!< The current total gradient.
     
+    stdoutASGD* ASGDout;
+    
     //! Method for calculating the total gradient.
     /*!
      * Updates the error estimator with statistics.
@@ -78,7 +81,7 @@ protected:
     void get_variational_gradients(Walker* walker, double e_local);
 
 public:
-    ASGD(VMC*, MinimizerParams &, const ParParams &);
+    ASGD(VMC*, MinimizerParams &, const ParParams &, std::string path);
 
     void minimize();
 

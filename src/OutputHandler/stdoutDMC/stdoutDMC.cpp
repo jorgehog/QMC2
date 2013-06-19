@@ -10,10 +10,10 @@
 #include "../../QMC/DMC/DMC.h"
 
 
-stdoutDMC::stdoutDMC(std::string path, std::string filename)
-: OutputHandler(filename, path, false, 0, 1) {
+stdoutDMC::stdoutDMC(DMC* dmc, std::string path)
+: OutputHandler("DMC_out", path, false, 0, 1) {
 
-    this->is_dmc = true;
+    this->dmc = dmc;
     sumE = 0;
     sumN = 0;
     n = 0;

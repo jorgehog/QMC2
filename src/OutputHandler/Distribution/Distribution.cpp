@@ -16,29 +16,8 @@ Distribution::Distribution(ParParams & pp, std::string path, std::string name)
     this->name = name;
 }
 
-void Distribution::dump() {
-    qmc->save_distribution();
-}
 
-void Distribution::post_pointer_init() {
-    this->dim = qmc->dim;
-}
-
-void Distribution::finalize() {
-
-    //scrap out all the over-allocated space (DMC)
-    qmc->dist.resize(qmc->last_inserted, dim);
-
-    if (dim == 3) {
-        generate_distribution3D(qmc->dist, qmc->n_p);
-    } else {
-        generate_distribution2D(qmc->dist, qmc->n_p);
-    }
-
-    qmc->dist.reset();
-}
-
-void Distribution::detect_deadlock(const arma::mat& dist, int n_p, int n) {
+void Distribution::detect_deadlock(const arma::mat& dist, int n_p, int dim, int n) {
 
     deadlock_x = dist(0, 0);
     deadlock_y = dist(0, 1);
@@ -50,7 +29,7 @@ void Distribution::detect_deadlock(const arma::mat& dist, int n_p, int n) {
 
     for (int i = n_p; i < n; i += n_p) {
 
-        if (!is_deadlocked(dist, i)) {
+        if (!is_deadlocked(dist, dim, i)) {
             locked = false;
             return;
         }
@@ -69,6 +48,8 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     int x_i, y_i, z_i, r_i, n, n_tot;
     double x, y, z, r, dr, dr_R, stretch, mean_r;
 
+    int dim = 3;
+    
     using namespace arma;
 
     ucube distribution(N, N, N);
@@ -89,7 +70,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     n_tot = n;
 #endif
 
-    detect_deadlock(dist, n_p, n);
+    detect_deadlock(dist, n_p, dim, n);
 
     //On fly calculation during QMC initialized by a binedge 0.
     if (bin_edge == 0) {
@@ -104,7 +85,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
             int k = 0;
 
             for (int i = 0; i < n; i++) {
-                if (is_deadlocked(dist, i)) continue;
+                if (is_deadlocked(dist, dim, i)) continue;
 
                 mean_r += R(i);
                 k++;
@@ -121,7 +102,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
 
     for (int ni = 0; ni < n; ni++) {
 
-        if (is_deadlocked(dist, ni)) continue;
+        if (is_deadlocked(dist, dim, ni)) continue;
 
         x = dist(ni, 0);
         y = dist(ni, 1);
@@ -146,7 +127,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     dr_R = dr / 2;
     for (int ni = 0; ni < n; ni++) {
 
-        if (is_deadlocked(dist, ni)) continue;
+        if (is_deadlocked(dist, dim, ni)) continue;
 
         r = R(ni);
 
@@ -161,28 +142,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
     }
 
 
-    //    //Very linear interpolation
-    //    double interpolated;
-    //    ucube dist_raw = distribution;
-    //
-    //    for (int i = 1; i < N - 1; i++) {
-    //        for (int j = 1; j < N - 1; j++) {
-    //            for (int k = 1; k < N - 1; k++) {
-    //
-    //                interpolated = 0;
-    //                for (int I = i - 1; I < i + 2; I++) {
-    //                    for (int J = j - 1; J < j + 2; J++) {
-    //                        for (int K = k - 1; K < k + 2; K++) {
-    //                            interpolated += dist_raw(I, J, K);
-    //                        }
-    //                    }
-    //                }
-    //                distribution(i, j, k) = interpolated;
-    //            }
-    //        }
-    //    }
-    //
-    //    dist_raw.reset();
+
 
 #ifdef MPI_ON
     if (node == 0) {
@@ -292,6 +252,8 @@ void Distribution::generate_distribution2D(arma::mat & dist,
 
     using namespace arma;
 
+    int dim = 2;
+    
     int x_i, y_i, r_i, n, n_tot;
     double x, y, r, dr, dr_R, stretch, mean_r;
 
@@ -316,7 +278,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
     n_tot = n;
 #endif
 
-    detect_deadlock(dist, n_p, n);
+    detect_deadlock(dist, n_p, dim, n);
 
     //On fly calculation during QMC initialized by a binedge 0.
     if (bin_edge == 0) {
@@ -331,7 +293,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
             int k = 0;
 
             for (int i = 0; i < n; i++) {
-                if (is_deadlocked(dist, i)) continue;
+                if (is_deadlocked(dist, dim, i)) continue;
 
                 mean_r += R(i);
                 k++;
@@ -348,7 +310,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
 
     for (int ni = 0; ni < n; ni++) {
 
-        if (is_deadlocked(dist, ni)) continue;
+        if (is_deadlocked(dist, dim, ni)) continue;
 
         x = dist(ni, 0);
         y = dist(ni, 1);
@@ -369,7 +331,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
     dr_R = dr / 2;
     for (int ni = 0; ni < n; ni++) {
 
-        if (is_deadlocked(dist, ni)) continue;
+        if (is_deadlocked(dist, dim, ni)) continue;
 
         r = R(ni);
 
@@ -485,7 +447,7 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
     using namespace arma;
 
     mat dist;
-    int n;
+    int n, dim;
 
     if (node == 0) {
         s << path << "walker_positions/dist_rawdata_" << name << ".arma";

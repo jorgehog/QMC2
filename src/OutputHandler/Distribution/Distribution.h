@@ -12,6 +12,7 @@
 #include <armadillo>
 struct ParParams;
 
+
 /*! \brief Class for calculating distribution functions such as the one-body density.
  *  Does not collect data itself, but works merely as a control organ for the QMC class,
  * calling it's methods for storing position data.
@@ -26,16 +27,8 @@ public:
      */
     Distribution(ParParams &, std::string path, std::string name);
 
-    /*!
-     * Signals QMC solver to store position data.
-     */
-    void dump();
-
-    //! Method for calculating the distribution.
-    /*!
-     * Overrides the superclass implementation.
-     */
-    void finalize();
+    void dump(){}
+    void finalize() {}
 
     //! Method for re-calculating the distribution given a stores set of position data. 
     /*!
@@ -47,9 +40,7 @@ public:
     void rerun(int n_p, int N, double bin_edge = 0);
 
 private:
-
-    int dim;
-
+    
     std::string name;
 
     double deadlock_x;
@@ -58,7 +49,7 @@ private:
 
     bool locked;
 
-    bool is_deadlocked(const arma::mat & dist, int i) const {
+    bool is_deadlocked(const arma::mat & dist, int dim, int i) const {
         if (!locked) return false;
 
         if (dim == 2) {
@@ -68,7 +59,7 @@ private:
         }
     }
 
-    void detect_deadlock(const arma::mat & dist, int n_p, int n);
+    void detect_deadlock(const arma::mat & dist, int n_p, int dim, int n);
 
     //! Method for generating the one-body density and projected one-axis distribution.
     /*! 
@@ -90,12 +81,7 @@ private:
             int N = 200,
             bool rerun = false);
 
-    /*!
-     * In order to calculate the radial distribution, the dimension is needed.
-     * \see OutputHandler::post_pointer_init()
-     */
-    void post_pointer_init();
-
+    friend class QMC;
 };
 
 

@@ -5,53 +5,39 @@
  * Created on 13. april 2012, 17:04
  */
 
-//#include "QMCheaders.h"
 //#include "HartreeFock/HartreeFock.h"
 
-//#include "defines.h"
 #include "structs.h"
 
-#include <armadillo>
-#include <iostream>
-
-#include "QMC/QMC.h"
 #include "QMC/VMC/VMC.h"
 #include "QMC/DMC/DMC.h"
 
-#include "Minimizer/Minimizer.h"
 #include "Minimizer/ASGD/ASGD.h"
 
-#include "ErrorEstimator/ErrorEstimator.h"
 #include "ErrorEstimator/SimpleVar/SimpleVar.h"
 #include "ErrorEstimator/Blocking/Blocking.h"
 
-#include "OutputHandler/OutputHandler.h"
 #include "OutputHandler/stdoutASGD/stdoutASGD.h"
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
 #include "OutputHandler/Distribution/Distribution.h"
 
-#include "Orbitals/Orbitals.h"
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
 #include "Orbitals/DiTransform/DiTransform.h"
 //#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
-#include "Potential/Potential.h"
 #include "Potential/AtomCore/AtomCore.h"
 #include "Potential/Coulomb/Coulomb.h"
 #include "Potential/DiAtomCore/DiAtomCore.h"
 #include "Potential/DoubleWell/DoubleWell.h"
 #include "Potential/Harmonic_osc/Harmonic_osc.h"
 
-#include "System/System.h"
 //#include "System/Bosons/Bosons.h"
 #include "System/Fermions/Fermions.h"
 
-#include "Sampling/Sampling.h"
 #include "Sampling/Brute_Force/Brute_Force.h"
 #include "Sampling/Importance/Importance.h"
 
-#include "Jastrow/Jastrow.h"
 #include "Jastrow/No_Jastrow/No_Jastrow.h"
 #include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
 
@@ -73,7 +59,6 @@ void parseCML(int argc, char** argv,
         VariationalParams & variationalParams,
         GeneralParams & generalParams,
         MinimizerParams & minimizerParams,
-        OutputParams & outputParams,
         ParParams & parParams);
 
 
@@ -116,7 +101,6 @@ int main(int argc, char** argv) {
     struct VariationalParams variationalParams;
     struct GeneralParams generalParams;
     struct MinimizerParams minimizerParams;
-    struct OutputParams outputParams;
     struct SystemObjects systemObjects;
 
 
@@ -165,7 +149,6 @@ int main(int argc, char** argv) {
             variationalParams,
             generalParams,
             minimizerParams,
-            outputParams,
             parParams);
 
 
@@ -176,55 +159,17 @@ int main(int argc, char** argv) {
     VMC* vmc;
     DMC* dmc;
 
-    std::stringstream name;
-
     if (generalParams.doVMC) {
 
-        vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, outputParams.dist_out);
+        vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w);
 
         if (generalParams.doMIN) {
 
-            minimizer = new ASGD(vmc, minimizerParams, parParams);
-
-            if (outputParams.ASGD_out && parParams.is_master) {
-                OutputHandler* ASGDout = new stdoutASGD(generalParams.runpath);
-                minimizer->add_output(ASGDout);
-            }
-
-
-            int N = minimizerParams.alpha.n_elem + minimizerParams.beta.n_rows * generalParams.use_jastrow;
-            for (int i = 0; i < N; i++) {
-                if (generalParams.do_blocking) {
-
-                    ErrorEstimator* blocking = new Blocking(minimizerParams.SGDsamples,
-                            parParams,
-                            "blocking_MIN_out" + TOSTR(i),
-                            generalParams.runpath);
-
-                    minimizer->add_error_estimator(blocking);
-                } else {
-                    minimizer->add_error_estimator(new SimpleVar(parParams));
-                }
-            }
+            minimizer = new ASGD(vmc, minimizerParams, parParams, generalParams.runpath);
 
             if (parParams.is_master) t.tic();
             minimizer->minimize();
             if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
-        }
-
-
-
-        if (outputParams.dist_out) {
-
-            name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
-            name << "vmc";
-
-            OutputHandler* dist_vmc = new Distribution(parParams, generalParams.runpath, name.str());
-            vmc->add_output(dist_vmc);
-
-            name.str(std::string());
-            name.clear();
-
         }
 
 
@@ -249,28 +194,8 @@ int main(int argc, char** argv) {
 
     if (generalParams.doDMC) {
 
-        dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc, outputParams.dist_out);
+        dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc);
 
-        if (outputParams.dmc_out && parParams.is_master) {
-
-            OutputHandler* DMCout = new stdoutDMC(generalParams.runpath);
-            dmc->add_output(DMCout);
-        }
-
-        if (outputParams.dist_out) {
-
-            name << generalParams.system << generalParams.n_p << "c" << generalParams.systemConstant;
-            name << "dmc";
-
-            OutputHandler* dist_dmc = new Distribution(parParams, generalParams.runpath, name.str());
-            dmc->add_output(dist_dmc);
-
-            name.str(std::string());
-            name.clear();
-
-        }
-
-        //        int DMCerrorN = dmcParams.n_c;
         if (generalParams.do_blocking) {
 
             ErrorEstimator* blocking = new Blocking(dmcParams.n_c,
@@ -402,11 +327,10 @@ void parseCML(int argc, char** argv,
         VariationalParams & variationalParams,
         GeneralParams & generalParams,
         MinimizerParams & minimizerParams,
-        OutputParams & outputParams,
         ParParams & parParams) {
 
 
-    int n_args = 35;
+    int n_args = 32;
 
     //Default values:
 
@@ -426,10 +350,7 @@ void parseCML(int argc, char** argv,
     generalParams.system = "QDots";
 
     generalParams.deadlock = false;
-
-    outputParams.dist_out = true;
-    outputParams.dmc_out = true;
-    outputParams.ASGD_out = true;
+    
     generalParams.runpath = "/home/jorgmeister/scratch/QMC_SCRATCH/";
 
     vmcParams.n_c = 1E6;
@@ -473,69 +394,74 @@ void parseCML(int argc, char** argv,
     std::string def = "def";
 
     if (argc == n_args) {
-        if (def.compare(argv[1]) != 0) outputParams.dist_out = (bool)atoi(argv[1]);
-        if (def.compare(argv[2]) != 0) outputParams.dmc_out = (bool)atoi(argv[2]);
-        if (def.compare(argv[3]) != 0) outputParams.ASGD_out = (bool)atoi(argv[3]);
+        
+        
+        if (def.compare(argv[1]) != 0) generalParams.runpath = argv[1];
+        if (def.compare(argv[2]) != 0) generalParams.n_p = atoi(argv[2]);
+        if (def.compare(argv[3]) != 0) generalParams.dim = atoi(argv[3]);
+        if (def.compare(argv[4]) != 0) generalParams.systemConstant = atof(argv[4]);
+        if (def.compare(argv[5]) != 0) generalParams.R = atof(argv[5]);
 
 
 
-        if (def.compare(argv[4]) != 0) generalParams.runpath = argv[4];
-        if (def.compare(argv[5]) != 0) generalParams.n_p = atoi(argv[5]);
-        if (def.compare(argv[6]) != 0) generalParams.dim = atoi(argv[6]);
-        if (def.compare(argv[7]) != 0) generalParams.systemConstant = atof(argv[7]);
-        if (def.compare(argv[8]) != 0) generalParams.R = atof(argv[8]);
-
-
-        if (def.compare(argv[9]) != 0) generalParams.random_seed = atoi(argv[9]);
-
-
-        if (def.compare(argv[10]) != 0) generalParams.doMIN = (bool)atoi(argv[10]);
-        if (def.compare(argv[11]) != 0) generalParams.doVMC = (bool)atoi(argv[11]);
-        if (def.compare(argv[12]) != 0) generalParams.doDMC = (bool)atoi(argv[12]);
+        if (def.compare(argv[6]) != 0) generalParams.random_seed = atoi(argv[6]);
 
 
 
-        if (def.compare(argv[13]) != 0) generalParams.use_coulomb = (bool)atoi(argv[13]);
-        if (def.compare(argv[14]) != 0) generalParams.use_jastrow = (bool)atoi(argv[14]);
-        if (def.compare(argv[15]) != 0) generalParams.do_blocking = (bool)atoi(argv[15]);
+        if (def.compare(argv[7]) != 0) generalParams.doMIN = (bool)atoi(argv[7]);
+        if (def.compare(argv[8]) != 0) generalParams.doVMC = (bool)atoi(argv[8]);
+        if (def.compare(argv[9]) != 0) generalParams.doDMC = (bool)atoi(argv[9]);
 
 
 
-        if (def.compare(argv[16]) != 0) generalParams.sampling = argv[16];
-        if (def.compare(argv[17]) != 0) generalParams.system = argv[17];
 
-        if (def.compare(argv[18]) != 0) generalParams.deadlock_x = atof(argv[18]);
-
-
-
-        if (def.compare(argv[19]) != 0) vmcParams.n_c = atoi(argv[19]);
-        if (def.compare(argv[20]) != 0) vmcParams.dt = atof(argv[20]);
+        if (def.compare(argv[10]) != 0) generalParams.use_coulomb = (bool)atoi(argv[10]);
+        if (def.compare(argv[11]) != 0) generalParams.use_jastrow = (bool)atoi(argv[11]);
+        if (def.compare(argv[12]) != 0) generalParams.do_blocking = (bool)atoi(argv[12]);
 
 
 
-        if (def.compare(argv[21]) != 0) dmcParams.dt = atof(argv[21]);
-        if (def.compare(argv[22]) != 0) dmcParams.n_b = atoi(argv[22]);
-        if (def.compare(argv[23]) != 0) dmcParams.n_w = atoi(argv[23]);
-        if (def.compare(argv[24]) != 0) dmcParams.n_c = atoi(argv[24]);
-        if (def.compare(argv[25]) != 0) dmcParams.therm = atoi(argv[25]);
+
+        if (def.compare(argv[13]) != 0) generalParams.sampling = argv[13];
+        if (def.compare(argv[14]) != 0) generalParams.system = argv[14];
+
+
+        if (def.compare(argv[15]) != 0) generalParams.deadlock_x = atof(argv[15]);
 
 
 
-        if (def.compare(argv[26]) != 0) minimizerParams.SGDsamples = atoi(argv[26]);
-        if (def.compare(argv[27]) != 0) minimizerParams.n_w = atoi(argv[27]);
-        if (def.compare(argv[28]) != 0) minimizerParams.therm = atoi(argv[28]);
-        if (def.compare(argv[29]) != 0) minimizerParams.n_c_SGD = atoi(argv[29]);
-        if (def.compare(argv[30]) != 0) minimizerParams.max_step = atof(argv[30]);
-        if (def.compare(argv[31]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[31]);
-        if (def.compare(argv[32]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[32]);
+
+        if (def.compare(argv[16]) != 0) vmcParams.n_c = atoi(argv[16]);
+        if (def.compare(argv[17]) != 0) vmcParams.dt = atof(argv[17]);
 
 
 
-        if (def.compare(argv[33]) != 0) variationalParams.alpha = atof(argv[33]);
-        if (def.compare(argv[34]) != 0) variationalParams.beta = atof(argv[34]);
 
-        int vmc_dt_loc = 20;
-        int deadlock_loc = 18;
+        if (def.compare(argv[18]) != 0) dmcParams.dt = atof(argv[18]);
+        if (def.compare(argv[19]) != 0) dmcParams.n_b = atoi(argv[19]);
+        if (def.compare(argv[20]) != 0) dmcParams.n_w = atoi(argv[20]);
+        if (def.compare(argv[21]) != 0) dmcParams.n_c = atoi(argv[21]);
+        if (def.compare(argv[22]) != 0) dmcParams.therm = atoi(argv[22]);
+
+
+
+
+        if (def.compare(argv[23]) != 0) minimizerParams.SGDsamples = atoi(argv[23]);
+        if (def.compare(argv[24]) != 0) minimizerParams.n_w = atoi(argv[24]);
+        if (def.compare(argv[25]) != 0) minimizerParams.therm = atoi(argv[25]);
+        if (def.compare(argv[26]) != 0) minimizerParams.n_c_SGD = atoi(argv[26]);
+        if (def.compare(argv[27]) != 0) minimizerParams.max_step = atof(argv[27]);
+        if (def.compare(argv[28]) != 0) minimizerParams.alpha = arma::zeros(1, 1) + atof(argv[28]);
+        if (def.compare(argv[29]) != 0) minimizerParams.beta = arma::zeros(1, 1) + atof(argv[29]);
+
+
+
+
+        if (def.compare(argv[30]) != 0) variationalParams.alpha = atof(argv[30]);
+        if (def.compare(argv[31]) != 0) variationalParams.beta = atof(argv[31]);
+        
+	int vmc_dt_loc = 17;
+	int deadlock_loc = 15;
 
 
         if (def.compare(argv[vmc_dt_loc]) == 0) {
@@ -607,9 +533,6 @@ void parseCML(int argc, char** argv,
     if (initOut) {
         if (parParams.is_master) {
             std::cout << n_args << " =? " << argc << std::endl;
-            std::cout << " 1" << " outputParams.dist_out           " << " = " << outputParams.dist_out << "   " << argv[1] << std::endl;
-            std::cout << " 2" << " outputParams.dmc_out            " << " = " << outputParams.dmc_out << "   " << argv[2] << std::endl;
-            std::cout << " 3" << " outputParams.ASGD_out           " << " = " << outputParams.ASGD_out << "   " << argv[3] << std::endl;
             std::cout << " 4" << " generalParams.runpath           " << " = " << generalParams.runpath << "   " << argv[4] << std::endl;
             std::cout << " 5" << " generalParams.n_p               " << " = " << generalParams.n_p << "   " << argv[5] << std::endl;
             std::cout << " 6" << " generalParams.dim               " << " = " << generalParams.dim << "   " << argv[6] << std::endl;

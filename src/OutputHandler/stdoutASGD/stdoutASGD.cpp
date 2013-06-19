@@ -11,10 +11,12 @@
 #include "../../Orbitals/Orbitals.h"
 #include "../../Jastrow/Jastrow.h"
 
-stdoutASGD::stdoutASGD(std::string path, std::string filename)
-: OutputHandler(filename, path, false, 0, 1) {
-    this->is_ASGD = true;
+stdoutASGD::stdoutASGD(ASGD* asgd, std::string path)
+: OutputHandler("ASGD_out", path, false, 0, 1) {
 
+    this->asgd = asgd;
+    grad = arma::zeros(asgd->Nparams);
+    
     sumE = 0;
 
     init_file();
@@ -45,7 +47,4 @@ void stdoutASGD::dump() {
 
 }
 
-void stdoutASGD::post_pointer_init() {
-    grad = arma::zeros(asgd->Nparams);
-}
 

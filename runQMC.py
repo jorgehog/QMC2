@@ -16,47 +16,43 @@ try:
 except:
     print "Unable to detect pyside. GUI not supported."
 
-cmlMAPo = {"dist_out"      : 0,
-           "dmc_out"       : 1,
-           "ASGD_out"      : 2}
 
-cmlMAPg = {"runpath"       : 3,
-           "n_p"           : 4,
-           "dim"           : 5,
-           "systemConstant" : 6,
-           "R"             : 7,
-           "random_seed"   : 8,
-           "doMIN"         : 9,
-           "doVMC"         : 10,
-           "doDMC"         : 11,
-           "use_coulomb"   : 12,
-           "use_jastrow"   : 13,
-           "do_blocking"   : 14,
-           "sampling"      : 15,
-           "system"        : 16,
-           "deadlock_x"    : 17}
+cmlMAPg = {"runpath"       : 0,
+           "n_p"           : 1,
+           "dim"           : 2,
+           "systemConstant" : 3,
+           "R"             : 4,
+           "random_seed"   : 5,
+           "doMIN"         : 6,
+           "doVMC"         : 7,
+           "doDMC"         : 8,
+           "use_coulomb"   : 9,
+           "use_jastrow"   : 10,
+           "do_blocking"   : 11,
+           "sampling"      : 12,
+           "system"        : 13,
+           "deadlock_x"    : 14}
 
-cmlMAPv = {"n_c"           : 18,
-           "dt"            : 19}
+cmlMAPv = {"n_c"           : 15,
+           "dt"            : 16}
 
-cmlMAPd = {"dt"            : 20,
-           "n_b"           : 21,
-           "n_w"           : 22,
-           "n_c"           : 23,
-           "therm"         : 24}
+cmlMAPd = {"dt"            : 17,
+           "n_b"           : 18,
+           "n_w"           : 19,
+           "n_c"           : 20,
+           "therm"         : 21}
 
-cmlMAPm = {"SGDsamples"    : 25,
-           "n_w"           : 26,
-           "therm"         : 27,
-           "n_c_SGD"       : 28,
-           "max_step"      : 29,
-           "alpha"         : 30,
-           "beta"          : 31}
+cmlMAPm = {"SGDsamples"    : 22,
+           "n_w"           : 23,
+           "therm"         : 24,
+           "n_c_SGD"       : 25,
+           "max_step"      : 26,
+           "alpha"         : 27,
+           "beta"          : 28}
 
-cmlMAPvp = {"alpha"         : 32,
-            "beta"          : 33}
-
-
+cmlMAPvp = {"alpha"         : 29,
+            "beta"          : 30}
+            
 def dumpStrList(aList):
     i = 0
     for element in aList:
@@ -647,9 +643,9 @@ def consistencyCheck(cmlArgs):
 
 
 def convertToCMLargs(arglist):
-    nInputs = len(cmlMAPo) + len(cmlMAPg) + len(cmlMAPv) \
+    nInputs = len(cmlMAPg) + len(cmlMAPv) \
             + len(cmlMAPd) + len(cmlMAPm) + len(cmlMAPvp) 
-
+    
     cmlArgs = ["def"]*nInputs
 
     for arg in arglist:

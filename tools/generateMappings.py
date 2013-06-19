@@ -31,30 +31,33 @@ if generateSTDOUTtests:
 
 if generateCMLMaps:
 
-	p = "^(\s*if \(def\.compare\(argv\[\d+\]\) != 0\) .+ = .*argv\[\d+\].*\;\s*)$"
-	data = re.findall(p, raw, re.MULTILINE)
+     p = "^(\s*if \(def\.compare\(argv\[\d+\]\) != 0\) .+ = .*argv\[\d+\].*\;\s*)$"
+     data = re.findall(p, raw, re.MULTILINE)
 
-	pyMap = {"ge" : [], "vm" : [], "dm" : [], "ou" : [], "mi" : [], "va" : []}
+     pyMap = {"ge" : [], "vm" : [], "dm" : [], "mi" : [], "va" : []}
 
-	cppMap = ""
-	for i in range(len(data)):
-		if "vmcParams.dt" in data[i]:
+     cppMap = ""
+     for i in range(len(data)):
+           if "vmcParams.dt" in data[i]:
 			vmcDt = i + 1
+           elif "generalParams.deadlock_x" in data[i]:
+                 deadlock = i + 1
 
-		cppMap += re.sub("argv\[\d+\]", "argv[%d]" % (i+1), data[i]) + "\n"
+           cppMap += re.sub("argv\[\d+\]", "argv[%d]" % (i+1), data[i]) + "\n"
 
 
-		pyData = re.findall("\s*if \(def.compare\(argv\[\d+\]\) != 0\) (.+)\.(.+) = ", data[i])[0]
+           pyData = re.findall("\s*if \(def.compare\(argv\[\d+\]\) != 0\) (.+)\.(.+) = ", data[i])[0]
 	
-		pyMap[pyData[0][:2]].append((pyData[1], i))
+           pyMap[pyData[0][:2]].append((pyData[1], i))
 
 		
 
-	cppMap += "\tint vmc_dt_loc = %d;\n" % (vmcDt)
+     cppMap += "\tint vmc_dt_loc = %d;\n" % (vmcDt)
+     cppMap += "\tint deadlock_loc = %d;\n" % (deadlock)
 	
-	l = None
-	pyMapS = ""
-	for key in ['ou', 'ge', 'vm', 'dm', 'mi', 'va']:
+     l = None
+     pyMapS = ""
+     for key in ['ge', 'vm', 'dm', 'mi', 'va']:
 		if key == 'va':
 			pyKey = 'vp'
 		else:
@@ -71,10 +74,10 @@ if generateCMLMaps:
 			pyMapS += ''.ljust(l) + '%s : %d,\n' % (('"%s"' % name).ljust(15), index)
 		pyMapS = pyMapS[:-2] + "}\n\n"
 
-	print "[CPP]\n\n"
-	print cppMap
-	print "\n\n[PYTHON]\n\n"
-	print pyMapS
+     print "[CPP]\n\n"
+     print cppMap
+     print "\n\n[PYTHON]\n\n"
+     print pyMapS
 
 
 

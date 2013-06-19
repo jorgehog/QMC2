@@ -15,9 +15,9 @@
 #include "../System/System.h"
 #include "../Orbitals/Orbitals.h"
 #include "../Sampling/Sampling.h"
-#include "../OutputHandler/OutputHandler.h"
 #include "../Jastrow/Jastrow.h"
 #include "../ErrorEstimator/ErrorEstimator.h"
+#include "../OutputHandler/Distribution/Distribution.h"
 
 QMC::QMC(GeneralParams & gP, int n_c,
         SystemObjects & sO,
@@ -113,25 +113,18 @@ void QMC::dump_subsamples(bool mean_of_means) {
 
 }
 
-void QMC::add_output(OutputHandler* output_handler) {
-    output_handler->set_qmc_ptr(this);
-    this->output_handler.push_back(output_handler);
-}
+void QMC::finalize_distribution(){
+    
+    //scrap out all the over-allocated space (DMC)
+    dist.resize(last_inserted, dim);
 
-void QMC::dump_output() {
-
-    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
-        (*output_obj)->dump();
+    if (dim == 3) {
+        distribution->generate_distribution3D(dist, n_p);
+    } else {
+        distribution->generate_distribution2D(dist, n_p);
     }
 
-}
-
-void QMC::finalize_output() {
-
-    for (std::vector<OutputHandler*>::iterator output_obj = output_handler.begin(); output_obj != output_handler.end(); ++output_obj) {
-        (*output_obj)->finalize();
-    }
-
+    dist.reset();
 }
 
 void QMC::estimate_error() const {

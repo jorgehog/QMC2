@@ -64,10 +64,7 @@ protected:
 public:
 
     //! Constructor.
-    /*
-     * @param dist_out If true, matrices to hold positional data is initialized.
-     */
-    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w, bool dist_out);
+    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w);
     ~VMC();
 
     void set_e(double E) {
