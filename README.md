@@ -9,9 +9,11 @@ QMC2 is an efficient diffusion monte-carlo implementation coded in C++ supported
 To compile, go to the QMC2/qmakeQMC2 folder and run
 
 ```
-qmake -makefile QMC.pro
+qmake -makefile
 make
 ```
+
+(makefile is not directly supplied to force development throught qmake standards.)
 
 External library dependencies:
 
