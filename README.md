@@ -21,7 +21,7 @@ Dependencies are
 ###VERY basic intro to how things work:
 
 
-Adding a new system:
+##Adding a new system:
 -Implement your potential as a subclass of Potentials. See mainfile on how to add it to the solver.
 -Implement your basis functions as BasisFunctions subclasses. Do use the OrbitalGenerator (SymPy) if things are extensive.
 -Set up your basis in an Orbitals subclass, see the code for examples. This creates the mapping from single particle states to the reference Slater determinant (for Fermions).
