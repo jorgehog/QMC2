@@ -26,7 +26,7 @@ External library dependencies:
 > - Implement your basis functions as BasisFunctions subclasses. Do use the OrbitalGenerator (SymPy) if things are extensive.
 > - Set up your basis in an Orbitals subclass, see the code for examples. This creates the mapping from single particle states to the reference Slater determinant (for Fermions).
 
-###Seting up mainfile:
+###Example mainfile:
 
 Here follows an example of a mainfile structure.
 
@@ -103,6 +103,7 @@ TODO list:
 
 ###Scripting:
 > - Change the input to be parsed by libconfig and not throught the CML. Goal: Deprecate runQMC.py
+> - Set smarter default values for initialization structs to lower the threshold for seting up main files.
 > - Get DCViz out of the repository and try/except everywhere it is used (remove dependency)
 > - Cleanup?
 
