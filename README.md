@@ -9,7 +9,7 @@ qmake -makefile QMC.pro
 make
 ```
 
-Dependencies are
+External library dependencies:
 
  - armadillo (http://arma.sourceforge.net)
  - MPI (can be turned off in the QMC2/src/defines.h)
@@ -18,9 +18,7 @@ Dependencies are
 
 
 
-##VERY basic intro to how things work:
-
-
+----------------------------
 
 ###Adding a new system:
 > - Implement your potential as a subclass of Potentials. See mainfile on how to add it to the solver.
