@@ -1,19 +1,19 @@
-### QMC2 ###
-
+QMC2
+==================
 QMC2 is an efficient diffusion monte-carlo implementation coded in C++ supported by Python scripts.
 
-Easy install:
+To compile, go to the QMC2/qmakeQMC2 folder and run
 
-go to the QMC2/qmakeQMC2 folder and run
-
+```
 qmake -makefile QMC.pro
 make
+```
 
 Dependencies are
 
--armadillo (arma.sourceforge.net)
--MPI (can be turned off in the src/defines.h)
--boost (www.boost.org)
+-armadillo (http://arma.sourceforge.net)
+-MPI (can be turned off in the QMC2/src/defines.h)
+-boost (http://www.boost.org)
 
 
 #########
