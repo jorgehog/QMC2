@@ -16,8 +16,9 @@ Dependencies are
  - boost (http://www.boost.org)
 
 
-#########
+
 VERY basic intro to how things work:
+------------------------------------
 
 Adding a new system:
 -Implement your potential as a subclass of Potentials. See mainfile on how to add it to the solver.
