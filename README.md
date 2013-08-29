@@ -11,9 +11,9 @@ make
 
 Dependencies are
 
--armadillo (http://arma.sourceforge.net)
--MPI (can be turned off in the QMC2/src/defines.h)
--boost (http://www.boost.org)
+ - armadillo (http://arma.sourceforge.net)
+ - MPI (can be turned off in the QMC2/src/defines.h)
+ - boost (http://www.boost.org)
 
 
 #########
