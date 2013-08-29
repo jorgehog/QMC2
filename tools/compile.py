@@ -22,7 +22,7 @@ def stripPath(s0, s1):
 def getClassFiles():
     classes = []
     ignore = ["HartreeFock.cpp", "Bosons.cpp"]
-
+    print "src", paths.src
     for dirPath, dirname, filenames in os.walk(paths.src):
         for filename in filenames:
             p = re.findall("(.+\.cpp)", filename)
