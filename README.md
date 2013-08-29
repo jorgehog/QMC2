@@ -2,6 +2,10 @@ QMC2
 ==================
 QMC2 is an efficient diffusion monte-carlo implementation coded in C++ supported by Python scripts.
 
+-----------------------
+
+###Compiling
+
 To compile, go to the QMC2/qmakeQMC2 folder and run
 
 ```
@@ -12,11 +16,8 @@ make
 External library dependencies:
 
  - armadillo (http://arma.sourceforge.net)
- - MPI (can be turned off in the QMC2/src/defines.h)
  - boost (http://www.boost.org)
-
-
-
+ - MPI (can be turned off in the QMC2/src/defines.h)
 
 ----------------------------
 
@@ -25,15 +26,73 @@ External library dependencies:
 > - Implement your basis functions as BasisFunctions subclasses. Do use the OrbitalGenerator (SymPy) if things are extensive.
 > - Set up your basis in an Orbitals subclass, see the code for examples. This creates the mapping from single particle states to the reference Slater determinant (for Fermions).
 
-###Running your system:
-> - Select your orbitals
-> - Load either Fermions or Bosons in a System object.
-> - Push Potentials into your System object (add_potential(Potential* pot))
-> - Select a jastrow factor
-> - Select either BruteForce of Importance as your sampling method.
-> - REMEMBER TO ADD THE COULUMB INTERACTION IF YOU WANT IT (NOT DEFAULT)
-> - Mash these objects into a systemObject struct and feed it to a VMC/DMC constructor.
-> - Good to go!
+###Seting up mainfile:
+
+Here follows an example of a mainfile structure.
+
+```
+//...
+
+//Initializing the system
+
+struct GeneralParams gP;
+struct SystemObjects sO;
+struct VariationalParams vP;
+
+gP.dim = 3;
+gP.n_p = 2;
+
+sO.SP_basis = new DiTransform(gP, vP);
+
+System* system = new Fermions(gP, sO.SP_basis);
+system->add_potential(new DiAtomCore(gP));
+system->add_potential(new Coulomb(gP));
+
+sO.SYSTEM = system;
+
+sO.sample_method = new Importance(gP);
+sO.jastrow = new Pade_Jastrow(gP, vP);
+
+//Initializing the solver
+
+struct DMCparams dmcParams;
+dmcParams.dt = 0.001;
+dmcParams.n_b = 100;
+dmcParams.n_c = 1000;
+dmcParams.n_w = 1E5;
+dmcParams.therm = 1000;
+
+struct VMCparams vmcParams;
+vmcParams.dt = 0.01;
+vmcParams.n_c = 1E8;
+
+vP.alpha = 1.0;
+vP.beta = 0.5;
+
+//initialize parallelization (or not!)
+
+struct ParParams parParams;
+
+parParams.parallel = false;
+parParams.node = 0;
+parParams.n_nodes = 1;
+parParams.is_master = true;
+
+
+//create a VMC solver object initialized to prepare DMC walkers.
+//adding an error estimator which computes the variance of the samples.
+VMC vmc(gP, vmcParams, sO, parParams, dmcParams.n_w);
+vmc->set_error_estimator(new SimpleVar(parParams));
+vmc->run_method();
+
+//and the same for DMC. The last argument is the VMC-object which now have prepped walkers ready.
+DMC dmc(gP, dmcParams, sO, parParams, &vmc);
+dmc->set_error_estimator(new SimpleVar(parParams));
+dmc->run_method();
+
+//...
+
+```
 
 For more details regarding closed form expressions for derivatives, parameterspace energy minimization etc, see the actual code for examples and comments.
 
