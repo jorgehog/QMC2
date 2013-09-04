@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys
 from pyLibQMC import paths
 
-sys.path.append(os.path.join(paths.toolsPath, "DCViz", "GUI"))
-
-import DCVizGUI
-
+try:
+    import DCVizGUI
+except:
+    print "No DCViz installation found: GUI not supported."
+    sys.exit(0)
+    
 if __name__ == "__main__":
     path = paths.scratchPath
     if len(sys.argv) > 1:

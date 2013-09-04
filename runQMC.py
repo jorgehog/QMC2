@@ -197,14 +197,17 @@ def parseFiles(openGUI, codename):
     if openGUI:
         fileNames = None
         app = QApplication(sys.argv)
-        while fileNames is None:
-            fileNames = selectFilesGUI()
-            if fileNames is None:
-                print "No files chosen."
+        
+        fileNames = selectFilesGUI()
+            
         app.exit()
         
     else:
         fileNames = selectFilesRaw()
+
+    if fileNames is None:
+        print "No files chosen."
+        sys.exit(0)
 
     #The master directory of runs are set to the scratchPath variable
     superDir = initializeDir(paths.scratchPath, codename)

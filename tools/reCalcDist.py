@@ -4,12 +4,11 @@ import sys, re, subprocess, os
 from os.path import join as pjoin
 from pyLibQMC import parseCML, paths, misc
 
-sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
-import DCVizWrapper as viz
 try:
     import DCVizWrapper as viz
     canViz = True
 except:
+    print "Displaying results not available: No DCViz installation found."
     canViz = False
 
 

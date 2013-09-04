@@ -2,13 +2,11 @@
 import sys, os, subprocess, re
 from os.path import join as pjoin
 
-
 from pyLibQMC import paths, parseCML, misc
 
 try:
     from PySide.QtCore import *
     from PySide.QtGui import *
-    sys.path.append(pjoin(paths.toolsPath, "DCViz", "GUI"))
     
     forceTerminal = False
        
@@ -21,11 +19,9 @@ except:
     QDialog = list
 
 try:
-    sys.path.append(pjoin(paths.toolsPath, "DCViz", "src"))
-
     from DCViz_classes import Blocking, MIN_OUT, DMC_OUT
 except:
-    print "Warning: Displaying results not aviable.."
+    print "Displaying results not available: No DCViz installation found."
     
 
 class runAgainForm(QDialog):
@@ -571,6 +567,8 @@ def initRun(n_cores, mpiFlag,
 def main():
 
     stdoutToFile, mpiFlag, openGUI, n_cores = parseCML(sys.argv)
+    
+    global forceTerminal    
     
     if not openGUI:
         forceTerminal = True
