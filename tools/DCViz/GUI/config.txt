@@ -1,3 +1,0 @@
-dynamic refresh interval [seconds] = 1.1
-terminal tracker = 1
-warnings on = 0
