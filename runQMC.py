@@ -6,14 +6,18 @@ Created on Fri Oct  5 16:29:12 2012
 """
 
 import sys, os, re, shutil, subprocess
-from os.path import join as pjoin
+from inspect import getfile, currentframe
+from os.path import join as pjoin, dirname, abspath
 
 try:
 	from pyLibQMC import paths, misc, add_date, parseCML
 except ImportError:
-	print "\n\nYou need to add the QMC paths your PythonPath"
-	print "\nexport PYTHONPATH=$PYTHONPATH:[QMCDIR]/tools/lib \n"
-	sys.exit(1)
+	print "\n\nYou need to add the QMC paths your PythonPath for some scripts to work."
+	_dir = pjoin(dirname(abspath(getfile(currentframe()))), "tools", "lib")
+	print "\nexport PYTHONPATH=$PYTHONPATH:%s \n" % _dir
+	raw_input("Press return to continue.")
+	sys.path.append(_dir)
+	from pyLibQMC import paths, misc, add_date, parseCML 
 except:
      print "Error in pyLibQMC. Run 'python pyLibQMC.py' to debug."
      sys.exit(1)
