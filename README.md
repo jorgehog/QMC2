@@ -4,22 +4,35 @@ QMC2 is an efficient diffusion monte-carlo implementation coded in C++ supported
 
 -----------------------
 
-###Compiling
+###Installing
 
-To compile, go to the QMC2/qmakeQMC2 folder and run
+To install, go to the QMC2 main folder and run
 
 ```
-qmake -makefile
-make
+python runQMC.py
 ```
-
-(makefile is not directly supplied to force development throught qmake standards.)
 
 External library dependencies:
 
  - armadillo (http://arma.sourceforge.net)
  - boost (http://www.boost.org)
  - MPI (can be turned off in the QMC2/src/defines.h)
+
+To access the GUI functionalities you will need PySide
+ - PySide (apt-get install pyside-tools)
+
+To access automatic plotting and the QMCGui, you will need to get DCViz from
+
+```
+git@github.com:jorgehog/DCViz.git
+```
+
+Remember to add it to your Pythonpath!
+
+
+### Developing
+
+The qmake project file is available in the QMC2/qmakeQMC2. Please use it :-)
 
 ----------------------------
 
