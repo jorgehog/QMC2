@@ -8,7 +8,17 @@ Created on Fri Oct  5 16:29:12 2012
 import sys, os, re, shutil, subprocess
 from os.path import join as pjoin
 
-from pyLibQMC import paths, misc, add_date, parseCML
+try:
+	from pyLibQMC import paths, misc, add_date, parseCML
+except ImportError:
+	print "\n\nYou need to add an image of ./tools/lib/pyLibQMC to your PythonPath\n\n"
+	print "Current PythonPath:"
+	for a in sys.path:
+		print "\t", a
+	print "\n"
+	sys.exit(1)
+except:
+     sys.exit(1)
 
 try:
     from PySide.QtCore import *
