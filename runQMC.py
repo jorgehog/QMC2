@@ -11,13 +11,11 @@ from os.path import join as pjoin
 try:
 	from pyLibQMC import paths, misc, add_date, parseCML
 except ImportError:
-	print "\n\nYou need to add an image of ./tools/lib/pyLibQMC to your PythonPath\n\n"
-	print "Current PythonPath:"
-	for a in sys.path:
-		print "\t", a
-	print "\n"
+	print "\n\nYou need to add the QMC paths your PythonPath"
+	print "\nexport PYTHONPATH=$PYTHONPATH:[QMCDIR]/tools/lib \n"
 	sys.exit(1)
 except:
+     print "Error in pyLibQMC. Run 'python pyLibQMC.py' to debug."
      sys.exit(1)
 
 try:

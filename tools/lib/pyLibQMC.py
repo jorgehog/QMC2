@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import os, time, re, sys
-from os.path import join as pjoin
+from inspect import getfile, currentframe
+from os.path import join, split, dirname, abspath
+
+
 
 class paths:
-    HOME = os.path.expanduser('~')
-    CODE = pjoin(HOME ,"code/QMC2")
-    src = pjoin(CODE, "src")
-    toolsPath = pjoin(CODE ,"tools")
-    scratchPath = pjoin(HOME ,"scratch")
-    iniFilePath = pjoin(CODE ,"iniFiles")
-    programPath =pjoin(CODE, "qmakeQMC2")
+    CODE = split(split(dirname(abspath(getfile(currentframe()))))[0])[0]
+    src = join(CODE, "src")
+    toolsPath = join(CODE ,"tools")
+    scratchPath = join(CODE ,"scratch")
+    iniFilePath = join(CODE ,"iniFiles")
+    programPath =join(CODE, "qmakeQMC2")
     
     
 
@@ -19,9 +21,9 @@ class misc:
     
 class verifyPaths:
 
-    l1_paths = [paths.HOME, paths.CODE, paths.src, paths.toolsPath]    
-    l2_paths = [paths.iniFilePath, paths.scratchPath, paths.programPath, pjoin(paths.scratchPath, "QMC_SCRATCH")]
-    l3_paths = [pjoin(paths.programPath, misc.QMC2programName)]
+    l1_paths = [paths.CODE, paths.src, paths.toolsPath]    
+    l2_paths = [paths.iniFilePath, paths.scratchPath, paths.programPath, join(paths.scratchPath, "QMC_SCRATCH")]
+    l3_paths = [join(paths.programPath, misc.QMC2programName)]
 
     
     def l1(self, path):
@@ -114,7 +116,6 @@ def main():
 #Paths:
 #===========================================
 """   
-    print "HOME:".ljust(spacing) + "%s" % paths.HOME 
     print "CODE:".ljust(spacing) + "%s" % paths.CODE
     print "src:".ljust(spacing) + "%s" % paths.src
     print "toolsPath:".ljust(spacing) + "%s" % paths.toolsPath
