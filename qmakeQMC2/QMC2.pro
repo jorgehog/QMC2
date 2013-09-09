@@ -6,6 +6,12 @@ CONFIG -= qt
 
 LIBS += -llapack -lblas -larmadillo
 
+release {
+    DEFINES += ARMA_NO_DEBUG
+    QMAKE_CXXFLAGS_RELEASE -= -O2
+    QMAKE_CXXFLAGS_RELEASE += -O3
+}
+
 SOURCES += ../src/QMCmain.cpp \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
@@ -26,7 +32,6 @@ SOURCES += ../src/QMCmain.cpp \
     ../src/Minimizer/ASGD/ASGD.cpp \
     ../src/Minimizer/Minimizer.cpp \
     ../src/Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.cpp \
-    ../src/Orbitals/CoulombElements/coulomb.cpp \
     ../src/Orbitals/DiTransform/DiTransform.cpp \
     ../src/Orbitals/ExpandedBasis/ExpandedBasis.cpp \
     ../src/Orbitals/Orbitals.cpp \
@@ -99,7 +104,7 @@ HEADERS += \
     ../src/System/System.h \
     ../src/Walker/Walker.h \
     ../src/defines.h \
-    
+
 
 # MPI Settings
 QMAKE_CXX = mpicxx

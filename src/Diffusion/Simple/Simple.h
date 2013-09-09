@@ -21,6 +21,9 @@ public:
     }
 
     double get_g_ratio(const Walker* walker_post, const Walker* walker_pre) const {
+        (void) walker_post;
+        (void) walker_pre;
+
         return 1;
     }
 

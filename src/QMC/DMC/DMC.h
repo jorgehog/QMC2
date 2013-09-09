@@ -22,16 +22,16 @@ protected:
 
     bool thermalized; //!< Flag used to indicate whether to start sampling or not.
     
-    int n_w_last; //!< The amount of walkers at the time the walker loop was initiated.
-    int n_w_tot; //!< The total number of walkers across all nodes.
+    unsigned int n_w_last; //!< The amount of walkers at the time the walker loop was initiated.
+    unsigned int n_w_tot; //!< The total number of walkers across all nodes.
     arma::uvec n_w_list; //!< List of the number of walkers of each node.
 
     bool force_comm; //!< Flag set true if population should be renormalized.
     
-    int deaths; //< The number of walkers who died the last cycle.
+    unsigned int deaths; //< The number of walkers who died the last cycle.
 
-    int block_size; //< The number of block samples for each walker for each cycle.
-    int samples; //< The number of samples to the expectation value made every cycle.
+    unsigned int block_size; //< The number of block samples for each walker for each cycle.
+    unsigned int samples; //< The number of samples to the expectation value made every cycle.
 
     double dmc_E; //!< The DMC energy.
     double dmc_E_unscaled; //!< The accumulative DMC energy: The sum of all previous trial energies.
@@ -102,7 +102,7 @@ protected:
      * @param dest_id The index where the walker is to be received.
      * \see Walker::send_soul(), Walker::recv_soul()
      */
-    void switch_souls(int root, int root_id, int dest, int dest_id);
+    void switch_souls(unsigned int root, unsigned int root_id, unsigned int dest, unsigned int dest_id);
 
     //! Method for evening out the number of walkers on each node.
     void normalize_population();
@@ -114,9 +114,9 @@ public:
 
     //! Factor of empty space for walkers over initial walkers.
     /*! \see QMC::QMC() */
-    static const int K = 50;
-    static const int check_thresh = 25; //< The amount of cycles between every time the population is normalized.
-    static const int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
+    static const unsigned int K = 50;
+    static const unsigned int check_thresh = 25; //< The amount of cycles between every time the population is normalized.
+    static const unsigned int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
 
     //! Constructor.
     DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc);

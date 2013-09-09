@@ -65,6 +65,8 @@ public:
      */
     void update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
         using namespace arma;
+        (void) particle;
+
         walker_pre->inv(span(0, n2 - 1), span(start, end)) = walker_post->inv(span(0, n2 - 1), span(start, end));
     };
 
@@ -73,6 +75,8 @@ public:
      */
     void reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
         using namespace arma;
+        (void) particle;
+
         walker_post->inv(span(0, n2 - 1), span(start, end)) = walker_pre->inv(span(0, n2 - 1), span(start, end));
     }
 

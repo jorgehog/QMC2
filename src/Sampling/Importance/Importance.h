@@ -49,7 +49,7 @@ public:
      * No energy necessities (they are already calculated).
      */
     void calculate_energy_necessities(Walker* walker) const {
-
+        (void) walker;
     }
 
     /*!

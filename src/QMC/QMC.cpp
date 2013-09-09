@@ -35,7 +35,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
     trial_walker = new Walker(n_p, dim);
     original_walkers = new Walker*[n_w_size];
-    for (int i = 0; i < n_w_size; i++) {
+    for (unsigned int i = 0; i < n_w_size; i++) {
         original_walkers[i] = new Walker(n_p, dim);
     }
 
@@ -159,9 +159,9 @@ double QMC::get_acceptance_ratio(const Walker* walker_pre, const Walker* walker_
     return spatial_jast * spatial_jast * G;
 }
 
-void QMC::set_spin_state(int particle) const {
-    int start = n2 * (particle >= n2);
-    int end = start + n2 - 1;
+void QMC::set_spin_state(unsigned int particle) const {
+    unsigned int start = n2 * (particle >= n2);
+    unsigned int end = start + n2 - 1;
     system->set_spin_state(start, end);
     sampling->set_spin_state(start, end);
 }
@@ -187,20 +187,20 @@ void QMC::calculate_energy_necessities(Walker* walker) const {
 
 void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
 
-    for (int i = 0; i < dim; i++) {
+    for (unsigned int i = 0; i < dim; i++) {
         walker_pre->r(particle, i) = walker_post->r(particle, i);
     }
 
-    for (int i = 0; i < n_p; i++) {
+    for (unsigned int i = 0; i < n_p; i++) {
         walker_pre->r_rel(i, particle) = walker_pre->r_rel(particle, i) = walker_post->r_rel(i, particle);
 
-        for (int k = 0; k < dim; k++) {
+        for (unsigned int k = 0; k < dim; k++) {
             walker_pre->dJ(particle, i, k) = walker_post->dJ(particle, i, k);
             walker_pre->dJ(i, particle, k) = walker_post->dJ(i, particle, k);
         }
     }
 
-    for (int i = 0; i < n2; i++) {
+    for (unsigned int i = 0; i < n2; i++) {
         walker_pre->phi(particle, i) = walker_post->phi(particle, i);
         walker_pre->dell_phi(particle)(arma::span(), i) = walker_post->dell_phi(particle)(arma::span(), i);
     }
@@ -212,20 +212,20 @@ void QMC::update_walker(Walker* walker_pre, const Walker* walker_post, int parti
 }
 
 void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
-    for (int i = 0; i < dim; i++) {
+    for (unsigned int i = 0; i < dim; i++) {
         walker_post->r(particle, i) = walker_pre->r(particle, i);
     }
 
-    for (int i = 0; i < n_p; i++) {
+    for (unsigned int i = 0; i < n_p; i++) {
         walker_post->r_rel(i, particle) = walker_post->r_rel(particle, i) = walker_pre->r_rel(i, particle);
 
-        for (int k = 0; k < dim; k++) {
+        for (unsigned int k = 0; k < dim; k++) {
             walker_post->dJ(particle, i, k) = walker_pre->dJ(particle, i, k);
             walker_post->dJ(i, particle, k) = walker_pre->dJ(i, particle, k);
         }
     }
 
-    for (int i = 0; i < n2; i++) {
+    for (unsigned int i = 0; i < n2; i++) {
         walker_post->phi(particle, i) = walker_pre->phi(particle, i);
         walker_post->dell_phi(particle)(arma::span(), i) = walker_pre->dell_phi(particle)(arma::span(), i);
     }
@@ -237,7 +237,7 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
 }
 
 void QMC::diffuse_walker(Walker* original, Walker* trial) {
-    for (int particle = p_start; particle < n_p; particle++) {
+    for (unsigned int particle = p_start; particle < n_p; particle++) {
 
         set_spin_state(particle);
         sampling->update_pos(original, trial, particle);
@@ -275,7 +275,7 @@ void QMC::copy_walker(const Walker* parent, Walker* child) const {
 }
 
 double QMC::get_KE(const Walker* walker) {
-    int i, j;
+    unsigned int i, j;
     double xterm, e_kinetic;
 
     e_kinetic = xterm = 0;
@@ -320,8 +320,8 @@ void QMC::test_gradients(Walker* walker) {
 
     double val = get_wf_value(walker);
     double h = 0.000001;
-    for (int i = 0; i < n_p; i++) {
-        for (int j = 0; j < dim; j++) {
+    for (unsigned int i = 0; i < n_p; i++) {
+        for (unsigned int j = 0; j < dim; j++) {
             walker->r(i, j) += h;
             walker->make_rel_matrix();
             walker->calc_r_i2();
@@ -371,7 +371,7 @@ void QMC::test_ratios(const Walker* walker_pre, const Walker* walker_post, int p
     double t3 = R_qmc / R;
 
     double eps = 1e-10;
-    if (abs(t1 - 1) < eps & abs(t2 - 1) < eps & abs(t3 - 1) < eps) {
+    if ((abs(t1 - 1) < eps) & (abs(t2 - 1) < eps) & (abs(t3 - 1) < eps)) {
         std::cout << "ratio success" << std::endl;
     } else {
         std::cout << "ratio fail " << t1 << " " << t2 << " " << t3 << std::endl;

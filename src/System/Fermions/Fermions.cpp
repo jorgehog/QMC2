@@ -36,6 +36,9 @@ void Fermions::get_spatial_grad_full(Walker* walker) const {
 
 void Fermions::get_spatial_grad(Walker* walker, int particle) const {
     using namespace arma;
+
+    (void) particle;
+
     double sum;
 
     for (int i = start; i < n2 + start; i++) {

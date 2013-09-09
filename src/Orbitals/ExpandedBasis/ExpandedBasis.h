@@ -13,7 +13,7 @@ struct GeneralParams;
 
 class ExpandedBasis : public Orbitals {
 public:
-    ExpandedBasis(GeneralParams & gp, Orbitals* basis, int m, std::string coeffPath);
+    ExpandedBasis(GeneralParams & gp, Orbitals* basis, int m);
 
     double phi(const Walker* walker, int particle, int q_num);
     double del_phi(const Walker* walker, int particle, int q_num, int d);

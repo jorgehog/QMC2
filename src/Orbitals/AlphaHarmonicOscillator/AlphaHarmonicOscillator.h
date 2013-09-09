@@ -73,6 +73,8 @@ protected:
      * @return The variational parameter alpha.
      */
     double get_parameter(int n) {
+        (void) n;
+
         return *alpha;
     }
 
@@ -80,6 +82,8 @@ protected:
      * Sets a new value for the alpha and updates all the pointer values.
      */
     void set_parameter(double parameter, int n) {
+        (void) n;
+
         *alpha = parameter;
         *k2 = parameter*w;
         *k = sqrt(*k2);

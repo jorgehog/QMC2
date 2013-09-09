@@ -7,6 +7,7 @@
 
 #include "Walker.h"
 #include <iostream>
+#include "../defines.h"
 
 Walker::Walker(int n_p, int dim, bool alive) {
     using namespace arma;

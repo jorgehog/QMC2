@@ -37,9 +37,9 @@ protected:
 
     STDOUT* std_out; //!< Output object. Wraps and replaces std::cout.
     std::stringstream s;
-    int output_tresh;
+    unsigned int output_tresh;
 
-    int n_w_size; //!< The total number of allocated walkers.
+    unsigned int n_w_size; //!< The total number of allocated walkers.
 
     std::string runpath; //!< The directory which the simulation is set to run.
 
@@ -50,21 +50,21 @@ protected:
 
     bool is_master;
     bool parallel;
-    int node;
-    int n_nodes;
+    unsigned int node;
+    unsigned int n_nodes;
 
-    int p_start;
+    unsigned int p_start; //!< Is always zero unless a deadlock is initialized.
 
-    int n_c; //!< The number of Monte-Carlo cycles.
-    int thermalization; //!< The number of thermalization steps.
-    int cycle; //!< The current Monte-Carlo cycle.
+    unsigned int n_c; //!< The number of Monte-Carlo cycles.
+    unsigned int thermalization; //!< The number of thermalization steps.
+    unsigned int cycle; //!< The current Monte-Carlo cycle.
     //! The number of walkers
     /*! VMC stores this many cycles in case of DMC */
-    int n_w;
+    unsigned int n_w;
 
-    int n_p;
-    int n2;
-    int dim;
+    unsigned int n_p;
+    unsigned int n2;
+    unsigned int dim;
 
     unsigned long int accepted; //!< Number of accepted moves.
     unsigned long int total_samples; //!< Total number of moves.
@@ -177,7 +177,7 @@ protected:
      * 
      * \see System::start, System::end
      */
-    void set_spin_state(int particle) const;
+    void set_spin_state(unsigned int particle) const;
 
     
     //! Method used for testing the optimized ratio calculation.

@@ -25,10 +25,14 @@ protected:
     double get_variational_derivative(const Walker* walker, int n);
 
     void set_parameter(double param, int n) {
+        (void) n;
+
         beta = param;
     }
 
     double get_parameter(int n) {
+        (void) n;
+
         return beta;
     }
 

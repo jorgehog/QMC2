@@ -185,6 +185,8 @@ double Pade_Jastrow::get_lapl_sum(Walker * walker) const {
 
 double Pade_Jastrow::get_variational_derivative(const Walker* walker, int n) {
 
+    (void) n;
+
     double dbeta = 0.0;
 
     for (int i = 0; i < n_p - 1; i++) {

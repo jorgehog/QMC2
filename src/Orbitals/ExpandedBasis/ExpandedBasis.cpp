@@ -11,23 +11,14 @@
 #include "../../Walker/Walker.h"
 
 
-ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size, std::string coeffPath)
+ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size)
 : Orbitals(gp.n_p, gp.dim) {
 
     this->basis = basis;
     this->basis_size = basis_size;
     coeffs = arma::zeros<arma::mat > (n_p, basis_size);
 
-//    std::ifstream coeffs_file;
-//    coeffs_file.open(coeffPath.c_str());
-//
-//    for (int i = 0; i < n_p; i++) {
-//        for (int m = 0; m < basis_size; m++) {
-//            coeffs_file >> coeffs(i, m);
-//        }
-//    }
-//
-//    coeffs_file.close();
+    //load coeffs in some intelligent way.
 
 }
 

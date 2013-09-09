@@ -75,7 +75,7 @@ double Blocking::estimate_error() {
     int block_size, n;
     double error, var, mean;
 
-
+    error = 0;
     get_initial_error();
 
     arma::Row<int> block_sizes = arma::zeros<arma::Row<int> >(n_block_samples);

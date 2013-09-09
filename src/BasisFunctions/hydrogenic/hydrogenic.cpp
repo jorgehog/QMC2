@@ -548,7 +548,10 @@ lapl_hydrogenic_17::lapl_hydrogenic_17(double* k, double* k2, double* r22d, doub
 
 
 double hydrogenic_0::eval(const Walker* walker, int i) {
-    
+
+    (void) walker;
+    (void) i;
+
     //exp(-k*r)
     
     psi = 1;

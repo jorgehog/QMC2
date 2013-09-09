@@ -190,6 +190,8 @@ int main(int argc, char** argv) {
         vmc->run_method();
         if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
 
+    } else {
+        vmc = NULL;
     }
 
     if (generalParams.doDMC) {

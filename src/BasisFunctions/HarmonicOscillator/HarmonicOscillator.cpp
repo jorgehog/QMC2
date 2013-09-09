@@ -698,6 +698,9 @@ lapl_HarmonicOscillator_27::lapl_HarmonicOscillator_27(double* k, double* k2, do
 
 double HarmonicOscillator_0::eval(const Walker* walker, int i) {
     
+    (void) walker;
+    (void) i;
+
     //exp(-k^2*r^2/2)
     
     H = 1;

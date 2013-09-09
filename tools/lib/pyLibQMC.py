@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import os, time, re, sys
+import os, time, re, sys, shutil
 from inspect import getfile, currentframe
 from os.path import join, split, dirname, abspath
 
 
 
 class paths:
-    CODE = split(split(dirname(abspath(getfile(currentframe()))))[0])[0]
+    lib = dirname(abspath(getfile(currentframe())))
+    toolsPath = split(lib)[0]
+    CODE = split(toolsPath)[0]
     src = join(CODE, "src")
-    toolsPath = join(CODE ,"tools")
     scratchPath = join(CODE ,"scratch")
     iniFilePath = join(CODE ,"iniFiles")
     programPath =join(CODE, "qmakeQMC2")
@@ -44,6 +45,7 @@ class verifyPaths:
             os.system("qmake -makefile")
             os.system("make")
             os.chdir(cwd)
+            shutil.copy(join(paths.toolsPath, "misc", "verify.ini"), paths.iniFilePath)
 
     def __init__(self):
         
@@ -55,7 +57,9 @@ class verifyPaths:
                 self.l2(path)
         for path in self.l3_paths:
             if not os.path.exists(path):
-                self.l3(path)            
+                self.l3(path)        
+                
+        
                 
 verifyPaths()
             

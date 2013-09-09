@@ -609,6 +609,9 @@ lapl_HarmonicOscillator3D_19::lapl_HarmonicOscillator3D_19(double* k, double* k2
 
 double HarmonicOscillator3D_0::eval(const Walker* walker, int i) {
     
+    (void) walker;
+    (void) i;
+
     //exp(-k^2*r^2/2)
     
     H = 1;

@@ -470,6 +470,9 @@ double AlphaHarmonicOscillator::get_coulomb_element(const arma::uvec& qnum_set) 
     //
     //    return I;
 
+    (void) qnum_set;
+    return 0;
+
 }
 
 double AlphaHarmonicOscillator::get_sp_energy(int qnum) const {

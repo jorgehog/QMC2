@@ -45,6 +45,10 @@ Diffusion::Diffusion(int n_p, int dim, double timestep, seed_type random_seed, d
 }
 
 double Diffusion::get_new_pos(const Walker* walker, int i, int j) {
+    (void) walker;
+    (void) i;
+    (void) j;
+
 #ifdef RNG_ZIG
     return DRanNormalZig32() * std;
 #endif

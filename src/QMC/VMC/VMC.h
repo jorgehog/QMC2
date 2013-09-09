@@ -18,9 +18,9 @@ struct VMCparams;
 class VMC : public QMC {
 protected:
 
-    int pop_tresh; //!< The amount of cycles between storing walkers for DMC.
-    int offset; //!< The amount of cycles before starting to store walkers for DMC.
-    int last_walker; //!< Count variable for the last walker stores for DMC.
+    unsigned int pop_tresh; //!< The amount of cycles between storing walkers for DMC.
+    unsigned int offset; //!< The amount of cycles before starting to store walkers for DMC.
+    unsigned int last_walker; //!< Count variable for the last walker stores for DMC.
 
     double vmc_E; //!< The VMC energy.
 

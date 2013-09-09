@@ -255,6 +255,7 @@ double hydrogenicOrbitals::get_dell_alpha_phi(Walker* walker, int i, int qnum) {
 
     } else {
         std::cout << "qnum level " << qnum << " not implemented in dalpha hydro" << std::endl;
+        dphi = 0;
     }
 
     return dphi;
@@ -623,16 +624,7 @@ double hydrogenicOrbitals::get_coulomb_element(const arma::uvec& qnum_set) {
     else if (n1 == 4 && n2 == 4 && n3 == 4 && n4 == 4) return (19541 * Z) / 524288;
     //    return N(0) * N(1) * N(2) * N(3) * I;
 
-
-
-
-
-
-
-
-
-
-
+    return 0;
 }
 
 double hydrogenicOrbitals::get_sp_energy(int qnum) const {

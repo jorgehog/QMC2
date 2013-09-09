@@ -23,6 +23,8 @@ Importance::Importance(GeneralParams & gP)
 void Importance::update_walker(Walker* walker_pre, const Walker* walker_post, int particle) const {
     using namespace arma;
 
+    (void) particle;
+
     walker_pre->spatial_grad(span(start, end), span()) = walker_post->spatial_grad(span(start, end), span());
     walker_pre->jast_grad = walker_post->jast_grad;
 
@@ -32,6 +34,8 @@ void Importance::update_walker(Walker* walker_pre, const Walker* walker_post, in
 
 void Importance::reset_walker(const Walker* walker_pre, Walker* walker_post, int particle) const {
     using namespace arma;
+
+    (void) particle;
 
     walker_post->spatial_grad(span(start, end), span()) = walker_pre->spatial_grad(span(start, end), span());
     walker_post->jast_grad = walker_pre->jast_grad;

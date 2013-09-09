@@ -46,7 +46,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     if (gP.doVMC) {
 
         E_T = vmc->get_energy();
-        for (int i = 0; i < n_w; i++) {
+        for (unsigned int i = 0; i < n_w; i++) {
             copy_walker(vmc->original_walkers[i], original_walkers[i]);
             delete vmc->original_walkers[i];
         }
@@ -70,14 +70,14 @@ void DMC::set_trial_positions() {
 
     double tmpDt = sampling->get_dt();
     sampling->set_dt(0.5);
-    for (int k = 0; k < n_w; k++) {
+    for (unsigned int k = 0; k < n_w; k++) {
         sampling->set_trial_pos(original_walkers[k]);
     }
     sampling->set_dt(tmpDt);
 
     //Calculating and storing energies of active walkers
     E_T = 0;
-    for (int k = 0; k < n_w; k++) {
+    for (unsigned int k = 0; k < n_w; k++) {
         calculate_energy_necessities(original_walkers[k]);
         double El = calculate_local_energy(original_walkers[k]);
 
@@ -142,7 +142,7 @@ void DMC::iterate_walker(int k) {
 
     copy_walker(original_walkers[k], trial_walker);
 
-    for (int b = 0; b < block_size; b++) {
+    for (unsigned int b = 0; b < block_size; b++) {
 
         double local_E_prev = original_walkers[k]->get_E();
 
@@ -170,7 +170,7 @@ void DMC::run_method() {
 
         reset_parameters();
 
-        for (int k = 0; k < n_w_last; k++) {
+        for (unsigned int k = 0; k < n_w_last; k++) {
             iterate_walker(k);
         }
 
@@ -192,7 +192,7 @@ void DMC::run_method() {
 
         reset_parameters();
 
-        for (int k = 0; k < n_w_last; k++) {
+        for (unsigned int k = 0; k < n_w_last; k++) {
             iterate_walker(k);
         }
 
@@ -228,7 +228,7 @@ void DMC::save_distribution() {
             dist.resize(dist.n_rows + n_w * n_p * 100, dim);
         }
 
-        for (int i = 0; i < n_w; i++) {
+        for (unsigned int i = 0; i < n_w; i++) {
             dist(span(last_inserted, last_inserted + n_p - 1), span()) = original_walkers[i]->r;
             last_inserted += n_p;
         }
@@ -238,10 +238,10 @@ void DMC::save_distribution() {
 
 void DMC::bury_the_dead() {
 
-    int newborn = n_w - n_w_last;
-    int last_alive = n_w - 1;
-    int i = 0;
-    int k = 0;
+    unsigned int newborn = n_w - n_w_last;
+    unsigned int last_alive = n_w - 1;
+    unsigned int i = 0;
+    unsigned int k = 0;
 
     while (k < newborn && i < n_w_last) {
         if (original_walkers[i]->is_dead()) {
@@ -259,9 +259,9 @@ void DMC::bury_the_dead() {
 
     if (deaths > newborn) {
 
-        int difference = deaths - newborn;
-        int i = 0;
-        int first_dead = 0;
+        unsigned int difference = deaths - newborn;
+        unsigned int i = 0;
+        unsigned int first_dead = 0;
 
         //we have to delete [difference] spots to compress array.
         while (i != difference) {
@@ -273,13 +273,15 @@ void DMC::bury_the_dead() {
                 //                original_walkers[last_alive] = new Walker(n_p, dim, false);
                 original_walkers[last_alive]->kill();
                 i++;
-                last_alive--;
 
                 //if all the walkers are dead
-                if (last_alive == -1) {
+                if (last_alive == 0) {
                     n_w = 0;
                     return;
                 }
+
+                last_alive--;
+
             }
 
             //Find the first dead walker
@@ -315,7 +317,7 @@ void DMC::node_comm() {
 
         MPI_Allgather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
 
-        for (int i = 0; i < n_nodes; i++) {
+        for (unsigned int i = 0; i < n_nodes; i++) {
             if (n_w_list(i) == 0) {
                 force_comm = true;
             }
@@ -339,7 +341,7 @@ void DMC::node_comm() {
 
 }
 
-void DMC::switch_souls(int root, int root_id, int dest, int dest_id) {
+void DMC::switch_souls(unsigned int root, unsigned int root_id, unsigned  int dest, unsigned  int dest_id) {
     if (node == root) {
         original_walkers[root_id]->send_soul(dest);
         n_w--;
@@ -357,7 +359,7 @@ void DMC::normalize_population() {
 
     force_comm = false;
 
-    int avg = n_w_tot / n_nodes;
+    unsigned int avg = n_w_tot / n_nodes;
 
     umat swap_map = zeros<umat > (n_nodes, n_nodes); //root x (recieve_count @ index dest)
     uvec snw = sort_index(n_w_list, 1); //enables us to index n_w as decreasing
@@ -367,8 +369,8 @@ void DMC::normalize_population() {
     //Start iterating sending from highest to lowest. When root or dest reaches the average
     //value they are shifted to the second highest/lowest. Process continues untill root
     //reaches dest.
-    int root = 0;
-    int dest = n_nodes - 1;
+    unsigned int root = 0;
+    unsigned int dest = n_nodes - 1;
     while (root < dest) {
         if (n_w_list(snw(root)) > avg) {
             if (n_w_list(snw(dest)) < avg) {
@@ -417,15 +419,15 @@ void DMC::normalize_population() {
     //    s << n_w_list.st() << endl;
     //    std_out->cout(s);
 
-    for (int root = 0; root < n_nodes; root++) {
-        for (int dest = 0; dest < n_nodes; dest++) {
+    for (unsigned int root = 0; root < n_nodes; root++) {
+        for (unsigned int dest = 0; dest < n_nodes; dest++) {
             if (swap_map(root, dest) != 0) {
 
                 //                s << "node" << root << " sends ";
                 //                s << swap_map(root, dest) << " walkers to node " << dest;
                 //                std_out->cout(s);
 
-                for (int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
+                for (unsigned int sendcount = 0; sendcount < swap_map(root, dest); sendcount++) {
                     switch_souls(root, n_w - 1, dest, n_w);
                 }
 
@@ -447,7 +449,7 @@ void DMC::normalize_population() {
 void DMC::free_walkers() {
 
     delete trial_walker;
-    for (int i = 0; i < n_w_size; i++) {
+    for (unsigned int i = 0; i < n_w_size; i++) {
         delete original_walkers[i];
     }
 

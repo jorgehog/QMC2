@@ -167,11 +167,15 @@ double Orbitals::lapl_phi(const Walker* walker, int particle, int q_num) {
 }
 
 double Orbitals::get_coulomb_element(const arma::uvec & qnum_set) {
+    (void) qnum_set;
+
     //Do nothing
     return 0;
 }
 
 double Orbitals::get_sp_energy(int qnum) const {
+    (void) qnum;
+
     //Do nothing
     return 0;
 }

@@ -29,7 +29,7 @@ public:
 
     }
 
-    const double extract_mean() {
+    double extract_mean() {
 
 #ifdef MPI_ON
         MPI_Allreduce(MPI_IN_PLACE, &mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -45,7 +45,7 @@ public:
         return M;
     }
 
-    const double extract_mean_of_means() {
+    double extract_mean_of_means() {
 
         double M = mean_of_means / mm_counter;
 
