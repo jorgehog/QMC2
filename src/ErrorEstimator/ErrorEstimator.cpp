@@ -19,6 +19,7 @@ ErrorEstimator::ErrorEstimator(int n_c,
         int node, int n_nodes, bool rerun) {
 
     this->n_c = n_c;
+    this->n_c_orig = n_c;
     i = 0;
 
     this->node = node;
@@ -200,4 +201,12 @@ void ErrorEstimator::update_data(double val) {
     
     data(i) = val;
     i++;
+}
+
+void ErrorEstimator::reset()
+{
+    data.reset();
+    n_c = n_c_orig;
+    data.set_size(n_c);
+    i = 0;
 }

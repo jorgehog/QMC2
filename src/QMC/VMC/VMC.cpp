@@ -15,12 +15,13 @@
 #include "../../Sampling/Sampling.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../../OutputHandler/Distribution/Distribution.h"
+#include "../../Orbitals/Orbitals.h"
 
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w)
 : QMC(gP, vP.n_c, sO, pp, n_w) {
 
     std::stringstream name;
-    name << gP.system << gP.n_p << "c" << gP.systemConstant << "vmc";
+    name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "vmc";
     distribution = new Distribution(pp, gP.runpath, name.str());
 
     pop_tresh = n_c / n_w;
@@ -28,7 +29,8 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     dist_tresh = 25;
     last_walker = 0;
 
-    dist = arma::zeros(n_c * n_p / dist_tresh, dim);
+    dist_size = n_c * n_p / dist_tresh;
+    dist = arma::zeros(dist_size, dim);
 
     output_tresh = n_c / 100;
 
@@ -73,16 +75,23 @@ void VMC::store_walkers() {
 
 }
 
-void VMC::run_method() {
 
-    set_trial_positions();
+void VMC::run_method(bool initialize) {
 
-    copy_walker(original_walker, trial_walker);
 
-    for (cycle = 1; cycle <= thermalization; cycle++) {
-        diffuse_walker(original_walker, trial_walker);
+    if (initialize) {
+
+        set_trial_positions();
+
+        copy_walker(original_walker, trial_walker);
+
+        for (cycle = 1; cycle <= thermalization; cycle++) {
+            diffuse_walker(original_walker, trial_walker);
+        }
+
+    } else {
+        reset_all();
     }
-
 
     for (cycle = 1; cycle <= n_c; cycle++) {
 
@@ -92,6 +101,8 @@ void VMC::run_method() {
         local_E = calculate_local_energy(original_walker);
 
         vmc_E += local_E;
+
+        update_samplers(original_walker);
 
         output();
         update_subsamples();
@@ -135,6 +146,15 @@ void VMC::node_comm() {
 #ifdef MPI_ON
     MPI_Allreduce(MPI_IN_PLACE, &vmc_E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif
+}
+
+void VMC::reset_all()
+{
+
+    last_walker = 0;
+    vmc_E = 0;
+
+    QMC::reset_all();
 }
 
 

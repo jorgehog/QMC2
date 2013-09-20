@@ -27,6 +27,7 @@ class Jastrow;
 class Sampling;
 class Orbitals;
 class Distribution;
+class Sampler;
 
 /*! \brief The QMC superclass.
  * Holds implementations of general functions for both VMC and DMC in order to
@@ -47,6 +48,7 @@ protected:
     arma::mat dist; //!< Matrix holding positional data for the distribution.
     int last_inserted; //!< Index of last inserted positional data.
     int dist_tresh; //!< Amount of cycles to skip in between storing position data.
+    int dist_size;
 
     bool is_master;
     bool parallel;
@@ -81,6 +83,12 @@ protected:
 
     Sampler kinetic_sampler;
     Distribution* distribution;
+
+    std::vector<Sampler*> samplers;
+
+    virtual void reset_all();
+
+    void update_samplers(const Walker* walker);
 
     //! Method for setting the trial position of the QMC method's walkers.
     /*!
@@ -210,7 +218,11 @@ public:
     QMC();
 
     //! Method used for executing the solver.
-    virtual void run_method() = 0;
+    virtual void run_method(bool initialize = true) = 0;
+
+    void add_subsample(Sampler * sampler){
+        samplers.push_back(sampler);
+    }
 
     //! Method for calculating the Quantum Force.
     void get_QF(Walker* walker) const;

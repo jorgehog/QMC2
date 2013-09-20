@@ -77,6 +77,10 @@ public:
      */
     virtual void finalize();
 
+    virtual void reset() {
+        if (use_file) init_file();
+    }
+
 };
 
 

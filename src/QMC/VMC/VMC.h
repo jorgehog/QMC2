@@ -60,6 +60,8 @@ protected:
      */
     void node_comm();
 
+    void reset_all();
+
 
 public:
 
@@ -75,7 +77,7 @@ public:
         return vmc_E;
     }
 
-    void run_method();
+    void run_method(bool initialize = true);
     
     void output();
 

@@ -34,7 +34,6 @@ double DiAtomCore::get_pot_E(const Walker* walker) const {
         com_corr = (*R)*walker->r(i, 0);
         
         e_pot -= Z*(1./sqrt(shared + com_corr) + 1./sqrt(shared - com_corr));
-//        e_pot -= 2*Z*shared/sqrt(shared*shared - com_corr*com_corr);
     }
 
     e_pot += Z*Z/(*R);

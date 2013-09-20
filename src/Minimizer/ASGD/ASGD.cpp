@@ -95,9 +95,13 @@ void ASGD::get_total_grad() {
 
 }
 
-void ASGD::minimize() {
+void ASGD::minimize(bool initialize) {
 
-    thermalize_walkers();
+    if (initialize){
+        thermalize_walkers();
+    } else {
+        ASGDout->reset();
+    }
 
     for (sample = 1; sample <= SGDsamples; sample++) {
 

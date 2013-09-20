@@ -12,7 +12,6 @@
 #include "../Orbitals/Orbitals.h"
 #include "../Jastrow/Jastrow.h"
 
-
 Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha, const arma::rowvec & beta) {
 
     this->vmc = vmc;

@@ -29,9 +29,11 @@ AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, Variational
     qnums = arma::zeros<arma::imat > (n2, dim);
 
     if (dim == 2) {
+        name = "QDots";
         get_qnums();
         setup_basis();
     } else if (dim == 3) {
+        name = "QDots3D";
         get_qnums3D();
         setup_basis3D();
     }

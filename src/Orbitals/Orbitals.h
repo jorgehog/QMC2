@@ -9,6 +9,7 @@
 #define	ORBITALS_H
 
 #include <armadillo>
+#include <string>
 class QMC;
 class BasisFunctions;
 class Walker;
@@ -35,6 +36,8 @@ protected:
     BasisFunctions** basis_functions; //!< A vector maping a quantum number index to a single particle wave function.
     BasisFunctions*** dell_basis_functions; //!< A maxtrix maping a quantum number- and dimension index to a single particle wave function derivative.
     BasisFunctions** lapl_basis_functions; //!< A vector maping a quantum number index to a single particle wave function Laplacian.
+
+    std::string name;
 
     //! A method for retrieving variational parameters.
     /*! 
@@ -135,6 +138,10 @@ public:
 
     void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;
+    }
+
+    std::string getName() const {
+        return name;
     }
 
     friend class HartreeFock;

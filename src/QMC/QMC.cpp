@@ -41,7 +41,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
     jastrow = sO.jastrow;
     sampling = sO.sample_method;
-    system = sO.SYSTEM;
+    system = sO.system;
 
     sampling->set_qmc_ptr(this);
     get_orbitals_ptr()->set_qmc_ptr(this);
@@ -82,12 +82,47 @@ QMC::QMC() {
 void QMC::update_subsamples(double weight) {
     kinetic_sampler.update_mean(weight);
     system->update_potential_samples(weight);
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->update_mean(weight);
+    }
+
 }
 
 void QMC::push_subsamples() {
     kinetic_sampler.push_mean();
     system->push_potential_samples();
+
+    for (Sampler * sampler : samplers) {
+        sampler->push_mean();
+    }
+
 }
+
+
+void QMC::reset_all()
+{
+
+    error_estimator->reset();
+
+    accepted = 0;
+    total_samples = 0;
+    last_inserted = 0;
+
+    dist.reset();
+    dist.set_size(dist_size, dim);
+
+}
+
+void QMC::update_samplers(const Walker *walker)
+{
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->setValue(walker);
+    }
+
+}
+
 
 void QMC::dump_subsamples(bool mean_of_means) {
 
@@ -103,6 +138,18 @@ void QMC::dump_subsamples(bool mean_of_means) {
     s << endl;
 
     s << system->dump_samples(mean_of_means) << endl;
+
+//    for (Sampler* sampler : samplers) {
+//        s << sampler->getName() << " " << setprecision(6) << fixed;
+//        if (mean_of_means) {
+//            s << sampler->extract_mean_of_means();
+//        } else {
+//            s << sampler->extract_mean();
+//        }
+
+//        s << endl;
+
+//    }
 
     if (is_master) {
         cout << setprecision(6) << fixed;
@@ -235,6 +282,8 @@ void QMC::reset_walker(const Walker* walker_pre, Walker* walker_post, int partic
     system->reset_walker(walker_pre, walker_post, particle);
     sampling->reset_walker(walker_pre, walker_post, particle);
 }
+
+
 
 void QMC::diffuse_walker(Walker* original, Walker* trial) {
     for (unsigned int particle = p_start; particle < n_p; particle++) {

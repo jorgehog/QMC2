@@ -35,3 +35,13 @@ void stdoutDMC::dump() {
     file << dmc->E_T << std::endl;
 
 }
+
+void stdoutDMC::reset()
+{
+    sumE = 0;
+    sumN = 0;
+    n = 0;
+
+    OutputHandler::reset();
+
+}

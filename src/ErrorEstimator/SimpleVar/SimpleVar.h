@@ -24,8 +24,9 @@ public:
      * Does not store values in memory, but rather use sum variables.
      */
     void update_data(double val);
-    
-    void normalize(); //NOT NEEDED?
+
+    void reset();
+
 protected:
     
     double f; //!< sum variable used to calculate the mean

@@ -47,4 +47,14 @@ void stdoutASGD::dump() {
 
 }
 
+void stdoutASGD::reset()
+{
+    grad = arma::zeros(asgd->Nparams);
+
+    sumE = 0;
+
+    OutputHandler::reset();
+}
+
+
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   QMCmain.cpp
  * Author: jorgehog
  *
@@ -41,11 +41,41 @@
 #include "Jastrow/No_Jastrow/No_Jastrow.h"
 #include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
 
+#include "Sampler/sampleMethods/SampleForce.h"
+
 
 
 /*
- * 
+ *
  */
+
+enum SYSTEMS {
+    _QDots,
+    _DoubleWell,
+    _Atoms,
+    _Diatom,
+    _QDots3D
+};
+
+enum SAMPLING {
+    IS,
+    BF
+};
+
+struct MainFileParams {
+
+    bool doMIN = false;
+    bool doVMC = true;
+    bool doDMC = false;
+    bool do_blocking = false;
+    bool use_jastrow = true;
+    bool use_coulomb = true;
+
+    int system = _QDots;
+    int sampling = IS;
+
+};
+
 
 
 //! Function for parsing the command line for parameters.
@@ -54,48 +84,31 @@
  * Compiling with a different main file is designed to be easy.
  */
 void parseCML(int argc, char** argv,
-        VMCparams & vmcParams,
-        DMCparams & dmcParams,
-        VariationalParams & variationalParams,
-        GeneralParams & generalParams,
-        MinimizerParams & minimizerParams,
-        ParParams & parParams);
+              MainFileParams & mP,
+              VMCparams & vmcParams,
+              DMCparams & dmcParams,
+              VariationalParams & variationalParams,
+              GeneralParams & generalParams,
+              MinimizerParams & minimizerParams,
+              ParParams & parParams);
 
 
 //! Function for setting up the system objects.
-void selectSystem(GeneralParams & gP,
-        SystemObjects & sO,
-        VariationalParams & vP,
-        ParParams & pp);
+void selectSystem(MainFileParams &mP, GeneralParams & gP,
+                  SystemObjects & sO,
+                  VariationalParams & vP,
+                  ParParams & pp);
+
+void blocking(int argc, char**argv, struct ParParams & parParams);
+
+void dist(int argc, char**argv, struct ParParams & parParams);
 
 int main(int argc, char** argv) {
 
     using namespace std;
 
-    //Setting up parallel parameters
-    struct ParParams parParams;
-
-#ifdef MPI_ON
-    int node, n_nodes;
-
-    MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
-    MPI_Comm_rank(MPI_COMM_WORLD, &node);
-
-    parParams.n_nodes = n_nodes;
-    parParams.node = node;
-    parParams.parallel = (parParams.n_nodes > 1);
-    parParams.is_master = (parParams.node == 0);
-#else
-    parParams.parallel = false;
-    parParams.node = 0;
-    parParams.n_nodes = 1;
-    parParams.is_master = true;
-#endif
-
-    arma::wall_clock t;
-
     //Initialize structs for holding constructor arguments.
+    struct ParParams parParams;
     struct VMCparams vmcParams;
     struct DMCparams dmcParams;
     struct VariationalParams variationalParams;
@@ -103,82 +116,65 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct SystemObjects systemObjects;
 
-
-    //Test for rerunning blocking
-    //argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
-    string rerun_blocking = "reblock";
-    if ((argc == 7) && (rerun_blocking.compare(argv[1]) == 0)) {
-        ErrorEstimator* reblock = new Blocking(0, parParams,
-                (string) argv[2],
-                (string) argv[3],
-                atoi(argv[4]),
-                atoi(argv[5]),
-                atoi(argv[6]),
-                true);
-        double error = reblock->estimate_error();
-        if (parParams.is_master) cout << "Estimated Error: " << error << endl;
-        if (parParams.is_master) cout << "Finished Error Recalculation" << endl;
-
-        reblock->finalize();
-
-#ifdef MPI_ON
-        MPI_Finalize();
-#endif
-        return 0;
-    }
-    //
-
-    //Test for rerunning distribution
-    //argv = [x-name, "redist", n_p, path, name, N, bin_edge?
-    string rerun_dist = "redist";
-    if ((argc == 7) && (rerun_dist.compare(argv[1]) == 0)) {
-        Distribution* redist = new Distribution(parParams, argv[3], argv[4]);
-
-        redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]));
-
-#ifdef MPI_ON
-        MPI_Finalize();
-#endif
-        return 0;
-    }
-
-
-    parseCML(argc, argv,
-            vmcParams,
-            dmcParams,
-            variationalParams,
-            generalParams,
-            minimizerParams,
-            parParams);
-
-
-    selectSystem(generalParams, systemObjects, variationalParams, parParams);
-
-
+    //Initializing solver objects
     Minimizer* minimizer;
     VMC* vmc;
     DMC* dmc;
 
-    if (generalParams.doVMC) {
+    //Setting up parallel parameters
+    initMPI(parParams, argc, argv);
+
+    //THIS IS CONTROLLED BY PYTHON SCRIPT
+    blocking(argc, argv, parParams);
+    dist(argc, argv, parParams);
+
+    struct MainFileParams mainParams;
+
+    parseCML(argc, argv,
+             mainParams,
+             vmcParams,
+             dmcParams,
+             variationalParams,
+             generalParams,
+             minimizerParams,
+             parParams);
+    //END OF PYTHON CONTROLLED ROUTINES
+
+
+    arma::wall_clock t;
+    scaleWithProcs(parParams, generalParams, minimizerParams, vmcParams, dmcParams);
+
+    //Deprecate this
+    selectSystem(mainParams, generalParams, systemObjects, variationalParams, parParams);
+
+    SampleForce sampleForce(&generalParams.R, generalParams.n_p);
+
+    mainParams.doDMC = true;
+    mainParams.doMIN = true;
+
+    if (mainParams.doVMC) {
 
         vmc = new VMC(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w);
 
-        if (generalParams.doMIN) {
+        if (mainParams.doMIN) {
 
             minimizer = new ASGD(vmc, minimizerParams, parParams, generalParams.runpath);
 
             if (parParams.is_master) t.tic();
             minimizer->minimize();
             if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
+
+            minimizer->minimize(false);
+
         }
 
 
-        if (generalParams.do_blocking) {
+        if (mainParams.do_blocking) {
 
             ErrorEstimator* blocking = new Blocking(vmcParams.n_c,
-                    parParams,
-                    "blocking_VMC_out",
-                    generalParams.runpath);
+                                                    parParams,
+                                                    "blocking_VMC_out",
+                                                    generalParams.runpath);
 
             vmc->set_error_estimator(blocking);
         } else {
@@ -190,20 +186,26 @@ int main(int argc, char** argv) {
         vmc->run_method();
         if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
 
+        vmc->add_subsample(&sampleForce);
+        vmc->run_method(false);
+
+        cout << "I has force " << sampleForce.extract_mean() << endl;
+
+
     } else {
         vmc = NULL;
     }
 
-    if (generalParams.doDMC) {
+    if (mainParams.doDMC) {
 
         dmc = new DMC(generalParams, dmcParams, systemObjects, parParams, vmc);
 
-        if (generalParams.do_blocking) {
+        if (mainParams.do_blocking) {
 
             ErrorEstimator* blocking = new Blocking(dmcParams.n_c,
-                    parParams,
-                    "blocking_DMC_out",
-                    generalParams.runpath);
+                                                    parParams,
+                                                    "blocking_DMC_out",
+                                                    generalParams.runpath);
 
             dmc->set_error_estimator(blocking);
         } else {
@@ -213,6 +215,12 @@ int main(int argc, char** argv) {
         if (parParams.is_master) t.tic();
         dmc->run_method();
         if (parParams.is_master) cout << "---DMC time: " << t.toc() << " s---\n" << endl;
+
+        dmc->add_subsample(&sampleForce);
+        dmc->run_method(false);
+
+        cout << "I has force " << sampleForce.extract_mean_of_means() << endl;
+
     }
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
@@ -226,23 +234,28 @@ int main(int argc, char** argv) {
 
 
 
-void selectSystem(GeneralParams & gP,
-        SystemObjects & sO,
-        VariationalParams & vP,
-        ParParams & pp) {
+void selectSystem(MainFileParams &mP,
+                  GeneralParams & gP,
+                  SystemObjects & sO,
+                  VariationalParams & vP,
+                  ParParams & pp) {
 
-    if (gP.system == "QDots") {
+    System* system;
 
+    switch (mP.system) {
+    case _QDots:
         gP.dim = 2;
 
         sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
 
         sO.onebody_pot = new Harmonic_osc(gP);
 
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-        sO.SYSTEM->add_potential(sO.onebody_pot);
+        sO.system = new Fermions(gP, sO.SP_basis);
+        sO.system->add_potential(sO.onebody_pot);
 
-    } else if (gP.system == "QDots3D") {
+        break;
+
+    case _QDots3D:
 
         gP.dim = 3;
 
@@ -250,10 +263,12 @@ void selectSystem(GeneralParams & gP,
 
         sO.onebody_pot = new Harmonic_osc(gP);
 
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
-        sO.SYSTEM->add_potential(sO.onebody_pot);
+        sO.system = new Fermions(gP, sO.SP_basis);
+        sO.system->add_potential(sO.onebody_pot);
 
-    } else if (gP.system == "Atoms") {
+        break;
+
+    case _Atoms:
 
         gP.dim = 3;
 
@@ -261,143 +276,105 @@ void selectSystem(GeneralParams & gP,
 
         sO.onebody_pot = new AtomCore(gP);
 
-        sO.SYSTEM = new Fermions(gP, sO.SP_basis);
+        sO.system = new Fermions(gP, sO.SP_basis);
 
-        sO.SYSTEM->add_potential(sO.onebody_pot);
+        sO.system->add_potential(sO.onebody_pot);
 
+        break;
 
-    } else if (gP.system == "Diatom") {
+    case _Diatom:
 
         gP.dim = 3;
 
-        sO.SP_basis = new DiTransform(gP, vP);
+        sO.SP_basis = new DiTransform(gP, vP, ATOMS);
 
-        System* system = new Fermions(gP, sO.SP_basis);
+        system = new Fermions(gP, sO.SP_basis);
         system->add_potential(new DiAtomCore(gP));
 
-        sO.SYSTEM = system;
+        sO.system = system;
 
-    } else if (gP.system == "DoubleWell") {
+        break;
+
+    case _DoubleWell:
 
         gP.dim = 2;
 
-        sO.SP_basis = new DiTransform(gP, vP);
+        sO.SP_basis = new DiTransform(gP, vP, QDOTS);
 
-        System* system = new Fermions(gP, sO.SP_basis);
+        system = new Fermions(gP, sO.SP_basis);
         system->add_potential(new DoubleWell(gP));
 
-        sO.SYSTEM = system;
+        sO.system = system;
 
-    } else {
-        if (pp.is_master) std::cout << "unknown system" << std::endl;
+        break;
+
+    default:
+
+        if (pp.is_master) std::cout << "unknown system " << system << std::endl;
         if (pp.is_master) exit(1);
+
+        break;
     }
 
-    if (gP.sampling == "IS") {
+
+    switch (mP.sampling) {
+    case IS:
+
         sO.sample_method = new Importance(gP);
 
-    } else if (gP.sampling == "BF") {
+        break;
+
+    case BF:
+
         sO.sample_method = new Brute_Force(gP);
 
-    } else {
+        break;
+
+    default:
 
         if (pp.is_master) std::cout << "unknown sampling method" << std::endl;
         if (pp.is_master) exit(1);
+
+        break;
     }
 
 
-    if (gP.use_jastrow) {
+
+    if (mP.use_jastrow) {
         sO.jastrow = new Pade_Jastrow(gP, vP);
 
     } else {
         sO.jastrow = new No_Jastrow();
-
     }
 
 
 
-    if (gP.use_coulomb) {
-        sO.SYSTEM->add_potential(new Coulomb(gP));
+    if (mP.use_coulomb) {
+        sO.system->add_potential(new Coulomb(gP));
     }
+
 
 }
 
 
 void parseCML(int argc, char** argv,
-        VMCparams & vmcParams,
-        DMCparams & dmcParams,
-        VariationalParams & variationalParams,
-        GeneralParams & generalParams,
-        MinimizerParams & minimizerParams,
-        ParParams & parParams) {
+              MainFileParams & mP,
+              VMCparams & vmcParams,
+              DMCparams & dmcParams,
+              VariationalParams & variationalParams,
+              GeneralParams & generalParams,
+              MinimizerParams & minimizerParams,
+              ParParams & parParams) {
 
 
     int n_args = 32;
-
-    //Default values:
-
-    generalParams.n_p = 2;
-    generalParams.dim = 2;
-    generalParams.systemConstant = 1;
-    generalParams.random_seed = (seed_type) time(NULL);
-    generalParams.doMIN = false;
-    generalParams.doVMC = false;
-    generalParams.doDMC = false;
-
-    generalParams.use_coulomb = true;
-    generalParams.use_jastrow = true;
-
-    generalParams.sampling = "IS";
-    generalParams.do_blocking = false;
-    generalParams.system = "QDots";
-
-    generalParams.deadlock = false;
-    
-    generalParams.runpath = "/home/jorgmeister/scratch/QMC_SCRATCH/";
-
-    vmcParams.n_c = 1E6;
-    if (generalParams.sampling == "IS") {
-        vmcParams.dt = 0.005;
-    } else {
-        vmcParams.dt = 0.5;
-    }
-
-
-    dmcParams.dt = 0.001;
-    dmcParams.n_b = 100;
-    dmcParams.n_c = 1000;
-    dmcParams.n_w = 1000;
-    dmcParams.therm = 1000;
-
-    if (argc == 1) {
-        variationalParams.alpha = 0.987;
-        variationalParams.beta = 0.398;
-    }
-
-
-    //defauls ASGD parameters
-    minimizerParams.max_step = 0.1;
-    minimizerParams.f_max = 1.0;
-    minimizerParams.f_min = -0.5;
-    minimizerParams.omega = 0.8;
-    minimizerParams.A = 60;
-    minimizerParams.a = 0.5;
-    minimizerParams.n_w = 10;
-    minimizerParams.therm = 10000;
-    minimizerParams.n_c = 1000;
-
-    minimizerParams.SGDsamples = 2000;
-    minimizerParams.n_c_SGD = 400;
-    minimizerParams.alpha = arma::zeros(1, 1) + 0.5;
-    minimizerParams.beta = arma::zeros(1, 1) + 0.5;
-
 
     //Seting values if not flagged default (controlled by Python)
     std::string def = "def";
 
     if (argc == n_args) {
-        
-        
+
+
         if (def.compare(argv[1]) != 0) generalParams.runpath = argv[1];
         if (def.compare(argv[2]) != 0) generalParams.n_p = atoi(argv[2]);
         if (def.compare(argv[3]) != 0) generalParams.dim = atoi(argv[3]);
@@ -410,22 +387,22 @@ void parseCML(int argc, char** argv,
 
 
 
-        if (def.compare(argv[7]) != 0) generalParams.doMIN = (bool)atoi(argv[7]);
-        if (def.compare(argv[8]) != 0) generalParams.doVMC = (bool)atoi(argv[8]);
-        if (def.compare(argv[9]) != 0) generalParams.doDMC = (bool)atoi(argv[9]);
+        if (def.compare(argv[7]) != 0) mP.doMIN = (bool)atoi(argv[7]);
+        if (def.compare(argv[8]) != 0) mP.doVMC = (bool)atoi(argv[8]);
+        if (def.compare(argv[9]) != 0) mP.doDMC = (bool)atoi(argv[9]);
 
 
 
 
-        if (def.compare(argv[10]) != 0) generalParams.use_coulomb = (bool)atoi(argv[10]);
-        if (def.compare(argv[11]) != 0) generalParams.use_jastrow = (bool)atoi(argv[11]);
-        if (def.compare(argv[12]) != 0) generalParams.do_blocking = (bool)atoi(argv[12]);
+        if (def.compare(argv[10]) != 0) mP.use_coulomb = (bool)atoi(argv[10]);
+        if (def.compare(argv[11]) != 0) mP.use_jastrow = (bool)atoi(argv[11]);
+        if (def.compare(argv[12]) != 0) mP.do_blocking = (bool)atoi(argv[12]);
 
 
 
 
-        if (def.compare(argv[13]) != 0) generalParams.sampling = argv[13];
-        if (def.compare(argv[14]) != 0) generalParams.system = argv[14];
+        if (def.compare(argv[13]) != 0) mP.sampling = atoi(argv[13]);
+        if (def.compare(argv[14]) != 0) mP.system = atoi(argv[14]);
 
 
         if (def.compare(argv[15]) != 0) generalParams.deadlock_x = atof(argv[15]);
@@ -461,13 +438,13 @@ void parseCML(int argc, char** argv,
 
         if (def.compare(argv[30]) != 0) variationalParams.alpha = atof(argv[30]);
         if (def.compare(argv[31]) != 0) variationalParams.beta = atof(argv[31]);
-        
-	int vmc_dt_loc = 17;
-	int deadlock_loc = 15;
+
+        int vmc_dt_loc = 17;
+        int deadlock_loc = 15;
 
 
         if (def.compare(argv[vmc_dt_loc]) == 0) {
-            if (generalParams.sampling == "IS") {
+            if (mP.sampling == IS) {
                 vmcParams.dt = 0.005;
             } else {
                 vmcParams.dt = 0.5;
@@ -482,15 +459,15 @@ void parseCML(int argc, char** argv,
     }
 
 
-    if (!(generalParams.doVMC) && generalParams.doMIN) {
+    if (!(mP.doVMC) && mP.doMIN) {
         //we initialize a VMC run at the end either way. Cheap verification.
-        generalParams.doVMC = 1;
+        mP.doVMC = 1;
     }
 
     //Check consitency in chosen cycle numbers etc. given node number.
     if (parParams.is_master) {
         if (parParams.parallel) {
-            if (generalParams.doMIN) {
+            if (mP.doMIN) {
                 if (minimizerParams.n_c_SGD >= parParams.n_nodes) {
 
                 } else {
@@ -503,14 +480,14 @@ void parseCML(int argc, char** argv,
 
         }
 
-        if (generalParams.doDMC) {
+        if (mP.doDMC) {
             if (dmcParams.n_w < parParams.n_nodes) {
                 std::cout << "n_w = " << dmcParams.n_w << " is insufficient for ";
                 std::cout << parParams.n_nodes << " nodes." << std::endl;
             }
 
 
-            if (generalParams.doVMC) {
+            if (mP.doVMC) {
 
                 if (dmcParams.n_w > vmcParams.n_c) {
                     std::cout << "Unsufficient VMC cycles store all walkers." << std::endl;
@@ -523,11 +500,7 @@ void parseCML(int argc, char** argv,
 
     }
 
-    generalParams.random_seed -= parParams.node;
-    minimizerParams.n_c_SGD /= parParams.n_nodes;
 
-    vmcParams.n_c /= parParams.n_nodes;
-    dmcParams.n_w /= parParams.n_nodes;
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
@@ -541,14 +514,14 @@ void parseCML(int argc, char** argv,
             std::cout << " 7" << " generalParams.systemConstant    " << " = " << generalParams.systemConstant << "   " << argv[7] << std::endl;
             std::cout << " 8" << " generalParams.R                 " << " = " << generalParams.R << "   " << argv[8] << std::endl;
             std::cout << " 9" << " generalParams.random_seed       " << " = " << generalParams.random_seed << "   " << argv[9] << std::endl;
-            std::cout << "10" << " generalParams.doMIN             " << " = " << generalParams.doMIN << "   " << argv[10] << std::endl;
-            std::cout << "11" << " generalParams.doVMC             " << " = " << generalParams.doVMC << "   " << argv[11] << std::endl;
-            std::cout << "12" << " generalParams.doDMC             " << " = " << generalParams.doDMC << "   " << argv[12] << std::endl;
-            std::cout << "13" << " generalParams.use_coulomb       " << " = " << generalParams.use_coulomb << "   " << argv[13] << std::endl;
-            std::cout << "14" << " generalParams.use_jastrow       " << " = " << generalParams.use_jastrow << "   " << argv[14] << std::endl;
-            std::cout << "15" << " generalParams.do_blocking       " << " = " << generalParams.do_blocking << "   " << argv[15] << std::endl;
-            std::cout << "16" << " generalParams.sampling          " << " = " << generalParams.sampling << "   " << argv[16] << std::endl;
-            std::cout << "17" << " generalParams.system            " << " = " << generalParams.system << "   " << argv[17] << std::endl;
+            std::cout << "10" << " generalParams.doMIN             " << " = " << mP.doMIN << "   " << argv[10] << std::endl;
+            std::cout << "11" << " generalParams.doVMC             " << " = " << mP.doVMC << "   " << argv[11] << std::endl;
+            std::cout << "12" << " generalParams.doDMC             " << " = " << mP.doDMC << "   " << argv[12] << std::endl;
+            std::cout << "13" << " generalParams.use_coulomb       " << " = " << mP.use_coulomb << "   " << argv[13] << std::endl;
+            std::cout << "14" << " generalParams.use_jastrow       " << " = " << mP.use_jastrow << "   " << argv[14] << std::endl;
+            std::cout << "15" << " generalParams.do_blocking       " << " = " << mP.do_blocking << "   " << argv[15] << std::endl;
+            std::cout << "16" << " generalParams.sampling          " << " = " << mP.sampling << "   " << argv[16] << std::endl;
+            std::cout << "17" << " generalParams.system            " << " = " << mP.system << "   " << argv[17] << std::endl;
             std::cout << "18" << " vmcParams.n_c                   " << " = " << vmcParams.n_c << "   " << argv[18] << std::endl;
             std::cout << "19" << " vmcParams.dt                    " << " = " << vmcParams.dt << "   " << argv[19] << std::endl;
             std::cout << "20" << " dmcParams.dt                    " << " = " << dmcParams.dt << "   " << argv[20] << std::endl;
@@ -566,8 +539,8 @@ void parseCML(int argc, char** argv,
             std::cout << "32" << " variationalParams.alpha         " << " = " << variationalParams.alpha << "   " << argv[32] << std::endl;
             std::cout << "33" << " variationalParams.beta          " << " = " << variationalParams.beta << "   " << argv[33] << std::endl;
         }
-
 #ifdef MPI_ON
+        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Finalize();
 #endif
 
@@ -579,4 +552,52 @@ void parseCML(int argc, char** argv,
 #ifdef MPI_ON
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
+}
+
+//Test for rerunning blocking
+//argv = [x-name, "reblock", filename, path, #blocks, max_block_size, min_block_size]?
+void blocking(int argc, char** argv, struct ParParams & parParams){
+
+    using namespace std;
+
+    string rerun_blocking = "reblock";
+    if ((argc == 7) && (rerun_blocking.compare(argv[1]) == 0)) {
+        ErrorEstimator* reblock = new Blocking(0, parParams,
+                                               (string) argv[2],
+                (string) argv[3],
+                atoi(argv[4]),
+                atoi(argv[5]),
+                atoi(argv[6]),
+                true);
+        double error = reblock->estimate_error();
+        if (parParams.is_master) cout << "Estimated Error: " << error << endl;
+        if (parParams.is_master) cout << "Finished Error Recalculation" << endl;
+
+        reblock->finalize();
+
+#ifdef MPI_ON
+        MPI_Finalize();
+#endif
+        exit(0);
+    }
+}
+//
+
+//Test for rerunning distribution
+//argv = [x-name, "redist", n_p, path, name, N, bin_edge?
+void dist(int argc, char** argv, struct ParParams & parParams){
+
+    using namespace std;
+
+    string rerun_dist = "redist";
+    if ((argc == 7) && (rerun_dist.compare(argv[1]) == 0)) {
+        Distribution* redist = new Distribution(parParams, argv[3], argv[4]);
+
+        redist->rerun(atoi(argv[2]), atoi(argv[5]), atof(argv[6]));
+
+#ifdef MPI_ON
+        MPI_Finalize();
+#endif
+        exit(0);
+    }
 }

@@ -22,6 +22,8 @@ public:
     stdoutASGD(ASGD* asgd, std::string path);
 
     void dump();
+
+    void reset();
     
     
 private:

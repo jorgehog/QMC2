@@ -33,6 +33,9 @@ void SimpleVar::update_data(double val) {
     i++;
 }
 
-void SimpleVar::normalize(){
-    
+void SimpleVar::reset()
+{
+    f = f2 = 0;
+    ErrorEstimator::reset();
 }
+

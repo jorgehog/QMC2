@@ -12,10 +12,15 @@
 struct GeneralParams;
 struct VariationalParams;
 
+enum TRANS_SYSTEMS {
+    ATOMS,
+    QDOTS
+};
+
 class DiTransform : public Orbitals {
 public:
 
-    DiTransform(GeneralParams & gP, VariationalParams & vP);
+    DiTransform(GeneralParams & gP, VariationalParams & vP, int system);
 
     /*!
      * Calculates the exponential terms exp(-r/n) for all needed n once pr. particle

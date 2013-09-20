@@ -774,13 +774,15 @@ def initRuns(CMLargs, dirs, superDir, stdoutToFile, mpiFlag, openGUI, n_cores, m
 def getTupleString(pre, suff):
         if pre.startswith('var'):
     	      pre = 'vp'
+        elif pre == "mP":
+            pre = 'g'
         else:
             pre = pre[0]
         return '("-%s", "%s")' % (pre, suff)
 
 def getCppMap(raw):
     
-    printCppMap = False
+    printCppMap = True
 
     p = "^\s*if \(def\.compare\(argv\[\d+\]\) != 0\) (.+) = "
     vars_ = re.findall(p, raw, re.MULTILINE)

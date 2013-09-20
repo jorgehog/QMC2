@@ -43,8 +43,6 @@ protected:
     Walker** walkers; //!< The walkers used to sample expectation values.
     Walker** trial_walkers;
 
-    arma::rowvec parameter; // UNUSED?
-
     arma::rowvec gradient; //!< Sumamtion vector for the trial wave function's variational derivatives.
     arma::rowvec gradient_local; //!< Sumamtion vector for the trial wave function's variational derivatives times the energy.
 
@@ -83,7 +81,7 @@ protected:
 public:
     ASGD(VMC*, MinimizerParams &, const ParParams &, std::string path);
 
-    void minimize();
+    void minimize(bool initialize = true);
 
     friend class stdoutASGD;
 };

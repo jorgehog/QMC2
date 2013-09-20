@@ -14,6 +14,8 @@
 ExpandedBasis::ExpandedBasis(GeneralParams & gp, Orbitals* basis, int basis_size)
 : Orbitals(gp.n_p, gp.dim) {
 
+    name = "Expanded" + basis->getName();
+
     this->basis = basis;
     this->basis_size = basis_size;
     coeffs = arma::zeros<arma::mat > (n_p, basis_size);

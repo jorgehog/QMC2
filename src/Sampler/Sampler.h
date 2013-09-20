@@ -1,21 +1,36 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
 
+#define SKIPVALUE -1337
+
+#include "../defines.h"
+#include <string>
+
+class Walker;
+
 class Sampler {
 public:
 
     Sampler() {
-
         m_counter = mm_counter = 0;
         mean = mean_of_means = 0;
     }
 
-    void queue_value(const double & value) {
+    void setValue(const Walker* walker) {
+        queue_value(calculateValue(walker));
+    }
+
+    void queue_value(const double value) {
         queued_value = value;
     }
 
-    void update_mean(const double & weight) {
-        mean += weight*queued_value;
+    void update_mean(const double weight = 1) {
+
+        if (queued_value == SKIPVALUE) return;
+
+        double newVal = weight*queued_value;
+
+        mean += newVal;
         m_counter++;
     }
 
@@ -56,7 +71,9 @@ public:
 
     }
 
-private:
+
+
+protected:
 
     unsigned long int m_counter;
     unsigned long int mm_counter;
@@ -65,6 +82,12 @@ private:
     double mean;
     double mean_of_means;
 
+    virtual double calculateValue(const Walker * walker) {
+
+        (void) walker;
+
+        return 0.0;
+    }
 };
 
 #endif /* SAMPLER_H */

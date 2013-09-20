@@ -60,7 +60,7 @@ public:
     }
 
     //! Method for executing the minimization main solver.
-    virtual void minimize() = 0;
+    virtual void minimize(bool initialize = true) = 0;
 
     //! Method for dumping variational parameter values to screen.
     void output(std::string message, double number = -1);

@@ -56,9 +56,11 @@ SOURCES += ../src/QMCmain.cpp \
     ../src/System/Fermions/Fermions.cpp \
     ../src/System/System.cpp \
     ../src/Walker/Walker.cpp \
+    ../src/Sampler/sampleMethods/SampleForce.cpp
     
 
 HEADERS += \
+    ../src/structs.h \
     ../src/BasisFunctions/BasisFunctions.h \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.h \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.h \
@@ -104,6 +106,7 @@ HEADERS += \
     ../src/System/System.h \
     ../src/Walker/Walker.h \
     ../src/defines.h \
+    ../src/Sampler/sampleMethods/SampleForce.h
 
 
 # MPI Settings
@@ -116,7 +119,15 @@ QMAKE_CC = mpicc
 QMAKE_CFLAGS += $$system(mpicc --showme:compile)
 QMAKE_LFLAGS += $$system(mpicxx --showme:link)
 QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
-QMAKE_CXXFLAGS_RELEASE += $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK    
+QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
+
+#C++11 features
+COMMON_CXXFLAGS = -std=c++0x -DARMA_USE_CXX11
+QMAKE_CXXFLAGS += $$COMMON_CXXFLAGS
+
+QMAKE_CXXFLAGS_DEBUG += $$COMMON_CXXFLAGS -O2 -g
+
+QMAKE_CXXFLAGS_RELEASE += $$COMMON_CXXFLAGS -O3 -DARMA_NO_DEBUG
 
 
 #remove this line if you don't use ccache

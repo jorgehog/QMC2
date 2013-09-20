@@ -90,9 +90,12 @@ public:
      */
     virtual void update_data(double val); 
 
+    virtual void reset();
+
 
 protected:
     int n_c; //!< Size of the data vector
+    int n_c_orig;
     int i; //!< Count variable for the data vector.
 
     bool parallel;

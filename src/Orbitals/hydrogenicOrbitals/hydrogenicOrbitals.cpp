@@ -16,6 +16,8 @@
 hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
 
+    name = "Atoms";
+
     this->alpha = new double();
     this->k = new double();
     this->k2 = new double();

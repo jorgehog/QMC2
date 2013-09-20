@@ -18,6 +18,7 @@
 #include "../../OutputHandler/Distribution/Distribution.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../VMC/VMC.h"
+#include "../../Orbitals/Orbitals.h"
 
 DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc)
 : QMC(gP, dP.n_c, sO, pp, dP.n_w, K) {
@@ -25,12 +26,13 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     if (is_master) DMCout = new stdoutDMC(this, gP.runpath);
 
     std::stringstream name;
-    name << gP.system << gP.n_p << "c" << gP.systemConstant << "dmc";
+    name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "dmc";
     distribution = new Distribution(pp, gP.runpath, name.str());
 
     dist_tresh = 25;
 
-    dist = arma::zeros(n_w * n_p * n_c / dist_tresh, dim);
+    dist_size = n_w * n_p * n_c / dist_tresh;
+    dist = arma::zeros(dist_size, dim);
 
     block_size = dP.n_b;
     thermalization = dP.therm;
@@ -43,7 +45,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     dmc_E = 0;
     dmc_E_unscaled = 0;
 
-    if (gP.doVMC) {
+    if (vmc != NULL) {
 
         E_T = vmc->get_energy();
         for (unsigned int i = 0; i < n_w; i++) {
@@ -121,7 +123,9 @@ void DMC::Evolve_walker(int k, double GB) {
         E += GB * local_E;
         samples++;
 
-        if (thermalized) update_subsamples(GB);
+        if (thermalized) {
+            update_subsamples(GB);
+        }
 
     }
 }
@@ -148,6 +152,8 @@ void DMC::iterate_walker(int k) {
 
         diffuse_walker(original_walkers[k], trial_walker);
 
+        if (thermalized) update_samplers(original_walkers[k]);
+
         calculate_energy_necessities(original_walkers[k]);
         local_E = calculate_local_energy(original_walkers[k]);
         original_walkers[k]->set_E(local_E);
@@ -164,7 +170,11 @@ void DMC::iterate_walker(int k) {
     }
 }
 
-void DMC::run_method() {
+void DMC::run_method(bool initialize) {
+
+    if (!initialize) {
+        reset_all();
+    }
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
@@ -211,7 +221,7 @@ void DMC::run_method() {
 
     if (is_master) DMCout->finalize();
 
-    free_walkers();
+//    free_walkers();
     estimate_error();
     dump_subsamples(true);
     finalize_distribution();
@@ -456,6 +466,18 @@ void DMC::free_walkers() {
     delete [] original_walkers;
 
 }
+
+void DMC::reset_all()
+{
+
+    thermalization = 0;
+
+    DMCout->reset();
+
+    QMC::reset_all();
+
+}
+
 
 bool DMC::move_autherized(double A) {
     return metropolis_test(A) & system->allow_transition();

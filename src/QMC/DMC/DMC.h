@@ -40,7 +40,7 @@ protected:
     double E; //!< The accumulative energy for each cycle.
 
     stdoutDMC* DMCout;
-    
+
     //! Method for setting the trial position of all DMC walkers.
     /*!
      * In case VMC is not run prior to DMC, trial positions must be set. 
@@ -110,6 +110,8 @@ protected:
     //! Method which deletes all walkers.
     void free_walkers();
 
+    void reset_all();
+
 public:
 
     //! Factor of empty space for walkers over initial walkers.
@@ -119,9 +121,9 @@ public:
     static const unsigned int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
 
     //! Constructor.
-    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc);
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc = NULL);
 
-    void run_method();
+    void run_method(bool initialize = true);
 
     void output();
 

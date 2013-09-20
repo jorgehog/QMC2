@@ -29,6 +29,8 @@ public:
 
     void dump();
 
+    void reset();
+
 };
 
 #endif	/* STDOUTDMC_H */
