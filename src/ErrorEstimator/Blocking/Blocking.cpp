@@ -31,6 +31,7 @@ Blocking::Blocking(int n_c, ParParams & pp,
         }
 
         this->n_c = data.n_elem;
+        n_c_orig = this->n_c;
 
         if (is_master) {
             if (max_block_size > this->n_c/2) {

@@ -131,5 +131,5 @@ QMAKE_CXXFLAGS_RELEASE += $$COMMON_CXXFLAGS -O3 -DARMA_NO_DEBUG
 
 
 #remove this line if you don't use ccache
-QMAKE_CXX = ccache $$QMAKE_CXX
+#QMAKE_CXX = ccache $$QMAKE_CXX
 

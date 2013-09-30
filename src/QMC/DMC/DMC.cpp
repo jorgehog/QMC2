@@ -472,7 +472,7 @@ void DMC::reset_all()
 
     thermalization = 0;
 
-    DMCout->reset();
+    if (is_master) DMCout->reset();
 
     QMC::reset_all();
 
