@@ -49,18 +49,30 @@
  *
  */
 
-enum SYSTEMS {
-    _QDots,
-    _DoubleWell,
-    _Atoms,
-    _Diatom,
-    _QDots3D
-};
+namespace QMC2 {
 
-enum SAMPLING {
+namespace SYSTEMS {
+
+enum {
+
+    QDots,
+    DoubleWell,
+    Atoms,
+    Diatom,
+    QDots3D
+
+};
+}
+
+namespace SAMPLING {
+
+enum {
     IS,
     BF
 };
+}
+
+}
 
 struct MainFileParams {
 
@@ -71,8 +83,8 @@ struct MainFileParams {
     bool use_jastrow = true;
     bool use_coulomb = true;
 
-    int system = _QDots;
-    int sampling = IS;
+    int system = QMC2::SYSTEMS::QDots;
+    int sampling = QMC2::SAMPLING::IS;
 
 };
 
@@ -140,17 +152,12 @@ int main(int argc, char** argv) {
              parParams);
     //END OF PYTHON CONTROLLED ROUTINES
 
-
     arma::wall_clock t;
     scaleWithProcs(parParams, generalParams, minimizerParams, vmcParams, dmcParams);
 
     //Deprecate this
     selectSystem(mainParams, generalParams, systemObjects, variationalParams, parParams);
 
-    SampleForce sampleForce(&generalParams.R, generalParams.n_p);
-
-    mainParams.doDMC = true;
-    mainParams.doMIN = true;
 
     if (mainParams.doVMC) {
 
@@ -163,8 +170,6 @@ int main(int argc, char** argv) {
             if (parParams.is_master) t.tic();
             minimizer->minimize();
             if (parParams.is_master) cout << "---Minimization time: " << t.toc() << " s---\n" << endl;
-
-            minimizer->minimize(false);
 
         }
 
@@ -185,12 +190,6 @@ int main(int argc, char** argv) {
         if (parParams.is_master) t.tic();
         vmc->run_method();
         if (parParams.is_master) cout << "---VMC time: " << t.toc() << " s---\n" << endl;
-
-        vmc->add_subsample(&sampleForce);
-        vmc->run_method(false);
-
-        cout << "I has force " << sampleForce.extract_mean() << endl;
-
 
     } else {
         vmc = NULL;
@@ -216,11 +215,6 @@ int main(int argc, char** argv) {
         dmc->run_method();
         if (parParams.is_master) cout << "---DMC time: " << t.toc() << " s---\n" << endl;
 
-        dmc->add_subsample(&sampleForce);
-        dmc->run_method(false);
-
-        cout << "I has force " << sampleForce.extract_mean_of_means() << endl;
-
     }
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
@@ -240,10 +234,12 @@ void selectSystem(MainFileParams &mP,
                   VariationalParams & vP,
                   ParParams & pp) {
 
+    using namespace QMC2;
+
     System* system;
 
     switch (mP.system) {
-    case _QDots:
+    case SYSTEMS::QDots:
         gP.dim = 2;
 
         sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
@@ -255,7 +251,7 @@ void selectSystem(MainFileParams &mP,
 
         break;
 
-    case _QDots3D:
+    case SYSTEMS::QDots3D:
 
         gP.dim = 3;
 
@@ -268,7 +264,7 @@ void selectSystem(MainFileParams &mP,
 
         break;
 
-    case _Atoms:
+    case SYSTEMS::Atoms:
 
         gP.dim = 3;
 
@@ -282,7 +278,7 @@ void selectSystem(MainFileParams &mP,
 
         break;
 
-    case _Diatom:
+    case SYSTEMS::Diatom:
 
         gP.dim = 3;
 
@@ -295,7 +291,7 @@ void selectSystem(MainFileParams &mP,
 
         break;
 
-    case _DoubleWell:
+    case SYSTEMS::DoubleWell:
 
         gP.dim = 2;
 
@@ -318,13 +314,13 @@ void selectSystem(MainFileParams &mP,
 
 
     switch (mP.sampling) {
-    case IS:
+    case SAMPLING::IS:
 
         sO.sample_method = new Importance(gP);
 
         break;
 
-    case BF:
+    case SAMPLING::BF:
 
         sO.sample_method = new Brute_Force(gP);
 
@@ -399,8 +395,6 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[12]) != 0) mP.do_blocking = (bool)atoi(argv[12]);
 
 
-
-
         if (def.compare(argv[13]) != 0) mP.sampling = atoi(argv[13]);
         if (def.compare(argv[14]) != 0) mP.system = atoi(argv[14]);
 
@@ -444,7 +438,7 @@ void parseCML(int argc, char** argv,
 
 
         if (def.compare(argv[vmc_dt_loc]) == 0) {
-            if (mP.sampling == IS) {
+            if (mP.sampling == QMC2::SAMPLING::IS) {
                 vmcParams.dt = 0.005;
             } else {
                 vmcParams.dt = 0.5;

@@ -65,6 +65,20 @@ cmlMAPm = {"SGDsamples"    : 22,
 cmlMAPvp = {"alpha"         : 29,
             "beta"          : 30}
             
+SYSTEMS = {
+
+    "QDots" : "0",
+    "DoubleWell" : "1",
+    "Atoms" : "2",
+    "Diatom" : "3",
+    "QDots3D" : "4"
+}
+
+SAMPLING = {
+    "IS" : "0",
+    "BF" : "1"
+}            
+            
 def dumpStrList(aList):
     i = 0
     for element in aList:
@@ -261,7 +275,7 @@ def valConvert(val):
 
 def varParameterMap(n_p, systemConstant, system, R):
     
-    if system == "QDots":
+    if system ==  SYSTEMS["QDots"]:
         
         w = systemConstant
         
@@ -414,7 +428,7 @@ def varParameterMap(n_p, systemConstant, system, R):
         return alpha, beta, 0
         
         
-    elif system == "Atoms":
+    elif system ==  SYSTEMS["Atoms"]:
 
         Z = systemConstant
 
@@ -447,7 +461,7 @@ def varParameterMap(n_p, systemConstant, system, R):
         
         return alpha, beta, 0
         
-    elif system == "Diatom":
+    elif system ==  SYSTEMS["Diatom"]:
     
         if n_p == 2:
              alpha = 1.35618
@@ -495,7 +509,7 @@ def varParameterMap(n_p, systemConstant, system, R):
         
         return alpha, beta, R
     
-    elif system == "DoubleWell":
+    elif system ==  SYSTEMS["DoubleWell"]:
         
         if n_p== 2 and R == 3:
             alpha = 1.36139
@@ -511,7 +525,7 @@ def varParameterMap(n_p, systemConstant, system, R):
             
         return alpha, beta, R
         
-    elif system == "QDots3D":
+    elif system == SYSTEMS["QDots3D"]:
         
         w = systemConstant
 
@@ -605,11 +619,14 @@ def consistencyCheck(cmlArgs):
     if (cmlArgs[cmlMAPg['systemConstant']] != "def"):
         systemConstant = float(cmlArgs[cmlMAPg['systemConstant']])
     else:
-        if system in ["QDots", "QDots3D", "DoubleWell"]:
+        if system in [SYSTEMS["QDots"], SYSTEMS["QDots3D"], SYSTEMS["DoubleWell"]]:
             systemConstant = 1.0
-        elif system in ["Atoms", "Diatom"]:
+        elif system in [SYSTEMS["Atoms"], SYSTEMS["Diatom"]]:
             systemConstant = n_p
             cmlArgs[cmlMAPg['systemConstant']] = str(n_p)
+        else:
+            raise ValueError("unknown system %s" % system)
+            sys.exit(1)
   
     #Get the COM distance
     if system in ["Diatom", "DoubleWell"]:
@@ -673,6 +690,11 @@ def convertToCMLargs(arglist):
         #from the correct dictionary cmlMAP__key__[name]
         else:
             name, val = arg.split("=");
+            if name == "sampling" and key == "g":
+                val = SAMPLING[val]
+            elif name == "system" and key == "g":
+                val = SYSTEMS[val]
+                
             index = eval("cmlMAP" + key + "[name]")
             val = valConvert(val)
             cmlArgs[index] = val
