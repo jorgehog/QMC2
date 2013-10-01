@@ -7,6 +7,8 @@
 
 #include "ASGD.h"
 
+#include <iomanip>
+
 #include "../../structs.h"
 
 #include "../../Walker/Walker.h"
@@ -18,7 +20,7 @@
 
 
 ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp, std::string path)
-: Minimizer(vmc, pp, mP.alpha, mP.beta) {
+    : Minimizer(vmc, pp, mP.alpha, mP.beta) {
     using namespace arma;
 
     if (is_master) ASGDout = new stdoutASGD(this, path);
@@ -140,7 +142,6 @@ void ASGD::minimize(bool initialize) {
 
     }
 
-    output("Finished minimizing. Final parameters:");
     if (is_master) ASGDout->finalize();
 
     vmc->accepted = 0;
@@ -185,11 +186,61 @@ void ASGD::update_parameters() {
 }
 
 void ASGD::output_cycle() {
-    if ((sample % 100) == 0) {
-        output("cycle:", sample);
-        s << gradient_tot << std::endl;
-        s << E << std::endl;
-        std_out->cout(s);
+
+    using namespace std;
+
+    if (is_master) {
+
+        if ((sample % 100) == 0) {
+
+
+
+            if (Nspatial_params != 0) s << "a:";
+            for (int alpha = 0; alpha < Nspatial_params; alpha++) {
+
+                s << " ";
+                s << setprecision(4) << fixed;
+                s << vmc->get_orbitals_ptr()->get_parameter(alpha);
+
+                s << " (";
+                s << setprecision(4) << fixed << setfill(' ') << setw(7);
+                s << gradient_tot(alpha) << ")";
+
+            }
+
+            if (Nspatial_params != 0) s << " | ";
+
+            if (Njastrow_params != 0) s << "b:";
+            for (int beta = 0; beta < Njastrow_params; beta++) {
+                s << " ";
+                s << setprecision(4) << fixed;
+                s << vmc->get_jastrow_ptr()->get_parameter(beta);
+
+                s << " (";
+                s << setprecision(4) << fixed << setfill(' ') << setw(7);
+                s << gradient_tot(Njastrow_params + beta) << ")";
+
+            }
+
+            s << " | E = ";
+            s << setprecision(4) << fixed;
+            s << E << " | ";
+
+
+            s << setprecision(1) << fixed << setfill(' ') << setw(5);
+            s << (double) sample / SGDsamples * 100 << "%";
+
+            if (sample == SGDsamples) {
+                cout << "\r" << s.str() << endl;
+            } else {
+                cout << "\r" << s.str();
+                cout.flush();
+            }
+
+            s.str(string());
+            s.clear();
+
+        }
     }
 }
 

@@ -3,14 +3,14 @@
 #include "../../Walker/Walker.h"
 
 SampleForce::SampleForce(double * R, int n_p) :
-    Sampler(), R(R), n_p(n_p)
+    Sampler(), n_p(n_p)
 {
-
+    this->R = R;
 }
 
 double SampleForce::calculateValue(const Walker *walker)
 {
-    double * R = new double(1.4);
+
     double Rhalf = *R/2;
 
     double force = 0;
@@ -50,6 +50,5 @@ double SampleForce::calculateValue(const Walker *walker)
 
     force -= 1. /(*R*(*R));
 
-    delete R;
     return 0.5*force;
 }

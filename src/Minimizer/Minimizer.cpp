@@ -38,28 +38,3 @@ Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha,
     n_nodes = pp.n_nodes;
 
 }
-
-void Minimizer::output(std::string message, double number) {
-    using namespace std;
-
-    if (number != -1) {
-        s << message << " " << number << endl;
-    } else {
-        s << message << endl;
-    }
-
-
-    if (Nspatial_params != 0) s << "\nAlpha:\n";
-    for (int alpha = 0; alpha < Nspatial_params; alpha++) {
-        s << "\t" << vmc->get_orbitals_ptr()->get_parameter(alpha) << endl;
-    }
-
-    if (Njastrow_params != 0) s << "\nBeta:\n";
-    for (int beta = 0; beta < Njastrow_params; beta++) {
-        s << "\t" << vmc->get_jastrow_ptr()->get_parameter(beta) << endl;
-    }
-
-    s << endl;
-    std_out->cout(s);
-
-}

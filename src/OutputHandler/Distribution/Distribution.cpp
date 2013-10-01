@@ -11,9 +11,10 @@
 #include "../../QMC/QMC.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"
 
-Distribution::Distribution(ParParams & pp, std::string path, std::string name)
+Distribution::Distribution(ParParams & pp, std::string path, std::string name, bool silent)
 : OutputHandler("", path, pp.parallel, pp.node, pp.n_nodes) {
     this->name = name;
+    this->silent = silent;
 }
 
 
@@ -36,7 +37,7 @@ void Distribution::detect_deadlock(const arma::mat& dist, int n_p, int dim, int 
 
     }
 
-    if (node == 0) std::cout << "Detected deadlock at " << deadlock_x << "  " << deadlock_y << "  " << deadlock_z << "  " << std::endl;
+    if ((node == 0) && (!silent)) std::cout << "Detected deadlock at " << deadlock_x << "  " << deadlock_y << "  " << deadlock_z << "  " << std::endl;
 }
 
 void Distribution::generate_distribution3D(arma::mat& dist,
@@ -198,7 +199,7 @@ void Distribution::generate_distribution3D(arma::mat& dist,
 
     if (node == 0) {
 
-        cout << "3D Distribution calculated using " << n_tot << " samples." << endl;
+        if (!silent) cout << "3D Distribution calculated using " << n_tot << " samples." << endl;
 
         cube normalized_dist = conv_to< cube>::from(distribution);
         vec normalized_radd = conv_to< vec>::from(radial_dist);
@@ -400,7 +401,7 @@ void Distribution::generate_distribution2D(arma::mat & dist,
 
     if (node == 0) {
 
-        cout << "Distribution calculated using " << n_tot << " samples." << endl;
+        if (!silent) cout << "Distribution calculated using " << n_tot << " samples." << endl;
 
         mat normalized_dist = conv_to< mat>::from(distribution);
         vec normalized_radd = conv_to< vec>::from(radial_dist);

@@ -17,12 +17,12 @@
 #include "../../OutputHandler/Distribution/Distribution.h"
 #include "../../Orbitals/Orbitals.h"
 
-VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w)
-: QMC(gP, vP.n_c, sO, pp, vP.dt, n_w) {
+VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool silent)
+: QMC(gP, vP.n_c, sO, pp, silent, vP.dt, n_w) {
 
     std::stringstream name;
     name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "vmc";
-    distribution = new Distribution(pp, gP.runpath, name.str());
+    distribution = new Distribution(pp, gP.runpath, name.str(), silent);
 
     pop_tresh = n_c / n_w;
     offset = n_c - n_w*pop_tresh;
@@ -112,10 +112,9 @@ void VMC::run_method(bool initialize) {
     }
 
     node_comm();
-    scale_values();
-
     output();
-    dump_subsamples();
+
+//    dump_subsamples(); //This should be called from the outside if wanted.
     get_accepted_ratio();
 
     finalize_distribution();
@@ -128,13 +127,34 @@ void VMC::output() {
     using namespace std;
 
     if (is_master) {
-        if (cycle > n_c) {
-            cout << endl;
-            cout << setprecision(6) << fixed;
-            cout << "Final VMC energy: " << vmc_E << endl;
+
+        if (cycle == n_c + 1) {
+
+            s <<  "VMC energy: ";
+            s << setprecision(6) << fixed << vmc_E;
+            s << "  ";
+            s << setprecision(1) << fixed << setfill(' ') << setw(5);
+            s << 100.0 << "%";
+
+            cout << "\r" << s.str() << endl;
+
+            s.str(string());
+            s.clear();
+
         } else if (cycle % output_tresh == 0) {
-            cout << "\rVMC energy: " << vmc_E / cycle << "  " << (double) cycle / n_c * 100 << "%";
+
+            s << "VMC energy: ";
+            s << setprecision(6) << fixed << vmc_E / cycle;
+            s << "  ";
+            s << setprecision(1) << fixed << setfill(' ') << setw(5);
+            s << (double) cycle / n_c * 100 << "%";
+
+            cout << "\r" << s.str();
             cout.flush();
+
+            s.str(string());
+            s.clear();
+
         }
 
     }
@@ -145,6 +165,9 @@ void VMC::node_comm() {
 #ifdef MPI_ON
     MPI_Allreduce(MPI_IN_PLACE, &vmc_E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif
+
+    scale_values();
+
 }
 
 void VMC::reset_all()

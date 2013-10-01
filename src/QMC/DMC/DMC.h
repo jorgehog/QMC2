@@ -123,7 +123,7 @@ public:
     static const unsigned int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
 
     //! Constructor.
-    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, bool silent = false);
 
     void run_method(bool initialize = true);
 

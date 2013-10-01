@@ -25,7 +25,7 @@ public:
      * @param path The path where output is stored (or read).
      * @param name Name of the file.
      */
-    Distribution(ParParams &, std::string path, std::string name);
+    Distribution(ParParams &, std::string path, std::string name, bool silent = false);
 
     void dump(){}
     void finalize() {}
@@ -48,6 +48,8 @@ private:
     double deadlock_z;
 
     bool locked;
+
+    bool silent;
 
     bool is_deadlocked(const arma::mat & dist, int dim, int i) const {
         if (!locked) return false;

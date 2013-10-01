@@ -31,7 +31,7 @@ class Sampler;
 
 /*! \brief The QMC superclass.
  * Holds implementations of general functions for both VMC and DMC in order to
- * avoid rewriting code and emphasize the similarities. 
+ * avoid rewriting code and emphasize the similarities.
  */
 class QMC {
 protected:
@@ -54,6 +54,8 @@ protected:
     bool parallel;
     unsigned int node;
     unsigned int n_nodes;
+
+    bool silent;
 
     unsigned int p_start; //!< Is always zero unless a deadlock is initialized.
 
@@ -117,7 +119,7 @@ protected:
 
     //! Method for performing the metropolis test after when diffusing a walker.
     /*!
-     * @param A The acceptance ratio calulated by get_acceptance_ratio(). 
+     * @param A The acceptance ratio calulated by get_acceptance_ratio().
      */
     bool metropolis_test(double A);
 
@@ -180,11 +182,11 @@ protected:
      * Since the spatial wave function is split, certain values are unchanged if
      * the moved particle has opposite spin. Assuming a two-level system, the
      * first half of the particles are assumed to have one spin value, and the
-     * second half the other. 
-     * 
+     * second half the other.
+     *
      * This method sets the start and end position of the block that needs to be
      * changed.
-     * 
+     *
      * \see System::start, System::end
      */
     void set_spin_state(unsigned int particle) const;
@@ -213,12 +215,12 @@ public:
      * @params K K times n_w walkers are initialized. K != 0 only sensible in DMC.
      */
     QMC(GeneralParams &, int n_c,
-            SystemObjects &,
-            ParParams &,
-            double dt,
-            int n_w,
-            int K = 1);
-    QMC();
+        SystemObjects &,
+        ParParams &,
+        bool silent,
+        double dt,
+        int n_w,
+        int K = 1);
 
     //! Method used for executing the solver.
     virtual void run_method(bool initialize = true) = 0;

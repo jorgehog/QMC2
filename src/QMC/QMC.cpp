@@ -1,7 +1,7 @@
 /* 
  * File:   QMC.cpp
  * Author: jorgehog
- * 
+ *
  * Created on 30. mars 2012, 17:42
  */
 
@@ -20,10 +20,12 @@
 #include "../OutputHandler/Distribution/Distribution.h"
 
 QMC::QMC(GeneralParams & gP, int n_c,
-        SystemObjects & sO,
-        ParParams & pp, double dt,
-        int n_w,
-        int K) {
+         SystemObjects & sO,
+         ParParams & pp,
+         bool silent,
+         double dt,
+         int n_w,
+         int K) {
 
     n_p = gP.n_p;
     dim = gP.dim;
@@ -32,6 +34,7 @@ QMC::QMC(GeneralParams & gP, int n_c,
     n_w_size = K*n_w;
 
     dtOrig = dt;
+    this->silent = silent;
 
     n2 = ceil(n_p / 2.0);
 
@@ -77,9 +80,6 @@ QMC::QMC(GeneralParams & gP, int n_c,
 
 }
 
-QMC::QMC() {
-
-}
 
 void QMC::update_subsamples(double weight) {
     kinetic_sampler.update_mean(weight);
@@ -141,18 +141,6 @@ void QMC::dump_subsamples(bool mean_of_means) {
 
     s << system->dump_samples(mean_of_means) << endl;
 
-//    for (Sampler* sampler : samplers) {
-//        s << sampler->getName() << " " << setprecision(6) << fixed;
-//        if (mean_of_means) {
-//            s << sampler->extract_mean_of_means();
-//        } else {
-//            s << sampler->extract_mean();
-//        }
-
-//        s << endl;
-
-//    }
-
     if (is_master) {
         cout << setprecision(6) << fixed;
         cout << s.str();
@@ -181,7 +169,7 @@ void QMC::estimate_error() const {
     double error = error_estimator->estimate_error();
 
     if (is_master) {
-        if (error != 0) std::cout << "Estimated Error: " << error << std::endl;
+        if ((error != 0) && (!silent)) std::cout << "Estimated Error: " << error << std::endl;
     }
 
     error_estimator->finalize();
@@ -350,6 +338,8 @@ void QMC::get_QF(Walker* walker) const {
 
 void QMC::get_accepted_ratio() {
 
+    if (silent) return;
+
     double ratio = ((double) accepted) / total_samples;
 
     s << "Acceptance ratio: " << error_estimator->combine_mean(ratio, total_samples);
@@ -362,9 +352,9 @@ void QMC::clean() {
 }
 
 /*
- 
+
  Test functions
- * 
+ *
  */
 
 void QMC::test_gradients(Walker* walker) {

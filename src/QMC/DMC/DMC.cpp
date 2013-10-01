@@ -20,14 +20,14 @@
 #include "../VMC/VMC.h"
 #include "../../Orbitals/Orbitals.h"
 
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
-: QMC(gP, dP.n_c, sO, pp, dP.dt, dP.n_w, K) {
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, bool silent)
+: QMC(gP, dP.n_c, sO, pp, silent, dP.dt, dP.n_w, K) {
 
     if (is_master) DMCout = new stdoutDMC(this, gP.runpath);
 
     std::stringstream name;
     name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "dmc";
-    distribution = new Distribution(pp, gP.runpath, name.str());
+    distribution = new Distribution(pp, gP.runpath, name.str(), silent);
 
     dist_tresh = 25;
 
@@ -244,7 +244,7 @@ void DMC::run_method(bool initialize) {
     if (is_master) DMCout->finalize();
 
 //    free_walkers();
-    dump_subsamples(true);
+//    dump_subsamples(true); //This should be called from the outside if wanted.
     estimate_error();
     finalize_distribution();
     get_accepted_ratio();

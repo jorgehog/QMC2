@@ -46,7 +46,7 @@
 
 #include "Sampler/sampleMethods/SampleForce.h"
 
-void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, SampleForce & forceSampler);
+void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, double *R, int n_p, bool is_master);
 
 int main(int argc, char** argv) {
 
@@ -60,11 +60,13 @@ int main(int argc, char** argv) {
     struct GeneralParams generalParams;
     struct MinimizerParams minimizerParams;
     struct SystemObjects systemObjects;
-    minimizerParams.n_c_SGD=100;
-    dmcParams.n_c=100;
-    dmcParams.therm=200;
-    dmcParams.n_b=20;
-    generalParams.random_seed = -1380642306;
+
+    minimizerParams.n_c_SGD=600;
+    minimizerParams.SGDsamples = 4000;
+    dmcParams.n_c=250;
+    dmcParams.therm=1000;
+    dmcParams.n_b=50;
+    dmcParams.n_w = 2000;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
@@ -84,40 +86,21 @@ int main(int argc, char** argv) {
 
     //
 
-    if (parParams.is_master) std::cout << generalParams.random_seed << std::endl;
-
-    //Creating a sampler
-    SampleForce sampleForce(&generalParams.R, generalParams.n_p);
+    if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
     //Creating the solver objects
-    VMC vmc(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w);
+    bool silent = true;
+    VMC vmc(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, silent);
     ASGD minimizer(&vmc, minimizerParams, parParams, generalParams.runpath);
-    DMC dmc(generalParams, dmcParams, systemObjects, parParams);
+    DMC dmc(generalParams, dmcParams, systemObjects, parParams, silent);
 
     vmc.set_error_estimator(new SimpleVar(parParams));
     dmc.set_error_estimator(new SimpleVar(parParams));
 
-    vmc.add_subsample(&sampleForce);
-    dmc.add_subsample(&sampleForce);
-
-    minimizer.minimize();
-    vmc.run_method();
-
-    double F = sampleForce.extract_mean();
-
-    dmc.initFromVMC(&vmc);
-    dmc.run_method();
-
-    F = sampleForce.extract_mean_of_means();
-
-
-
-    forceLoop(minimizer, vmc, dmc, sampleForce);
-
+    forceLoop(minimizer, vmc, dmc, &generalParams.R, generalParams.n_p, parParams.is_master);
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
 
-//Kinetic 1.221304
 #ifdef MPI_ON
     MPI_Finalize();
 #endif
@@ -126,18 +109,62 @@ int main(int argc, char** argv) {
 }
 
 
-void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, SampleForce & forceSampler){
+void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_master){
 
     using namespace arma;
 
-    int nPoints = 20;
+    double f_dmc, f_vmc, f0;
+
+    int nPoints = 100;
     double rMin = 0.5;
     double rMax = 5;
 
     vec rVec = linspace<vec>(rMin, rMax, nPoints);
     vec fVec = zeros<vec>(nPoints);
 
-    for (int i = 0; i < nPoints; ++i) {
+    SampleForce forceSampler(R, n_p);
+    vmc.add_subsample(&forceSampler);
+    dmc.add_subsample(&forceSampler);
+
+
+
+    //Performing first iteration with initializations
+    *R = rMin;
+
+    asgd.minimize();
+    vmc.run_method();
+
+    f_vmc = forceSampler.extract_mean();
+
+    dmc.initFromVMC(&vmc);
+    dmc.run_method();
+
+    f_dmc = forceSampler.extract_mean_of_means();
+
+    f0 = 2*f_dmc - f_vmc;
+    fVec(0) = f0;
+
+    fVec.save("/tmp/binaryArmaVec.arma");
+
+    for (int i = 1; i < nPoints; ++i) {
+
+        *R = rVec(i);
+
+        if (is_master) std::cout << "\nLooping R = " << *R << "\n" << std::endl;
+
+        asgd.minimize(false);
+        vmc.run_method(false);
+
+        f_vmc = forceSampler.extract_mean();
+
+        dmc.run_method(false);
+
+        f_dmc = forceSampler.extract_mean_of_means();
+
+        f0 = 2*f_dmc - f_vmc;
+        fVec(i) = f0;
+
+        fVec.save("/tmp/binaryArmaVec.arma");
 
     }
 }

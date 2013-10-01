@@ -41,6 +41,7 @@ protected:
     friend QMC::QMC(GeneralParams &, int,
                     SystemObjects &,
                     ParParams &,
+                    bool,
                     double,
                     int,
                     int);

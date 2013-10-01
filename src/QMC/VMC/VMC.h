@@ -66,7 +66,7 @@ protected:
 public:
 
     //! Constructor.
-    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w);
+    VMC(GeneralParams &, VMCparams &, SystemObjects &, ParParams &, int n_w, bool silent = false);
     ~VMC();
 
     void set_e(double E) {
