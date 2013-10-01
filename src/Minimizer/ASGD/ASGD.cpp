@@ -97,6 +97,8 @@ void ASGD::get_total_grad() {
 
 void ASGD::minimize(bool initialize) {
 
+    vmc->get_sampling_ptr()->set_dt(vmc->dtOrig);
+
     if (initialize){
         thermalize_walkers();
     } else {

@@ -6,13 +6,7 @@ CONFIG -= qt
 
 LIBS += -llapack -lblas -larmadillo
 
-release {
-    DEFINES += ARMA_NO_DEBUG
-    QMAKE_CXXFLAGS_RELEASE -= -O2
-    QMAKE_CXXFLAGS_RELEASE += -O3
-}
-
-SOURCES += ../src/QMCmain.cpp \
+SOURCES += \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
     ../src/BasisFunctions/hydrogenic/hydrogenic.cpp \
@@ -56,7 +50,8 @@ SOURCES += ../src/QMCmain.cpp \
     ../src/System/Fermions/Fermions.cpp \
     ../src/System/System.cpp \
     ../src/Walker/Walker.cpp \
-    ../src/Sampler/sampleMethods/SampleForce.cpp
+    ../src/Sampler/sampleMethods/SampleForce.cpp \
+    ../src/forcesMain.cpp
     
 
 HEADERS += \
@@ -125,7 +120,7 @@ QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 COMMON_CXXFLAGS = -std=c++0x -DARMA_USE_CXX11
 QMAKE_CXXFLAGS += $$COMMON_CXXFLAGS
 
-QMAKE_CXXFLAGS_DEBUG += $$COMMON_CXXFLAGS -O2 -g
+QMAKE_CXXFLAGS_DEBUG += $$COMMON_CXXFLAGS -g
 
 QMAKE_CXXFLAGS_RELEASE += $$COMMON_CXXFLAGS -O3 -DARMA_NO_DEBUG
 

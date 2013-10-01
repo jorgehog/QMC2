@@ -96,7 +96,6 @@ class Jastrow;
 struct SystemObjects {
     
     Orbitals* SP_basis;
-    Potential* onebody_pot;
     System* system;
     Sampling* sample_method;
     Jastrow* jastrow;

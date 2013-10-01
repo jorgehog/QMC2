@@ -20,8 +20,8 @@
 #include "../VMC/VMC.h"
 #include "../../Orbitals/Orbitals.h"
 
-DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, VMC* vmc)
-: QMC(gP, dP.n_c, sO, pp, dP.n_w, K) {
+DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp)
+: QMC(gP, dP.n_c, sO, pp, dP.dt, dP.n_w, K) {
 
     if (is_master) DMCout = new stdoutDMC(this, gP.runpath);
 
@@ -40,35 +40,35 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     thermalized = false;
     force_comm = false;
 
-    sampling->set_dt(dP.dt);
-
     dmc_E = 0;
     dmc_E_unscaled = 0;
 
-    if (vmc != NULL) {
-
-        E_T = vmc->get_energy();
-        for (unsigned int i = 0; i < n_w; i++) {
-            copy_walker(vmc->original_walkers[i], original_walkers[i]);
-            delete vmc->original_walkers[i];
-        }
-        delete [] vmc->original_walkers;
-
-    } else {
-        set_trial_positions();
-    }
-
+    initializedFromVMC = false;
 
     if (parallel) {
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
 
 
+}
 
+void DMC::initFromVMC(VMC *vmc)
+{
+    E_T = vmc->get_energy();
+
+    for (unsigned int i = 0; i < n_w; i++) {
+        copy_walker(vmc->original_walkers[i], original_walkers[i]);
+        //delete vmc->original_walkers[i];
+    }
+    //delete [] vmc->original_walkers;
+
+    initializedFromVMC = true;
 
 }
 
 void DMC::set_trial_positions() {
+
+    if (initializedFromVMC) return;
 
     double tmpDt = sampling->get_dt();
     sampling->set_dt(0.5);
@@ -92,19 +92,33 @@ void DMC::set_trial_positions() {
 }
 
 void DMC::output() {
+
     using namespace std;
 
-    s << setprecision(6) << fixed;
-    s << "dmcE: " << dmc_E << " | E_T: " << E_T;
+    if (is_master) {
 
-    s << " | Nw: ";
-    s << setfill(' ') << setw(5);
-    s << n_w_tot << " | ";
+        s << setprecision(6) << fixed;
+        s << "dmcE: " << dmc_E << " | E_T: " << E_T;
 
-    s << setprecision(1) << fixed << setfill(' ') << setw(5);
-    s << (double) cycle / n_c * 100 << "%";
+        s << " | Nw: ";
+        s << setfill(' ') << setw(5);
+        s << n_w_tot << " | ";
 
-    std_out->cout(s);
+        s << setprecision(1) << fixed << setfill(' ') << setw(5);
+        s << (double) cycle / n_c * 100 << "%";
+
+        if ((cycle == n_c) && thermalized) {
+            cout << "\r" << s.str() << endl;
+        } else {
+            cout << "\r" << s.str();
+            cout.flush();
+        }
+
+        s.str(string());
+        s.clear();
+
+    }
+
 }
 
 void DMC::Evolve_walker(int k, double GB) {
@@ -140,6 +154,7 @@ void DMC::update_energies() {
 
     push_subsamples();
 
+
 }
 
 void DMC::iterate_walker(int k) {
@@ -172,9 +187,14 @@ void DMC::iterate_walker(int k) {
 
 void DMC::run_method(bool initialize) {
 
-    if (!initialize) {
+    sampling->set_dt(dtOrig);
+
+    if (initialize) {
+        set_trial_positions();
+    } else {
         reset_all();
     }
+
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
@@ -185,11 +205,13 @@ void DMC::run_method(bool initialize) {
         }
 
         bury_the_dead();
+
         update_energies();
 
         normalize_population();
 
         output();
+
 
     }
 
@@ -222,8 +244,8 @@ void DMC::run_method(bool initialize) {
     if (is_master) DMCout->finalize();
 
 //    free_walkers();
-    estimate_error();
     dump_subsamples(true);
+    estimate_error();
     finalize_distribution();
     get_accepted_ratio();
     clean();
@@ -321,10 +343,11 @@ void DMC::bury_the_dead() {
 
 void DMC::node_comm() {
 #ifdef MPI_ON
+
     if (parallel) {
+
         MPI_Allreduce(MPI_IN_PLACE, &E, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         MPI_Allreduce(MPI_IN_PLACE, &samples, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
         MPI_Allgather(&n_w, 1, MPI_INT, n_w_list.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
 
         for (unsigned int i = 0; i < n_nodes; i++) {

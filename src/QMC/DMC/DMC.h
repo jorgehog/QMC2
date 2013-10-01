@@ -21,7 +21,8 @@ class DMC : public QMC {
 protected:
 
     bool thermalized; //!< Flag used to indicate whether to start sampling or not.
-    
+    bool initializedFromVMC;
+
     unsigned int n_w_last; //!< The amount of walkers at the time the walker loop was initiated.
     unsigned int n_w_tot; //!< The total number of walkers across all nodes.
     arma::uvec n_w_list; //!< List of the number of walkers of each node.
@@ -40,6 +41,7 @@ protected:
     double E; //!< The accumulative energy for each cycle.
 
     stdoutDMC* DMCout;
+
 
     //! Method for setting the trial position of all DMC walkers.
     /*!
@@ -121,9 +123,11 @@ public:
     static const unsigned int sendcount_thresh = 20; //< Minimum threshold for initializing a population normalization.
 
     //! Constructor.
-    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &, VMC* vmc = NULL);
+    DMC(GeneralParams &, DMCparams &, SystemObjects &, ParParams &);
 
     void run_method(bool initialize = true);
+
+    void initFromVMC(VMC* vmc);
 
     void output();
 

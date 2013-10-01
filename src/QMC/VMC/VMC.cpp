@@ -18,7 +18,7 @@
 #include "../../Orbitals/Orbitals.h"
 
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w)
-: QMC(gP, vP.n_c, sO, pp, n_w) {
+: QMC(gP, vP.n_c, sO, pp, vP.dt, n_w) {
 
     std::stringstream name;
     name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "vmc";
@@ -42,8 +42,6 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
 
     vmc_E = 0;
     thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
-
-    sampling->set_dt(vP.dt);
 
 }
 
@@ -78,6 +76,7 @@ void VMC::store_walkers() {
 
 void VMC::run_method(bool initialize) {
 
+    sampling->set_dt(dtOrig);
 
     if (initialize) {
 

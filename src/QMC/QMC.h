@@ -73,6 +73,8 @@ protected:
 
     double local_E; //!< The last calculated local energy.
 
+    double dtOrig;
+
     Walker *trial_walker; //!< The trial walker used to test a move.
     Walker **original_walkers; //!< A list of n_w walkers used in DMC.
 
@@ -213,6 +215,7 @@ public:
     QMC(GeneralParams &, int n_c,
             SystemObjects &,
             ParParams &,
+            double dt,
             int n_w,
             int K = 1);
     QMC();

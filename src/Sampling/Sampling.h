@@ -39,10 +39,11 @@ protected:
     QMC* qmc; //!< The QMC main solver object. Needed to access e.g. the system object.
 
     friend QMC::QMC(GeneralParams &, int,
-            SystemObjects &,
-            ParParams &,
-            int,
-            int);
+                    SystemObjects &,
+                    ParParams &,
+                    double,
+                    int,
+                    int);
     
     friend void QMC::clean();
 
@@ -116,7 +117,6 @@ public:
     }
 
     void set_qmc_ptr(QMC* qmc) {
-        diffusion->set_qmc_ptr(qmc);
         this->qmc = qmc;
     }
 

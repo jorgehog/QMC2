@@ -21,7 +21,7 @@
 
 QMC::QMC(GeneralParams & gP, int n_c,
         SystemObjects & sO,
-        ParParams & pp,
+        ParParams & pp, double dt,
         int n_w,
         int K) {
 
@@ -30,6 +30,8 @@ QMC::QMC(GeneralParams & gP, int n_c,
     this->n_c = n_c;
     this->n_w = n_w;
     n_w_size = K*n_w;
+
+    dtOrig = dt;
 
     n2 = ceil(n_p / 2.0);
 

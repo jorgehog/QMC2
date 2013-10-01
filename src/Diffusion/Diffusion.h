@@ -22,8 +22,6 @@ protected:
     int n_p;
     int dim;
 
-    QMC* qmc; //!< The qmc main solver object. Not needed?
-
     double timestep; //!< The discrete time step
     double D; //!< The diffusion constant
     long random_seed; //!< The random seed. Needs to be stored for some RNGs to work.
@@ -57,10 +55,6 @@ public:
      * Returns a random uniform number on [0,1).
      */
     double call_RNG();
-
-    void set_qmc_ptr(QMC* qmc) {
-        this->qmc = qmc;
-    }
 
     //! Function for altering the time step. 
     /*!
