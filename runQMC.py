@@ -607,7 +607,7 @@ def consistencyCheck(cmlArgs):
     if (cmlArgs[cmlMAPg['system']] != "def"):
         system = cmlArgs[cmlMAPg['system']] 
     else:
-        system = "QDots"
+        system = SYSTEMS["QDots"]
 
     #if no number of particles specified -> n_p=2        
     if (cmlArgs[cmlMAPg['n_p']] != "def"):
@@ -804,7 +804,7 @@ def getTupleString(pre, suff):
 
 def getCppMap(raw):
     
-    printCppMap = True
+    printCppMap = False
 
     p = "^\s*if \(def\.compare\(argv\[\d+\]\) != 0\) (.+) = "
     vars_ = re.findall(p, raw, re.MULTILINE)
