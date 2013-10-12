@@ -14,7 +14,7 @@ DoubleWell::DoubleWell(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){
     
     this->w = gp.systemConstant; 
-    this->R = &(gp.R);
+//    this->R = &(gp.R);
     
     name = "DoubleWell";
     

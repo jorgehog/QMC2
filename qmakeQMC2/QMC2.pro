@@ -3,6 +3,7 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG += CXX11
 
 LIBS += -llapack -lblas -larmadillo
 
@@ -51,7 +52,9 @@ SOURCES += \
     ../src/System/System.cpp \
     ../src/Walker/Walker.cpp \
     ../src/Sampler/sampleMethods/SampleForce.cpp \
-    ../src/forcesMain.cpp
+    ../src/forcesMain.cpp \
+    ../src/Orbitals/NBodyTransform/nbodytransform.cpp \
+    ../src/Potential/MolecularCoulomb/molecularcoulomb.cpp
     
 
 HEADERS += \
@@ -101,8 +104,25 @@ HEADERS += \
     ../src/System/System.h \
     ../src/Walker/Walker.h \
     ../src/defines.h \
-    ../src/Sampler/sampleMethods/SampleForce.h
+    ../src/Sampler/sampleMethods/SampleForce.h \
+    ../src/Orbitals/NBodyTransform/nbodytransform.h \
+    ../src/Potential/MolecularCoulomb/molecularcoulomb.h
 
+ABEL {
+    ARMAPATH = ../NOTUR_README/armadillo-3.920.1
+
+    INCLUDEPATH += $(ARMAPATH)/usr/include \
+                /cluster/software/VERSIONS/intel-2013.2/mkl/include \
+                .
+
+    LIBS -= -llapack -lblas
+    LIBS +=  -L/cluster/software/VERSIONS/intel-2013.2/mkl/lib/intel64 \
+             -L$(ARMAPATH)/usr/lib64 \
+             -lpthread \
+             -liomp5
+    DEFINES += MKL_LP64
+    QMAKE_CXXFLAGS += -openmp
+}
 
 # MPI Settings
 QMAKE_CXX = mpicxx
@@ -114,17 +134,18 @@ QMAKE_CC = mpicc
 QMAKE_CFLAGS += $$system(mpicc --showme:compile)
 QMAKE_LFLAGS += $$system(mpicxx --showme:link)
 QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
-QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
+
 
 #C++11 features
-COMMON_CXXFLAGS = -std=c++0x -DARMA_USE_CXX11
-QMAKE_CXXFLAGS += $$COMMON_CXXFLAGS
+CXX11 {
+    QMAKE_CXXFLAGS += -std=c++0x -DARMA_USE_CXX11
+}
 
-QMAKE_CXXFLAGS_DEBUG += $$COMMON_CXXFLAGS -g
+QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CXXFLAGS -g
 
-QMAKE_CXXFLAGS_RELEASE += $$COMMON_CXXFLAGS -O3 -DARMA_NO_DEBUG
+QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS -O3 -DARMA_NO_DEBUG
 
-
-#remove this line if you don't use ccache
-#QMAKE_CXX = ccache $$QMAKE_CXX
-
+!ABEL {
+    #remove this line if you don't use ccache
+    QMAKE_CXX = ccache $$QMAKE_CXX
+}

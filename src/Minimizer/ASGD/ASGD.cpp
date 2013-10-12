@@ -102,6 +102,7 @@ void ASGD::minimize(bool initialize) {
     vmc->get_sampling_ptr()->set_dt(vmc->dtOrig);
 
     if (initialize){
+        initializeParameters();
         thermalize_walkers();
     } else {
         if (is_master) ASGDout->reset();

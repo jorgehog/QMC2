@@ -40,6 +40,11 @@ protected:
      */
     virtual void update_parameters() = 0;
 
+    void initializeParameters();
+
+    arma::rowvec alpha0;
+    arma::rowvec beta0;
+
 public:
 
     //! Constructor. 
@@ -48,7 +53,7 @@ public:
      * @param alpha Vector of initial conditions of spatial variational parameters
      * @param beta Vector of initial conditions of Jastrow variational parameters
      */
-    Minimizer(VMC* vmc, const ParParams &, const arma::rowvec & alpha, const arma::rowvec & beta);
+    Minimizer(VMC* vmc, const ParParams &, const arma::rowvec & alpha0, const arma::rowvec & beta0);
 
 
     Orbitals* get_orbitals() {

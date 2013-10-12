@@ -14,6 +14,12 @@ class QMC;
 class BasisFunctions;
 class Walker;
 
+
+enum TRANS_SYSTEMS {
+    ATOMS,
+    QDOTS
+};
+
 /*! \brief Superclass for the single particle orbital classes.
  * Handles everything specific regarding choice of single particle basis.
  */
@@ -144,11 +150,15 @@ public:
         return name;
     }
 
+
+    virtual void debug() {}
+
     friend class HartreeFock;
     friend class Minimizer;
     friend class ASGD;
     friend class stdoutASGD;
     friend class DiTransform;
+    friend class NBodyTransform;
 };
 
 

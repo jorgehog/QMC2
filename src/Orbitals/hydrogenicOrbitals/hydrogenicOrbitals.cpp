@@ -18,6 +18,8 @@ hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & v
 
     name = "Atoms";
 
+    assert(dim == 3);
+
     this->alpha = new double();
     this->k = new double();
     this->k2 = new double();

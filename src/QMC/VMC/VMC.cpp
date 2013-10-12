@@ -16,7 +16,7 @@
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../../OutputHandler/Distribution/Distribution.h"
 #include "../../Orbitals/Orbitals.h"
-
+#include "../../System/System.h"
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool silent)
 : QMC(gP, vP.n_c, sO, pp, silent, vP.dt, n_w) {
 
@@ -91,6 +91,8 @@ void VMC::run_method(bool initialize) {
     } else {
         reset_all();
     }
+
+
 
     for (cycle = 1; cycle <= n_c; cycle++) {
 

@@ -29,6 +29,7 @@ public:
 
     friend class ExpandedBasis;
     friend class DiTransform;
+    friend class NBodyTransform;
 
 protected:
 
@@ -71,10 +72,10 @@ protected:
      */
     void set_parameter(double parameter, int n) {
         (void) n;
-
         *alpha = parameter;
         *k = parameter*Z;
         *k2 = (*k)*(*k);
+
     }
 
 };

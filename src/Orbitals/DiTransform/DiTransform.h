@@ -12,10 +12,6 @@
 struct GeneralParams;
 struct VariationalParams;
 
-enum TRANS_SYSTEMS {
-    ATOMS,
-    QDOTS
-};
 
 class DiTransform : public Orbitals {
 public:
@@ -28,6 +24,8 @@ public:
      * \see Orbitals::set_qnum_indie_terms()
      */
     void set_qnum_indie_terms(Walker * walker, int i);
+
+    void debug();
 
 protected:
 
