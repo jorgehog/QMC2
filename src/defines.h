@@ -8,8 +8,8 @@
 #include <mpi.h>
 #endif
 
-#define RNG_NUMREC
-//#define RNG_ZIG
+//#define RNG_NUMREC
+#define RNG_ZIG
 
 #ifdef RNG_ZIG
 #ifdef RNG_NUMREC

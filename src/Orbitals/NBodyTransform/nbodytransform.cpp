@@ -60,7 +60,7 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
 
     makePMatrix();
 
-
+    std::cout << P << std::endl;
 }
 
 void NBodyTransform::makePMatrix()

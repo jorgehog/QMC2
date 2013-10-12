@@ -93,22 +93,22 @@ int main(int argc, char** argv) {
     double theta = 140.0; //deg
     theta *= arma::datum::pi/180;
 
-    BodyDef firstCore;
-    firstCore.n_p_local = 14;
-    firstCore.origin << 0 << 0 << 0;
+    BodyDef Silicon;
+    Silicon.n_p_local = 14;
+    Silicon.origin << 0 << 0 << 0;
 
-    BodyDef secondCore;
-    secondCore.n_p_local = 8;
-    secondCore.origin << R << 0 << 0;
+    BodyDef Oxygen1;
+    Oxygen1.n_p_local = 8;
+    Oxygen1.origin << R << 0 << 0;
 
-    BodyDef thirdCore;
-    thirdCore.n_p_local = 8;
-    thirdCore.origin << R*cos(theta) << R*sin(theta) << 0;
+    BodyDef Oxygen2;
+    Oxygen2.n_p_local = 8;
+    Oxygen2.origin << R*cos(theta) << R*sin(theta) << 0;
 
     std::vector<BodyDef> bodies;
-    bodies.push_back(firstCore);
-    bodies.push_back(secondCore);
-    bodies.push_back(thirdCore);
+    bodies.push_back(Silicon);
+    bodies.push_back(Oxygen1);
+    bodies.push_back(Oxygen2);
 
     NBodyTransform *Molecule = new NBodyTransform(generalParams, variationalParams, ATOMS, bodies);
     systemObjects.SP_basis = Molecule;

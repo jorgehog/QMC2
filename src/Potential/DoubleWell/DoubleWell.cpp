@@ -10,11 +10,12 @@
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
 
-DoubleWell::DoubleWell(GeneralParams& gp) :
+//TODO: Create a general well potential.
+DoubleWell::DoubleWell(GeneralParams& gp, double R) :
 Potential(gp.n_p, gp.dim){
     
     this->w = gp.systemConstant; 
-//    this->R = &(gp.R);
+    this->R = &R;
     
     name = "DoubleWell";
     
