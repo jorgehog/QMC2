@@ -81,7 +81,6 @@ int main(int argc, char** argv) {
 
     variationalParams.alpha = 1.1451;
     variationalParams.beta =  0.31;
-    generalParams.random_seed = -1381743635;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
