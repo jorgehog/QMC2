@@ -145,6 +145,10 @@ QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CXXFLAGS -g
 
 QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS -O3 -DARMA_NO_DEBUG
 
+ABEL {
+    QMAKE_LFLAGS -= -lm
+}
+
 !ABEL {
     #remove this line if you don't use ccache
     QMAKE_CXX = ccache $$QMAKE_CXX
