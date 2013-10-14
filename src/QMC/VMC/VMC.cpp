@@ -92,6 +92,8 @@ void VMC::run_method(bool initialize) {
         reset_all();
     }
 
+
+
     for (cycle = 1; cycle <= n_c; cycle++) {
 
         diffuse_walker(original_walker, trial_walker);
@@ -154,7 +156,9 @@ void VMC::output() {
 
             s.str(string());
             s.clear();
-
+#ifdef LINED_OUTPUT
+            cout << endl;
+#endif
         }
 
     }

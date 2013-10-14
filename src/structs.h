@@ -49,7 +49,7 @@ struct GeneralParams {
      */
     double systemConstant = 1;
 
-    double R = 1.4; //! Center of mass coordinate for diatmic systems.
+//    double R = 1.4; //! Center of mass coordinate for diatmic systems.
 
     bool deadlock = false; //! If true, freezes one particle;
     double deadlock_x = 0; //! Position of the locked particle. y=z=0;
@@ -159,6 +159,18 @@ inline void scaleWithProcs(struct ParParams & parParams,
 
     vmcParams.n_c /= parParams.n_nodes;
     dmcParams.n_w /= parParams.n_nodes;
+
+    if (minimizerParams.n_c_SGD == 0) {
+        minimizerParams.n_c_SGD = 1;
+    }
+
+    if (vmcParams.n_c == 0) {
+        vmcParams.n_c = 1;
+    }
+
+    if (dmcParams.n_w == 0) {
+        dmcParams.n_w = 1;
+    }
 
 }
 

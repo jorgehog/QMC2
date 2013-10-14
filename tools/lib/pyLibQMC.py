@@ -23,7 +23,7 @@ class misc:
 class verifyPaths:
 
     l1_paths = [paths.CODE, paths.src, paths.toolsPath]    
-    l2_paths = [paths.iniFilePath, paths.scratchPath, paths.programPath, join(paths.scratchPath, "QMC_SCRATCH")]
+    l2_paths = [paths.iniFilePath, paths.scratchPath, paths.programPath, join(paths.scratchPath, "QMC_SCRATCH"), join(paths.scratchPath, "QMC_SCRATCH", "walker_positions")]
     l3_paths = [join(paths.programPath, misc.QMC2programName)]
 
     
@@ -43,7 +43,7 @@ class verifyPaths:
             cwd = os.getcwd()
             os.chdir(paths.programPath)
             os.system("qmake -makefile")
-            os.system("make")
+            os.system("make -j")
             os.chdir(cwd)
             shutil.copy(join(paths.toolsPath, "misc", "verify.ini"), paths.iniFilePath)
 

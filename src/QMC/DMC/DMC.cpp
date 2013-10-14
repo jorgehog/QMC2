@@ -112,6 +112,11 @@ void DMC::output() {
         } else {
             cout << "\r" << s.str();
             cout.flush();
+
+#ifdef LINED_OUTPUT
+                cout << endl;
+#endif
+
         }
 
         s.str(string());

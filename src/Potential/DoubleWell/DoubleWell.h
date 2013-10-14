@@ -13,7 +13,7 @@ struct GeneralParams;
 
 class DoubleWell : public Potential {
 public:
-    DoubleWell(GeneralParams & gp);
+    DoubleWell(GeneralParams & gp, double R);
     
     double get_pot_E(const Walker* walker) const;
     

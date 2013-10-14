@@ -17,7 +17,9 @@
 DiTransform::DiTransform(GeneralParams& gP, VariationalParams& vP, int system)
 : Orbitals(gP.n_p, gP.dim) {
 
-    this->R = &(gP.R);
+    assert(false && "deprecated. Use NBodyTransform instead.");
+
+//    this->R = &(gP.R);
 
     gP.n_p /= 2;
 
@@ -58,8 +60,6 @@ DiTransform::DiTransform(GeneralParams& gP, VariationalParams& vP, int system)
 
 void DiTransform::set_qnum_indie_terms(Walker* walker, int i) {
 
-    walker->calc_r_i(i);
-
     walker_nucleus1->r.row(i) = walker->r.row(i);
     walker_nucleus2->r.row(i) = walker->r.row(i);
 
@@ -77,6 +77,14 @@ void DiTransform::set_qnum_indie_terms(Walker* walker, int i) {
 
 }
 
+void DiTransform::debug()
+{
+    std::cout << *((hydrogenicOrbitals*)nucleus1)->exp_factor_n1 << std::endl;
+    std::cout << *((hydrogenicOrbitals*)nucleus2)->exp_factor_n1 << std::endl;
+    std::cout << *((hydrogenicOrbitals*)nucleus2)->k << std::endl;
+
+}
+
 double DiTransform::get_dell_alpha_phi(Walker* walker, int p, int q_num) {
 
     (void) walker;
@@ -88,11 +96,10 @@ double DiTransform::get_dell_alpha_phi(Walker* walker, int p, int q_num) {
 
 }
 
-double DiTransform::phi(const Walker* walker, int particle, int q_num) {
+double DiTransform::phi(const Walker*    walker, int particle, int q_num) {
 
     (void) walker;
     int sign = minusPower(q_num);
-
     return nucleus1->phi(walker_nucleus1, particle, q_num / 2) +
             sign * nucleus2->phi(walker_nucleus2, particle, q_num / 2);
 }

@@ -102,6 +102,7 @@ void ASGD::minimize(bool initialize) {
     vmc->get_sampling_ptr()->set_dt(vmc->dtOrig);
 
     if (initialize){
+        initializeParameters();
         thermalize_walkers();
     } else {
         if (is_master) ASGDout->reset();
@@ -191,7 +192,7 @@ void ASGD::output_cycle() {
 
     if (is_master) {
 
-        if ((sample % 100) == 0) {
+        if ((sample % 10) == 0) {
 
 
 
@@ -235,6 +236,11 @@ void ASGD::output_cycle() {
             } else {
                 cout << "\r" << s.str();
                 cout.flush();
+
+#ifdef LINED_OUTPUT
+                cout << endl;
+#endif
+
             }
 
             s.str(string());

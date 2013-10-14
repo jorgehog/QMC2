@@ -27,6 +27,7 @@
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
 #include "Orbitals/DiTransform/DiTransform.h"
+#include "Orbitals/NBodyTransform/nbodytransform.h"
 //#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
 #include "Potential/AtomCore/AtomCore.h"
@@ -34,6 +35,7 @@
 #include "Potential/DiAtomCore/DiAtomCore.h"
 #include "Potential/DoubleWell/DoubleWell.h"
 #include "Potential/Harmonic_osc/Harmonic_osc.h"
+#include "Potential/MolecularCoulomb/molecularcoulomb.h"
 
 //#include "System/Bosons/Bosons.h"
 #include "System/Fermions/Fermions.h"
@@ -45,6 +47,10 @@
 #include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
 
 #include "Sampler/sampleMethods/SampleForce.h"
+
+#include <armadillo>
+#include <iomanip>
+#include <vector>
 
 void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, double *R, int n_p, bool is_master);
 
@@ -61,34 +67,65 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct SystemObjects systemObjects;
 
-    minimizerParams.n_c_SGD=1600;
-    minimizerParams.SGDsamples = 3500;
-    minimizerParams.a = 0.25;
 
-    vmcParams.n_c = 1E7;
+    minimizerParams.SGDsamples = 3000;
 
-    dmcParams.n_c=250;
     dmcParams.therm=1000;
-    dmcParams.n_b=50;
-    dmcParams.n_w = 2000;
+    dmcParams.n_c = 2000;
+    vmcParams.n_c = 1E6;
+    dmcParams.dt = 0.00005;
+
+    //    variationalParams.alpha = 1.35618;
+    //    variationalParams.beta =  0.28;
+    //    generalParams.R = 1.4;
+
+    variationalParams.alpha = 1.1451;
+    variationalParams.beta =  0.31;
+    generalParams.random_seed = -1381743635;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
+
+    dmcParams.n_w = 200*parParams.n_nodes;
+    minimizerParams.n_c_SGD=100*parParams.n_nodes;
+
     scaleWithProcs(parParams, generalParams, minimizerParams, vmcParams, dmcParams);
 
     //Setting up the solver parameters
     generalParams.dim = 3;
-    systemObjects.SP_basis = new DiTransform(generalParams, variationalParams, ATOMS);
+    generalParams.n_p = 30;
 
-    Fermions system(generalParams, systemObjects.SP_basis);
-    system.add_potential(new DiAtomCore(generalParams));
+    double R = 3.0;       //bohr radii
+    double theta = 140.0; //deg
+
+    theta *= arma::datum::pi/180;
+
+    BodyDef Silicon;
+    Silicon.n_p_local = 14;
+    Silicon.origin << 0 << 0 << 0;
+
+    BodyDef Oxygen1;
+    Oxygen1.n_p_local = 8;
+    Oxygen1.origin << R << 0 << 0;
+
+    BodyDef Oxygen2;
+    Oxygen2.n_p_local = 8;
+    Oxygen2.origin << R*cos(theta) << R*sin(theta) << 0;
+
+    std::vector<BodyDef> bodies;
+    bodies.push_back(Silicon);
+    bodies.push_back(Oxygen1);
+    bodies.push_back(Oxygen2);
+
+    NBodyTransform *Molecule = new NBodyTransform(generalParams, variationalParams, ATOMS, bodies);
+    systemObjects.SP_basis = Molecule;
+    Fermions system(generalParams, Molecule);
+    system.add_potential(new MolecularCoulomb(generalParams, Molecule));
     system.add_potential(new Coulomb(generalParams));
     systemObjects.system = &system;
 
     systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
     systemObjects.sample_method = new Importance(generalParams);
-
-    //
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
@@ -98,10 +135,18 @@ int main(int argc, char** argv) {
     ASGD minimizer(&vmc, minimizerParams, parParams, generalParams.runpath);
     DMC dmc(generalParams, dmcParams, systemObjects, parParams, silent);
 
-    vmc.set_error_estimator(new SimpleVar(parParams));
+    vmc.set_error_estimator(new Blocking(vmcParams.n_c, parParams));
     dmc.set_error_estimator(new SimpleVar(parParams));
 
-    forceLoop(minimizer, vmc, dmc, &generalParams.R, generalParams.n_p, parParams.is_master);
+    //    forceLoop(minimizer, vmc, dmc, &generalParams.R, generalParams.n_p, parParams.is_master);
+
+    arma::wall_clock a;
+    a.tic();
+//    minimizer.minimize();
+    vmc.run_method();
+    dmc.initFromVMC(&vmc);
+    dmc.run_method();
+    if (parParams.is_master) std::cout << "Time: " <<setprecision(3) << fixed << a.toc()/60 << std::endl;
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
 

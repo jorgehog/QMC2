@@ -157,7 +157,6 @@ protected:
 
     void push_subsamples();
 
-    void dump_subsamples(bool mean_of_means = false);
 
     //! Method for storing positional data.
     /*!
@@ -229,6 +228,8 @@ public:
     void add_subsample(Sampler * sampler){
         samplers.push_back(sampler);
     }
+
+    void dump_subsamples(bool mean_of_means = false);
 
     //! Method for calculating the Quantum Force.
     void get_QF(Walker* walker) const;

@@ -14,8 +14,10 @@
 DiAtomCore::DiAtomCore(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){
     
+    assert(false && "DEPRECATED. Use MolecularCoulomb instead.");
+
     this->Z = gp.n_p/2; 
-    this->R = &(gp.R);
+//    this->R = &(gp.R);
     
     name = "DiAtomCore";
     
