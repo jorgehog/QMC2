@@ -111,13 +111,13 @@ HEADERS += \
 ABEL {
     ARMAPATH = /usit/abel/u1/jorgehog/libs/armadillo-3.920.1
 
-    INCLUDEPATH += $(ARMAPATH)/usr/include \
+    INCLUDEPATH += $$ARMAPATH/usr/include \
                 /cluster/software/VERSIONS/intel-2013.2/mkl/include \
                 .
 
     LIBS -= -llapack -lblas
     LIBS +=  -L/cluster/software/VERSIONS/intel-2013.2/mkl/lib/intel64 \
-             -L$(ARMAPATH)/usr/lib64 \
+             -L$$ARMAPATH/usr/lib64 \
              -lpthread \
              -liomp5
     DEFINES += MKL_LP64
