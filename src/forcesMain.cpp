@@ -56,6 +56,7 @@ void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, double *R, int n_p, bool is_ma
 
 int main(int argc, char** argv) {
 
+
     using namespace std;
 
     //Initialize structs for holding constructor arguments.
@@ -67,6 +68,9 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct SystemObjects systemObjects;
 
+    if (argc == 2) {
+        generalParams.runpath = argv[1];
+    }
 
     minimizerParams.SGDsamples = 3000;
 
