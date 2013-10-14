@@ -13,11 +13,13 @@
 #include "../AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "../hydrogenicOrbitals/hydrogenicOrbitals.h"
 
+#include <iostream>
 
 DiTransform::DiTransform(GeneralParams& gP, VariationalParams& vP, int system)
 : Orbitals(gP.n_p, gP.dim) {
 
-    assert(false && "deprecated. Use NBodyTransform instead.");
+    std::cout << "Orbital DiTransform is deprecated. Use NBodyTransform instead." << std::endl;
+    exit(1);
 
 //    this->R = &(gP.R);
 

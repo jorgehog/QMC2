@@ -12,13 +12,17 @@
 #include "../../Walker/Walker.h"
 #include "../../BasisFunctions/hydrogenic/hydrogenic.h"
 
+#include <iostream>
 
 hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
 
     name = "Atoms";
 
-    assert(dim == 3);
+    if (dim != 3) {
+        std::cout << "Hydrogenic orbitals are threedimensional creatures." << std::endl;
+        exit(1);
+    }
 
     this->alpha = new double();
     this->k = new double();

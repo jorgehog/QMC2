@@ -7,6 +7,8 @@
 #include "../AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "../hydrogenicOrbitals/hydrogenicOrbitals.h"
 
+#include <iostream>
+
 NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_SYSTEMS system, const std::vector<BodyDef> &bodies) :
     Orbitals(gP.n_p, gP.dim),
     N(0)
@@ -53,8 +55,14 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
 
     }
 
-    assert((N > 1) && "No bodies transformed...");
-    assert(NTot == n_p && "nBodyTransform failed. Mismatch in the particle numbers.");
+    if (N <= 1) {
+        std::cout << "No bodies transformed..." << std::endl;
+        exit(1);
+    }
+    if (NTot != n_p) {
+        std::cout << "nBodyTransform failed. Mismatch in the particle numbers." << std::endl;
+        exit(1);
+    }
 
     makeRRelNucleiMatrix();
 

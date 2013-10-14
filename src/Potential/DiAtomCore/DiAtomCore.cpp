@@ -14,7 +14,8 @@
 DiAtomCore::DiAtomCore(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){
     
-    assert(false && "DEPRECATED. Use MolecularCoulomb instead.");
+    std::cout << "DiAtomCore potential is DEPRECATED. Use MolecularCoulomb instead." << std::endl;
+    exit(1);
 
     this->Z = gp.n_p/2; 
 //    this->R = &(gp.R);
