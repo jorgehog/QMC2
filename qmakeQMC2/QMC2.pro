@@ -109,7 +109,7 @@ HEADERS += \
     ../src/Potential/MolecularCoulomb/molecularcoulomb.h
 
 ABEL {
-    ARMAPATH = ../NOTUR_README/armadillo-3.920.1
+    ARMAPATH = /usit/abel/u1/jorgehog/libs/armadillo-3.920.1
 
     INCLUDEPATH += $(ARMAPATH)/usr/include \
                 /cluster/software/VERSIONS/intel-2013.2/mkl/include \

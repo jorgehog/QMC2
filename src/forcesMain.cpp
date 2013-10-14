@@ -98,7 +98,8 @@ int main(int argc, char** argv) {
     double R = 3.0;       //bohr radii
     double theta = 140.0; //deg
 
-    theta *= arma::datum::pi/180;
+    theta *= arma::datum::pi/180;//dmcE: -433.274597 | E_T: -433.357147 | Nw:   957 | 100.0%
+
 
     BodyDef Silicon;
     Silicon.n_p_local = 14;
