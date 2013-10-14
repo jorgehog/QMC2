@@ -61,8 +61,12 @@ int main(int argc, char** argv) {
     struct MinimizerParams minimizerParams;
     struct SystemObjects systemObjects;
 
-    minimizerParams.n_c_SGD=600;
-    minimizerParams.SGDsamples = 4000;
+    minimizerParams.n_c_SGD=1600;
+    minimizerParams.SGDsamples = 3500;
+    minimizerParams.a = 0.25;
+
+    vmcParams.n_c = 1E7;
+
     dmcParams.n_c=250;
     dmcParams.therm=1000;
     dmcParams.n_b=50;
@@ -115,9 +119,9 @@ void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_maste
 
     double f_dmc, f_vmc, f0;
 
-    int nPoints = 100;
-    double rMin = 0.5;
-    double rMax = 5;
+    int nPoints = 200;
+    double rMin = 0.1;
+    double rMax = 6;
 
     vec rVec = linspace<vec>(rMin, rMax, nPoints);
     vec fVec = zeros<vec>(nPoints);
@@ -136,13 +140,15 @@ void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_maste
 
     f_vmc = forceSampler.extract_mean();
 
-    dmc.initFromVMC(&vmc);
-    dmc.run_method();
+//    dmc.initFromVMC(&vmc);
+//    dmc.run_method();
 
-    f_dmc = forceSampler.extract_mean_of_means();
+//    f_dmc = forceSampler.extract_mean_of_means();
 
-    f0 = 2*f_dmc - f_vmc;
-    fVec(0) = f0;
+//    f0 = 2*f_dmc - f_vmc;
+//    fVec(0) = f0;
+
+    fVec(0) = f_vmc;
 
     fVec.save("/tmp/binaryArmaVec.arma");
 
@@ -157,12 +163,14 @@ void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_maste
 
         f_vmc = forceSampler.extract_mean();
 
-        dmc.run_method(false);
+//        dmc.run_method(false);
 
-        f_dmc = forceSampler.extract_mean_of_means();
+//        f_dmc = forceSampler.extract_mean_of_means();
 
-        f0 = 2*f_dmc - f_vmc;
-        fVec(i) = f0;
+//        f0 = 2*f_dmc - f_vmc;
+//        fVec(i) = f0;
+
+        fVec(i) = f_vmc;
 
         fVec.save("/tmp/binaryArmaVec.arma");
 

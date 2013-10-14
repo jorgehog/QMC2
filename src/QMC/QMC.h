@@ -85,7 +85,6 @@ protected:
     System *system; //!< The system object.
     ErrorEstimator* error_estimator; //!< The error estimator.
 
-    Sampler kinetic_sampler;
     Distribution* distribution;
 
     std::vector<Sampler*> samplers;
@@ -209,6 +208,8 @@ protected:
     
     
 public:
+
+    Sampler kinetic_sampler;
 
     //! Constructor.
     /*!
