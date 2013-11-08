@@ -38,10 +38,10 @@ double MolecularCoulomb::get_pot_E(const Walker *walker) const
 
         //Nucleus - nucleus interaction
         for (int i = k + 1; i < nBodyOrbitals->N; ++i) {
-            potE_i2 += nBodyOrbitals->populations.at(i)/nBodyOrbitals->r_rel_nuclei(k, i);
+            potE_i2 += nBodyOrbitals->populations(i)/nBodyOrbitals->r_rel_nuclei(k, i);
         }
 
-        potE += (potE_i1 + potE_i2)*nBodyOrbitals->populations.at(k);
+        potE += (potE_i1 + potE_i2)*nBodyOrbitals->populations(k);
 
     }
 

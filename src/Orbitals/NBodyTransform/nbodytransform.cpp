@@ -19,10 +19,12 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
 
     int NTot = 0;
 
+    populations.set_size(bodies.size());
+
     for (const BodyDef & body : bodies) {
         bodyParams.n_p = body.n_p_local;
 
-        populations.push_back(body.n_p_local);
+        populations(N) = body.n_p_local;
 
         nuclei_walkers.push_back(new Walker(n_p, gP.dim));
         origins.push_back(body.origin);
@@ -68,6 +70,16 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
 
     makePMatrix();
 
+    createMonoStructureCouplingMatrix();
+
+    //Set the highest accessible state. Needed in order to calculate the
+    //required exponentions (i.e. avoid calculating unneccessary ones)
+    for (int i = 0; i < N; ++i) {
+        nuclei.at(i)->nCap = 2*(monoStructureCouplings.col(i).eval().max() + 1);
+    }
+
+    std::cout << monoStructureCouplings << std::endl;
+
 }
 
 void NBodyTransform::makePMatrix()
@@ -79,18 +91,14 @@ void NBodyTransform::makePMatrix()
     tmp.diag()*=-1;
     tmp(0, 0) = 1;
 
-//    int nFac = 0;
     int n_p_local;
 
     for (int i = 0; i < N; ++i) {
-        n_p_local = populations.at(i);
+        n_p_local = populations(i);
 
-        tmp.col(i) *= ((double)n_p_local)/n_p;
-
-//        nFac += n_p_local*n_p_local;
+        tmp.col(i) *= sqrt(n_p_local);
     }
 
-//    tmp *= n_p/sqrt(nFac);
 
     for (int i = 0; i < n2; ++i) {
 
@@ -108,6 +116,109 @@ void NBodyTransform::makeRRelNucleiMatrix()
         for (int j = i + 1; j < N; j++) {
             r_rel_nuclei(i, j) = r_rel_nuclei(j, i) = arma::norm(origins.at(i) - origins.at(j), 2);
         }
+    }
+
+}
+
+void NBodyTransform::createMonoStructureCouplingMatrix()
+{
+    using namespace arma;
+
+    monoStructureCouplings.set_size(n2, N);
+
+    //
+    for (int i = 0; i < n2; ++i) {
+        for (int j = 0; j < N; ++j) {
+            monoStructureCouplings(i,j) = i/N;
+        }
+    }
+    return;
+    //
+
+    unsigned int maxN2 = populations.max()/2;
+
+
+    mat spEnergies(maxN2, N);
+    for (unsigned int i = 0; i < maxN2; ++i) {
+        for (int j = 0; j < N; ++j) {
+            spEnergies(i, j) = nuclei.at(j)->get_sp_energy(i);
+        }
+    }
+
+    int nCouplings = pow(maxN2, N);
+
+    umat allQuantumNumbers(nCouplings, N);
+    vec allEnergyCouplings(nCouplings);
+    uvec indexMap(N);
+
+    allEnergyCouplings.zeros();
+    indexMap.zeros();
+
+    for (int i = 0; i < nCouplings; ++i) {
+
+        allQuantumNumbers.row(i) = indexMap.t();
+
+        for (int j = 0; j < N; ++j) {
+            allEnergyCouplings(i) += spEnergies(indexMap(j), j);
+        }
+
+        indexMap(N-1)++;
+
+        for (int j = N-1; j >= 0; --j) {
+            if (indexMap(j) == maxN2) {
+
+                if (j == 0) {
+                    break;
+                }
+
+                indexMap(j) = 0;
+                indexMap(j-1)++;
+            }
+        }
+
+    }
+
+    uvec sortedIndexes = sort_index(allEnergyCouplings);
+
+    int startRow;
+    int endRow;
+    double startE;
+    double testE;
+
+    uvec sumVec = sum(allQuantumNumbers, 1).eval()(sortedIndexes);
+    uvec sumVecSpanSort;
+
+    startRow = 0;
+    endRow = 0;
+    while (startRow < nCouplings - 1) {
+
+        endRow = startRow + 1;
+
+        startE = allEnergyCouplings(sortedIndexes(startRow));
+        testE = allEnergyCouplings(sortedIndexes(endRow));
+
+        if (startE != testE) {
+            startRow = endRow;
+            continue;
+        }
+
+        if (endRow < nCouplings - 1){
+            while((allEnergyCouplings(sortedIndexes(endRow)) == startE) && (endRow < nCouplings - 1)) {
+                endRow++;
+            }
+        }
+
+
+        sumVecSpanSort = sort_index(sumVec(span(startRow, endRow)));
+        sortedIndexes(span(startRow, endRow)) = sortedIndexes(span(startRow, endRow)).eval()(sumVecSpanSort);
+
+        startRow = endRow;
+
+    }
+
+    for (int i = 0; i < n2; ++i) {
+        monoStructureCouplings.row(i) = allQuantumNumbers.row(sortedIndexes(i/N));
+
     }
 
 }
@@ -149,7 +260,7 @@ double NBodyTransform::get_dell_alpha_phi(Walker *walker, int p, int q_num)
     double dell_alpha_phi = 0;
 
     for(int i = 0; i < N; i++){
-        dell_alpha_phi += P(q_num, i)*nuclei.at(i)->get_dell_alpha_phi(nuclei_walkers.at(i), p, q_num/N);
+        dell_alpha_phi += P(q_num, i)*nuclei.at(i)->get_dell_alpha_phi(nuclei_walkers.at(i), p, monoStructureCouplings(q_num, i));
     }
 
     return dell_alpha_phi;
@@ -164,7 +275,7 @@ double NBodyTransform::phi(const Walker *walker, int particle, int q_num)
     double phi = 0;
 
     for(int i = 0; i < N; i++){
-        phi += P(q_num, i)*nuclei.at(i)->phi(nuclei_walkers.at(i), particle, q_num/N);
+        phi += P(q_num, i)*nuclei.at(i)->phi(nuclei_walkers.at(i), particle, monoStructureCouplings(q_num, i));
     }
 
     return phi;
@@ -177,7 +288,7 @@ double NBodyTransform::del_phi(const Walker *walker, int particle, int q_num, in
     double del_phi = 0;
 
     for(int i = 0; i < N; i++){
-        del_phi += P(q_num, i)*nuclei.at(i)->del_phi(nuclei_walkers.at(i), particle, q_num/N, d);
+        del_phi += P(q_num, i)*nuclei.at(i)->del_phi(nuclei_walkers.at(i), particle, monoStructureCouplings(q_num, i), d);
     }
 
     return del_phi;
@@ -190,7 +301,7 @@ double NBodyTransform::lapl_phi(const Walker *walker, int particle, int q_num)
     double lapl_phi = 0;
 
     for(int i = 0; i < N; i++){
-        lapl_phi += P(q_num, i)*nuclei.at(i)->lapl_phi(nuclei_walkers.at(i), particle, q_num/N);
+        lapl_phi += P(q_num, i)*nuclei.at(i)->lapl_phi(nuclei_walkers.at(i), particle, monoStructureCouplings(q_num, i));
     }
 
     return lapl_phi;

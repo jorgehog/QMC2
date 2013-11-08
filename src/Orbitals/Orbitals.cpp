@@ -31,6 +31,8 @@ Orbitals::Orbitals(int n_p, int dim) {
     }
 
     lapl_basis_functions = new BasisFunctions*[max_implemented];
+
+    nCap = n_p;
 }
 
 Orbitals::Orbitals() {

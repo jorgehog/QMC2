@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
 
     dmcParams.therm=1000;
     dmcParams.n_c = 2000;
-    vmcParams.n_c = 1E6;
+    vmcParams.n_c = 1E5;
     dmcParams.dt = 0.00005;
 
     //    variationalParams.alpha = 1.35618;
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
     //Setting up the solver parameters
     generalParams.dim = 3;
-    generalParams.n_p = 30;
+    generalParams.n_p = 16;
 
     double R = 3.0;       //bohr radii
     double theta = 140.0; //deg
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     Oxygen2.origin << R*cos(theta) << R*sin(theta) << 0;
 
     std::vector<BodyDef> bodies;
-    bodies.push_back(Silicon);
+//    bodies.push_back(Silicon);
     bodies.push_back(Oxygen1);
     bodies.push_back(Oxygen2);
 
@@ -148,8 +148,10 @@ int main(int argc, char** argv) {
     a.tic();
 //    minimizer.minimize();
     vmc.run_method();
-    dmc.initFromVMC(&vmc);
-    dmc.run_method();
+    vmc.dump_subsamples();
+
+    //dmc.initFromVMC(&vmc);
+    //dmc.run_method();
     if (parParams.is_master) std::cout << "Time: " <<setprecision(3) << fixed << a.toc()/60 << std::endl;
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;

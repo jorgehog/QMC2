@@ -5,7 +5,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 CONFIG += CXX11
 
-LIBS += -llapack -lblas -larmadillo
+LIBS += -larmadillo
 
 SOURCES += \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
@@ -54,7 +54,9 @@ SOURCES += \
     ../src/Sampler/sampleMethods/SampleForce.cpp \
     ../src/forcesMain.cpp \
     ../src/Orbitals/NBodyTransform/nbodytransform.cpp \
-    ../src/Potential/MolecularCoulomb/molecularcoulomb.cpp
+    ../src/Potential/MolecularCoulomb/molecularcoulomb.cpp \
+    ../src/Orbitals/Gaussians/gaussians.cpp \
+    ../src/Orbitals/Gaussians/gassianset.cpp
     
 
 HEADERS += \
@@ -106,7 +108,9 @@ HEADERS += \
     ../src/defines.h \
     ../src/Sampler/sampleMethods/SampleForce.h \
     ../src/Orbitals/NBodyTransform/nbodytransform.h \
-    ../src/Potential/MolecularCoulomb/molecularcoulomb.h
+    ../src/Potential/MolecularCoulomb/molecularcoulomb.h \
+    ../src/Orbitals/Gaussians/gaussians.h \
+    ../src/Orbitals/Gaussians/gassianset.h
 
 ABEL {
     ARMAPATH = /usit/abel/u1/jorgehog/libs/armadillo-3.920.1
@@ -115,7 +119,6 @@ ABEL {
                 /cluster/software/VERSIONS/intel-2013.2/mkl/include \
                 .
 
-    LIBS -= -llapack -lblas
     LIBS +=  -L/cluster/software/VERSIONS/intel-2013.2/mkl/lib/intel64 \
              -L$$ARMAPATH/usr/lib64 \
              -lpthread \
@@ -151,7 +154,8 @@ ABEL {
 
 !ABEL {
     #remove this line if you don't use ccache
-    QMAKE_CXX = ccache $$QMAKE_CXX
+#    QMAKE_CXX = ccache $$QMAKE_CXX
+    LIBS += -L/usr/lib/openblas-base -lopenblas
 }
 
 DEFINES += LINED_OUTPUT
