@@ -122,14 +122,21 @@ class gaussians(orbitalGenerator):
          
     def extraToFile(self, path):
         
-        s = ""
+        s = "int px = powers(0);\nint py = powers(1);\nint pz = powers(2);\n\n"
         for i in range(self.maxImplemented/2):
-            nx,ny,nz = self.stateMap[i]
-            s += "qnums(%d, 0) = %d; qnums(%d, 1) = %d; qnums(%d, 2) = %d;\n" % (i, nx,
-                                                                                 i, ny,
-                                                                                 i, nz)
+            px,py,pz = self.stateMap[i]
+            s += """if ((px == %d) && (py == %d) && (pz == %d)) {
+phi = new gaussians___N__(expFactor, alpha);            
+del_phi_x = new dell_gaussians___N___x(expFactor, alpha);
+del_phi_y = new dell_gaussians___N___y(expFactor, alpha);
+del_phi_z = new dell_gaussians___N___z(expFactor, alpha);
+lapl_phi = new lapl_gaussians___N__(expFactor, alpha);
+}
+""".replace("__N__", "%d%d%d" % (px, py, pz)) % (px, py, pz)
+            
+            
         
-        with open(pjoin(path, "%s_qnums.cpp" % self.name), 'w') as f:
+        with open(pjoin(path, "%s_powerselector.cpp" % self.name), 'w') as f:
             f.write(s)
             f.close()
             

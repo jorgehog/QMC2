@@ -12,12 +12,12 @@ def main():
     outPath = pjoin(os.getcwd(), "output")    
     
 #    orbitalSet = HO.HOOrbitals(56)
-    orbitalSet = gaussians.gaussians(10)
+    orbitalSet = gaussians.gaussians(200)
 #    orbitalSet = HO_3D.HOOrbitals3D(40)
     orbitalSet.closedFormify()
     orbitalSet.TeXToFile(outPath)
     orbitalSet.CPPToFile(outPath)
-#    orbitalSet.extraToFile(outPath)
+    orbitalSet.extraToFile(outPath)
     
     
 
