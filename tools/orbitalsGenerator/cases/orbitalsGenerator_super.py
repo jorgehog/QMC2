@@ -11,7 +11,7 @@ from sympy import (sympify,
                    
 import re as regxp
 from math import ceil
-from subprocess import call
+from subprocess import call, PIPE
 
 import sys, os
 from os.path import join as pjoin
@@ -59,6 +59,9 @@ class orbitalGenerator(object):
    
         self.initCPPbasis()
         self.cppBasis.make(self)
+
+    def getNameFromIndex(self, i):
+        return str(i)
 
     def extraToFile(self, path):
         return;        
@@ -220,6 +223,7 @@ class orbitalGenerator(object):
             score += 2
         
         return score        
+    
         
     def getOptimizedHits(self, raw):
         
@@ -288,28 +292,33 @@ class orbitalGenerator(object):
         for i in range(self.maxImplemented/2):
             qNums = self.stateMap[i]
  
-            
             simple = self.simplifyLocal(self.orbitals[i], qNums, subs=False)
-
-            numer, denom = simple.as_numer_denom()
-            numer = self.simplifyLocal(numer, qNums, subs=False)
             
+      
+            
+            
+            numer, denom = simple.as_numer_denom()
+#            numer = self.simplifyLocal(numer, qNums, subs=False)
+            
+#            if i != 4:
+#                continue
+        
             if numer != 1:
       
                 numFac = numer.as_independent(x, y, z)[0]
                 singleFactor = len(numer.as_ordered_terms()) == 1 and numFac == numer
-               
-                if numFac != 1 and (numFac not in numer.as_ordered_terms() or singleFactor):     
-                    numer = numer/numFac
 
-                
+                   
+#                if numFac != 1 and (numFac not in numer.as_ordered_terms() or singleFactor):     
+                numer = numer/abs(numFac)
+               
             if denom != 1:
                 
                 numFac = denom.as_independent(x, y, z)[0]
                 singleFactor = len(denom.as_ordered_terms()) == 1 and numFac == denom
                
-                if numFac != 1 and (numFac not in denom.as_ordered_terms() or singleFactor):
-                    denom = denom/numFac
+#                if numFac != 1 and (numFac not in denom.as_ordered_terms() or singleFactor):
+                denom = denom/abs(numFac)
             
             numer = self.simplifyLocal(numer, qNums, subs=False)
             self.orbitals[i] = numer/denom
@@ -470,7 +479,7 @@ class orbitalGenerator(object):
         
         cwd = os.getcwd()
         os.chdir(path)
-        call(["pdflatex", pjoin(path, '%s.tex' % self.name)])
+        call(["pdflatex", pjoin(path, '%s.tex' % self.name)], stdout=PIPE)
         os.chdir(cwd)
 
     def makeCPP(self):

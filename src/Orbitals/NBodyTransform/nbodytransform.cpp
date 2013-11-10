@@ -4,12 +4,13 @@
 
 #include "../../Walker/Walker.h"
 
-#include "../AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
-#include "../hydrogenicOrbitals/hydrogenicOrbitals.h"
+#include "../../Orbitals/OrbitalsFactory.h"
 
 #include <iostream>
 
-NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_SYSTEMS system, const std::vector<BodyDef> &bodies) :
+NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP,
+                               const std::vector<BodyDef> &bodies,
+                               OrbitalsFactory &factory) :
     Orbitals(gP.n_p, gP.dim),
     N(0)
 {
@@ -22,6 +23,7 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
     populations.set_size(bodies.size());
 
     for (const BodyDef & body : bodies) {
+
         bodyParams.n_p = body.n_p_local;
 
         populations(N) = body.n_p_local;
@@ -29,33 +31,13 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
         nuclei_walkers.push_back(new Walker(n_p, gP.dim));
         origins.push_back(body.origin);
 
-        switch (system) {
-        case ATOMS:
-
-            name = "Molecule";
-
-            nuclei.push_back(new hydrogenicOrbitals(bodyParams, vP));
-            break;
-
-        case QDOTS:
-
-            name = "QDotLattice";
-
-            nuclei.push_back(new AlphaHarmonicOscillator(bodyParams, vP));
-            break;
-
-        default:
-
-            std::cout << "System valued" << system << " has not been implemented for DiTransform." << std::endl;
-            exit(1);
-
-            break;
-        }
-
+        nuclei.push_back(factory.create(bodyParams, vP));
         NTot += body.n_p_local;
         N++;
 
     }
+
+    name = TOSTR(N) + ("bodyTransformed" + nuclei.at(N-1)->getName());
 
     if (N <= 1) {
         std::cout << "No bodies transformed..." << std::endl;
@@ -307,10 +289,4 @@ double NBodyTransform::lapl_phi(const Walker *walker, int particle, int q_num)
     return lapl_phi;
 }
 
-void NBodyTransform::debug()
-{
-    std::cout << *((hydrogenicOrbitals*)nuclei.at(0))->exp_factor_n1 << std::endl;
-    std::cout << *((hydrogenicOrbitals*)nuclei.at(1))->exp_factor_n1 << std::endl;
-    std::cout << *((hydrogenicOrbitals*)nuclei.at(1))->k << std::endl;
-}
 

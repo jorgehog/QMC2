@@ -1,7 +1,7 @@
 #ifndef NBODYTRANSFORM_H
 #define NBODYTRANSFORM_H
 
-#include "../Orbitals.h"
+#include "../OrbitalsFactory.h"
 
 struct GeneralParams;
 struct VariationalParams;
@@ -14,8 +14,9 @@ struct BodyDef {
 class NBodyTransform : public Orbitals
 {
 public:
-    NBodyTransform(GeneralParams & gP, VariationalParams & vp,
-                   TRANS_SYSTEMS system, const std::vector<BodyDef> & bodies);
+    NBodyTransform(GeneralParams & gP, VariationalParams &vP,
+                   const std::vector<BodyDef> & bodies,
+                   OrbitalsFactory &factory);
 
     friend class MolecularCoulomb;
 protected:

@@ -182,6 +182,12 @@ double Orbitals::get_sp_energy(int qnum) const {
     return 0;
 }
 
+Orbitals::Orbitals(GeneralParams &gP, VariationalParams &vP)
+{
+    (void) gP;
+    (void) vP;
+}
+
 void Orbitals::testDell(const Walker* walker, int particle, int q_num, int d) {
     double cf = dell_basis_functions[d][q_num]->eval(walker, particle);
     double num = num_diff(walker, particle, q_num, d);

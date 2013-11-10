@@ -13,12 +13,8 @@
 class QMC;
 class BasisFunctions;
 class Walker;
-
-
-enum TRANS_SYSTEMS {
-    ATOMS,
-    QDOTS
-};
+struct GeneralParams;
+struct VariationalParams;
 
 /*! \brief Superclass for the single particle orbital classes.
  * Handles everything specific regarding choice of single particle basis.
@@ -127,6 +123,7 @@ protected:
 
 public:
 
+    Orbitals(GeneralParams &gP, VariationalParams &vP);
     Orbitals(int n_p, int dim);
     Orbitals();
 
@@ -169,9 +166,6 @@ public:
     std::string getName() const {
         return name;
     }
-
-
-    virtual void debug() {}
 
     friend class HartreeFock;
     friend class Minimizer;

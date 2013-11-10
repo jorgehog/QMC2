@@ -24,15 +24,15 @@
 #include "OutputHandler/stdoutDMC/stdoutDMC.h"
 #include "OutputHandler/Distribution/Distribution.h"
 
+#include "Orbitals/OrbitalsFactory.h"
 #include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
 #include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
-#include "Orbitals/DiTransform/DiTransform.h"
+#include "Orbitals/Gaussians/oxygen3-21G/oxygen3_21g.h"
 #include "Orbitals/NBodyTransform/nbodytransform.h"
-//#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
+#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
 
 #include "Potential/AtomCore/AtomCore.h"
 #include "Potential/Coulomb/Coulomb.h"
-#include "Potential/DiAtomCore/DiAtomCore.h"
 #include "Potential/DoubleWell/DoubleWell.h"
 #include "Potential/Harmonic_osc/Harmonic_osc.h"
 #include "Potential/MolecularCoulomb/molecularcoulomb.h"
@@ -83,8 +83,10 @@ int main(int argc, char** argv) {
     //    variationalParams.beta =  0.28;
     //    generalParams.R = 1.4;
 
-    variationalParams.alpha = 1.1451;
-    variationalParams.beta =  0.31;
+//    variationalParams.alpha = 1.1451;
+//    variationalParams.beta =  0.31;
+
+    variationalParams.alpha = 1;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
@@ -98,37 +100,46 @@ int main(int argc, char** argv) {
     generalParams.dim = 3;
     generalParams.n_p = 16;
 
-    double R = 3.0;       //bohr radii
-    double theta = 140.0; //deg
+    double R = 2.282;       //bohr radii
+    double theta = 180.0; //deg
 
     theta *= arma::datum::pi/180;//dmcE: -433.274597 | E_T: -433.357147 | Nw:   957 | 100.0%
 
 
-    BodyDef Silicon;
-    Silicon.n_p_local = 14;
-    Silicon.origin << 0 << 0 << 0;
+//    BodyDef Silicon;
+//    Silicon.n_p_local = 14;
+//    Silicon.origin << 0 << 0 << 0;
 
     BodyDef Oxygen1;
     Oxygen1.n_p_local = 8;
-    Oxygen1.origin << R << 0 << 0;
+    Oxygen1.origin << R/2 << 0 << 0;
 
     BodyDef Oxygen2;
     Oxygen2.n_p_local = 8;
-    Oxygen2.origin << R*cos(theta) << R*sin(theta) << 0;
+    Oxygen2.origin << -R/2 << 0 << 0;
 
     std::vector<BodyDef> bodies;
 //    bodies.push_back(Silicon);
     bodies.push_back(Oxygen1);
     bodies.push_back(Oxygen2);
 
-    NBodyTransform *Molecule = new NBodyTransform(generalParams, variationalParams, ATOMS, bodies);
+    arma::mat C;
+    C.load("/home/jorgehog/tmp/HF_O2.dat");
+
+    OrbitalsFactory expBasisFactory(OXYGEN3_21G);
+    OrbitalsFactory factory(EXPANDED);
+    factory.basisForExpanded = &expBasisFactory;
+    factory.C = C;
+
+    NBodyTransform *Molecule = new NBodyTransform(generalParams, variationalParams, bodies, factory);
     systemObjects.SP_basis = Molecule;
     Fermions system(generalParams, Molecule);
     system.add_potential(new MolecularCoulomb(generalParams, Molecule));
     system.add_potential(new Coulomb(generalParams));
     systemObjects.system = &system;
 
-    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
+//    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
+    systemObjects.jastrow = new No_Jastrow();
     systemObjects.sample_method = new Importance(generalParams);
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
