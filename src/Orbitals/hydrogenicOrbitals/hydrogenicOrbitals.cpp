@@ -143,9 +143,9 @@ void hydrogenicOrbitals::set_qnum_indie_terms(Walker* walker, int i) {
 
     double kr = -(*k) * walker->get_r_i(i);
     *exp_factor_n1 = exp(kr);
-    if (n_p > 2) *exp_factor_n2 = exp(kr / 2);
-    if (n_p > 10) *exp_factor_n3 = exp(kr / 3);
-    if (n_p > 28) *exp_factor_n4 = exp(kr / 4);
+    if (nCap > 2) *exp_factor_n2 = exp(kr / 2);
+    if (nCap > 10) *exp_factor_n3 = exp(kr / 3);
+    if (nCap > 28) *exp_factor_n4 = exp(kr / 4);
 
 }
 
@@ -642,7 +642,7 @@ double hydrogenicOrbitals::get_sp_energy(int qnum) const {
 }
 
 void hydrogenicOrbitals::get_qnums() {
-    int n2 = 5;
+    int n2 = 20;
     qnums.set_size(n2, dim);
 
     int i = 0;
@@ -650,6 +650,9 @@ void hydrogenicOrbitals::get_qnums() {
     while (i < n2) {
 
         for (int l = 0; l < n; l++) {
+
+            if (i == n2) break;
+
             qnums(i, 0) = n;
             qnums(i, 1) = l;
             qnums(i, 2) = 0;

@@ -9,7 +9,7 @@ class CPPBasis:
 
         self.xi = ['x', 'y', 'z']
         
-        self.includes = ["../../QMCheaders.h"]        
+        self.includes = ["../../Walker/Walker.h"]        
         
         self.name = 'undefined'        
         
@@ -35,28 +35,33 @@ public:
 
 };
 '''
-                                        
-        self.subClassShell = '''
-class __name__ : public __superName__ {
-public:
-
-    __name__(__constArgs__);
-    virtual double eval(const Walker* walker, int i);
-
-};
-'''
 
         self.supClassConstShell = '''__name__::__name__(__constArgs__) {
 __statements__
 }
 '''
 
-        self.subClassConstShell = '''
-__name__::__name__(__constArgs__)
-: __superName__(__constArgsRaw__) {
-__statements__
-}
+
+                                        
+        self.subClassShell = '''
+class __name__ : public __superName__ {
+public:
+
+    __name__(__constArgs__) : __superName__(__constArgsRaw__) {
+        __statements__
+    }
+        
+    virtual double eval(const Walker* walker, int i);
+
+};
 '''
+
+#        self.subClassConstShell = '''
+#__name__::__name__(__constArgs__)
+#: __superName__(__constArgsRaw__) {
+#__statements__
+#}
+#'''
     
         self.evalShell = '''
 double __name__::eval(const Walker* walker, int i) {
@@ -78,14 +83,6 @@ __includes__
 //Superclass Constructor
 __superClassConst__
 
-
-/*
-    Subclass Constructors
-*/
-
-__subclassConst__
-
-
 /*
     Subclass Eval functions
 */
@@ -93,10 +90,10 @@ __subclassConst__
 __subclassEval__
 """        
 
-        self.rawH = """
-        
-#ifndef __nameUpper___H
+        self.rawH = """#ifndef __nameUpper___H
 #define __nameUpper___H 
+
+#include "../BasisFunctions.h"
 
 //Superclass 
 __superClass__
@@ -126,7 +123,7 @@ __subClass__
         self.subClassShell = self.subClassShell.replace("__superName__", superName) 
         
         self.supClassConstShell = self.supClassConstShell.replace("__name__", superName)
-        self.subClassConstShell = self.subClassConstShell.replace("__superName__", superName)
+#        self.subClassConstShell = self.subClassConstShell.replace("__superName__", superName)
         
         args = ""
         argsRaw = ""
@@ -147,13 +144,13 @@ __subClass__
         
         self.supClassConstShell = \
             self.supClassConstShell.replace("__constArgs__", args)
-        self.subClassConstShell = \
-            self.subClassConstShell.replace("__constArgs__", args)
-        self.subClassConstShell = \
-            self.subClassConstShell.replace("__constArgsRaw__", argsRaw)
+#        self.subClassConstShell = \
+#            self.subClassConstShell.replace("__constArgs__", args)
+#        self.subClassConstShell = \
+#            self.subClassConstShell.replace("__constArgsRaw__", argsRaw)
             
         self.supClassShell = self.supClassShell.replace("__constArgs__", args)
-        self.subClassShell = self.subClassShell.replace("__constArgs__", args)
+        self.subClassShell = self.subClassShell.replace("__constArgs__", args).replace("__constArgsRaw__", argsRaw)
         
         supConstStatements = ""
         for arg in argsRaw.split(","):
@@ -184,6 +181,10 @@ __subClass__
         self.rawH = self.rawH.replace("__nameUpper__", superName.upper())
 
         includes = ""        
+        thisHeader = superName + ".h"
+        if thisHeader not in self.includes:
+            self.includes = [thisHeader] + self.includes
+        
         for include in self.includes:
             includes += "#include \"%s\"\n" % include
 
@@ -197,29 +198,29 @@ __subClass__
         EVAL = {}        
         
         #H part
-        H    = self.subClassShell.replace("__name__", name)
-        CPP  = self.subClassConstShell.replace("__name__", name)
+        H    = self.subClassShell.replace("__name__", name).replace("__statements__", cppConstStatements)
+#        CPP  = self.subClassConstShell.replace("__name__", name)
         EVAL["phi"] = self.evalShell.replace("__name__", name)
         
         nameDell = "dell_" + name + "_"    
         
-        
         for i in range(self.dim):
             xi = self.xi[i]
             dimName = nameDell + xi
-            H    += self.subClassShell.replace("__name__", dimName)
-            CPP  += self.subClassConstShell.replace("__name__", dimName)
+            H    += self.subClassShell.replace("__name__", dimName).replace("__statements__", cppConstStatements)
+#            CPP  += self.subClassConstShell.replace("__name__", dimName)
             EVAL["d" + xi] = self.evalShell.replace("__name__", dimName)
             
         laplName = "lapl_" + name
         
-        H   += self.subClassShell.replace("__name__", laplName)
-        CPP += self.subClassConstShell.replace("__name__", laplName)   
+        H   += self.subClassShell.replace("__name__", laplName).replace("__statements__", cppConstStatements)
+#        CPP += self.subClassConstShell.replace("__name__", laplName)   
         EVAL["lapl"] = self.evalShell.replace("__name__", laplName)
         
-        CPP = CPP.replace("__statements__", cppConstStatements)
+#        CPP = CPP.replace("__statements__", cppConstStatements)
         
-        return H, CPP, EVAL
+#        return H, CPP, EVAL
+        return H, EVAL
     
     def setConstVars(self, *args):
         for arg in args:
@@ -254,25 +255,42 @@ __subClass__
     
         return orbConstState
     
-    def updateExpressions(self, constCPP, evalCPP, constH, orbitals, i):
+    def updateExpressions(self, evalCPP, constH, orbitals, i):
         
         size = 60        
         sep = self.getSeparator(size=size, header="  END %d  " % i)    
         
-        name = "%s_%d" % (self.name, i)        
-        H, CPP, EVAL = self.makeSubclasses(name)
+        name = "%s_%s" % (self.name, orbitals.getNameFromIndex(i))        
+#        H, CPP, EVAL = self.makeSubclasses(name)
+        H, EVAL = self.makeSubclasses(name)
         
         constH += H + sep
-        constCPP += CPP + sep
+#        constCPP += CPP + sep
    
         evalCPP += self.getEvalFunc(EVAL, orbitals, i) + sep
         
         
-        return constCPP, evalCPP, constH
+#        return constCPP, evalCPP, constH
+        return evalCPP, constH
     
     def getEvalExpr(self, orbitals, raw, expr, i):
         
         nec, simple, preCalc, ret = orbitals.getCCode(expr, i)
+        
+        walkerUnused = True
+        iUnused = True
+        for e in [nec, simple, preCalc, ret]:
+            if "walker" in e:
+                walkerUnused = False
+            if "(i" in e or "i)" in e or ", i" in e or ",i" in e:
+                iUnused = False
+
+        if (walkerUnused or iUnused) and not nec:
+            nec = "\n\n" + nec                
+        if walkerUnused:
+            nec += "    (void) walker;\n"
+        if iUnused:
+            nec += "    (void) i;\n"
         
         return raw.replace("\n\n__necessities__", nec).\
                 replace("__preCalc__", preCalc).\
@@ -310,16 +328,14 @@ __subClass__
         
         orbConstState = ["", "", ""]
         
-        constCPP = ""
         evalCPP = ""
         constH = ""
         for i in range(orbitals.maxImplemented/2):
         
             orbConstState = self.updateOrbConstState(orbConstState, orbitals, i)
             
-            constCPP, evalCPP, constH =\
-                self.updateExpressions(constCPP, 
-                                       evalCPP, 
+            evalCPP, constH =\
+                self.updateExpressions(evalCPP, 
                                        constH, 
                                        orbitals, 
                                        i)
@@ -329,7 +345,7 @@ __subClass__
         self.constStatesOrbitals = "\n".join(orbConstState)
         
         self.rawH = self.rawH.replace("__subClass__", constH)
-        self.rawCPP = self.rawCPP.replace("__subclassConst__", constCPP)
+#        self.rawCPP = self.rawCPP.replace("__subclassConst__", constCPP)
         self.rawCPP = self.rawCPP.replace("__subclassEval__", evalCPP)
     
     def getH(self):

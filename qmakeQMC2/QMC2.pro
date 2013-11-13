@@ -5,12 +5,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 CONFIG += CXX11
 
-LIBS += -llapack -lblas -larmadillo
+LIBS += -larmadillo
 
 SOURCES += \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
     ../src/BasisFunctions/hydrogenic/hydrogenic.cpp \
+    ../src/BasisFunctions/Gaussians/gaussians.cpp \
     ../src/Diffusion/Diffusion.cpp \
     ../src/Diffusion/Fokker_Planck/Fokker_Planck.cpp \
     ../src/Diffusion/RNGs/gaussian_deviate.cpp \
@@ -27,17 +28,16 @@ SOURCES += \
     ../src/Minimizer/ASGD/ASGD.cpp \
     ../src/Minimizer/Minimizer.cpp \
     ../src/Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.cpp \
-    ../src/Orbitals/DiTransform/DiTransform.cpp \
-    ../src/Orbitals/ExpandedBasis/ExpandedBasis.cpp \
     ../src/Orbitals/Orbitals.cpp \
     ../src/Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.cpp \
+    ../src/Orbitals/Gaussians/gaussianfitted.cpp \
+    ../src/Orbitals/Gaussians/oxygen3-21G/oxygen3_21G.cpp \
     ../src/OutputHandler/Distribution/Distribution.cpp \
     ../src/OutputHandler/OutputHandler.cpp \
     ../src/OutputHandler/stdoutASGD/stdoutASGD.cpp \
     ../src/OutputHandler/stdoutDMC/stdoutDMC.cpp \
     ../src/Potential/AtomCore/AtomCore.cpp \
     ../src/Potential/Coulomb/Coulomb.cpp \
-    ../src/Potential/DiAtomCore/DiAtomCore.cpp \
     ../src/Potential/DoubleWell/DoubleWell.cpp \
     ../src/Potential/Harmonic_osc/Harmonic_osc.cpp \
     ../src/Potential/Potential.cpp \
@@ -54,15 +54,25 @@ SOURCES += \
     ../src/Sampler/sampleMethods/SampleForce.cpp \
     ../src/forcesMain.cpp \
     ../src/Orbitals/NBodyTransform/nbodytransform.cpp \
-    ../src/Potential/MolecularCoulomb/molecularcoulomb.cpp
-    
+    ../src/Potential/MolecularCoulomb/molecularcoulomb.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/basisset.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/primitiveGTO/primitiveGTO.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/contractedGTO/contractedGTO.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/splitvalence.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/o_431g.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/o_321g.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/li_321g.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/h_431g.cpp \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/h_321g.cpp
 
 HEADERS += \
     ../src/structs.h \
     ../src/BasisFunctions/BasisFunctions.h \
+    ../src/BasisFunctions/expandedbasisfunctions.h \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.h \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.h \
     ../src/BasisFunctions/hydrogenic/hydrogenic.h \
+    ../src/BasisFunctions/Gaussians/gaussians.h \
     ../src/Diffusion/Diffusion.h \
     ../src/Diffusion/Fokker_Planck/Fokker_Planck.h \
     ../src/Diffusion/RNGs/gaussian_deviate.h \
@@ -79,17 +89,18 @@ HEADERS += \
     ../src/Minimizer/ASGD/ASGD.h \
     ../src/Minimizer/Minimizer.h \
     ../src/Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h \
-    ../src/Orbitals/DiTransform/DiTransform.h \
     ../src/Orbitals/ExpandedBasis/ExpandedBasis.h \
     ../src/Orbitals/Orbitals.h \
+    ../src/Orbitals/OrbitalsFactory.h \
     ../src/Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h \
+    ../src/Orbitals/Gaussians/gaussianfitted.h \
+    ../src/Orbitals/Gaussians/oxygen3-21G/oxygen3_21G.h \
     ../src/OutputHandler/Distribution/Distribution.h \
     ../src/OutputHandler/OutputHandler.h \
     ../src/OutputHandler/stdoutASGD/stdoutASGD.h \
     ../src/OutputHandler/stdoutDMC/stdoutDMC.h \
     ../src/Potential/AtomCore/AtomCore.h \
     ../src/Potential/Coulomb/Coulomb.h \
-    ../src/Potential/DiAtomCore/DiAtomCore.h \
     ../src/Potential/DoubleWell/DoubleWell.h \
     ../src/Potential/Harmonic_osc/Harmonic_osc.h \
     ../src/Potential/Potential.h \
@@ -106,7 +117,16 @@ HEADERS += \
     ../src/defines.h \
     ../src/Sampler/sampleMethods/SampleForce.h \
     ../src/Orbitals/NBodyTransform/nbodytransform.h \
-    ../src/Potential/MolecularCoulomb/molecularcoulomb.h
+    ../src/Potential/MolecularCoulomb/molecularcoulomb.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/basisset.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/primitiveGTO/primitiveGTO.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/contractedGTO/contractedGTO.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/splitvalence.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/o_431g.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/o_321g.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/li_321g.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/h_431g.h \
+    ../src/Orbitals/Gaussians/BasisSetCodeMilad/splitValence/h_321g.h
 
 ABEL {
     ARMAPATH = /usit/abel/u1/jorgehog/libs/armadillo-3.920.1
@@ -115,7 +135,6 @@ ABEL {
                 /cluster/software/VERSIONS/intel-2013.2/mkl/include \
                 .
 
-    LIBS -= -llapack -lblas
     LIBS +=  -L/cluster/software/VERSIONS/intel-2013.2/mkl/lib/intel64 \
              -L$$ARMAPATH/usr/lib64 \
              -lpthread \
@@ -151,7 +170,8 @@ ABEL {
 
 !ABEL {
     #remove this line if you don't use ccache
-    QMAKE_CXX = ccache $$QMAKE_CXX
+#    QMAKE_CXX = ccache $$QMAKE_CXX
+#    LIBS += -L/usr/lib/openblas-base -lopenblas
 }
 
 DEFINES += LINED_OUTPUT

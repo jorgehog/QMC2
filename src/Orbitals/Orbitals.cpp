@@ -31,6 +31,8 @@ Orbitals::Orbitals(int n_p, int dim) {
     }
 
     lapl_basis_functions = new BasisFunctions*[max_implemented];
+
+    nCap = n_p;
 }
 
 Orbitals::Orbitals() {
@@ -178,6 +180,12 @@ double Orbitals::get_sp_energy(int qnum) const {
 
     //Do nothing
     return 0;
+}
+
+Orbitals::Orbitals(GeneralParams &gP, VariationalParams &vP)
+{
+    (void) gP;
+    (void) vP;
 }
 
 void Orbitals::testDell(const Walker* walker, int particle, int q_num, int d) {

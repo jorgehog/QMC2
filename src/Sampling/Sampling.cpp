@@ -81,6 +81,7 @@ void Sampling::set_trial_states(Walker * walker) {
         for (int j = 0; j < n2; j++) {
             walker->phi(i, j) = qmc->get_orbitals_ptr()->phi(walker, i, j);
         }
+
         for (int j = 0; j < n2; j++) {
             for (int k = 0; k < dim; k++) {
                 walker->dell_phi(i)(k, j) = qmc->get_orbitals_ptr()->del_phi(walker, i, j, k);

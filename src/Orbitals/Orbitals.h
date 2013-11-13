@@ -13,12 +13,8 @@
 class QMC;
 class BasisFunctions;
 class Walker;
-
-
-enum TRANS_SYSTEMS {
-    ATOMS,
-    QDOTS
-};
+struct GeneralParams;
+struct VariationalParams;
 
 /*! \brief Superclass for the single particle orbital classes.
  * Handles everything specific regarding choice of single particle basis.
@@ -28,6 +24,8 @@ protected:
     int n_p;
     int n2;
     int dim;
+
+    int nCap; //!< The highest number of states accessible
 
     int max_implemented; //!< The maximum number basis size supported for any system ##RYDD OPP
 
@@ -49,14 +47,25 @@ protected:
     /*! 
      * @param n Index of the sought variational parameter.
      */
-    virtual double get_parameter(int n) = 0;
+    virtual double get_parameter(int n) {
+        (void) n;
+
+        std::cout << "ATTEMPT TO GET PARAMETER FROM ASSUMINGLY PARAMETER FREE ORBITAL." << std::endl;
+
+        return 1.0;
+    }
 
     //! A method for setting variational parameters.
     /*!
      * @param n Index of the sought variational parameter.
      * @param parameter The new value of the variational parameter.
      */
-    virtual void set_parameter(double parameter, int n) = 0;
+    virtual void set_parameter(double parameter, int n) {
+        (void) parameter;
+        (void) n;
+
+        std::cout << "ATTEMPT TO SET PARAMETER IN ASSUMINGLY PARAMETER FREE ORBITAL." << std::endl;
+    }
 
     //! A method for calculating the variational derivative. 
     /*!
@@ -103,10 +112,18 @@ protected:
     virtual double get_coulomb_element(const arma::uvec & qnum_set);
     virtual double get_sp_energy(int qnum) const;
 
+    void set_n_p(int n_p) {
+        this->n_p = n_p;
+    }
+
+    void set_dim(int dim) {
+        this->dim = dim;
+    }
 
 
 public:
 
+    Orbitals(GeneralParams &gP, VariationalParams &vP);
     Orbitals(int n_p, int dim);
     Orbitals();
 
@@ -149,9 +166,6 @@ public:
     std::string getName() const {
         return name;
     }
-
-
-    virtual void debug() {}
 
     friend class HartreeFock;
     friend class Minimizer;

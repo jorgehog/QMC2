@@ -1,7 +1,7 @@
 #ifndef NBODYTRANSFORM_H
 #define NBODYTRANSFORM_H
 
-#include "../Orbitals.h"
+#include "../OrbitalsFactory.h"
 
 struct GeneralParams;
 struct VariationalParams;
@@ -14,8 +14,9 @@ struct BodyDef {
 class NBodyTransform : public Orbitals
 {
 public:
-    NBodyTransform(GeneralParams & gP, VariationalParams & vp,
-                   TRANS_SYSTEMS system, const std::vector<BodyDef> & bodies);
+    NBodyTransform(GeneralParams & gP, VariationalParams &vP,
+                   const std::vector<BodyDef> & bodies,
+                   OrbitalsFactory &factory);
 
     friend class MolecularCoulomb;
 protected:
@@ -39,14 +40,17 @@ private:
 
     std::vector<Walker*> nuclei_walkers;
     std::vector<Orbitals*> nuclei;
-    std::vector<int> populations;
+    arma::uvec populations;
     std::vector<arma::rowvec> origins;
 
     arma::mat r_rel_nuclei;
+    arma::umat monoStructureCouplings;
 
     void makePMatrix();
 
-    void makeRRelNucleiMatrix();
+    void makeRRelNucleiMatrix(); //-434.703048
+
+    void createMonoStructureCouplingMatrix();
 
 };
 
