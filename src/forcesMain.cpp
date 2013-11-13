@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     generalParams.random_seed = -1384354898;
 
     variationalParams.alpha = 1;//0.922925;
-//    variationalParams.beta  = 0.3477;
+    variationalParams.beta  = 0.3477;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
@@ -89,19 +89,41 @@ int main(int argc, char** argv) {
     scaleWithProcs(parParams, generalParams, minimizerParams, vmcParams, dmcParams);
 
     //Setting up the solver parameters
-    generalParams.n_p = 8;
+    generalParams.n_p = 16;
     generalParams.dim = 3;
 
+    double R = 1.8;
+    BodyDef Oxygen1;
+    Oxygen1.n_p_local = 8;
+    Oxygen1.origin << R/2 << 0 << 0;
 
-    Orbitals* Oxygen = new Oxygen3_21G();
+    BodyDef Oxygen2;
+    Oxygen2.n_p_local = 8;
+    Oxygen2.origin << -R/2 << 0 << 0;
+
+    std::vector<BodyDef> bodies;
+    //    bodies.push_back(Silicon);
+    bodies.push_back(Oxygen1);
+    bodies.push_back(Oxygen2);
+
+
+    arma::mat C;
+    C.load("../data/HartreeFock/O_321G/O_321G_HF.dat");
+
+    OrbitalsFactory expBasisFactory(OXYGEN3_21G);
+    OrbitalsFactory factory(EXPANDED);
+    factory.basisForExpanded = &expBasisFactory;
+    factory.C = C;
+
+    NBodyTransform* Oxygen = new NBodyTransform(generalParams, variationalParams, bodies, expBasisFactory);
     systemObjects.SP_basis = Oxygen;
     Fermions system(generalParams, Oxygen);
-    system.add_potential(new AtomCore(generalParams));
-//    system.add_potential(new Coulomb(generalParams));
+    system.add_potential(new MolecularCoulomb(generalParams, Oxygen));
+    system.add_potential(new Coulomb(generalParams));
     systemObjects.system = &system;
 
-//    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
-    systemObjects.jastrow = new No_Jastrow();
+    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
+    //    systemObjects.jastrow = new No_Jastrow();
     systemObjects.sample_method = new Importance(generalParams);
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
@@ -113,7 +135,7 @@ int main(int argc, char** argv) {
 
     arma::wall_clock a;
     a.tic();
-//    minimizer.minimize();
+    //    minimizer.minimize();
     vmc.run_method();
     vmc.dump_subsamples();
 

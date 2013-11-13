@@ -66,6 +66,9 @@ void GaussianFitted::addGaussianFitFromCGTOs(const ContractedGTO &CGTO)
 
 void GaussianFitted::set_qnum_indie_terms(Walker *walker, int i)
 {
+
+    walker->calc_r_i(i);
+
     for (unsigned int k = 0; k < expFactors.size(); ++k) {
         *(expFactors.at(k)) = exp(-alphas.at(k)*walker->get_r_i2(i));
     }
