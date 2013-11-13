@@ -76,11 +76,27 @@ void VMC::store_walkers() {
 
 void VMC::run_method(bool initialize) {
 
+    using namespace arma;
+    using namespace std;
+
     sampling->set_dt(dtOrig);
 
     if (initialize) {
 
         set_trial_positions();
+
+        cout << original_walker->phi << endl;
+        mat A = original_walker->phi*original_walker->inv;
+
+        for (int i = 0; i < A.n_rows; ++i) {
+            for (int j = 0; j < A.n_cols; ++j) {
+                if (A(i, j) < 0.0001) {
+                    A(i, j) = 0;
+                }
+            }
+        }
+
+        cout << A << endl;
 
         copy_walker(original_walker, trial_walker);
 

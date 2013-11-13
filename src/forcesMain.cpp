@@ -78,72 +78,39 @@ int main(int argc, char** argv) {
     dmcParams.n_c = 2000;
     vmcParams.n_c = 1E5;
     dmcParams.dt = 0.00005;
+    generalParams.random_seed = -1384354898;
 
-
-    //    variationalParams.alpha = 1.35618;
-    //    variationalParams.beta =  0.28;
-    //    generalParams.R = 1.4;
-
-//    variationalParams.alpha = 1.1451;
-//    variationalParams.beta =  0.31;
-
-    variationalParams.alpha = 1;
+    variationalParams.alpha = 0.922925;
+    variationalParams.beta  = 0.3477;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
 
-    dmcParams.n_w = 200*parParams.n_nodes;
-    minimizerParams.n_c_SGD=100*parParams.n_nodes;
-
     scaleWithProcs(parParams, generalParams, minimizerParams, vmcParams, dmcParams);
 
     //Setting up the solver parameters
+    generalParams.n_p = 2;
     generalParams.dim = 3;
-    generalParams.n_p = 16;
 
+//    gP.dim = 3;
 
-    double R = 1.8;       //bohr radii
-    double theta = 109.47; //deg
+//    sO.SP_basis = new hydrogenicOrbitals(gP, vP);
 
+//    sO.onebody_pot = new AtomCore(gP);
 
-    theta *= arma::datum::pi/180;//dmcE: -433.274597 | E_T: -433.357147 | Nw:   957 | 100.0%
+//    sO.system = new Fermions(gP, sO.SP_basis);
 
+//    sO.system->add_potential(sO.onebody_pot);
 
-
-//    BodyDef Silicon;
-//    Silicon.n_p_local = 14;
-//    Silicon.origin << 0 << 0 << 0;
-
-    BodyDef Oxygen1;
-    Oxygen1.n_p_local = 8;
-    Oxygen1.origin << R/2 << 0 << 0;
-
-    BodyDef Oxygen2;
-    Oxygen2.n_p_local = 8;
-    Oxygen2.origin << -R/2 << 0 << 0;
-
-    std::vector<BodyDef> bodies;
-//    bodies.push_back(Silicon);
-    bodies.push_back(Oxygen1);
-    bodies.push_back(Oxygen2);
-
-    arma::mat C;
-    C.load("/home/jorgehog/tmp/HF_O2.dat");
-
-    OrbitalsFactory expBasisFactory(OXYGEN3_21G);
-    OrbitalsFactory factory(EXPANDED);
-    factory.basisForExpanded = &expBasisFactory;
-    factory.C = C;
-
-    NBodyTransform *Molecule = new NBodyTransform(generalParams, variationalParams, bodies, factory);
-    systemObjects.SP_basis = Molecule;
-    Fermions system(generalParams, Molecule);
-    system.add_potential(new MolecularCoulomb(generalParams, Molecule));
+    Orbitals* Oxygen = new hydrogenicOrbitals(generalParams, variationalParams);
+    systemObjects.SP_basis = Oxygen;
+    Fermions system(generalParams, Oxygen);
+    system.add_potential(new AtomCore(generalParams));
     system.add_potential(new Coulomb(generalParams));
     systemObjects.system = &system;
 
-//    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
-    systemObjects.jastrow = new No_Jastrow();
+    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
+//    systemObjects.jastrow = new No_Jastrow();
     systemObjects.sample_method = new Importance(generalParams);
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
@@ -151,13 +118,7 @@ int main(int argc, char** argv) {
     //Creating the solver objects
     bool silent = true;
     VMC vmc(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, silent);
-//    ASGD minimizer(&vmc, minimizerParams, parParams, generalParams.runpath);
-    DMC dmc(generalParams, dmcParams, systemObjects, parParams, silent);
-
     vmc.set_error_estimator(new Blocking(vmcParams.n_c, parParams));
-    dmc.set_error_estimator(new SimpleVar(parParams));
-
-//        forceLoop(minimizer, vmc, dmc, generalParams.n_p, parParams.is_master);
 
     arma::wall_clock a;
     a.tic();
@@ -165,8 +126,6 @@ int main(int argc, char** argv) {
     vmc.run_method();
     vmc.dump_subsamples();
 
-    //dmc.initFromVMC(&vmc);
-    //dmc.run_method();
     if (parParams.is_master) std::cout << "Time: " <<setprecision(3) << fixed << a.toc()/60 << std::endl;
 
 
@@ -179,74 +138,5 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-
-void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, int n_p, bool is_master){
-
-    using namespace arma;
-
-    double f_dmc, f_vmc, f0;
-
-    int nPoints = 200;
-    double rMin = 0.1;
-    double rMax = 6;
-
-    vec rVec = linspace<vec>(rMin, rMax, nPoints);
-    vec fVec = zeros<vec>(nPoints);
-
-//    SampleForce forceSampler(R, n_p);
-//    vmc.add_subsample(&forceSampler);
-//    dmc.add_subsample(&forceSampler);
-
-
-
-    //Performing first iteration with initializations
-//    *R = rMin;
-
-    asgd.minimize();
-    vmc.run_method();
-
-//    f_vmc = forceSampler.extract_mean();
-
-//    dmc.initFromVMC(&vmc);
-//    dmc.run_method();
-
-//    f_dmc = forceSampler.extract_mean_of_means();
-
-//    f0 = 2*f_dmc - f_vmc;
-//    fVec(0) = f0;
-
-    fVec(0) = vmc.get_energy();
-
-    fVec.save("/tmp/binaryArmaVec.arma");
-
-
-
-    for (int i = 1; i < nPoints; ++i) {
-
-        double R = rVec(i);
-
-
-
-        dynamic_cast<NBodyTransform*>(vmc.get_orbitals_ptr())->update(R);
-        if (is_master) std::cout << "\nLooping R = " << R << "\n" << std::endl;
-
-        asgd.minimize(false);
-        vmc.run_method(false);
-
-//        f_vmc = forceSampler.extract_mean();
-
-//        dmc.run_method(false);
-
-//        f_dmc = forceSampler.extract_mean_of_means();
-
-//        f0 = 2*f_dmc - f_vmc;
-//        fVec(i) = f0;
-
-        fVec(i) = vmc.get_energy();
-
-        fVec.save("/tmp/binaryArmaVec.arma");
-
-    }
-}
 
 #endif //QMC2_MAIN

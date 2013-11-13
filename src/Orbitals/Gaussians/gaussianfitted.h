@@ -5,6 +5,8 @@
 
 #include "BasisSetCodeMilad/contractedGTO/contractedGTO.h"
 
+#include "BasisSetCodeMilad/splitValence/splitvalence.h"
+
 #include <vector>
 
 class gaussians;
@@ -12,7 +14,7 @@ class gaussians;
 class GaussianFitted : public Orbitals
 {
 public:
-    GaussianFitted(int n_p, int dim);
+    GaussianFitted(int n_p, int dim, SplitValence * basis);
 
 private:
     int CURRENT;
@@ -30,10 +32,7 @@ private:
 
     void getGaussianFromPGTO(const PrimitiveGTO & PGTO);
     void locateGaussianFromPowers(const arma::rowvec & powers, double alpha, double * expFactor);
-
-protected:
     void addGaussianFitFromCGTOs(const ContractedGTO & CGTO);
-
 
     // Orbitals interface
 public:

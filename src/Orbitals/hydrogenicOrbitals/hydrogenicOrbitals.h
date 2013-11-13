@@ -54,7 +54,6 @@ protected:
     double get_dell_alpha_phi(Walker* walker, int p, int qnum) ;
 
     double get_sp_energy(int qnum) const;
-    double get_coulomb_element(const arma::uvec & qnum_set);
 
     void get_qnums();
 

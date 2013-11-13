@@ -4,11 +4,17 @@
 #include "../../BasisFunctions/Gaussians/gaussians.h"
 
 
-GaussianFitted::GaussianFitted(int n_p, int dim) :
+GaussianFitted::GaussianFitted(int n_p, int dim, SplitValence * basis) :
     Orbitals(n_p, dim),
     CURRENT(0)
 {
     name = "gaussianFitted";
+
+
+    for (int i = 0; i < basis->getNumContracted(); ++i) {
+        addGaussianFitFromCGTOs(basis->getContracted(i));
+    }
+
 }
 
 void GaussianFitted::getGaussianFromPGTO(const PrimitiveGTO &PGTO)

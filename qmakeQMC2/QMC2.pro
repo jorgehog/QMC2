@@ -8,6 +8,7 @@ CONFIG += CXX11
 LIBS += -larmadillo
 
 SOURCES += \
+    ../src/forcesMain.cpp \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
     ../src/BasisFunctions/hydrogenic/hydrogenic.cpp \
@@ -52,7 +53,6 @@ SOURCES += \
     ../src/System/System.cpp \
     ../src/Walker/Walker.cpp \
     ../src/Sampler/sampleMethods/SampleForce.cpp \
-    ../src/forcesMain.cpp \
     ../src/Orbitals/NBodyTransform/nbodytransform.cpp \
     ../src/Potential/MolecularCoulomb/molecularcoulomb.cpp \
     ../src/Orbitals/Gaussians/BasisSetCodeMilad/basisset.cpp \

@@ -237,6 +237,7 @@ void selectSystem(MainFileParams &mP,
     using namespace QMC2;
 
     System* system;
+    Potential* onebody_pot;
 
     switch (mP.system) {
     case SYSTEMS::QDots:
@@ -244,10 +245,10 @@ void selectSystem(MainFileParams &mP,
 
         sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
 
-        sO.onebody_pot = new Harmonic_osc(gP);
+        onebody_pot = new Harmonic_osc(gP);
 
         sO.system = new Fermions(gP, sO.SP_basis);
-        sO.system->add_potential(sO.onebody_pot);
+        sO.system->add_potential(onebody_pot);
 
         break;
 
@@ -257,10 +258,10 @@ void selectSystem(MainFileParams &mP,
 
         sO.SP_basis = new AlphaHarmonicOscillator(gP, vP);
 
-        sO.onebody_pot = new Harmonic_osc(gP);
+        onebody_pot = new Harmonic_osc(gP);
 
         sO.system = new Fermions(gP, sO.SP_basis);
-        sO.system->add_potential(sO.onebody_pot);
+        sO.system->add_potential(onebody_pot);
 
         break;
 
@@ -270,11 +271,11 @@ void selectSystem(MainFileParams &mP,
 
         sO.SP_basis = new hydrogenicOrbitals(gP, vP);
 
-        sO.onebody_pot = new AtomCore(gP);
+        onebody_pot = new AtomCore(gP);
 
         sO.system = new Fermions(gP, sO.SP_basis);
 
-        sO.system->add_potential(sO.onebody_pot);
+        sO.system->add_potential(onebody_pot);
 
         break;
 
@@ -282,10 +283,10 @@ void selectSystem(MainFileParams &mP,
 
         gP.dim = 3;
 
-        sO.SP_basis = new DiTransform(gP, vP, ATOMS);
+//        sO.SP_basis = new DiTransform(gP, vP, ATOMS);
 
         system = new Fermions(gP, sO.SP_basis);
-        system->add_potential(new DiAtomCore(gP));
+//        system->add_potential(new DiAtomCore(gP));
 
         sO.system = system;
 
@@ -295,10 +296,10 @@ void selectSystem(MainFileParams &mP,
 
         gP.dim = 2;
 
-        sO.SP_basis = new DiTransform(gP, vP, QDOTS);
+//        sO.SP_basis = new DiTransform(gP, vP, QDOTS);
 
         system = new Fermions(gP, sO.SP_basis);
-        system->add_potential(new DoubleWell(gP));
+        system->add_potential(new DoubleWell(gP, 1));
 
         sO.system = system;
 
@@ -375,7 +376,7 @@ void parseCML(int argc, char** argv,
         if (def.compare(argv[2]) != 0) generalParams.n_p = atoi(argv[2]);
         if (def.compare(argv[3]) != 0) generalParams.dim = atoi(argv[3]);
         if (def.compare(argv[4]) != 0) generalParams.systemConstant = atof(argv[4]);
-        if (def.compare(argv[5]) != 0) generalParams.R = atof(argv[5]);
+//        if (def.compare(argv[5]) != 0) generalParams.R = atof(argv[5]);
 
 
 
@@ -506,7 +507,7 @@ void parseCML(int argc, char** argv,
             std::cout << " 5" << " generalParams.n_p               " << " = " << generalParams.n_p << "   " << argv[5] << std::endl;
             std::cout << " 6" << " generalParams.dim               " << " = " << generalParams.dim << "   " << argv[6] << std::endl;
             std::cout << " 7" << " generalParams.systemConstant    " << " = " << generalParams.systemConstant << "   " << argv[7] << std::endl;
-            std::cout << " 8" << " generalParams.R                 " << " = " << generalParams.R << "   " << argv[8] << std::endl;
+//            std::cout << " 8" << " generalParams.R                 " << " = " << generalParams.R << "   " << argv[8] << std::endl;
             std::cout << " 9" << " generalParams.random_seed       " << " = " << generalParams.random_seed << "   " << argv[9] << std::endl;
             std::cout << "10" << " generalParams.doMIN             " << " = " << mP.doMIN << "   " << argv[10] << std::endl;
             std::cout << "11" << " generalParams.doVMC             " << " = " << mP.doVMC << "   " << argv[11] << std::endl;
