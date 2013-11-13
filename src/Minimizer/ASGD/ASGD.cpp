@@ -108,6 +108,7 @@ void ASGD::minimize(bool initialize) {
         if (is_master) ASGDout->reset();
     }
 
+
     for (sample = 1; sample <= SGDsamples; sample++) {
 
         E = 0;

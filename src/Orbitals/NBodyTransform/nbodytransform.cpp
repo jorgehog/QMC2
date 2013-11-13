@@ -68,6 +68,8 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP, TRANS_S
 
     makePMatrix();
 
+    std::cout << P << std::endl;
+
 }
 
 void NBodyTransform::makePMatrix()
@@ -85,7 +87,7 @@ void NBodyTransform::makePMatrix()
     for (int i = 0; i < N; ++i) {
         n_p_local = populations.at(i);
 
-        tmp.col(i) *= ((double)n_p_local)/n_p;
+        tmp.col(i) *= n_p_local;
 
 //        nFac += n_p_local*n_p_local;
     }
@@ -201,5 +203,13 @@ void NBodyTransform::debug()
     std::cout << *((hydrogenicOrbitals*)nuclei.at(0))->exp_factor_n1 << std::endl;
     std::cout << *((hydrogenicOrbitals*)nuclei.at(1))->exp_factor_n1 << std::endl;
     std::cout << *((hydrogenicOrbitals*)nuclei.at(1))->k << std::endl;
+}
+
+void NBodyTransform::update(double R)
+{
+    double theta = 109.47; //deg
+    origins.at(1) << R << 0 << 0;
+    origins.at(2) << R*cos(theta) << R*sin(theta) << 0;
+    makeRRelNucleiMatrix();
 }
 

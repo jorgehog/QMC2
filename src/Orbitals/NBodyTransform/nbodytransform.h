@@ -31,6 +31,7 @@ public:
 
     void debug();
 
+    void update(double R);
 private:
 
     int N;

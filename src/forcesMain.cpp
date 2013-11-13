@@ -52,7 +52,7 @@
 #include <iomanip>
 #include <vector>
 
-void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, double *R, int n_p, bool is_master);
+void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, int n_p, bool is_master);
 
 int main(int argc, char** argv) {
 
@@ -79,6 +79,7 @@ int main(int argc, char** argv) {
     vmcParams.n_c = 1E6;
     dmcParams.dt = 0.00005;
 
+
     //    variationalParams.alpha = 1.35618;
     //    variationalParams.beta =  0.28;
     //    generalParams.R = 1.4;
@@ -98,28 +99,28 @@ int main(int argc, char** argv) {
     generalParams.dim = 3;
     generalParams.n_p = 30;
 
-    double R = 3.0;       //bohr radii
-    double theta = 140.0; //deg
+    double R = 1.8;       //bohr radii
+    double theta = 109.47; //deg
 
     theta *= arma::datum::pi/180;//dmcE: -433.274597 | E_T: -433.357147 | Nw:   957 | 100.0%
 
 
-    BodyDef Silicon;
-    Silicon.n_p_local = 14;
-    Silicon.origin << 0 << 0 << 0;
+    BodyDef Oxygen;
+    Oxygen.n_p_local = 14;
+    Oxygen.origin << 0 << 0 << 0;
 
-    BodyDef Oxygen1;
-    Oxygen1.n_p_local = 8;
-    Oxygen1.origin << R << 0 << 0;
+    BodyDef Hydrogen1;
+    Hydrogen1.n_p_local = 8;
+    Hydrogen1.origin << R << 0 << 0;
 
-    BodyDef Oxygen2;
-    Oxygen2.n_p_local = 8;
-    Oxygen2.origin << R*cos(theta) << R*sin(theta) << 0;
+    BodyDef Hydrogen2;
+    Hydrogen2.n_p_local = 8;
+    Hydrogen2.origin << R*cos(theta) << R*sin(theta) << 0;
 
     std::vector<BodyDef> bodies;
-    bodies.push_back(Silicon);
-    bodies.push_back(Oxygen1);
-    bodies.push_back(Oxygen2);
+    bodies.push_back(Oxygen);
+    bodies.push_back(Hydrogen1);
+    bodies.push_back(Hydrogen2);
 
     NBodyTransform *Molecule = new NBodyTransform(generalParams, variationalParams, ATOMS, bodies);
     systemObjects.SP_basis = Molecule;
@@ -142,15 +143,15 @@ int main(int argc, char** argv) {
     vmc.set_error_estimator(new Blocking(vmcParams.n_c, parParams));
     dmc.set_error_estimator(new SimpleVar(parParams));
 
-    //    forceLoop(minimizer, vmc, dmc, &generalParams.R, generalParams.n_p, parParams.is_master);
+        forceLoop(minimizer, vmc, dmc, generalParams.n_p, parParams.is_master);
 
-    arma::wall_clock a;
-    a.tic();
+//    arma::wall_clock a;
+//    a.tic();
 //    minimizer.minimize();
-    vmc.run_method();
-    dmc.initFromVMC(&vmc);
-    dmc.run_method();
-    if (parParams.is_master) std::cout << "Time: " <<setprecision(3) << fixed << a.toc()/60 << std::endl;
+//    vmc.run_method();
+//    dmc.initFromVMC(&vmc);
+//    dmc.run_method();
+//    if (parParams.is_master) std::cout << "Time: " <<setprecision(3) << fixed << a.toc()/60 << std::endl;
 
     if (parParams.is_master) cout << "~.* QMC fin *.~" << endl;
 
@@ -162,7 +163,7 @@ int main(int argc, char** argv) {
 }
 
 
-void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_master){
+void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, int n_p, bool is_master){
 
     using namespace arma;
 
@@ -175,19 +176,19 @@ void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_maste
     vec rVec = linspace<vec>(rMin, rMax, nPoints);
     vec fVec = zeros<vec>(nPoints);
 
-    SampleForce forceSampler(R, n_p);
-    vmc.add_subsample(&forceSampler);
-    dmc.add_subsample(&forceSampler);
+//    SampleForce forceSampler(R, n_p);
+//    vmc.add_subsample(&forceSampler);
+//    dmc.add_subsample(&forceSampler);
 
 
 
     //Performing first iteration with initializations
-    *R = rMin;
+//    *R = rMin;
 
     asgd.minimize();
     vmc.run_method();
 
-    f_vmc = forceSampler.extract_mean();
+//    f_vmc = forceSampler.extract_mean();
 
 //    dmc.initFromVMC(&vmc);
 //    dmc.run_method();
@@ -197,20 +198,25 @@ void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_maste
 //    f0 = 2*f_dmc - f_vmc;
 //    fVec(0) = f0;
 
-    fVec(0) = f_vmc;
+    fVec(0) = vmc.get_energy();
 
     fVec.save("/tmp/binaryArmaVec.arma");
 
+
+
     for (int i = 1; i < nPoints; ++i) {
 
-        *R = rVec(i);
+        double R = rVec(i);
 
-        if (is_master) std::cout << "\nLooping R = " << *R << "\n" << std::endl;
+
+
+        dynamic_cast<NBodyTransform*>(vmc.get_orbitals_ptr())->update(R);
+        if (is_master) std::cout << "\nLooping R = " << R << "\n" << std::endl;
 
         asgd.minimize(false);
         vmc.run_method(false);
 
-        f_vmc = forceSampler.extract_mean();
+//        f_vmc = forceSampler.extract_mean();
 
 //        dmc.run_method(false);
 
@@ -219,7 +225,7 @@ void forceLoop(ASGD &asgd, VMC &vmc, DMC &dmc, double *R, int n_p, bool is_maste
 //        f0 = 2*f_dmc - f_vmc;
 //        fVec(i) = f0;
 
-        fVec(i) = f_vmc;
+        fVec(i) = vmc.get_energy();
 
         fVec.save("/tmp/binaryArmaVec.arma");
 
