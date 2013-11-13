@@ -80,8 +80,8 @@ int main(int argc, char** argv) {
     dmcParams.dt = 0.00005;
     generalParams.random_seed = -1384354898;
 
-    variationalParams.alpha = 0.922925;
-    variationalParams.beta  = 0.3477;
+    variationalParams.alpha = 1;//0.922925;
+//    variationalParams.beta  = 0.3477;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
@@ -89,28 +89,19 @@ int main(int argc, char** argv) {
     scaleWithProcs(parParams, generalParams, minimizerParams, vmcParams, dmcParams);
 
     //Setting up the solver parameters
-    generalParams.n_p = 2;
+    generalParams.n_p = 8;
     generalParams.dim = 3;
 
-//    gP.dim = 3;
 
-//    sO.SP_basis = new hydrogenicOrbitals(gP, vP);
-
-//    sO.onebody_pot = new AtomCore(gP);
-
-//    sO.system = new Fermions(gP, sO.SP_basis);
-
-//    sO.system->add_potential(sO.onebody_pot);
-
-    Orbitals* Oxygen = new hydrogenicOrbitals(generalParams, variationalParams);
+    Orbitals* Oxygen = new Oxygen3_21G();
     systemObjects.SP_basis = Oxygen;
     Fermions system(generalParams, Oxygen);
     system.add_potential(new AtomCore(generalParams));
-    system.add_potential(new Coulomb(generalParams));
+//    system.add_potential(new Coulomb(generalParams));
     systemObjects.system = &system;
 
-    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
-//    systemObjects.jastrow = new No_Jastrow();
+//    systemObjects.jastrow = new Pade_Jastrow(generalParams, variationalParams);
+    systemObjects.jastrow = new No_Jastrow();
     systemObjects.sample_method = new Importance(generalParams);
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;

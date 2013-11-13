@@ -168,26 +168,6 @@ double Orbitals::lapl_phi(const Walker* walker, int particle, int q_num) {
     return lapl_basis_functions[q_num]->eval(walker, particle);
 }
 
-double Orbitals::get_coulomb_element(const arma::uvec & qnum_set) {
-    (void) qnum_set;
-
-    //Do nothing
-    return 0;
-}
-
-double Orbitals::get_sp_energy(int qnum) const {
-    (void) qnum;
-
-    //Do nothing
-    return 0;
-}
-
-Orbitals::Orbitals(GeneralParams &gP, VariationalParams &vP)
-{
-    (void) gP;
-    (void) vP;
-}
-
 void Orbitals::testDell(const Walker* walker, int particle, int q_num, int d) {
     double cf = dell_basis_functions[d][q_num]->eval(walker, particle);
     double num = num_diff(walker, particle, q_num, d);

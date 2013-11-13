@@ -32,7 +32,7 @@ SOURCES += \
     ../src/Orbitals/Orbitals.cpp \
     ../src/Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.cpp \
     ../src/Orbitals/Gaussians/gaussianfitted.cpp \
-    ../src/Orbitals/Gaussians/oxygen3-21G/oxygen3_21G.cpp \
+    ../src/Orbitals/Gaussians/oxygen3-21G/oxygen3_21g.cpp \
     ../src/OutputHandler/Distribution/Distribution.cpp \
     ../src/OutputHandler/OutputHandler.cpp \
     ../src/OutputHandler/stdoutASGD/stdoutASGD.cpp \
@@ -94,7 +94,7 @@ HEADERS += \
     ../src/Orbitals/OrbitalsFactory.h \
     ../src/Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h \
     ../src/Orbitals/Gaussians/gaussianfitted.h \
-    ../src/Orbitals/Gaussians/oxygen3-21G/oxygen3_21G.h \
+    ../src/Orbitals/Gaussians/oxygen3-21G/oxygen3_21g.h \
     ../src/OutputHandler/Distribution/Distribution.h \
     ../src/OutputHandler/OutputHandler.h \
     ../src/OutputHandler/stdoutASGD/stdoutASGD.h \

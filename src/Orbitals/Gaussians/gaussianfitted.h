@@ -19,8 +19,6 @@ public:
 private:
     int CURRENT;
 
-    std::vector<double*> expFactors;
-    std::vector<double> uniqueAlphas;
 
     std::vector<BasisFunctions*> primitivesPhi;
     std::vector<BasisFunctions*> primitivesDelX;
@@ -39,6 +37,8 @@ public:
     void set_qnum_indie_terms(Walker *walker, int i);
 
 
+    std::vector<double*> expFactors;
+    std::vector<double> alphas;
 
 };
 

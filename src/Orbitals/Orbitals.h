@@ -104,13 +104,13 @@ protected:
      */
     void testDell(const Walker* walker, int particle, int q_num, int d);
 
-    //! Method for calculating the anti-symmetrized Coulumb matrix elements
-    /*!
-     * Used by Hartree Fock
-     */
 
-    virtual double get_coulomb_element(const arma::uvec & qnum_set);
-    virtual double get_sp_energy(int qnum) const;
+    virtual double get_sp_energy(int qnum) const {
+        (void) qnum;
+
+        //Do nothing
+        return 0;
+    }
 
     void set_n_p(int n_p) {
         this->n_p = n_p;

@@ -14,6 +14,7 @@ GaussianFitted::GaussianFitted(int n_p, int dim, SplitValence * basis) :
     for (int i = 0; i < basis->getNumContracted(); ++i) {
         addGaussianFitFromCGTOs(basis->getContracted(i));
     }
+//    exit(1);
 
 }
 
@@ -22,23 +23,11 @@ void GaussianFitted::getGaussianFromPGTO(const PrimitiveGTO &PGTO)
     double alpha = PGTO.exponent();
     arma::rowvec powers = PGTO.powers();
 
-    double* expFactor = NULL;
-    for (unsigned int i = 0; i < uniqueAlphas.size(); ++i) {
-        if (uniqueAlphas.at(i) == alpha) {
-            expFactor = expFactors.at(i);
-        }
-    }
+    alphas.push_back(alpha);
 
-    if (expFactor == NULL) {
-        uniqueAlphas.push_back(alpha);
-
-        expFactor = new double();
-        expFactors.push_back(expFactor);
-    }
-
-    if (expFactor == NULL) {
-        std::cout << "SOMETHING IS WRONG EXP FACTOR SHOULD NEVER BE NULL..." << std::endl;
-    }
+    double * expFactor = new double();
+    expFactors.push_back(expFactor);
+//    std::cout << alpha << std::endl;
 
     locateGaussianFromPowers(powers, alpha, expFactor);
 
@@ -78,7 +67,7 @@ void GaussianFitted::addGaussianFitFromCGTOs(const ContractedGTO &CGTO)
 void GaussianFitted::set_qnum_indie_terms(Walker *walker, int i)
 {
     for (unsigned int k = 0; k < expFactors.size(); ++k) {
-        *(expFactors.at(k)) = exp(-uniqueAlphas.at(k)*walker->get_r_i2(i));
+        *(expFactors.at(k)) = exp(-alphas.at(k)*walker->get_r_i2(i));
     }
 }
 
