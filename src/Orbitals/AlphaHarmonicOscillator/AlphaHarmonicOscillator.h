@@ -45,7 +45,7 @@ protected:
      */
     //    double get_variational_derivative(const Walker* walker, int n);
 
-    double get_dell_alpha_phi(Walker* walker, int p, int q_num);
+    double get_dell_alpha_phi(Walker* walker, int p, int q_num, int n);
 
     /*!
      * Calculates the quantum numbers of the oscillator and stores them in the matrix qnums.

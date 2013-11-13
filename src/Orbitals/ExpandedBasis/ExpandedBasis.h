@@ -73,7 +73,7 @@ protected:
 
     arma::mat coeffs;
 
-    Orbitals* basis = NULL;
+    Orbitals* basis;
 
 };
 

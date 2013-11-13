@@ -110,14 +110,14 @@ double Orbitals::num_ddiff(const Walker* walker, int particle, int q_num) {
 //    return (phip - phim) / (2 * h * qmc->get_system_ptr()->get_spatial_wf(walker));
 //}
 
-double Orbitals::get_variational_derivative(Walker* walker) {
+double Orbitals::get_variational_derivative(Walker* walker, double alpha) {
 
     double dell_alpha = 0;
 
     //Fermions only
     for (int i = 0; i < n_p; i++) {
         for (int j = 0; j < n2; j++) {
-            dell_alpha += walker->phi(i, j) * get_dell_alpha_phi(walker, i, j) * walker->inv(j, i);
+            dell_alpha += walker->phi(i, j) * get_dell_alpha_phi(walker, i, j, alpha) * walker->inv(j, i);
         }
     }
 
@@ -125,26 +125,26 @@ double Orbitals::get_variational_derivative(Walker* walker) {
 
 }
 
-double Orbitals::get_dell_alpha_phi(Walker* walker, int p, int q_num){
+double Orbitals::get_dell_alpha_phi(Walker* walker, int p, int q_num, int n){
     Walker* diff_walker = new Walker(n_p, dim);
 
-    double alpha_orig = get_parameter(0);
+    double alpha_orig = get_parameter(n);
 
     double phi_mid = walker->phi(p, q_num);
 
     diff_walker->r.row(p) = walker->r.row(p);
     diff_walker->r2(p) = walker->r2(p);
 
-    set_parameter(alpha_orig + h, 0);
+    set_parameter(alpha_orig + h, n);
     set_qnum_indie_terms(diff_walker, p);
     double phi_plus = phi(diff_walker, p, q_num);
 
-    set_parameter(alpha_orig - h, 0);
+    set_parameter(alpha_orig - h, n);
     set_qnum_indie_terms(diff_walker, p);
     double phi_minus = phi(diff_walker, p, q_num);
 
     delete diff_walker;
-    set_parameter(alpha_orig, 0);
+    set_parameter(alpha_orig, n);
     set_qnum_indie_terms(walker, p);
 
     

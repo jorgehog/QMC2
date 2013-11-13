@@ -174,4 +174,4 @@ ABEL {
 #    LIBS += -L/usr/lib/openblas-base -lopenblas
 }
 
-DEFINES += LINED_OUTPUT
+#DEFINES += LINED_OUTPUT

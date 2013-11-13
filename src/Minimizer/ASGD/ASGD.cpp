@@ -60,18 +60,19 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp, std::string pat
 void ASGD::get_variational_gradients(Walker* walker, double e_local) {
 
 
-    double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker);
+    for (int alpha = 0; alpha < Nspatial_params; alpha++){
+        double dalpha = vmc->get_orbitals_ptr()->get_variational_derivative(walker, alpha);
 
-    gradient_local(0) += e_local * dalpha;
-    gradient(0) += dalpha;
-
+        gradient_local(alpha) += e_local * dalpha;
+        gradient(alpha) += dalpha;
+    }
 
     for (int beta = 0; beta < Njastrow_params; beta++) {
 
         double dbeta = vmc->get_jastrow_ptr()->get_variational_derivative(walker, beta);
 
-        gradient_local(1 + beta) += e_local*dbeta;
-        gradient(1 + beta) += dbeta;
+        gradient_local(Nspatial_params + beta) += e_local*dbeta;
+        gradient(Nspatial_params + beta) += dbeta;
 
     }
 
@@ -220,7 +221,7 @@ void ASGD::output_cycle() {
 
                 s << " (";
                 s << setprecision(4) << fixed << setfill(' ') << setw(7);
-                s << gradient_tot(Njastrow_params + beta) << ")";
+                s << gradient_tot(Nspatial_params + beta) << ")";
 
             }
 

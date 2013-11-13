@@ -27,8 +27,8 @@ Minimizer::Minimizer(VMC* vmc, const ParParams & pp, const arma::rowvec & alpha0
 
     this->vmc = vmc;
 
-    this->Nspatial_params = alpha0.n_rows;
-    this->Njastrow_params = beta0.n_rows * vmc->get_jastrow_ptr()->active;
+    this->Nspatial_params = alpha0.n_elem;
+    this->Njastrow_params = beta0.n_elem * vmc->get_jastrow_ptr()->active;
     this->Nparams = this->Njastrow_params + this->Nspatial_params;
 
     if (pp.is_master) {

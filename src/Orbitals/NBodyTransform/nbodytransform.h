@@ -22,7 +22,7 @@ public:
 protected:
     double get_parameter(int n);
     void set_parameter(double parameter, int n);
-    double get_dell_alpha_phi(Walker *walker, int p, int q_num);
+    double get_dell_alpha_phi(Walker *walker, int p, int q_num, int n);
 
 public:
     void set_qnum_indie_terms(Walker *walker, int i);

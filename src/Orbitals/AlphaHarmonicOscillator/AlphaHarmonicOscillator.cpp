@@ -395,7 +395,9 @@ double AlphaHarmonicOscillator::H(int n, double x) const {
     }
 }
 
-double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_num) {
+double AlphaHarmonicOscillator::get_dell_alpha_phi(Walker* walker, int p, int q_num, int n) {
+
+    (void) n;
 
     int nij;
     double rij;

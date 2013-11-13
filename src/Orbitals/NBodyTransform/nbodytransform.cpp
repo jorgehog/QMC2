@@ -235,14 +235,14 @@ void NBodyTransform::set_parameter(double parameter, int n)
 }
 
 
-double NBodyTransform::get_dell_alpha_phi(Walker *walker, int p, int q_num)
+double NBodyTransform::get_dell_alpha_phi(Walker *walker, int p, int q_num, int n)
 {
     (void) walker;
 
     double dell_alpha_phi = 0;
 
     for(int i = 0; i < N; i++){
-        dell_alpha_phi += P(q_num, i)*nuclei.at(i)->get_dell_alpha_phi(nuclei_walkers.at(i), p, monoStructureCouplings(q_num, i));
+        dell_alpha_phi += P(q_num, i)*nuclei.at(i)->get_dell_alpha_phi(nuclei_walkers.at(i), p, monoStructureCouplings(q_num, i), n);
     }
 
     return dell_alpha_phi;

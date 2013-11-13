@@ -149,7 +149,9 @@ void hydrogenicOrbitals::set_qnum_indie_terms(Walker* walker, int i) {
 
 }
 
-double hydrogenicOrbitals::get_dell_alpha_phi(Walker* walker, int i, int qnum) {
+double hydrogenicOrbitals::get_dell_alpha_phi(Walker* walker, int i, int qnum, int n) {
+
+    (void) n;
 
     double dphi;
 

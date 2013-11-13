@@ -42,6 +42,8 @@ public:
             break;
         }
         default:
+
+	    basis = NULL;
             std::cout << "UNREGISTERED ORBITAL MET" << std::endl;
             break;
         }

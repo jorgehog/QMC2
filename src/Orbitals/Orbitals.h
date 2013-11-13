@@ -73,9 +73,9 @@ protected:
      * Can be overridden to evaluate a closed form expression.
      * @param n Index of the sought variational parameter.
      */
-    double get_variational_derivative(Walker* walker);
+    double get_variational_derivative(Walker* walker, double alpha);
 
-    virtual double get_dell_alpha_phi(Walker* walker, int p, int q_num);
+    virtual double get_dell_alpha_phi(Walker* walker, int p, int q_num, int n);
 
     //! Method for calculating the single particle derivative using a finite difference scheme.
     /*!

@@ -51,7 +51,7 @@ protected:
     /*!
      * @param i The particle number.
      */
-    double get_dell_alpha_phi(Walker* walker, int p, int qnum) ;
+    double get_dell_alpha_phi(Walker* walker, int p, int qnum, int n) ;
 
     double get_sp_energy(int qnum) const;
 

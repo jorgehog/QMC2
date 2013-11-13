@@ -76,12 +76,11 @@ int main(int argc, char** argv) {
 
     dmcParams.therm=1000;
     dmcParams.n_c = 2000;
-    vmcParams.n_c = 1E5;
-    dmcParams.dt = 0.00005;
-    generalParams.random_seed = -1384354898;
+    vmcParams.n_c = 1E6;
+    dmcParams.dt = 0.0001;
 
-    variationalParams.alpha = 1;//0.922925;
-    variationalParams.beta  = 0.3477;
+//    variationalParams.alpha = 1;//0.922925;
+    variationalParams.beta  =  0.6106;
 
     //Setting up parallel parameters
     initMPI(parParams, argc, argv);
@@ -92,14 +91,14 @@ int main(int argc, char** argv) {
     generalParams.n_p = 16;
     generalParams.dim = 3;
 
-    double R = 1.8;
+    double R = 2.282;
     BodyDef Oxygen1;
     Oxygen1.n_p_local = 8;
-    Oxygen1.origin << R/2 << 0 << 0;
+    Oxygen1.origin = {R/2, 0,  0};
 
     BodyDef Oxygen2;
     Oxygen2.n_p_local = 8;
-    Oxygen2.origin << -R/2 << 0 << 0;
+    Oxygen2.origin = {-R/2,  0,  0};
 
     std::vector<BodyDef> bodies;
     //    bodies.push_back(Silicon);
@@ -128,16 +127,25 @@ int main(int argc, char** argv) {
 
     if (parParams.is_master) std::cout << "seed: " << generalParams.random_seed << std::endl;
 
+    minimizerParams.alpha = {};
+    minimizerParams.beta = {0.5};
+
     //Creating the solver objects
     bool silent = true;
+
     VMC vmc(generalParams, vmcParams, systemObjects, parParams, dmcParams.n_w, silent);
+    ASGD asgd(&vmc, minimizerParams, parParams, "/tmp/");
+    DMC dmc(generalParams, dmcParams, systemObjects, parParams, silent);
+        
     vmc.set_error_estimator(new Blocking(vmcParams.n_c, parParams));
 
     arma::wall_clock a;
     a.tic();
-    //    minimizer.minimize();
+//    asgd.minimize();
     vmc.run_method();
     vmc.dump_subsamples();
+    dmc.initFromVMC(&vmc);
+    dmc.run_method();
 
     if (parParams.is_master) std::cout << "Time: " <<setprecision(3) << fixed << a.toc()/60 << std::endl;
 
