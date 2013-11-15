@@ -43,39 +43,6 @@ protected:
 
     std::string name;
 
-    //! A method for retrieving variational parameters.
-    /*! 
-     * @param n Index of the sought variational parameter.
-     */
-    virtual double get_parameter(int n) {
-        (void) n;
-
-        std::cout << "ATTEMPT TO GET PARAMETER FROM ASSUMINGLY PARAMETER FREE ORBITAL." << std::endl;
-
-        return 1.0;
-    }
-
-    //! A method for setting variational parameters.
-    /*!
-     * @param n Index of the sought variational parameter.
-     * @param parameter The new value of the variational parameter.
-     */
-    virtual void set_parameter(double parameter, int n) {
-        (void) parameter;
-        (void) n;
-
-        std::cout << "ATTEMPT TO SET PARAMETER IN ASSUMINGLY PARAMETER FREE ORBITAL." << std::endl;
-    }
-
-    //! A method for calculating the variational derivative. 
-    /*!
-     * By default uses a finite difference scheme.
-     * Can be overridden to evaluate a closed form expression.
-     * @param n Index of the sought variational parameter.
-     */
-    double get_variational_derivative(Walker* walker, double alpha);
-
-    virtual double get_dell_alpha_phi(Walker* walker, int p, int q_num, int n);
 
     //! Method for calculating the single particle derivative using a finite difference scheme.
     /*!
@@ -127,6 +94,30 @@ public:
     Orbitals(int n_p, int dim);
     Orbitals();
 
+    //! A method for retrieving variational parameters.
+    /*!
+     * @param n Index of the sought variational parameter.
+     */
+    virtual double get_parameter(int n) {
+        (void) n;
+
+        std::cout << "ATTEMPT TO GET PARAMETER FROM ASSUMINGLY PARAMETER FREE ORBITAL " << name << std::endl;
+
+        return 1.0;
+    }
+
+    //! A method for setting variational parameters.
+    /*!
+     * @param n Index of the sought variational parameter.
+     * @param parameter The new value of the variational parameter.
+     */
+    virtual void set_parameter(double parameter, int n) {
+        (void) parameter;
+        (void) n;
+
+        std::cout << "ATTEMPT TO SET PARAMETER IN ASSUMINGLY PARAMETER FREE ORBITAL " << name << std::endl;
+    }
+
     //! Calculates single particle wave function terms which are independent of the quantum numbers
 
     /*!
@@ -139,6 +130,16 @@ public:
         (void) walker;
         (void) i;
     }
+
+    //! A method for calculating the variational derivative.
+    /*!
+     * By default uses a finite difference scheme.
+     * Can be overridden to evaluate a closed form expression.
+     * @param n Index of the sought variational parameter.
+     */
+    double get_variational_derivative(Walker* walker, double alpha);
+
+    virtual double get_dell_alpha_phi(Walker* walker, int p, int q_num, int n);
 
     //! Calculates the single particle wave function for a given walker's particle.
     /*!
@@ -159,6 +160,10 @@ public:
      */
     virtual double lapl_phi(const Walker* walker, int particle, int q_num);
 
+    void set_nCap(int nc){
+        nCap = nc;
+    }
+
     void set_qmc_ptr(QMC* qmc) {
         this->qmc = qmc;
     }
@@ -167,12 +172,7 @@ public:
         return name;
     }
 
-    friend class HartreeFock;
-    friend class Minimizer;
-    friend class ASGD;
-    friend class stdoutASGD;
-    friend class DiTransform;
-    friend class NBodyTransform;
+
 };
 
 

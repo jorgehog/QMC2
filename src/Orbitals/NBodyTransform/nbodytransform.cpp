@@ -57,7 +57,7 @@ NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP,
     //Set the highest accessible state. Needed in order to calculate the
     //required exponentions (i.e. avoid calculating unneccessary ones)
     for (int i = 0; i < N; ++i) {
-        nuclei.at(i)->nCap = 2*(monoStructureCouplings.col(i).eval().max() + 1);
+        nuclei.at(i)->set_nCap(2*(monoStructureCouplings.col(i).eval().max() + 1));
     }
 
 }

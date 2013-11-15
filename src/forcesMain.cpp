@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
         generalParams.runpath = argv[1];
     }
 
-    minimizerParams.SGDsamples = 3000;
+    minimizerParams.SGDsamples = 400;
 
     dmcParams.therm=1000;
     dmcParams.n_c = 2000;
@@ -112,9 +112,9 @@ int main(int argc, char** argv) {
     OrbitalsFactory expBasisFactory(OXYGEN3_21G);
     OrbitalsFactory factory(EXPANDED);
     factory.basisForExpanded = &expBasisFactory;
-    factory.C = C;
+    factory.C = C.t();
 
-    NBodyTransform* Oxygen = new NBodyTransform(generalParams, variationalParams, bodies, expBasisFactory);
+    NBodyTransform* Oxygen = new NBodyTransform(generalParams, variationalParams, bodies, factory);
     systemObjects.SP_basis = Oxygen;
     Fermions system(generalParams, Oxygen);
     system.add_potential(new MolecularCoulomb(generalParams, Oxygen));
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
 
     arma::wall_clock a;
     a.tic();
-//    asgd.minimize();
+    asgd.minimize();
     vmc.run_method();
     vmc.dump_subsamples();
     dmc.initFromVMC(&vmc);

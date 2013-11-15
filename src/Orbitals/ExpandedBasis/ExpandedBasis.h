@@ -27,7 +27,15 @@ public:
 
     void setCoeffs(const arma::mat &coeffs) {
         this->coeffs = coeffs;
-        this->basis_size = coeffs.n_cols;
+        this->basis_size = coeffs.n_cols/2;
+    }
+
+    void set_parameter(double parameter, int n) {
+        basis->set_parameter(parameter, n);
+    }
+
+    double get_parameter(int n){
+        return basis->get_parameter(n);
     }
 
     arma::mat getCoeffs() {
@@ -38,12 +46,19 @@ public:
         basis->set_qnum_indie_terms(walker, i);
     }
 
+    double get_dell_alpha_phi(Walker *walker, int p, int q_num, int n) {
+        double value = 0;
+
+        for (int m = 0; m < basis_size; m++) {
+            value += coeffs(q_num, m) * basis->get_dell_alpha_phi(walker, p, q_num, n);
+        }
+        return value;
+    }
 
     double phi(const Walker* walker, int particle, int q_num) {
         double value = 0;
 
-        //Dividing basis_size by half assuming a two-level system.
-        //In case of Bosons, expanding s.p. w.f. does not make sence.
+
         for (int m = 0; m < basis_size; m++) {
             value += coeffs(q_num, m) * basis->phi(walker, particle, m);
         }
@@ -53,7 +68,7 @@ public:
     double del_phi(const Walker* walker, int particle, int q_num, int d) {
         double value = 0;
         for (int m = 0; m < basis_size; m++) {
-            value += coeffs(particle, m) * basis->del_phi(walker, particle, q_num, d);
+            value += coeffs(q_num, m) * basis->del_phi(walker, particle, m, d);
         }
 
         return value;
@@ -62,7 +77,7 @@ public:
     double lapl_phi(const Walker* walker, int particle, int q_num) {
         double value = 0;
         for (int m = 0; m < basis_size; m++) {
-            value += coeffs(particle, m) * basis->lapl_phi(walker, particle, q_num);
+            value += coeffs(q_num, m) * basis->lapl_phi(walker, particle, m);
         }
 
         return value;

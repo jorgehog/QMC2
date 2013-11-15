@@ -7,9 +7,11 @@
 
 #include "ExpandedBasis/ExpandedBasis.h"
 #include "Gaussians/oxygen3-21G/oxygen3_21g.h"
+#include "hydrogenicOrbitals/hydrogenicOrbitals.h"
 
 enum FACTORYTYPE {EXPANDED,
-                  OXYGEN3_21G};
+                  OXYGEN3_21G,
+                 ATOMS};
 
 
 class OrbitalsFactory {
@@ -41,6 +43,12 @@ public:
 
             break;
         }
+        case ATOMS:
+        {
+            basis = new hydrogenicOrbitals(gP, vP);
+            break;
+        }
+
         default:
 
 	    basis = NULL;

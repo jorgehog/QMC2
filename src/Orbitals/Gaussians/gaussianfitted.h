@@ -14,7 +14,7 @@ class gaussians;
 class GaussianFitted : public Orbitals
 {
 public:
-    GaussianFitted(int n_p, int dim, SplitValence * basis);
+    GaussianFitted(int n_p, SplitValence * basis);
 
 private:
     int CURRENT;

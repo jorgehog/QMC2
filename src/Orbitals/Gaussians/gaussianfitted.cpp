@@ -4,8 +4,8 @@
 #include "../../BasisFunctions/Gaussians/gaussians.h"
 
 
-GaussianFitted::GaussianFitted(int n_p, int dim, SplitValence * basis) :
-    Orbitals(n_p, dim),
+GaussianFitted::GaussianFitted(int n_p, SplitValence * basis) :
+    Orbitals(n_p, 3),
     CURRENT(0)
 {
     name = "gaussianFitted";
