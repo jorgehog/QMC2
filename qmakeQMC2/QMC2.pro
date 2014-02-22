@@ -8,7 +8,7 @@ CONFIG += CXX11
 LIBS += -larmadillo
 
 SOURCES += \
-    ../src/forcesMain.cpp \
+    ../src/virialMain.cpp \
     ../src/BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     ../src/BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
     ../src/BasisFunctions/hydrogenic/hydrogenic.cpp \

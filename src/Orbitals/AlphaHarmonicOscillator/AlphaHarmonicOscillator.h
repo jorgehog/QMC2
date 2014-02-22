@@ -27,6 +27,12 @@ public:
      */
     void set_qnum_indie_terms(Walker * walker, int i);
 
+    void set_w(double w)
+    {
+        this->w = w;
+        set_parameter(*alpha, 0);
+    }
+
     friend class ExpandedBasis;
     friend class DiTransform;
 
