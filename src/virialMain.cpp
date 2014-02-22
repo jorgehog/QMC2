@@ -57,7 +57,7 @@ int main()
     ASGD asgd(&vmc, mP, pp, gP.runpath);
 
 
-    uint N = 2;
+    uint N = 20;
     vec wList = linspace(0.01, 1, N);
 
     mat results;
@@ -92,7 +92,11 @@ int main()
 
     if (pp.is_master)
     {
-        results.save(gP.runpath + "/w_T_HO_COL.dat", raw_ascii);
+
+        std::stringstream name;
+        name << gP.runpath << "/w_t_HO_COL_N" << gP.n_p << ".dat";
+
+        results.save(name.str(), raw_ascii);
     }
 
     MPI_Finalize();
