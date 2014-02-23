@@ -21,19 +21,51 @@
 
 using namespace arma;
 
+inline
+void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double a0, double b0);
+
+
 int main()
+{
+
+    ParParams pp;
+
+    initMPI(pp, 0, NULL);
+
+    calcVirialPlot(2, 0.01, 1, 2, pp, 0.98831, 0.398664);
+    calcVirialPlot(6, 0.01, 1, 2, pp, 0.9243, 0.5571);
+    calcVirialPlot(12, 0.01, 1, 2, pp, 0.8756, 0.66);
+    calcVirialPlot(20, 0.01, 1, 20, pp, 0.8361, 0.7332);
+    calcVirialPlot(30, 0.01, 1, 20, pp, 0.8085, 0.7944);
+    calcVirialPlot(42, 0.01, 1, 20, pp, 0.782778, 0.84400);
+    calcVirialPlot(56, 0.01, 1, 20, pp, 0.76, 0.886972);
+
+
+    MPI_Finalize();
+
+    return 0;
+
+}
+
+inline
+void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double a0, double b0)
 {
 
     GeneralParams gP;
     SystemObjects sO;
     VariationalParams vP;
     MinimizerParams mP;
-    ParParams pp;
     VMCparams vmcP;
     DMCparams dmcP;
 
-    initMPI(pp, 0, NULL);
+    gP.n_p = np;
+    mP.n_c_SGD = 100;
+    mP.SGDsamples = 1000;
+
+    mP.alpha(0) = a0;
+    mP.beta(0) = b0;
     scaleWithProcs(pp, gP, mP, vmcP, dmcP);
+
 
     AlphaHarmonicOscillator aHO(gP, vP);
     sO.SP_basis = &aHO;
@@ -56,18 +88,16 @@ int main()
 
     ASGD asgd(&vmc, mP, pp, gP.runpath);
 
-
-    uint N = 20;
-    vec wList = linspace(0.01, 1, N);
+    vec wList = linspace(w0, w1, Nw);
 
     mat results;
 
     if (pp.is_master)
     {
-        results.set_size(N, 4);
+        results.set_size(Nw, 4);
     }
 
-    for (int i = N-1; i >= 0; --i)
+    for (int i = Nw-1; i >= 0; --i)
     {
 
         double w = wList(i);
@@ -75,7 +105,7 @@ int main()
         aHO.set_w(w);
         HO.set_w(w);
 
-        bool init = (uint)i == N-1;
+        bool init = i == Nw-1;
         asgd.minimize(init);
         vmc.run_method(init);
 
@@ -99,8 +129,6 @@ int main()
         results.save(name.str(), raw_ascii);
     }
 
-    MPI_Finalize();
-
-    return 0;
+    MPI_Barrier(MPI_COMM_WORLD);
 
 }

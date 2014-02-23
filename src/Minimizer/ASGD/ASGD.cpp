@@ -54,7 +54,12 @@ ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp, std::string pat
     gradient_old = zeros(1, Nparams);
     gradient_tot = zeros(1, Nparams);
 
-    t_prev = A;
+    t_prev.set_size(Nparams);
+    t.set_size(Nparams);
+
+    for (int i = 0; i < Nparams; ++i) {
+        t_prev(i) = A;
+    }
 }
 
 void ASGD::get_variational_gradients(Walker* walker, double e_local) {
@@ -106,6 +111,12 @@ void ASGD::minimize(bool initialize) {
         initializeParameters();
         thermalize_walkers();
     } else {
+
+        for (int i = 0; i < Nparams; ++i) {
+            t_prev(i) = A;
+        }
+
+        gradient_tot.zeros();
         if (is_master) ASGDout->reset();
     }
 
@@ -152,17 +163,21 @@ void ASGD::minimize(bool initialize) {
 
 void ASGD::update_parameters() {
 
-    double x = -arma::dot(gradient_tot, gradient_old);
+    for (int i = 0; i < Nparams; ++i) {
 
-    t = t_prev + f(x);
-    if (t < 0) {
-        t = 0;
+        double xi = -gradient_tot(i)*gradient_old(i);
+
+        t(i) = t_prev(i) + f(xi);
+        if (t(i) < 0) {
+            t(i) = 0;
+        }
+
     }
 
 
     for (int param = 0; param < Nspatial_params; param++) {
 
-        step = a / (t + A) * gradient_tot(param);
+        step = a / (t(param) + A) * gradient_tot(param);
         if (fabs(step) > max_step) {
             step *= max_step / fabs(step);
         }
@@ -174,7 +189,7 @@ void ASGD::update_parameters() {
 
     for (int param = 0; param < Njastrow_params; param++) {
 
-        step = a / (t + A) * gradient_tot(Nspatial_params + param);
+        step = a / (t(Nspatial_params + param) + A) * gradient_tot(Nspatial_params + param);
         if (step * step > max_step * max_step) {
             step *= max_step / fabs(step);
         }

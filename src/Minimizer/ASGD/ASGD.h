@@ -27,8 +27,9 @@ protected:
     
     int sample; //!< The current ASGD cycle.
 
-    double t_prev; //!< The previous t.
-    double t; //!< The current t.
+
+    arma::vec t_prev; //!< The previous t.
+    arma::vec t; //!< The current t.
     double step; //!< The current calculates step.
     double max_step; //!< The maximum threshold on a step.
 
