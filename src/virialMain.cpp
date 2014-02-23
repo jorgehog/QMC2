@@ -65,7 +65,7 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     gP.runpath = op;
 
     gP.n_p = np;
-    mP.n_c_SGD = 100;
+    mP.n_c_SGD = 25*pp.n_nodes;
     mP.SGDsamples = 1000;
 
     mP.alpha(0) = a0;
@@ -97,9 +97,11 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     vec wList = linspace(w0, w1, Nw);
 
     mat results;
+    std::stringstream name;
 
     if (pp.is_master)
     {
+        name << gP.runpath << "/w_t_HO_COL_N" << gP.n_p << ".dat";
         results.set_size(Nw, 4);
     }
 
@@ -122,17 +124,9 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
         if (pp.is_master)
         {
             results.row(i) = rowvec({w, T, vho, vcol});
+            results.save(name.str(), raw_ascii);
         }
 
-    }
-
-    if (pp.is_master)
-    {
-
-        std::stringstream name;
-        name << gP.runpath << "/w_t_HO_COL_N" << gP.n_p << ".dat";
-
-        results.save(name.str(), raw_ascii);
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
