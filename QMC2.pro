@@ -5,3 +5,4 @@ CONFIG += ordered
 
 SUBDIRS += src apps
 
+OTHER_FILES += .qmake.conf .gitignore README.md LICENSE.txt
