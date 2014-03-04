@@ -2,6 +2,7 @@
 
 
 #include "../defines.h"
+#include "../ErrorEstimator/ErrorEstimator.h"
 
 #include <string>
 
@@ -34,6 +35,11 @@ public:
 
         double newVal = weight*queued_value;
 
+        if (meanErrorEstimator != NULL)
+        {
+            meanErrorEstimator->update_data(newVal);
+        }
+
         mean += newVal;
         m_counter++;
     }
@@ -42,8 +48,14 @@ public:
 
         if (m_counter == 0) return;
         
-        
-        mean_of_means += extract_mean();
+        double M = extract_mean();
+
+        if (meanOfMeansErrorEstimator != NULL)
+        {
+            meanOfMeansErrorEstimator->update_data(M);
+        }
+
+        mean_of_means += M;
         mm_counter++;
 
     }
@@ -75,6 +87,31 @@ public:
 
     }
 
+    ErrorEstimator * meanErrorEstimator = NULL;
+    ErrorEstimator * meanOfMeansErrorEstimator = NULL;
+
+    enum meanType
+    {
+        MEAN,
+        MEANOFMEANS
+    };
+
+    void setErrorEstimator(const meanType type, ErrorEstimator * errorEstimator)
+    {
+        switch (type) {
+        case MEAN:
+            meanErrorEstimator = errorEstimator;
+            break;
+        case MEANOFMEANS:
+            meanOfMeansErrorEstimator = errorEstimator;
+            break;
+        default:
+            std::cout << "Invalid type " << type << std::endl;
+            exit(1);
+            break;
+        }
+    }
+
     const double SKIPVALUE = 1337;
 
 
@@ -94,6 +131,8 @@ protected:
 
         return 0.0;
     }
+
+
 
 };
 
