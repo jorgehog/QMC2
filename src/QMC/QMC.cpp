@@ -15,6 +15,7 @@
 #include "../System/System.h"
 #include "../Orbitals/Orbitals.h"
 #include "../Sampling/Sampling.h"
+#include "../Sampling/Importance/Importance.h"
 #include "../Jastrow/Jastrow.h"
 #include "../ErrorEstimator/ErrorEstimator.h"
 #include "../OutputHandler/Distribution/Distribution.h"
@@ -54,7 +55,15 @@ QMC::QMC(GeneralParams & gP, int n_c,
         jastrow = new No_Jastrow();
     }
 
-    sampling = sO.sample_method;
+    if (sO.sample_method != NULL)
+    {
+        sampling = sO.sample_method;
+    }
+    else
+    {
+        sampling = new Importance(gP);
+    }
+
     system = sO.system;
 
     sampling->set_qmc_ptr(this);
