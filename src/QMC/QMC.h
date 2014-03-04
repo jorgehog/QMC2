@@ -1,12 +1,5 @@
-/* 
- * File:   QMC.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 17:42
- */
+#pragma once
 
-#ifndef QMC_H
-#define	QMC_H
 
 #include <sstream>
 #include <string>
@@ -298,5 +291,3 @@ public:
 
 
 };
-
-#endif	/* QMC_H */

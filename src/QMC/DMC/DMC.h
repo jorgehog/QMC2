@@ -1,14 +1,8 @@
-/* 
- * File:   DMC.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:42 PM
- */
+#pragma once
 
-#ifndef DMC_H
-#define	DMC_H
 
 #include "../QMC.h"
+
 class VMC;
 struct DMCparams;
 class stdoutDMC;
@@ -135,4 +129,3 @@ public:
 
 };
 
-#endif	/* DMC_H */

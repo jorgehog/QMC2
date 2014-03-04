@@ -1,15 +1,9 @@
-/* 
- * File:   Distribution.h
- * Author: jorgehog
- *
- * Created on 3. sept 2012, 13:17
- */
+#pragma once
 
-#ifndef DISTRIBUTION_H
-#define	DISTRIBUTION_H
 
 #include "../OutputHandler.h"
 #include <armadillo>
+
 struct ParParams;
 
 
@@ -86,5 +80,3 @@ private:
     friend class QMC;
 };
 
-
-#endif	/* DISTRIBUTION_H */

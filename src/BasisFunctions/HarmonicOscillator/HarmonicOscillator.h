@@ -1,7 +1,4 @@
-
-        
-#ifndef HARMONICOSCILLATOR_H
-#define HARMONICOSCILLATOR_H 
+#pragma once
 
 #include "../BasisFunctions.h"
 
@@ -1039,5 +1036,3 @@ public:
     -------------------------  END 27  -------------------------
 */
 
-
-#endif /* HARMONICOSCILLATOR_H */

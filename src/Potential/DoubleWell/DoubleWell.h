@@ -1,14 +1,8 @@
-/* 
- * File:   DoubleWell.h
- * Author: jorgmeister
- *
- * Created on May 10, 2013, 1:25 PM
- */
+#pragma once
 
-#ifndef DOUBLEWELL_H
-#define	DOUBLEWELL_H
 
 #include "../Potential.h"
+
 struct GeneralParams;
 
 class DoubleWell : public Potential {
@@ -23,5 +17,3 @@ private:
     double w; //< Oscillator frequency
     
 };
-
-#endif	/* DOUBLEWELL_H */

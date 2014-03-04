@@ -1,14 +1,8 @@
-/* 
- * File:   Coulomb.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:41 PM
- */
+#pragma once
 
-#ifndef COULOMB_H
-#define	COULOMB_H
 
 #include "../Potential.h"
+
 struct GeneralParams;
 
 /*! \brief Implementation of the Coulomb potential. 1/r_{ij}
@@ -21,6 +15,4 @@ public:
     double get_pot_E(const Walker* walker) const;
 
 };
-
-#endif	/* COULOMB_H */
 

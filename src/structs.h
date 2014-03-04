@@ -1,5 +1,4 @@
-#ifndef MISC_H
-#define MISC_H
+#pragma once
 
 #include "defines.h"
 
@@ -54,7 +53,7 @@ struct GeneralParams {
     bool deadlock = false; //! If true, freezes one particle;
     double deadlock_x = 0; //! Position of the locked particle. y=z=0;
     
-    std::string runpath = "../scratch/QMC_SCRATCH/"; //!< The directory which the simulation is set to run.
+    std::string runpath = "../../scratch/QMC_SCRATCH/"; //!< The directory which the simulation is set to run.
 
 };
 
@@ -95,10 +94,10 @@ class Jastrow;
  */
 struct SystemObjects {
     
-    Orbitals* SP_basis;
-    System* system;
-    Sampling* sample_method;
-    Jastrow* jastrow;
+    Orbitals* SP_basis = NULL;
+    System* system = NULL;
+    Sampling* sample_method  = NULL;
+    Jastrow* jastrow = NULL;
 
 };
 
@@ -173,11 +172,3 @@ inline void scaleWithProcs(struct ParParams & parParams,
     }
 
 }
-
-
-
-
-
-
-
-#endif /* MISC_H */

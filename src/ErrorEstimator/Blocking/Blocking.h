@@ -1,12 +1,5 @@
-/* 
- * File:   Blocking.h
- * Author: jorgmeister
- *
- * Created on October 29, 2012, 3:58 PM
- */
+#pragma once
 
-#ifndef BLOCKING_H
-#define	BLOCKING_H
 
 #include "../ErrorEstimator.h"
 struct ParParams;
@@ -63,6 +56,3 @@ protected:
     void block_data(int block_size, double &var, double &mean);
 
 };
-
-#endif	/* BLOCKING_H */
-

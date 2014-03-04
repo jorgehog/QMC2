@@ -1,12 +1,4 @@
-/* 
- * File:   function.h
- * Author: jorgehog
- *
- * Created on 27. juni 2012, 13:17
- */
-
-#ifndef BASISFUNCTIONS_H
-#define	BASISFUNCTIONS_H
+#pragma once
 
 class Walker;
 
@@ -31,6 +23,4 @@ public:
      */
     virtual double eval(const Walker* walker, int i) = 0;
 };
-
-#endif	/* BASISFUNCTIONS_H */
 

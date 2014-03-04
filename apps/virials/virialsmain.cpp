@@ -1,21 +1,4 @@
-#include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
-
-#include "System/Fermions/Fermions.h"
-
-#include "Potential/Harmonic_osc/Harmonic_osc.h"
-#include "Potential/Coulomb/Coulomb.h"
-
-#include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
-
-#include "Sampling/Importance/Importance.h"
-
-#include "structs.h"
-
-#include "Minimizer/ASGD/ASGD.h"
-#include "QMC/VMC/VMC.h"
-
-#include "ErrorEstimator/SimpleVar/SimpleVar.h"
-
+#include <QMC2.h>
 
 #include <armadillo>
 
@@ -62,11 +45,13 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     VMCparams vmcP;
     DMCparams dmcP;
 
+    vP.alpha = 1;
+
     gP.runpath = op;
 
     gP.n_p = np;
     mP.n_c_SGD = 25*pp.n_nodes;
-    mP.SGDsamples = 1000;
+    mP.SGDsamples = 10;
 
     mP.alpha(0) = a0;
     mP.beta(0) = b0;
@@ -82,9 +67,9 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     Coulomb COL(gP);
 
     sO.system->add_potential(&HO);
-    sO.system->add_potential(&COL);
+//    sO.system->add_potential(&COL);
 
-    sO.jastrow = new Pade_Jastrow(gP, vP);
+//    sO.jastrow = new Pade_Jastrow(gP, vP);
 
     sO.sample_method = new Importance(gP);
 
@@ -114,7 +99,7 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
         HO.set_w(w);
 
         bool init = i == Nw-1;
-        asgd.minimize(init);
+//        asgd.minimize(init);
         vmc.run_method(init);
 
         double T = vmc.kinetic_sampler.extract_mean();

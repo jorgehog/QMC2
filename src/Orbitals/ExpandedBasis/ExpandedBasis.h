@@ -1,12 +1,5 @@
-/* 
- * File:   ExpandedBasis.h
- * Author: jorgmeister
- *
- * Created on October 9, 2012, 5:09 PM
- */
+#pragma once
 
-#ifndef EXPANDEDBASIS_H
-#define	EXPANDEDBASIS_H
 
 #include "../Orbitals.h"
 
@@ -91,6 +84,4 @@ protected:
     Orbitals* basis;
 
 };
-
-#endif	/* EXPANDEDBASIS_H */
 

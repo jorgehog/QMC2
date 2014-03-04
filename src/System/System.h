@@ -1,12 +1,5 @@
-/* 
- * File:   System.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 16:49
- */
+#pragma once
 
-#ifndef SYSTEM_H
-#define	SYSTEM_H
 
 #include <vector>
 #include <string>
@@ -135,5 +128,3 @@ public:
         this->end = end;
     }
 };
-
-#endif	/* SYSTEM_H */

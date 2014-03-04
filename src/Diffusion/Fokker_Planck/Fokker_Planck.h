@@ -1,12 +1,4 @@
-/* 
- * File:   Fokker_Planck.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:37 PM
- */
-
-#ifndef FOKKER_PLANCK_H
-#define	FOKKER_PLANCK_H
+#pragma once
 
 #include "../Diffusion.h"
 #include "../../Walker/Walker.h"
@@ -24,6 +16,3 @@ public:
     }
 
 };
-
-#endif	/* FOKKER_PLANCK_H */
-

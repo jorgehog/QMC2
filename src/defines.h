@@ -1,10 +1,7 @@
-#ifndef CFG_H
-#define CFG_H 
+#pragma once
 
-//#define ARMA_NO_DEBUG
+#ifndef QMC2_NO_MPI
 #define MPI_ON
-
-#ifdef MPI_ON
 #include <mpi.h>
 #endif
 
@@ -26,5 +23,3 @@ typedef long seed_type;
 #include <boost/lexical_cast.hpp>
 #define TOSTR boost::lexical_cast<std::string>
 #endif
-
-#endif	/* CFG_H */

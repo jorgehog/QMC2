@@ -1,12 +1,5 @@
-/* 
- * File:   MINIMIZER.h
- * Author: jorgehog
- *
- * Created on 23. August 2012, 16:52
- */
+#pragma once
 
-#ifndef MINIMIZER_H
-#define	MINIMIZER_H
 
 class Jastrow;
 class Orbitals;
@@ -70,4 +63,3 @@ public:
 };
 
 
-#endif	/* MINIMIZER_H */

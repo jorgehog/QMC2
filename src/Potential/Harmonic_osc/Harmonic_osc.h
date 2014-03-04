@@ -1,12 +1,5 @@
-/* 
- * File:   Harmonic_osc.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:42 PM
- */
+#pragma once
 
-#ifndef HARMONIC_OSC_H
-#define	HARMONIC_OSC_H
 
 #include "../Potential.h"
 struct GeneralParams;
@@ -30,6 +23,4 @@ public:
     double get_pot_E(const Walker* walker) const;
 
 };
-
-#endif	/* HARMONIC_OSC_H */
 

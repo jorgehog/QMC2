@@ -1,5 +1,5 @@
-#ifndef MOLECULARCOULOMB_H
-#define MOLECULARCOULOMB_H
+#pragma once
+
 
 #include "../Potential.h"
 
@@ -19,4 +19,3 @@ private:
 
 };
 
-#endif // MOLECULARCOULOMB_H

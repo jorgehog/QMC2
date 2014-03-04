@@ -1,14 +1,8 @@
-/* 
- * File:   hydrogenicOrbitals.h
- * Author: jorgehog
- *
- * Created on 26. juni 2012, 17:41
- */
+#pragma once
 
-#ifndef HYDROGENICORBITALS_H
-#define	HYDROGENICORBITALS_H
 
 #include "../Orbitals.h"
+
 struct GeneralParams;
 struct VariationalParams;
 
@@ -79,4 +73,3 @@ protected:
 
 };
 
-#endif	/* HYDROGENICORBITALS_H */

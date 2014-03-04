@@ -1,5 +1,5 @@
-#ifndef NBODYTRANSFORM_H
-#define NBODYTRANSFORM_H
+#pragma once
+
 
 #include "../OrbitalsFactory.h"
 
@@ -54,4 +54,3 @@ private:
 
 };
 
-#endif // NBODYTRANSFORM_H

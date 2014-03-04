@@ -1,14 +1,8 @@
-/* 
- * File:   SimpleVar.h
- * Author: jorgmeister
- *
- * Created on October 30, 2012, 6:13 PM
- */
+#pragma once
 
-#ifndef SIMPLEVAR_H
-#define	SIMPLEVAR_H
 
 #include "../ErrorEstimator.h"
+
 struct ParParams;
 
 /*! \brief Calculates the simple variance of the sampled values.
@@ -34,6 +28,4 @@ protected:
     
     
 };
-
-#endif	/* SIMPLEVAR_H */
 

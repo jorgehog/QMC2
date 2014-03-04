@@ -1,12 +1,5 @@
-/* 
- * File:   ErrorEstimator.h
- * Author: jorgmeister
- *
- * Created on October 29, 2012, 3:58 PM
- */
+#pragma once
 
-#ifndef ERRORESTIMATOR_H
-#define	ERRORESTIMATOR_H
 
 #include <string>
 #include <fstream>
@@ -112,6 +105,4 @@ protected:
     arma::rowvec data; //!< The vector containing the samples used in error calculation.
 
 };
-
-#endif	/* ERRORESTIMATOR_H */
 

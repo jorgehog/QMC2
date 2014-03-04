@@ -1,5 +1,5 @@
-#ifndef ORBITALSFACTORY_H
-#define ORBITALSFACTORY_H
+#pragma once
+
 
 #include "Orbitals.h"
 
@@ -10,8 +10,7 @@
 #include "hydrogenicOrbitals/hydrogenicOrbitals.h"
 
 enum FACTORYTYPE {EXPANDED,
-                  OXYGEN3_21G,
-                 ATOMS};
+                  ATOMS};
 
 
 class OrbitalsFactory {
@@ -37,12 +36,7 @@ public:
 
             break;
         }
-        case OXYGEN3_21G:
-        {
-            basis = new Oxygen3_21G();
 
-            break;
-        }
         case ATOMS:
         {
             basis = new hydrogenicOrbitals(gP, vP);
@@ -65,5 +59,3 @@ public:
     arma::mat C;
 
 };
-
-#endif // ORBITALSFACTORY_H

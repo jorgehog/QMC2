@@ -1,12 +1,5 @@
-/* 
- * File:   Walker.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 16:50
- */
+#pragma once
 
-#ifndef WALKER_H
-#define	WALKER_H
 
 #include <armadillo>
 #include <string>
@@ -167,4 +160,3 @@ public:
 
 };
 
-#endif	/* WALKER_H */

@@ -1,14 +1,7 @@
-/* 
- * File:   ASGD.h
- * Author: jorgehog
- *
- * Created on 23. August 2012, 16:52
- */
-
-#ifndef ASGD_H
-#define	ASGD_H
+#pragma once
 
 #include "../Minimizer.h"
+
 class Walker;
 class stdoutASGD;
 struct MinimizerParams;
@@ -87,5 +80,3 @@ public:
     friend class stdoutASGD;
 };
 
-
-#endif	/* ASGD_H */

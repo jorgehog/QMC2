@@ -1,15 +1,9 @@
-/* 
- * File:   stdoutASGD.h
- * Author: jorgmeister
- *
- * Created on October 29, 2012, 3:05 PM
- */
+#pragma once
 
-#ifndef STDOUTASGD_H
-#define	STDOUTASGD_H
 
 #include "../OutputHandler.h"
 #include <armadillo>
+
 class ASGD;
 
 /*!
@@ -33,6 +27,4 @@ private:
     double sumE; //!< Sum of the sampled energy used to calculate the trailing average.
 
 };
-
-#endif	/* STDOUTASGD_H */
 

@@ -13,7 +13,7 @@ try:
 	from pyLibQMC import paths, misc, add_date, parseCML
 except ImportError:
 	print "\n\nYou need to add the QMC paths your PythonPath for some scripts to work."
-	_dir = pjoin(dirname(abspath(getfile(currentframe()))), "tools", "lib")
+	_dir = pjoin(dirname(abspath(getfile(currentframe()))), "lib")
 	print "\nexport PYTHONPATH=$PYTHONPATH:%s \n" % _dir
 	raw_input("Press return to continue.")
 	sys.path.append(_dir)
@@ -828,7 +828,7 @@ def getCppMap(raw):
     
 def consistentMap():
     
-    mainCPPFile = open(pjoin(paths.CODE, 'src', 'QMCmain.cpp'), 'r')
+    mainCPPFile = open(pjoin(paths.CODE, 'apps', 'default', 'defaultmain.cpp'), 'r')
     p = "^\s*if \(def\.compare\(argv\[(\d+)\]\) != 0\) (.+) = "
 
     raw = mainCPPFile.read()  

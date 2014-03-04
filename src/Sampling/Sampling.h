@@ -1,12 +1,5 @@
-/* 
- * File:   Sampling.h
- * Author: jorgehog
- *
- * Created on 15. juni 2012, 18:44
- */
+#pragma once
 
-#ifndef SAMPLING_H
-#define	SAMPLING_H
 
 #include "../Diffusion/Diffusion.h"
 #include "../QMC/QMC.h"
@@ -152,5 +145,3 @@ public:
 
 
 };
-
-#endif	/* SAMPLING_H */

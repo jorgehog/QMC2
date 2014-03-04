@@ -1,7 +1,4 @@
-
-        
-#ifndef HYDROGENIC_H
-#define HYDROGENIC_H 
+#pragma once
 
 #include "../BasisFunctions.h"
 
@@ -828,5 +825,3 @@ public:
     -------------------------  END 17  -------------------------
 */
 
-
-#endif /* HYDROGENIC_H */

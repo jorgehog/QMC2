@@ -1,7 +1,7 @@
 #ifndef SAMPLEFORCE_H
 #define SAMPLEFORCE_H
 
-#include "../Sampler.h"
+#include <QMC2.h>
 
 class SampleForce : public Sampler
 {

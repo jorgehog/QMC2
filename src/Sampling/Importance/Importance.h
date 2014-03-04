@@ -1,12 +1,5 @@
-/* 
- * File:   Importance.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:43 PM
- */
+#pragma once
 
-#ifndef IMPORTANCE_H
-#define	IMPORTANCE_H
 
 #include "../Sampling.h"
 
@@ -59,6 +52,4 @@ public:
 
 
 };
-
-#endif	/* IMPORTANCE_H */
 

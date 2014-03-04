@@ -1,12 +1,5 @@
-/* 
- * File:   VMC.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:43 PM
- */
+#pragma once
 
-#ifndef VMC_H
-#define	VMC_H
 
 #include "../QMC.h"
 struct VMCparams;
@@ -89,5 +82,3 @@ public:
     friend class BlockingData;
 
 };
-
-#endif	/* VMC_H */

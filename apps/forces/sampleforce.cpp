@@ -1,6 +1,4 @@
-#include "SampleForce.h"
-
-#include "../../Walker/Walker.h"
+#include "sampleforce.h"
 
 SampleForce::SampleForce(double * R, int n_p) :
     Sampler(), n_p(n_p)

@@ -1,14 +1,8 @@
-/* 
- * File:   AtomCore.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:42 PM
- */
+#pragma once
 
-#ifndef ATOMCORE_H
-#define	ATOMCORE_H
 
 #include "../Potential.h"
+
 struct GeneralParams;
 
 /*! \brief Implementation of the Atom Core potential. -Z/r
@@ -24,5 +18,3 @@ public:
     double get_pot_E(const Walker* walker) const;
 
 };
-
-#endif	/* ATOMCORE_H */

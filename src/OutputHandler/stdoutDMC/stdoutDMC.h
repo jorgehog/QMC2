@@ -1,14 +1,8 @@
-/* 
- * File:   stdoutDMC.h
- * Author: jorgmeister
- *
- * Created on September 4, 2012, 7:22 PM
- */
+#pragma once
 
-#ifndef STDOUTDMC_H
-#define	STDOUTDMC_H
 
 #include "../OutputHandler.h"
+
 class DMC;
 
 /*! \brief Class for handling the output of DMC.
@@ -32,6 +26,4 @@ public:
     void reset();
 
 };
-
-#endif	/* STDOUTDMC_H */
 

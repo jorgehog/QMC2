@@ -1,5 +1,5 @@
-#ifndef SAMPLER_H
-#define SAMPLER_H
+#pragma once
+
 
 #define SKIPVALUE -1337
 
@@ -88,6 +88,5 @@ protected:
 
         return 0.0;
     }
-};
 
-#endif /* SAMPLER_H */
+};

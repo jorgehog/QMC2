@@ -1,12 +1,5 @@
-/* 
- * File:   Jastrow.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 16:52
- */
+#pragma once
 
-#ifndef JASTROW_H
-#define	JASTROW_H
 
 class Walker;
 
@@ -117,5 +110,3 @@ public:
     friend class stdoutASGD;
 
 };
-
-#endif	/* JASTROW_H */

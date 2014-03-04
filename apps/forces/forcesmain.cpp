@@ -1,52 +1,6 @@
-/*
- * File:   QMCmain.cpp
- * Author: jorgehog
- *
- * Created on 13. april 2012, 17:04
- */
+#include <QMC2.h>
 
-#ifndef QMC2_MAIN
-#define QMC2_MAIN
-
-//#include "HartreeFock/HartreeFock.h"
-
-#include "structs.h"
-
-#include "QMC/VMC/VMC.h"
-#include "QMC/DMC/DMC.h"
-
-#include "Minimizer/ASGD/ASGD.h"
-
-#include "ErrorEstimator/SimpleVar/SimpleVar.h"
-#include "ErrorEstimator/Blocking/Blocking.h"
-
-#include "OutputHandler/stdoutASGD/stdoutASGD.h"
-#include "OutputHandler/stdoutDMC/stdoutDMC.h"
-#include "OutputHandler/Distribution/Distribution.h"
-
-#include "Orbitals/OrbitalsFactory.h"
-#include "Orbitals/AlphaHarmonicOscillator/AlphaHarmonicOscillator.h"
-#include "Orbitals/hydrogenicOrbitals/hydrogenicOrbitals.h"
-#include "Orbitals/Gaussians/oxygen3-21G/oxygen3_21g.h"
-#include "Orbitals/NBodyTransform/nbodytransform.h"
-#include "Orbitals/ExpandedBasis/ExpandedBasis.h"
-
-#include "Potential/AtomCore/AtomCore.h"
-#include "Potential/Coulomb/Coulomb.h"
-#include "Potential/DoubleWell/DoubleWell.h"
-#include "Potential/Harmonic_osc/Harmonic_osc.h"
-#include "Potential/MolecularCoulomb/molecularcoulomb.h"
-
-//#include "System/Bosons/Bosons.h"
-#include "System/Fermions/Fermions.h"
-
-#include "Sampling/Brute_Force/Brute_Force.h"
-#include "Sampling/Importance/Importance.h"
-
-#include "Jastrow/No_Jastrow/No_Jastrow.h"
-#include "Jastrow/Pade_Jastrow/Pade_Jastrow.h"
-
-#include "Sampler/sampleMethods/SampleForce.h"
+#include "sampleforce.h"
 
 #include <armadillo>
 #include <iomanip>
@@ -106,10 +60,10 @@ int main(int argc, char** argv) {
     bodies.push_back(Oxygen2);
 
 
-    arma::mat C;
-    C.load("../data/HartreeFock/O_321G/O_321G_HF.dat");
+    arma::mat C(generalParams.n_p, generalParams.n_p);
+    C.eye();
 
-    OrbitalsFactory expBasisFactory(OXYGEN3_21G);
+    OrbitalsFactory expBasisFactory(ATOMS);
     OrbitalsFactory factory(EXPANDED);
     factory.basisForExpanded = &expBasisFactory;
     factory.C = C.t();
@@ -158,6 +112,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
-
-#endif //QMC2_MAIN

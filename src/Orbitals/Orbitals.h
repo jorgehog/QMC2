@@ -1,15 +1,9 @@
-/* 
- * File:   Orbitals.h
- * Author: jorgehog
- *
- * Created on 26. juni 2012, 17:41
- */
+#pragma once
 
-#ifndef ORBITALS_H
-#define	ORBITALS_H
 
 #include <armadillo>
 #include <string>
+
 class QMC;
 class BasisFunctions;
 class Walker;
@@ -175,5 +169,3 @@ public:
 
 };
 
-
-#endif	/* ORBITALS_H */

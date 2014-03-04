@@ -1,12 +1,5 @@
-/* 
- * File:   Potential.h
- * Author: jorgehog
- *
- * Created on 13. april 2012, 17:21
- */
+#pragma once
 
-#ifndef POTENTIAL_H
-#define	POTENTIAL_H
 
 #include <string>
 #include "../Sampler/Sampler.h"
@@ -45,6 +38,4 @@ public:
     }
 
 };
-
-#endif	/* POTENTIAL_H */
 

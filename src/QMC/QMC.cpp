@@ -18,6 +18,7 @@
 #include "../Jastrow/Jastrow.h"
 #include "../ErrorEstimator/ErrorEstimator.h"
 #include "../OutputHandler/Distribution/Distribution.h"
+#include "../Jastrow/No_Jastrow/No_Jastrow.h"
 
 QMC::QMC(GeneralParams & gP, int n_c,
          SystemObjects & sO,
@@ -44,7 +45,15 @@ QMC::QMC(GeneralParams & gP, int n_c,
         original_walkers[i] = new Walker(n_p, dim);
     }
 
-    jastrow = sO.jastrow;
+    if (sO.jastrow != NULL)
+    {
+        jastrow = sO.jastrow;
+    }
+    else
+    {
+        jastrow = new No_Jastrow();
+    }
+
     sampling = sO.sample_method;
     system = sO.system;
 
