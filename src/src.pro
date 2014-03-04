@@ -3,6 +3,7 @@ include(../defaults.pri)
 TEMPLATE = lib
 TARGET = ../lib/QMC2
 
+
 LIBS += -larmadillo
 
 SOURCES += \
@@ -100,3 +101,10 @@ OTHER_FILES += ../include/QMC2.h
 NO_MPI {
     DEFINES += QMC2_NO_MPI
 }
+
+
+target.path  = /usr/lib/
+other_files.files = $$TOP_PWD/include/*
+other_files.path  = /usr/include/
+
+INSTALLS += target other_files
