@@ -2,6 +2,12 @@
 
 
 #include "../Potential.h"
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 /*! \brief Implementation of the Harmonic Oscillator potential. 0.5*w**2*r**2
@@ -24,3 +30,4 @@ public:
 
 };
 
+}

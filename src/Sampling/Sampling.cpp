@@ -1,17 +1,12 @@
-/* 
- * File:   Sampling.cpp
- * Author: jorgehog
- * 
- * Created on 15. juni 2012, 18:44
- */
-
-
 #include "Sampling.h"
 
 #include "../Walker/Walker.h"
 #include "../System/System.h"
 #include "../Jastrow/Jastrow.h"
 #include "../Orbitals/Orbitals.h"
+
+
+using namespace QMC2;
 
 Sampling::Sampling(int n_p, int dim) {
 

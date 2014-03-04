@@ -1,10 +1,3 @@
-/* 
- * File:   QMC.cpp
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 17:42
- */
-
 #include "QMC.h"
 
 #include <iomanip>
@@ -20,6 +13,9 @@
 #include "../ErrorEstimator/ErrorEstimator.h"
 #include "../OutputHandler/Distribution/Distribution.h"
 #include "../Jastrow/No_Jastrow/No_Jastrow.h"
+
+
+using namespace QMC2;
 
 QMC::QMC(GeneralParams & gP, int n_c,
          SystemObjects & sO,

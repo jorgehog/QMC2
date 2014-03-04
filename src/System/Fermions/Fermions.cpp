@@ -1,14 +1,10 @@
-/* 
- * File:   Fermions.cpp
- * Author: jorgmeister
- * 
- * Created on October 12, 2012, 2:44 PM
- */
-
 #include "Fermions.h"
 
 #include "../../structs.h"
 #include "../../Orbitals/Orbitals.h"
+
+
+using namespace QMC2;
 
 Fermions::Fermions(GeneralParams & gP, Orbitals* orbital)
 : System(gP.n_p, gP.dim, orbital) {

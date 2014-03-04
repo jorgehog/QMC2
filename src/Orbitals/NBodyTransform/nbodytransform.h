@@ -3,6 +3,11 @@
 
 #include "../OrbitalsFactory.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 struct VariationalParams;
 
@@ -54,3 +59,4 @@ private:
 
 };
 
+}

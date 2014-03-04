@@ -8,6 +8,11 @@
 
 #include "../Sampler/Sampler.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 struct ParParams;
 struct SystemObjects;
@@ -291,3 +296,5 @@ public:
 
 
 };
+
+}

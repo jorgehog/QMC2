@@ -1,5 +1,8 @@
 #include "sampleforce.h"
 
+
+using namespace QMC2;
+
 SampleForce::SampleForce(double * R, int n_p) :
     Sampler(), n_p(n_p)
 {

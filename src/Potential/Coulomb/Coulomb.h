@@ -3,6 +3,11 @@
 
 #include "../Potential.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 /*! \brief Implementation of the Coulomb potential. 1/r_{ij}
@@ -16,3 +21,4 @@ public:
 
 };
 
+}

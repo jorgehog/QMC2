@@ -2,7 +2,12 @@
 
 
 #include "../OutputHandler.h"
+
 #include <armadillo>
+
+
+namespace QMC2
+{
 
 class ASGD;
 
@@ -28,3 +33,4 @@ private:
 
 };
 
+}

@@ -1,7 +1,10 @@
-#ifndef SAMPLEFORCE_H
-#define SAMPLEFORCE_H
+#pragma once
+
 
 #include <QMC2.h>
+
+namespace QMC2
+{
 
 class SampleForce : public Sampler
 {
@@ -18,4 +21,4 @@ private:
 
 };
 
-#endif // SAMPLEFORCE_H
+}

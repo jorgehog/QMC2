@@ -5,6 +5,11 @@
 #include <fstream>
 #include <armadillo>
 
+
+namespace QMC2
+{
+
+
 /*! \brief Class handling error estimations of the QMC methods.
  * The QMC class holds an object of this type, calling the update_data
  * function in order to update the sampling pool.
@@ -106,3 +111,4 @@ protected:
 
 };
 
+}

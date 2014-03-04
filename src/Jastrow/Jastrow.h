@@ -1,6 +1,10 @@
 #pragma once
 
 
+namespace QMC2
+{
+
+
 class Walker;
 
 /*! \brief The class representing the Jastrow correlation functions
@@ -110,3 +114,5 @@ public:
     friend class stdoutASGD;
 
 };
+
+}

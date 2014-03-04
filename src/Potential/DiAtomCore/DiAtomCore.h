@@ -1,14 +1,13 @@
-/* 
- * File:   DiAtomCore.h
- * Author: jorgmeister
- *
- * Created on May 10, 2013, 1:25 PM
- */
+#pragma once
 
-#ifndef DIATOMCORE_H
-#define	DIATOMCORE_H
 
 #include "../Potential.h"
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 class DiAtomCore : public Potential {
@@ -24,5 +23,4 @@ private:
     
 };
 
-#endif	/* DIATOMCORE_H */
-
+}

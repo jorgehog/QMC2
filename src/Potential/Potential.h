@@ -3,6 +3,12 @@
 
 #include <string>
 #include "../Sampler/Sampler.h"
+
+
+namespace QMC2
+{
+
+
 class Walker;
 
 /*! \brief Superclass for potentials. 
@@ -39,3 +45,4 @@ public:
 
 };
 
+}

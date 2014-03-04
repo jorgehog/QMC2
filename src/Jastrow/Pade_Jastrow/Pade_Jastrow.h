@@ -4,6 +4,12 @@
 #include "../Jastrow.h"
 
 #include <armadillo>
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 struct VariationalParams;
 
@@ -49,3 +55,4 @@ public:
 
 };
 
+}

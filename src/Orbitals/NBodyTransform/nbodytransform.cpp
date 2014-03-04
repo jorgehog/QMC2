@@ -1,12 +1,14 @@
 #include "nbodytransform.h"
 
 #include "../../structs.h"
-
 #include "../../Walker/Walker.h"
-
 #include "../../Orbitals/OrbitalsFactory.h"
 
 #include <iostream>
+
+
+using namespace QMC2;
+
 
 NBodyTransform::NBodyTransform(GeneralParams &gP, VariationalParams &vP,
                                const std::vector<BodyDef> &bodies,

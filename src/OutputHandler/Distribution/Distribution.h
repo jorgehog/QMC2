@@ -2,10 +2,14 @@
 
 
 #include "../OutputHandler.h"
+
 #include <armadillo>
 
-struct ParParams;
 
+namespace QMC2
+{
+
+struct ParParams;
 
 /*! \brief Class for calculating distribution functions such as the one-body density.
  *  Does not collect data itself, but works merely as a control organ for the QMC class,
@@ -80,3 +84,4 @@ private:
     friend class QMC;
 };
 
+}

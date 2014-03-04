@@ -2,6 +2,11 @@
 
 #include "../Diffusion.h"
 
+
+namespace QMC2
+{
+
+
 /*! \brief Simple Isotropic diffusion model.
  */
 class Simple : public Diffusion {
@@ -21,3 +26,4 @@ public:
 
 };
 
+}

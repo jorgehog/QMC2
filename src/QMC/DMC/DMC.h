@@ -3,6 +3,11 @@
 
 #include "../QMC.h"
 
+
+namespace QMC2
+{
+
+
 class VMC;
 struct DMCparams;
 class stdoutDMC;
@@ -128,4 +133,6 @@ public:
     friend class stdoutDMC;
 
 };
+
+}
 

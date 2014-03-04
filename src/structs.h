@@ -7,6 +7,9 @@
 
 #include <sys/time.h>
 
+namespace QMC2
+{
+
 //! Struct used to initialize DMC parameters.
 struct DMCparams {
     int n_c = 1000; //!< The number of cycles
@@ -170,5 +173,7 @@ inline void scaleWithProcs(struct ParParams & parParams,
     if (dmcParams.n_w == 0) {
         dmcParams.n_w = 1;
     }
+
+}
 
 }

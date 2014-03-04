@@ -3,6 +3,10 @@
 
 #include "../OutputHandler.h"
 
+
+namespace QMC2
+{
+
 class DMC;
 
 /*! \brief Class for handling the output of DMC.
@@ -27,3 +31,4 @@ public:
 
 };
 
+}

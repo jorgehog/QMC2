@@ -1,5 +1,10 @@
 #pragma once
 
+
+namespace QMC2
+{
+
+
 class Walker;
 
 /*! \brief The Superclass shell for orbital basis functions.
@@ -14,7 +19,7 @@ class Walker;
 
 class BasisFunctions {
 public:
-    BasisFunctions();
+    BasisFunctions() {}
     
     //! The method representing the orbitals functional expression.
     /*!
@@ -24,3 +29,4 @@ public:
     virtual double eval(const Walker* walker, int i) = 0;
 };
 
+}

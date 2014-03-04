@@ -4,7 +4,7 @@
 #include "../../Walker/Walker.h"
 
 
-
+using namespace QMC2;
 
 //Superclass Constructor
 HarmonicOscillator3D::HarmonicOscillator3D(double* k, double* k2, double* exp_factor) {

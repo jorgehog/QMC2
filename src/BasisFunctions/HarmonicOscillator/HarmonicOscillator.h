@@ -2,6 +2,11 @@
 
 #include "../BasisFunctions.h"
 
+
+namespace QMC2
+{
+
+
 //Superclass 
 class HarmonicOscillator : public BasisFunctions {
 protected:
@@ -1036,3 +1041,4 @@ public:
     -------------------------  END 27  -------------------------
 */
 
+}

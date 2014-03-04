@@ -2,6 +2,11 @@
 
 #include "../Minimizer.h"
 
+
+namespace QMC2
+{
+
+
 class Walker;
 class stdoutASGD;
 struct MinimizerParams;
@@ -80,3 +85,4 @@ public:
     friend class stdoutASGD;
 };
 
+}

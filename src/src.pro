@@ -9,7 +9,6 @@ SOURCES += \
     BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
     BasisFunctions/hydrogenic/hydrogenic.cpp \
-    BasisFunctions/Gaussians/gaussians.cpp \
     Diffusion/Diffusion.cpp \
     Diffusion/Fokker_Planck/Fokker_Planck.cpp \
     Diffusion/RNGs/zignor.cpp \
@@ -38,7 +37,6 @@ SOURCES += \
     QMC/DMC/DMC.cpp \
     QMC/QMC.cpp \
     QMC/VMC/VMC.cpp \
-    BasisFunctions/BasisFunctions.cpp \
     Sampling/Brute_Force/Brute_Force.cpp \
     Sampling/Importance/Importance.cpp \
     Sampling/Sampling.cpp \

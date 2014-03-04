@@ -1,14 +1,21 @@
 #pragma once
 
 
+#include "../QMC/VMC/VMC.h"
+
+#include <vector>
+#include <armadillo>
+#include <string>
+
+
+namespace QMC2
+{
+
+
 class Jastrow;
 class Orbitals;
 class STDOUT;
 
-#include "../QMC/VMC/VMC.h"
-#include <vector>
-#include <armadillo>
-#include <string>
 
 /*!\brief Class for minimization methods used to obtain optimal variational parameters.
  */
@@ -62,4 +69,4 @@ public:
 
 };
 
-
+}

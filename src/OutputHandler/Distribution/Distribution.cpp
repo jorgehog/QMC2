@@ -1,15 +1,12 @@
-/* 
- * File:   Distribution.cpp
- * Author: jorgehog
- *
- * Created on 3. sept 2012, 13:17
- */
-
 #include "Distribution.h"
+
 #include "../../structs.h"
 
 #include "../../QMC/QMC.h"
 #include "../../ErrorEstimator/ErrorEstimator.h"
+
+
+using namespace QMC2;
 
 Distribution::Distribution(ParParams & pp, std::string path, std::string name, bool silent)
 : OutputHandler("", path, pp.parallel, pp.node, pp.n_nodes) {

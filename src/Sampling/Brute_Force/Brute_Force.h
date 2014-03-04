@@ -3,6 +3,11 @@
 
 #include "../Sampling.h"
 
+
+namespace QMC2
+{
+
+
 /*! \brief Implementation of the Brute Force QMC.
  * Uses the Simle diffusion class.
  * All methods are empty except for the energy necessities part which requires the
@@ -46,3 +51,4 @@ public:
 
 };
 
+}

@@ -1,15 +1,10 @@
-/* 
- * File:   Pade_Jastrow.cpp
- * Author: jorgmeister
- * 
- * Created on October 12, 2012, 2:38 PM
- */
-
 #include "Pade_Jastrow.h"
 
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
 
+
+using namespace QMC2;
 
 Pade_Jastrow::Pade_Jastrow(GeneralParams & gP, VariationalParams & vP)
 : Jastrow(gP.n_p, gP.dim) {

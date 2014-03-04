@@ -3,6 +3,11 @@
 
 #include "../Potential.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 class NBodyTransform;
 
@@ -19,3 +24,4 @@ private:
 
 };
 
+}

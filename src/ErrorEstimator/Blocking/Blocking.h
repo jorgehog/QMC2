@@ -2,6 +2,11 @@
 
 
 #include "../ErrorEstimator.h"
+
+
+namespace QMC2
+{
+
 struct ParParams;
 
 class Blocking : public ErrorEstimator {
@@ -56,3 +61,5 @@ protected:
     void block_data(int block_size, double &var, double &mean);
 
 };
+
+}

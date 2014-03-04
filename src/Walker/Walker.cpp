@@ -1,13 +1,11 @@
-/* 
- * File:   Walker.cpp
- * Author: jorgehog
- * 
- * Created on 30. mars 2012, 16:50
- */
-
 #include "Walker.h"
-#include <iostream>
+
 #include "../defines.h"
+
+#include <iostream>
+
+
+using namespace QMC2;
 
 Walker::Walker(int n_p, int dim, bool alive) {
     using namespace arma;

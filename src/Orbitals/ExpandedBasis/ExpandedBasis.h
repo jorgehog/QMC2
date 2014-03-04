@@ -6,6 +6,11 @@
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
 
+
+namespace QMC2
+{
+
+
 class ExpandedBasis : public Orbitals {
 public:
     ExpandedBasis(GeneralParams & gp) :
@@ -85,3 +90,4 @@ protected:
 
 };
 
+}

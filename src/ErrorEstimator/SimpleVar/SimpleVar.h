@@ -3,6 +3,11 @@
 
 #include "../ErrorEstimator.h"
 
+
+namespace QMC2
+{
+
+
 struct ParParams;
 
 /*! \brief Calculates the simple variance of the sampled values.
@@ -29,3 +34,4 @@ protected:
     
 };
 
+}

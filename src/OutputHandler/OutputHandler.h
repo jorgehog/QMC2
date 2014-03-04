@@ -5,6 +5,11 @@
 #include <sstream>
 #include <fstream>
 
+
+namespace QMC2
+{
+
+
 class QMC;
 class DMC;
 class VMC;
@@ -76,3 +81,4 @@ public:
 
 };
 
+}

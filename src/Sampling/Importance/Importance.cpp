@@ -1,10 +1,3 @@
-/* 
- * File:   Importance.cpp
- * Author: jorgmeister
- * 
- * Created on October 12, 2012, 2:43 PM
- */
-
 #include "Importance.h"
 
 #include "../../structs.h"
@@ -12,6 +5,8 @@
 #include "../../Diffusion/Fokker_Planck/Fokker_Planck.h"
 #include "../../Walker/Walker.h"
 
+
+using namespace QMC2;
 
 Importance::Importance(GeneralParams & gP)
 : Sampling(gP.n_p, gP.dim) {

@@ -3,6 +3,8 @@
 #include "../../Walker/Walker.h"
 
 
+using namespace QMC2;
+
 //Superclass Constructor
 HarmonicOscillator::HarmonicOscillator(double* k, double* k2, double* exp_factor) {
     this->k = k;

@@ -3,6 +3,11 @@
 
 #include "../Potential.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 class DoubleWell : public Potential {
@@ -17,3 +22,5 @@ private:
     double w; //< Oscillator frequency
     
 };
+
+}

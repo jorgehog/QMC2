@@ -4,6 +4,8 @@
  *
  */
 
+using namespace QMC2;
+
 namespace QMC2 {
 
 namespace SYSTEMS {

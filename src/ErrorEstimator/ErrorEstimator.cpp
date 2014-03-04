@@ -1,12 +1,8 @@
-/* 
- * File:   ErrorEstimator.cpp
- * Author: jorgmeister
- * 
- * Created on October 29, 2012, 3:58 PM
- */
-
 #include "ErrorEstimator.h"
 #include "../defines.h"
+
+using namespace QMC2;
+
 
 ErrorEstimator::ErrorEstimator() {
 

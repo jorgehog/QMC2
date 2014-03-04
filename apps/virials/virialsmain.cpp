@@ -2,6 +2,7 @@
 
 #include <armadillo>
 
+using namespace QMC2;
 using namespace arma;
 
 inline

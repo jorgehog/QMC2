@@ -3,6 +3,11 @@
 
 #include "../Potential.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 /*! \brief Implementation of the Atom Core potential. -Z/r
@@ -18,3 +23,5 @@ public:
     double get_pot_E(const Walker* walker) const;
 
 };
+
+}

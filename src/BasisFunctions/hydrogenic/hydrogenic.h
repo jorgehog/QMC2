@@ -2,6 +2,11 @@
 
 #include "../BasisFunctions.h"
 
+
+namespace QMC2
+{
+
+
 //Superclass 
 
 class hydrogenic : public BasisFunctions {
@@ -825,3 +830,4 @@ public:
     -------------------------  END 17  -------------------------
 */
 
+}

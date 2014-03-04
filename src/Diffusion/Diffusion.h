@@ -1,6 +1,12 @@
 #pragma once
 
 #include "../defines.h"
+
+
+namespace QMC2
+{
+
+
 class QMC;
 class Walker;
 
@@ -65,3 +71,4 @@ public:
 
 };
 
+}

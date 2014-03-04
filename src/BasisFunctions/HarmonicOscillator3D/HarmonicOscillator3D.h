@@ -2,6 +2,11 @@
 
 #include "../BasisFunctions.h"
 
+
+namespace QMC2
+{
+
+
 //Superclass 
 
 class HarmonicOscillator3D : public BasisFunctions {
@@ -911,3 +916,4 @@ public:
     -------------------------  END 19  -------------------------
 */
 
+}

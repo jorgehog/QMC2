@@ -1,10 +1,14 @@
 #pragma once
 
 
-#define SKIPVALUE -1337
-
 #include "../defines.h"
+
 #include <string>
+
+
+namespace QMC2
+{
+
 
 class Walker;
 
@@ -71,6 +75,7 @@ public:
 
     }
 
+    const double SKIPVALUE = 1337;
 
 
 protected:
@@ -82,6 +87,7 @@ protected:
     double mean;
     double mean_of_means;
 
+
     virtual double calculateValue(const Walker * walker) {
 
         (void) walker;
@@ -90,3 +96,5 @@ protected:
     }
 
 };
+
+}

@@ -1,16 +1,11 @@
-/* 
- * File:   Minimizer.cpp
- * Author: jorgehog
- * 
- * Created on 23. august 2012, 16:52
- */
-
 #include "Minimizer.h"
 
 #include "../structs.h"
 
 #include "../Orbitals/Orbitals.h"
 #include "../Jastrow/Jastrow.h"
+
+using namespace QMC2;
 
 void Minimizer::initializeParameters()
 {

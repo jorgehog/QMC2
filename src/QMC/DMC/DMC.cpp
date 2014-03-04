@@ -1,10 +1,3 @@
-/* 
- * File:   DMC.cpp
- * Author: jorgmeister
- * 
- * Created on October 12, 2012, 2:42 PM
- */
-
 #include "DMC.h"
 
 #include <iomanip>
@@ -19,6 +12,10 @@
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../VMC/VMC.h"
 #include "../../Orbitals/Orbitals.h"
+
+
+using namespace QMC2;
+
 
 DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, bool silent)
 : QMC(gP, dP.n_c, sO, pp, silent, dP.dt, dP.n_w, K) {

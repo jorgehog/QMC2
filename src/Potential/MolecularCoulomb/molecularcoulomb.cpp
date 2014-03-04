@@ -1,10 +1,11 @@
 #include "molecularcoulomb.h"
 
-#include "../../Orbitals/NBodyTransform/nbodytransform.h"
-
 #include "../../structs.h"
-
+#include "../../Orbitals/NBodyTransform/nbodytransform.h"
 #include "../../Walker/Walker.h"
+
+
+using namespace QMC2;
 
 MolecularCoulomb::MolecularCoulomb(GeneralParams &gP, NBodyTransform *orbitals) :
     Potential(gP.n_p, gP.dim),

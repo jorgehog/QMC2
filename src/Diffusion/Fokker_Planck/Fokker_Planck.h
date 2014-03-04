@@ -3,6 +3,11 @@
 #include "../Diffusion.h"
 #include "../../Walker/Walker.h"
 
+
+namespace QMC2
+{
+
+
 /*! \brief Anisotropic diffusion by the Fokker-Planck equation.
  */
 class Fokker_Planck : public Diffusion {
@@ -16,3 +21,5 @@ public:
     }
 
 };
+
+}

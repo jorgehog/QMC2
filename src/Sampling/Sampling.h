@@ -4,6 +4,11 @@
 #include "../Diffusion/Diffusion.h"
 #include "../QMC/QMC.h"
 
+
+namespace QMC2
+{
+
+
 class Sampling {
 protected:
     int n_p;
@@ -145,3 +150,5 @@ public:
 
 
 };
+
+}

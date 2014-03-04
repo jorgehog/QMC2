@@ -6,8 +6,12 @@
 #include "../structs.h"
 
 #include "ExpandedBasis/ExpandedBasis.h"
-#include "Gaussians/oxygen3-21G/oxygen3_21g.h"
 #include "hydrogenicOrbitals/hydrogenicOrbitals.h"
+
+
+namespace QMC2
+{
+
 
 enum FACTORYTYPE {EXPANDED,
                   ATOMS};
@@ -59,3 +63,5 @@ public:
     arma::mat C;
 
 };
+
+}

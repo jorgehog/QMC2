@@ -3,6 +3,11 @@
 
 #include "../Sampling.h"
 
+
+namespace QMC2
+{
+
+
 /*! \brief Implementation of Importance sampled QMC.
  * Using the Fokker-Planck diffusion class.
  * Introduces the Quantum Force.
@@ -53,3 +58,4 @@ public:
 
 };
 
+}

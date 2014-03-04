@@ -4,6 +4,11 @@
 #include <vector>
 #include <string>
 
+
+namespace QMC2
+{
+
+
 class Walker;
 class Orbitals;
 class Potential;
@@ -128,3 +133,5 @@ public:
         this->end = end;
     }
 };
+
+}

@@ -2,6 +2,11 @@
 
 #include "../Jastrow.h"
 
+
+namespace QMC2
+{
+
+
 /*!
  * \brief Class loaded when no correlation factor is used.
  */
@@ -68,3 +73,5 @@ public:
     }
 
 };
+
+}

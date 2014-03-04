@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <vector>
 
+using namespace QMC2;
+
 void forceLoop(ASGD & asgd, VMC & vmc, DMC & dmc, int n_p, bool is_master);
 
 int main(int argc, char** argv) {

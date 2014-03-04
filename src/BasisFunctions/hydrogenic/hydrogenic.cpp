@@ -2,6 +2,10 @@
 #include "hydrogenic.h"
 #include "../../Walker/Walker.h"
 
+
+using namespace QMC2;
+
+
 //Superclass Constructor
 hydrogenic::hydrogenic(double* k, double* k2, double* r22d, double* r2d, double* exp_factor) {
     this->k = k;

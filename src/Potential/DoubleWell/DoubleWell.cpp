@@ -1,14 +1,10 @@
-/* 
- * File:   DoubleWell.cpp
- * Author: jorgmeister
- * 
- * Created on May 10, 2013, 1:25 PM
- */
-
 #include "DoubleWell.h"
 
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
+
+
+using namespace QMC2;
 
 //TODO: Create a general well potential.
 DoubleWell::DoubleWell(GeneralParams& gp, double R) :

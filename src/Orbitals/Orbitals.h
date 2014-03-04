@@ -4,6 +4,11 @@
 #include <armadillo>
 #include <string>
 
+
+namespace QMC2
+{
+
+
 class QMC;
 class BasisFunctions;
 class Walker;
@@ -169,3 +174,4 @@ public:
 
 };
 
+}

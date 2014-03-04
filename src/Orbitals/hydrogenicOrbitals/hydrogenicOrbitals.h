@@ -3,6 +3,11 @@
 
 #include "../Orbitals.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 struct VariationalParams;
 
@@ -73,3 +78,4 @@ protected:
 
 };
 
+}

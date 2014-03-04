@@ -2,9 +2,15 @@
 
 
 #include "../System.h"
+#include "../../Walker/Walker.h"
 
 #include <armadillo>
-#include "../../Walker/Walker.h"
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 
@@ -97,3 +103,4 @@ public:
 
 };
 
+}

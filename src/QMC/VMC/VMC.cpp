@@ -1,10 +1,3 @@
-/* 
- * File:   VMC.cpp
- * Author: jorgmeister
- * 
- * Created on October 12, 2012, 2:43 PM
- */
-
 #include "VMC.h"
 
 #include <iomanip>
@@ -16,6 +9,10 @@
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../../OutputHandler/Distribution/Distribution.h"
 #include "../../Orbitals/Orbitals.h"
+
+
+using namespace QMC2;
+
 
 VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp, int n_w, bool silent)
 : QMC(gP, vP.n_c, sO, pp, silent, vP.dt, n_w) {

@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+using namespace QMC2;
+
 DiTransform::DiTransform(GeneralParams& gP, VariationalParams& vP, int system)
 : Orbitals(gP.n_p, gP.dim) {
 

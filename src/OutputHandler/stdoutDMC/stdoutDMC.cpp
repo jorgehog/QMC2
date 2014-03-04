@@ -9,6 +9,7 @@
 
 #include "../../QMC/DMC/DMC.h"
 
+using namespace QMC2;
 
 stdoutDMC::stdoutDMC(DMC* dmc, std::string path)
 : OutputHandler("DMC_out", path, false, 0, 1) {

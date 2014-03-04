@@ -1,10 +1,3 @@
-/* 
- * File:   Diffusion.cpp
- * Author: jorgehog
- * 
- * Created on 16. april 2012, 14:03
- */
-
 #include "Diffusion.h"
 
 #include "../QMC/QMC.h"
@@ -19,6 +12,8 @@
 #include "RNGs/ran2.h"
 #endif
 
+
+using namespace QMC2;
 
 Diffusion::Diffusion(int n_p, int dim, double timestep, seed_type random_seed, double D) {
     this->n_p = n_p;

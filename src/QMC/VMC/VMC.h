@@ -2,6 +2,11 @@
 
 
 #include "../QMC.h"
+
+
+namespace QMC2
+{
+
 struct VMCparams;
 
 /*! \brief Implementation of the Variational Monte-Carlo Method.
@@ -82,3 +87,5 @@ public:
     friend class BlockingData;
 
 };
+
+}
