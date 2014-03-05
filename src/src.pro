@@ -95,15 +95,20 @@ HEADERS += \
     Orbitals/NBodyTransform/nbodytransform.h \
     Potential/MolecularCoulomb/molecularcoulomb.h
 
-OTHER_FILES += ../include/QMC2.h
+OTHER_FILES += ../include/QMC2.h ../install/include/QMC2.h
 
 NO_MPI {
     DEFINES += QMC2_NO_MPI
 }
 
 
-target.path  = /usr/lib/
-other_files.files = $$TOP_PWD/include/*
-other_files.path  = /usr/include/
 
-INSTALLS += target other_files
+#target.path  = /usr/lib/
+
+#all_headers.files  = $$HEADERS
+#all_headers.path   = /usr/include/QMC2_bits
+
+#main_include.files = $$TOP_PWD/install/include/*
+#main_include.path  = /usr/include/
+
+#INSTALLS += target main_include all_headers
