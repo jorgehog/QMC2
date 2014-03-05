@@ -1,12 +1,5 @@
 include(../../defaults.pri) 
-
-TEMPLATE = app 
-
+include(../apps_defaults.pri)
 
 SOURCES = virialsmain.cpp
-
-
-LIBS += -L$$TOP_OUT_PWD/lib -lQMC2
-
-INCLUDEPATH += $$TOP_PWD/include
 

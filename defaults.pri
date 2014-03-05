@@ -35,6 +35,10 @@ QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
 #C++11 features
 QMAKE_CXXFLAGS += -std=c++0x -DARMA_USE_CXX11
 
+QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CXXFLAGS -g
+
+QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS -O3 -DARMA_NO_DEBUG
+
 
 DIRS = scratch/QMC_SCRATCH/walker_positions
 
@@ -50,19 +54,3 @@ export(createDirs.commands)
 
 QMAKE_EXTRA_TARGETS += first createDirs
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CXXFLAGS -g
-
-QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS -O3 -DARMA_NO_DEBUG
