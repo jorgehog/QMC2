@@ -32,7 +32,7 @@ public:
         switch (type) {
         case EXPANDED:
         {
-            ExpandedBasis* expbasis = new ExpandedBasis(gP);
+            ExpandedBasis* expbasis = new ExpandedBasis();
             expbasis->setBasis(basisForExpanded->create(gP, vP));
             expbasis->setCoeffs(C);
 

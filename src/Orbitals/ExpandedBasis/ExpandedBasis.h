@@ -13,9 +13,13 @@ namespace QMC2
 
 class ExpandedBasis : public Orbitals {
 public:
-    ExpandedBasis(GeneralParams & gp) :
-        Orbitals(gp.n_p, gp.dim) {
 
+    ExpandedBasis() {}
+
+    ExpandedBasis(Orbitals* basis, const arma::mat &coeffs)
+    {
+        setBasis(basis);
+        setCoeffs(coeffs);
     }
 
     void setBasis(Orbitals* basis) {
@@ -36,7 +40,7 @@ public:
         return basis->get_parameter(n);
     }
 
-    arma::mat getCoeffs() {
+    const arma::mat & getCoeffs() {
         return coeffs;
     }
 
