@@ -1,0 +1,3 @@
+[submodule "apps/hfqmc/HF"]
+	path = apps/hfqmc/HF
+	url = git@github.com:miladh/HF.git

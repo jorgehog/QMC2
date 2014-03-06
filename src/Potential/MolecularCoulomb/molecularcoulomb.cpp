@@ -7,9 +7,8 @@
 
 using namespace QMC2;
 
-MolecularCoulomb::MolecularCoulomb(GeneralParams &gP, NBodyTransform *orbitals) :
-    Potential(gP.n_p, gP.dim),
-    nBodyOrbitals(orbitals)
+MolecularCoulomb::MolecularCoulomb(GeneralParams &gP) :
+    Potential(gP.n_p, gP.dim)
 {
     name = "MolecularCoulomb";
 }

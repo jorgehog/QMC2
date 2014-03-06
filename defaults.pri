@@ -46,11 +46,11 @@ for(DIR, DIRS) {
      mkcommands += $$TOP_OUT_PWD/$$DIR
 }
 
-createDirs.commands = $(MKDIR) $$mkcommands
+#createDirs.commands = $(MKDIR) $$mkcommands
 
-first.depends = $(first) createDirs
+first.depends = $(first) #createDirs
 export(first.depends)
-export(createDirs.commands)
+#export(createDirs.commands)
 
-QMAKE_EXTRA_TARGETS += first createDirs
+QMAKE_EXTRA_TARGETS += first #createDirs
 
