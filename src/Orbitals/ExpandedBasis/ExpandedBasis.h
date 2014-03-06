@@ -29,7 +29,7 @@ public:
 
     void setCoeffs(const arma::mat &coeffs) {
         this->coeffs = coeffs;
-        this->basis_size = coeffs.n_cols/2;
+        this->basis_size = coeffs.n_rows;
     }
 
     void set_parameter(double parameter, int n) {
@@ -52,7 +52,7 @@ public:
         double value = 0;
 
         for (int m = 0; m < basis_size; m++) {
-            value += coeffs(q_num, m) * basis->get_dell_alpha_phi(walker, p, q_num, n);
+            value += coeffs(m, q_num) * basis->get_dell_alpha_phi(walker, p, q_num, n);
         }
         return value;
     }
@@ -62,7 +62,7 @@ public:
 
 
         for (int m = 0; m < basis_size; m++) {
-            value += coeffs(q_num, m) * basis->phi(walker, particle, m);
+            value += coeffs(m, q_num) * basis->phi(walker, particle, m);
         }
         return value;
     }
@@ -70,7 +70,7 @@ public:
     double del_phi(const Walker* walker, int particle, int q_num, int d) {
         double value = 0;
         for (int m = 0; m < basis_size; m++) {
-            value += coeffs(q_num, m) * basis->del_phi(walker, particle, m, d);
+            value += coeffs(m, q_num) * basis->del_phi(walker, particle, m, d);
         }
 
         return value;
@@ -79,7 +79,7 @@ public:
     double lapl_phi(const Walker* walker, int particle, int q_num) {
         double value = 0;
         for (int m = 0; m < basis_size; m++) {
-            value += coeffs(q_num, m) * basis->lapl_phi(walker, particle, m);
+            value += coeffs(m, q_num) * basis->lapl_phi(walker, particle, m);
         }
 
         return value;

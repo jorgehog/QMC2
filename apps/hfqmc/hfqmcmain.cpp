@@ -9,9 +9,7 @@
 #include <armadillo>
 
 using namespace arma;
-
-void runQMC(mat & coeffs, System * system);
-void runHF(mat &coeffs, System *system);
+using namespace hf;
 
 int main(int argc, char** argv)
 {
@@ -32,6 +30,7 @@ int main(int argc, char** argv)
     int nElectrons;
     rowvec coreCharges,coreMass, A, B, C, D, E;
 
+    mat corePositions;
 
     BasisSet *basisCoreA;
     BasisSet *basisCoreB;
@@ -40,7 +39,7 @@ int main(int argc, char** argv)
     BasisSet *basisCoreE;
 
 
-    int m_case = 1;
+    int m_case = 2;
 
     if(m_case == 1){
         //Hydrogen molecule
@@ -173,6 +172,9 @@ int main(int argc, char** argv)
     basisCoreA->setCoreMass(coreMass(0));
     basisCoreA->setCorePosition(A);
 
+    corePositions.insert_rows(0, A);
+    corePositions.insert_rows(1, B);
+
     basisCoreB->setCorePosition(B);
     basisCoreB->setCoreCharge(coreCharges(1));
     basisCoreB->setCoreMass(coreMass(1));
@@ -183,6 +185,8 @@ int main(int argc, char** argv)
         basisCoreC->setCorePosition(C);
         basisCoreC->setCoreCharge(coreCharges(2));
         basisCoreC->setCoreMass(coreMass(2));
+
+        corePositions.insert_rows(2, C);
 
     }
 
@@ -225,18 +229,7 @@ int main(int argc, char** argv)
         cout << "Elapsed time: "<< (double(end - begin))/CLOCKS_PER_SEC << "s" << endl;
     }
 
-    runQMC(coeffs, system);
 
-
-    MPI_Finalize();
-
-    return 0;
-
-}
-
-
-void runQMC(mat &coeffs, System *system)
-{
 
     QMC2::ParParams parParams;
 
@@ -254,16 +247,18 @@ void runQMC(mat &coeffs, System *system)
     QMC2::SystemObjects sO;
     QMC2::VMCparams vmcP;
 
-    gP.n_p = system->getNumOfElectrons();
+    vmcP.n_c = 1000000;
 
-    HFOrbitals hfOrbitals(system);
+    gP.n_p = system->getNumOfElectrons();
+    gP.dim = 3;
+
+    QMC2::HFOrbitals hfOrbitals(system);
     QMC2::ExpandedBasis expHFBasis(&hfOrbitals, coeffs);
     sO.SP_basis = &expHFBasis;
 
-
     sO.system = new QMC2::Fermions(gP, sO.SP_basis);
 
-    QMC2::MolecularCoulomb MCO(gP);
+    QMC2::MolecularCoulomb MCO(gP, corePositions, coreCharges);
     QMC2::Coulomb COL(gP);
 
     sO.system->add_potential(&MCO);
@@ -276,6 +271,15 @@ void runQMC(mat &coeffs, System *system)
     vmc.set_error_estimator(new QMC2::SimpleVar(parParams));
 
     vmc.run_method();
+    vmc.dump_subsamples();
 
+
+
+
+    MPI_Finalize();
+
+    return 0;
 
 }
+
+
