@@ -3,18 +3,16 @@
 
 #include "../ErrorEstimator.h"
 
+#include "../../structs.h"
 
 namespace QMC2
 {
-
-
-struct ParParams;
 
 /*! \brief Calculates the simple variance of the sampled values.
  */
 class SimpleVar : public ErrorEstimator {
 public:
-    SimpleVar(ParParams &);
+    SimpleVar(const ParParams &);
     
     double estimate_error();
     

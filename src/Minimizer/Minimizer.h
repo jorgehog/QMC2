@@ -14,7 +14,6 @@ namespace QMC2
 
 class Jastrow;
 class Orbitals;
-class STDOUT;
 
 
 /*!\brief Class for minimization methods used to obtain optimal variational parameters.
@@ -27,7 +26,6 @@ protected:
 
     VMC* vmc; //!< Uses VMC methods to calculate stochastic variational gradients.
 
-    STDOUT* std_out; //!< Output object. Wraps and replaces std::cout.
     std::stringstream s; 
     
     int Nspatial_params; //!< The number of variational parameters in the spatial trial wave function.

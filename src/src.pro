@@ -5,6 +5,8 @@ TARGET = ../lib/QMC2
 
 LIBS += -larmadillo
 
+QMAKE_LFLAGS += -g
+
 SOURCES += \
     BasisFunctions/HarmonicOscillator/HarmonicOscillator.cpp \
     BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.cpp \
@@ -44,7 +46,8 @@ SOURCES += \
     System/System.cpp \
     Walker/Walker.cpp \
     Orbitals/NBodyTransform/nbodytransform.cpp \
-    Potential/MolecularCoulomb/molecularcoulomb.cpp
+    Potential/MolecularCoulomb/molecularcoulomb.cpp \
+    Sampler/Sampler.cpp
 
 HEADERS += \
     structs.h \
@@ -93,7 +96,9 @@ HEADERS += \
     System/System.h \
     Walker/Walker.h \
     Orbitals/NBodyTransform/nbodytransform.h \
-    Potential/MolecularCoulomb/molecularcoulomb.h
+    Potential/MolecularCoulomb/molecularcoulomb.h \
+    Sampler/standardsamplers.h \
+    misc.h
 
 OTHER_FILES += ../include/QMC2.h ../install/include/QMC2.h
 

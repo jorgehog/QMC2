@@ -78,3 +78,11 @@ std::string System::dump_samples(bool mean_of_means) {
     return s.str();
 
 }
+
+void System::reset_potential_samples()
+{
+    for (Potential * potential : potentials)
+    {
+        potential->pot_sampler.reset();
+    }
+}

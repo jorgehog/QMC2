@@ -9,7 +9,7 @@ SampleForce::SampleForce(double * R, int n_p) :
     this->R = R;
 }
 
-double SampleForce::calculateValue(const Walker *walker)
+void SampleForce::push_values(const Walker *walker)
 {
 
     double Rhalf = *R/2;
@@ -42,7 +42,7 @@ double SampleForce::calculateValue(const Walker *walker)
         double thresh = 0.01;
         if ((rp*rp < thresh*thresh) || (rm*rm < thresh*thresh)){
             //std::cout << "WARNING IN FORCE CALC: " << rp << "  " << rm << std::endl;
-            return SKIPVALUE;
+            return;
         }
 
         force += (Rhalf + rx)/(rp*rp*rp) + (Rhalf - rx)/(rm*rm*rm);
@@ -51,5 +51,5 @@ double SampleForce::calculateValue(const Walker *walker)
 
     force -= 1. /(*R*(*R));
 
-    return 0.5*force;
+    push_value(0.5*force);
 }
