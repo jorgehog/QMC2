@@ -3,9 +3,10 @@
 
 using namespace QMC2;
 
-HFOrbitals::HFOrbitals(hf::System *system) :
-    Orbitals(n_p = system->getNumOfElectrons(), 3),
-    m_system(system)
+HFOrbitals::HFOrbitals(hf::System *system, mat corePositions) :
+    Orbitals(system->getNumOfElectrons(), 3),
+    m_system(system),
+    m_corePositions(corePositions)
 {
 
 }
@@ -14,7 +15,30 @@ double HFOrbitals::phi(const Walker *walker, int particle, int q_num)
 {
     const rowvec & ri = walker->r.row(particle);
 
-    return 0;
+    double  Gab = 0.0;
+
+    const hf::ContractedGTO &contracted = m_system->getContracted(q_num);
+
+    const rowvec &corePosition = m_corePosition.row(q_num);
+
+    double Xa = x - corePositionA(0);
+    double Ya = y - corePositionA(1);
+    double Za = z - corePositionA(2);
+
+    double Ra = Xa * Xa + Ya * Ya + Za * Za;
+
+    for(int i = 0; i < contractedA.getNumPrimitives(); i++){
+        const PrimitiveGTO &primitiveA = contractedA.getPrimitive(i);
+        Gab +=  primitiveA.weight()
+                * pow(Xa, primitiveA.xPower())
+                * pow(Ya, primitiveA.yPower())
+                * pow(Za, primitiveA.zPower())
+                * exp(-primitiveA.exponent()*Ra);
+
+    }
+
+    return Gab;
+
 }
 
 double HFOrbitals::del_phi(const Walker *walker, int particle, int q_num, int d)
