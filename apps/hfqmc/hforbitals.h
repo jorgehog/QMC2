@@ -9,7 +9,7 @@ namespace QMC2
 class HFOrbitals : public Orbitals
 {
 public:
-    HFOrbitals(hf::System *system, mat corePositions);
+    HFOrbitals(hf::System *system);
 
     // Orbitals interface
 public:
@@ -20,7 +20,6 @@ public:
 
     hf::System* m_system;
 
-    mat m_corePositions;
 };
 
 }

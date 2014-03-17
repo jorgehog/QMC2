@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     NBodyTransform* Oxygen = new NBodyTransform(generalParams, variationalParams, bodies, factory);
     systemObjects.SP_basis = Oxygen;
     Fermions system(generalParams, Oxygen);
-    system.add_potential(new MolecularCoulomb(generalParams, Oxygen));
+//    system.add_potential(new MolecularCoulomb(generalParams, Oxygen));
     system.add_potential(new Coulomb(generalParams));
     systemObjects.system = &system;
 

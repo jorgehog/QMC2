@@ -4,7 +4,6 @@
  *
  */
 
-using namespace QMC2;
 
 namespace QMC2 {
 
@@ -29,7 +28,7 @@ enum {
 };
 }
 
-}
+
 
 struct MainFileParams {
 
@@ -45,7 +44,9 @@ struct MainFileParams {
 
 };
 
+}
 
+using namespace QMC2;
 
 //! Function for parsing the command line for parameters.
 /*!
