@@ -106,9 +106,9 @@ NO_MPI {
     DEFINES += QMC2_NO_MPI
 }
 
-
-QMAKE_POST_LINK += $(COPY_DIR) $$OUT_PWD/../lib $$TOP_PWD
-
+!equals($$OUT_PWD/.., $$TOP_PWD) {
+    QMAKE_POST_LINK += $(COPY_DIR) $$OUT_PWD/../lib $$TOP_PWD
+}
 
 #target.path  = /usr/lib/
 
