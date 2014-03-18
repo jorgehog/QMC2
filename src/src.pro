@@ -3,7 +3,7 @@ include(../defaults.pri)
 TEMPLATE = lib
 TARGET = ../lib/QMC2
 
-LIBS += -larmadillo -llapack -lblas
+LIBS += -larmadillo
 
 QMAKE_LFLAGS += -g
 
