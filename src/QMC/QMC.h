@@ -229,7 +229,7 @@ public:
 
     void dump_subsamples(bool mean_of_means = false);
 
-    const double get_error() const
+    double get_error() const
     {
         return error;
     }

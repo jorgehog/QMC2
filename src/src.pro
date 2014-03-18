@@ -107,6 +107,8 @@ NO_MPI {
 }
 
 
+QMAKE_POST_LINK += $(COPY_DIR) $$OUT_PWD/../lib $$TOP_PWD
+
 
 #target.path  = /usr/lib/
 

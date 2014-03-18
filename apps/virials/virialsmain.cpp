@@ -22,12 +22,12 @@ int main(int argc, char** argv)
 
     uint NW = 20;
 
-    calcVirialPlot(6, 0.01, 1, NW, pp, 0.9243, 0.5571, op);
-    calcVirialPlot(12, 0.01, 1, NW, pp, 0.8756, 0.66, op);
-    calcVirialPlot(20, 0.01, 1, NW, pp, 0.8361, 0.7332, op);
-    calcVirialPlot(30, 0.01, 1, NW, pp, 0.8085, 0.7944, op);
-    calcVirialPlot(42, 0.01, 1, NW, pp, 0.782778, 0.84400, op);
-    calcVirialPlot(56, 0.01, 1, NW, pp, 0.76, 0.886972, op);
+    calcVirialPlot( 6, 0.01, 1, NW, pp,   0.9243,   0.5571, op);
+    calcVirialPlot(12, 0.01, 1, NW, pp,   0.8756,     0.66, op);
+    calcVirialPlot(20, 0.01, 1, NW, pp,   0.8361,   0.7332, op);
+    calcVirialPlot(30, 0.01, 1, NW, pp,   0.8085,   0.7944, op);
+    calcVirialPlot(42, 0.01, 1, NW, pp, 0.782778,  0.84400, op);
+    calcVirialPlot(56, 0.01, 1, NW, pp,     0.76, 0.886972, op);
 
 
     MPI_Finalize();

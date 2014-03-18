@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS += default virials forces hfqmc
+SUBDIRS += default virials forces #hfqmc
