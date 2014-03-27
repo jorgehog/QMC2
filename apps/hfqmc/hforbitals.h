@@ -9,7 +9,7 @@ namespace QMC2
 class HFOrbitals : public Orbitals
 {
 public:
-    HFOrbitals(hf::System *system);
+    HFOrbitals(const uint n_p, vector<hf::ContractedGTO *> contractedGTOs);
 
     // Orbitals interface
 public:
@@ -18,7 +18,7 @@ public:
     double del_phi(const Walker *walker, int particle, int q_num, int d);
     double lapl_phi(const Walker *walker, int particle, int q_num);
 
-    hf::System* m_system;
+    hf::System* m_contractedGTOs;
 
 };
 
