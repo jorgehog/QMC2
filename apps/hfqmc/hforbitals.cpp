@@ -19,9 +19,7 @@ double HFOrbitals::phi(const Walker *walker, int particle, int q_num)
 
     const hf::ContractedGTO &contracted = m_system->getContracted(q_num);
 
-    //    const rowvec &corePosition = m_system->getCorePosition(q_num);
-
-    const rowvec &corePosition = {0,0,0};
+    const rowvec &corePosition = contracted.center();
 
     double X = ri(0) - corePosition(0);
     double Y = ri(1) - corePosition(1);
