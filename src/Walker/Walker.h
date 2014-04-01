@@ -78,7 +78,7 @@ public:
 
     void calc_r_i() {
         for (int i = 0; i < n_p; i++) {
-            this->calc_r_i2(i);
+            this->calc_r_i(i);
         }
     }
 

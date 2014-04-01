@@ -120,6 +120,8 @@ public:
     void push_potential_samples();
     
     std::string dump_samples(bool mean_of_means = false);
+
+    void reset_potential_samples();
     
     Orbitals* get_orbital_ptr() {
         return orbital;

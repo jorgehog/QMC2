@@ -17,8 +17,11 @@ private:
     double * R;
     int n_p;
 
-    double calculateValue(const Walker *walker);
 
+
+    // Sampler interface
+public:
+    void push_values(const Walker *walker);
 };
 
 }

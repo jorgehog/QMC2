@@ -252,7 +252,7 @@ int main(int argc, char** argv)
     gP.n_p = system->getNumOfElectrons();
     gP.dim = 3;
 
-    QMC2::HFOrbitals hfOrbitals(system);
+    QMC2::HFOrbitals hfOrbitals(system->getBasisFunctions());
     QMC2::ExpandedBasis expHFBasis(&hfOrbitals, coeffs);
     sO.SP_basis = &expHFBasis;
 

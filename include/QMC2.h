@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../src/structs.h"
+#include "../src/misc.h"
 
 #include "../src/QMC/VMC/VMC.h"
 #include "../src/QMC/DMC/DMC.h"
@@ -35,3 +36,4 @@
 #include "../src/Jastrow/No_Jastrow/No_Jastrow.h"
 #include "../src/Jastrow/Pade_Jastrow/Pade_Jastrow.h"
 
+#include "../src/Sampler/standardsamplers.h"

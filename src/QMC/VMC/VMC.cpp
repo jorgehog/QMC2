@@ -99,6 +99,7 @@ void VMC::run_method(bool initialize) {
         diffuse_walker(original_walker, trial_walker);
 
         calculate_energy_necessities(original_walker);
+
         local_E = calculate_local_energy(original_walker);
 
         vmc_E += local_E;
@@ -126,7 +127,10 @@ void VMC::run_method(bool initialize) {
 }
 
 void VMC::output() {
+
     using namespace std;
+
+    stringstream s;
 
     if (is_master) {
 
@@ -154,8 +158,6 @@ void VMC::output() {
             cout << "\r" << s.str();
             cout.flush();
 
-            s.str(string());
-            s.clear();
 #ifdef LINED_OUTPUT
             cout << endl;
 #endif

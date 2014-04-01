@@ -19,12 +19,6 @@ protected:
 
     bool active; //!< Parameter false if No_Jastrow is loaded.
 
-    //! Returns variational parameters
-    /*!
-     * @param n The index of the sought variational parameter
-     * @return Variational parameter with index [n]
-     */
-    virtual double get_parameter(int n) = 0;
 
     //! Sets variational parameters
     /*!
@@ -57,6 +51,12 @@ protected:
 public:
     Jastrow(int n_p, int dim);
     Jastrow();
+    //! Returns variational parameters
+    /*!
+     * @param n The index of the sought variational parameter
+     * @return Variational parameter with index [n]
+     */
+    virtual double get_parameter(int n) = 0;
 
     /*!
      * Initializes the non-variational parameters needed by the Jastrow Factor.

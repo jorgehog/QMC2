@@ -4,7 +4,7 @@
 
 using namespace QMC2;
 
-SimpleVar::SimpleVar(ParParams & pp)
+SimpleVar::SimpleVar(const ParParams & pp)
 : ErrorEstimator(0, "", "", pp.parallel, pp.node, pp.n_nodes, false) {
     data_to_file = false;
     f = 0;
