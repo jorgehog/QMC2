@@ -61,8 +61,8 @@ public:
         double value = 0;
 
 
-        for (int m = 0; m < basis_size; m++) {
-            value += coeffs(m, q_num) * basis->phi(walker, particle, m);
+        for (int k = 0; k < basis_size; k++) {
+            value += coeffs(k, q_num) * basis->phi(walker, particle, k);
         }
         return value;
     }

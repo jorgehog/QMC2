@@ -18,7 +18,7 @@ Orbitals::Orbitals(int n_p, int dim) {
     this->n2 = ceil(n_p / 2.0);
     this->dim = dim;
 
-    h = 1E-6;
+    h = 1E-7;
     h2 = 1 / (h * h);
     two_h = 1 / (2 * h);
 

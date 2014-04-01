@@ -1,3 +1,5 @@
+include(../defaults.pri)
+
 TEMPLATE = app
 
 QMAKE_LIBDIR += $$TOP_PWD/lib

@@ -1,9 +1,11 @@
-include(../../defaults.pri) 
 include(../apps_defaults.pri)
 
-INCLUDEPATH += $$PWD/HF/src/libs
+INCLUDEPATH += $$PWD/HF/include
 
-LIBS += -L$$PWD/HF/src/libs/ -lhartree-fock
+LIBS += -L$$PWD/HF/lib/ -lhartree-fock
+LIBS += -lboost_filesystem -lboost_system -lboost_mpi -lboost_serialization
+LIBS += $$system(mpicxx --showme:link)
+QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile)
 
 SOURCES = hfqmcmain.cpp \
     hforbitals.cpp
