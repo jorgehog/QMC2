@@ -50,11 +50,11 @@ double HFOrbitals::lapl_phi(const Walker *walker, int particle, int q_num)
     }
 
 
-//    cout << value << "       " << num_ddiff(walker, particle, q_num) << endl;
-//    sleep(5);
+    cout << value << "       " << num_ddiff(walker, particle, q_num) << endl;
+    sleep(5);
 
-    return value;
-//    return num_ddiff(walker, particle, q_num);
+//    return value;
+    return num_ddiff(walker, particle, q_num);
 }
 
 
@@ -161,6 +161,11 @@ double HFOrbitals::evaldelContracted(uint k, const rowvec & r, int d)
     }
 
     return dGab;
+}
+
+void HFOrbitals::set_qnum_indie_terms(Walker *walker, int i)
+{
+
 }
 
 

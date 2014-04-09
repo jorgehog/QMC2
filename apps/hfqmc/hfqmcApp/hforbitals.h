@@ -17,7 +17,7 @@ public:
 
     // Orbitals interface
 public:
-    void set_qnum_indie_terms(Walker *walker, int i) {}
+    void set_qnum_indie_terms(Walker *walker, int i);
     double phi(const Walker *walker, int particle, int q_num);
     double del_phi(const Walker *walker, int particle, int q_num, int d);
     double lapl_phi(const Walker *walker, int particle, int q_num);
