@@ -12,10 +12,15 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 int main(int argc, char** argv)
 {
 
-    (void) argc;
     ParParams pp;
 
     initMPI(pp, argc, argv);
+
+    if (argc != 2)
+    {
+        cerr << "Supply output path as first CML arg." << endl;
+        exit(1);
+    }
 
     std::string op = argv[1];
     op += "/";
@@ -51,12 +56,12 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
     gP.n_p = np;
     mP.n_c_SGD = 100*pp.n_nodes;
-    mP.SGDsamples = 4000;
+    mP.SGDsamples = 2000;
 
     mP.alpha(0) = a0;
     mP.beta(0) = b0;
 
-    vmcP.n_c = pp.n_nodes*1E7;
+    vmcP.n_c = pp.n_nodes*1E6;
 
     scaleWithProcs(pp, gP, mP, vmcP, dmcP);
 
@@ -137,7 +142,24 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
         if (pp.is_master)
         {
-            results.row(i) = rowvec({w, alpha, beta, E, T, vho, vcol, r, r2, rij, err_E, err_T, err_vho, err_vcol, err_r, err_r2, err_rij});
+            results.row(i) = rowvec({w,
+                                     alpha,
+                                     beta,
+                                     E,
+                                     T,
+                                     vho,
+                                     vcol,
+                                     r,
+                                     r2,
+                                     rij,
+                                     err_E,
+                                     err_T,
+                                     err_vho,
+                                     err_vcol,
+                                     err_r,
+                                     err_r2,
+                                     err_rij});
+
             results.save(name.str(), raw_ascii);
         }
 

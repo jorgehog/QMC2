@@ -22,18 +22,21 @@ inline void initMPI(struct ParParams & parParams, int argc, char ** argv){
     parParams.is_master = (parParams.node == 0);
 
     int nodeSum = 0;
-    MPI_Allreduce(&node, &nodeSum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Reduce(&node, &nodeSum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    if (nodeSum != ((n_nodes - 1)*n_nodes)/2)
+    if (parParams.is_master)
     {
-        std::cerr << "Error in MPI init: " << n_nodes <<  " ranks not properly distributed." << std::endl;
-        MPI_Finalize();
-        exit(1);
-    }
+        if (nodeSum != ((n_nodes - 1)*n_nodes)/2)
+        {
+            std::cerr << "Error in MPI init: " << n_nodes <<  " ranks not properly distributed." << std::endl;
+            MPI_Finalize();
+            exit(1);
+        }
 
-    else
-    {
-        std::cout << "MPI load successful." << std::endl;
+        else
+        {
+            std::cout << "MPI load successful." << std::endl;
+        }
     }
 
 #else

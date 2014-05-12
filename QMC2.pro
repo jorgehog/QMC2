@@ -6,3 +6,21 @@ CONFIG += ordered
 SUBDIRS += src apps
 
 OTHER_FILES += .qmake.conf .gitignore README.md LICENSE.txt
+
+
+
+
+DIRS = scratch/QMC_SCRATCH/walker_positions
+
+for(DIR, DIRS) {
+     mkcommands += $$PWD/$$DIR
+}
+
+createDirs.commands = $(MKDIR) $$mkcommands
+
+first.depends = $(first) createDirs
+export(first.depends)
+export(createDirs.commands)
+
+QMAKE_EXTRA_TARGETS += first createDirs
+
