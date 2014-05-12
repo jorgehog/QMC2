@@ -107,6 +107,8 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
         results.set_size(Nw, 17);
     }
 
+    results.zeros();
+
     for (int i = Nw-1; i >= 0; --i)
     {
 
