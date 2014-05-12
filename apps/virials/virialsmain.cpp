@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     (void) argc;
     ParParams pp;
 
-    initMPI(pp, 0, NULL);
+    initMPI(pp, argc, argv);
 
     std::string op = argv[1];
     op += "/";

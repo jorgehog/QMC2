@@ -4,7 +4,6 @@
 using namespace QMC2;
 
 
-
 ParParams Sampler::pp;
 
 
