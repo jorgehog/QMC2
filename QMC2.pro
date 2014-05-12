@@ -8,12 +8,10 @@ SUBDIRS += src apps
 OTHER_FILES += .qmake.conf .gitignore README.md LICENSE.txt
 
 
-
-
 DIRS = scratch/QMC_SCRATCH/walker_positions
 
 for(DIR, DIRS) {
-     mkcommands += $$PWD/$$DIR
+     mkcommands += $$TOP_OUT_PWD/$$DIR
 }
 
 createDirs.commands = $(MKDIR) $$mkcommands
