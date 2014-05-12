@@ -13,18 +13,17 @@ class paths:
     src = join(CODE, "src")
     scratchPath = join(CODE ,"scratch")
     iniFilePath = join(CODE ,"iniFiles")
-    programPath =join(CODE, "qmakeQMC2")
+    programPath =join(CODE, "apps", "default")
     
     
 
 class misc:
-    QMC2programName = "QMC2"
+    QMC2programName = "QMC2_default"
     
 class verifyPaths:
 
     l1_paths = [paths.CODE, paths.src, paths.toolsPath]    
     l2_paths = [paths.iniFilePath, paths.scratchPath, paths.programPath, join(paths.scratchPath, "QMC_SCRATCH"), join(paths.scratchPath, "QMC_SCRATCH", "walker_positions")]
-    l3_paths = [join(paths.programPath, misc.QMC2programName)]
 
     
     def l1(self, path):
@@ -36,16 +35,7 @@ class verifyPaths:
         a = raw_input("Do you want to create it[y]?")
         if a in ["", "Y", "y", "yes", "Yes"]:
             os.mkdir(path)
-    
-    def l3(self, path):
-        a = raw_input("Code is not compiled. Attempt compiling now?[y]?")
-        if a in ["", "Y", "y", "yes", "Yes"]:
-            cwd = os.getcwd()
-            os.chdir(paths.programPath)
-            os.system("qmake -makefile")
-            os.system("make -j")
-            os.chdir(cwd)
-            shutil.copy(join(paths.toolsPath, "misc", "verify.ini"), paths.iniFilePath)
+
 
     def __init__(self):
         
@@ -55,9 +45,6 @@ class verifyPaths:
         for path in self.l2_paths:
             if not os.path.exists(path):
                 self.l2(path)
-        for path in self.l3_paths:
-            if not os.path.exists(path):
-                self.l3(path)        
                 
         
                 

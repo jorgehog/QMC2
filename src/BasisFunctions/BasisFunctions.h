@@ -1,12 +1,9 @@
-/* 
- * File:   function.h
- * Author: jorgehog
- *
- * Created on 27. juni 2012, 13:17
- */
+#pragma once
 
-#ifndef BASISFUNCTIONS_H
-#define	BASISFUNCTIONS_H
+
+namespace QMC2
+{
+
 
 class Walker;
 
@@ -22,7 +19,7 @@ class Walker;
 
 class BasisFunctions {
 public:
-    BasisFunctions();
+    BasisFunctions() {}
     
     //! The method representing the orbitals functional expression.
     /*!
@@ -32,5 +29,4 @@ public:
     virtual double eval(const Walker* walker, int i) = 0;
 };
 
-#endif	/* BASISFUNCTIONS_H */
-
+}

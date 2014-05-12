@@ -1,14 +1,12 @@
-/* 
- * File:   stdoutDMC.h
- * Author: jorgmeister
- *
- * Created on September 4, 2012, 7:22 PM
- */
+#pragma once
 
-#ifndef STDOUTDMC_H
-#define	STDOUTDMC_H
 
 #include "../OutputHandler.h"
+
+
+namespace QMC2
+{
+
 class DMC;
 
 /*! \brief Class for handling the output of DMC.
@@ -33,5 +31,4 @@ public:
 
 };
 
-#endif	/* STDOUTDMC_H */
-
+}

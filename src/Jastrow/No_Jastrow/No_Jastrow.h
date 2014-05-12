@@ -1,14 +1,11 @@
-/* 
- * File:   No_Jastrow.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 3:23 PM
- */
-
-#ifndef NO_JASTROW_H
-#define	NO_JASTROW_H
+#pragma once
 
 #include "../Jastrow.h"
+
+
+namespace QMC2
+{
+
 
 /*!
  * \brief Class loaded when no correlation factor is used.
@@ -77,4 +74,4 @@ public:
 
 };
 
-#endif	/* NO_JASTROW_H */
+}

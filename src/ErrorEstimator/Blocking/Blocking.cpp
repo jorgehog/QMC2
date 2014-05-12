@@ -10,6 +10,7 @@
 #include "../../structs.h"
 #include <iomanip>
 
+using namespace QMC2;
 
 Blocking::Blocking(int n_c, ParParams & pp,
         std::string filename,

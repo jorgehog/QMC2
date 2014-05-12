@@ -1,15 +1,10 @@
-/* 
- * File:   DiAtomCore.cpp
- * Author: jorgmeister
- * 
- * Created on May 10, 2013, 1:25 PM
- */
-
 #include "DiAtomCore.h"
 
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
 
+
+using namespace QMC2;
 
 DiAtomCore::DiAtomCore(GeneralParams& gp) :
 Potential(gp.n_p, gp.dim){

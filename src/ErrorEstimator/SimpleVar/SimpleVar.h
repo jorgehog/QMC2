@@ -1,21 +1,18 @@
-/* 
- * File:   SimpleVar.h
- * Author: jorgmeister
- *
- * Created on October 30, 2012, 6:13 PM
- */
+#pragma once
 
-#ifndef SIMPLEVAR_H
-#define	SIMPLEVAR_H
 
 #include "../ErrorEstimator.h"
-struct ParParams;
+
+#include "../../structs.h"
+
+namespace QMC2
+{
 
 /*! \brief Calculates the simple variance of the sampled values.
  */
 class SimpleVar : public ErrorEstimator {
 public:
-    SimpleVar(ParParams &);
+    SimpleVar(const ParParams &);
     
     double estimate_error();
     
@@ -35,5 +32,4 @@ protected:
     
 };
 
-#endif	/* SIMPLEVAR_H */
-
+}

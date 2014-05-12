@@ -1,14 +1,12 @@
-/* 
- * File:   VMC.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:43 PM
- */
+#pragma once
 
-#ifndef VMC_H
-#define	VMC_H
 
 #include "../QMC.h"
+
+
+namespace QMC2
+{
+
 struct VMCparams;
 
 /*! \brief Implementation of the Variational Monte-Carlo Method.
@@ -90,4 +88,4 @@ public:
 
 };
 
-#endif	/* VMC_H */
+}

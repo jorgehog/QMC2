@@ -1,9 +1,11 @@
-
-        
-#ifndef HYDROGENIC_H
-#define HYDROGENIC_H 
+#pragma once
 
 #include "../BasisFunctions.h"
+
+
+namespace QMC2
+{
+
 
 //Superclass 
 
@@ -828,5 +830,4 @@ public:
     -------------------------  END 17  -------------------------
 */
 
-
-#endif /* HYDROGENIC_H */
+}

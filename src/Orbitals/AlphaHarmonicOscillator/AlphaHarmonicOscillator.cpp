@@ -14,6 +14,7 @@
 #include "../../BasisFunctions/HarmonicOscillator/HarmonicOscillator.h"
 #include "../../BasisFunctions/HarmonicOscillator3D/HarmonicOscillator3D.h"
 
+using namespace QMC2;
 
 AlphaHarmonicOscillator::AlphaHarmonicOscillator(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {

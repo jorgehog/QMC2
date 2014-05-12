@@ -1,14 +1,13 @@
-/* 
- * File:   DoubleWell.h
- * Author: jorgmeister
- *
- * Created on May 10, 2013, 1:25 PM
- */
+#pragma once
 
-#ifndef DOUBLEWELL_H
-#define	DOUBLEWELL_H
 
 #include "../Potential.h"
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 class DoubleWell : public Potential {
@@ -24,4 +23,4 @@ private:
     
 };
 
-#endif	/* DOUBLEWELL_H */
+}

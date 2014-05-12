@@ -1,13 +1,4 @@
-/* 
- * File:   ASGD.cpp
- * Author: jorgehog
- *
- * Created on 23. August 2012, 16:52
- */
-
 #include "ASGD.h"
-
-#include <iomanip>
 
 #include "../../structs.h"
 
@@ -18,6 +9,10 @@
 #include "../../Jastrow/Jastrow.h"
 #include "../../OutputHandler/stdoutASGD/stdoutASGD.h"
 
+#include <iomanip>
+
+
+using namespace QMC2;
 
 ASGD::ASGD(VMC* vmc, MinimizerParams & mP, const ParParams & pp, std::string path)
     : Minimizer(vmc, pp, mP.alpha, mP.beta) {

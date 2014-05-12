@@ -1,14 +1,11 @@
-/* 
- * File:   DiTransform.h
- * Author: jorgmeister
- *
- * Created on May 10, 2013, 1:46 PM
- */
-
-#ifndef DITRANSFORM_H
-#define	DITRANSFORM_H
+#pragma once
 
 #include "../Orbitals.h"
+
+
+namespace QMC2
+{
+
 struct GeneralParams;
 struct VariationalParams;
 
@@ -76,5 +73,4 @@ protected:
 
 };
 
-#endif	/* DITRANSFORM_H */
-
+}

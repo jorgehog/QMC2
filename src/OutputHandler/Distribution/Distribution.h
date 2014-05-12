@@ -1,17 +1,15 @@
-/* 
- * File:   Distribution.h
- * Author: jorgehog
- *
- * Created on 3. sept 2012, 13:17
- */
+#pragma once
 
-#ifndef DISTRIBUTION_H
-#define	DISTRIBUTION_H
 
 #include "../OutputHandler.h"
-#include <armadillo>
-struct ParParams;
 
+#include <armadillo>
+
+
+namespace QMC2
+{
+
+struct ParParams;
 
 /*! \brief Class for calculating distribution functions such as the one-body density.
  *  Does not collect data itself, but works merely as a control organ for the QMC class,
@@ -86,5 +84,4 @@ private:
     friend class QMC;
 };
 
-
-#endif	/* DISTRIBUTION_H */
+}

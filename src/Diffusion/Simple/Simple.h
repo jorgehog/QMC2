@@ -1,14 +1,11 @@
-/* 
- * File:   Simple.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:38 PM
- */
-
-#ifndef SIMPLE_H
-#define	SIMPLE_H
+#pragma once
 
 #include "../Diffusion.h"
+
+
+namespace QMC2
+{
+
 
 /*! \brief Simple Isotropic diffusion model.
  */
@@ -29,5 +26,4 @@ public:
 
 };
 
-#endif	/* SIMPLE_H */
-
+}

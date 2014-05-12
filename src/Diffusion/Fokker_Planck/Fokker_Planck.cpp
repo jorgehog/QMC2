@@ -1,14 +1,10 @@
-/* 
- * File:   Fokker_Planck.cpp
- * Author: jorgmeister
- * 
- * Created on October 12, 2012, 2:37 PM
- */
-
 #include "Fokker_Planck.h"
 
 #include "../../defines.h"
 #include "../../Walker/Walker.h"
+
+
+using namespace QMC2;
 
 Fokker_Planck::Fokker_Planck(int n_p, int dim, double timestep, seed_type random_seed, double D)
 : Diffusion(n_p, dim, timestep, random_seed, D) {

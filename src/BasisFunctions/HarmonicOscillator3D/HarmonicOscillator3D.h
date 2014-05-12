@@ -1,9 +1,11 @@
-
-        
-#ifndef HARMONICOSCILLATOR3D_H
-#define HARMONICOSCILLATOR3D_H 
+#pragma once
 
 #include "../BasisFunctions.h"
+
+
+namespace QMC2
+{
+
 
 //Superclass 
 
@@ -914,5 +916,4 @@ public:
     -------------------------  END 19  -------------------------
 */
 
-
-#endif /* HARMONICOSCILLATOR3D_H */
+}

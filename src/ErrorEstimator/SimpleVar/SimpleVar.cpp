@@ -1,15 +1,10 @@
-/* 
- * File:   SimpleVar.cpp
- * Author: jorgmeister
- * 
- * Created on October 30, 2012, 6:13 PM
- */
-
 #include "SimpleVar.h"
 
 #include "../../structs.h"
 
-SimpleVar::SimpleVar(ParParams & pp)
+using namespace QMC2;
+
+SimpleVar::SimpleVar(const ParParams & pp)
 : ErrorEstimator(0, "", "", pp.parallel, pp.node, pp.n_nodes, false) {
     data_to_file = false;
     f = 0;

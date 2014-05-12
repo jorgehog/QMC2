@@ -1,7 +1,12 @@
-#ifndef MOLECULARCOULOMB_H
-#define MOLECULARCOULOMB_H
+#pragma once
+
 
 #include "../Potential.h"
+
+
+namespace QMC2
+{
+
 
 struct GeneralParams;
 class NBodyTransform;
@@ -19,4 +24,4 @@ private:
 
 };
 
-#endif // MOLECULARCOULOMB_H
+}

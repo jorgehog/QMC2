@@ -1,23 +1,25 @@
-/* 
- * File:   ExpandedBasis.h
- * Author: jorgmeister
- *
- * Created on October 9, 2012, 5:09 PM
- */
+#pragma once
 
-#ifndef EXPANDEDBASIS_H
-#define	EXPANDEDBASIS_H
 
 #include "../Orbitals.h"
 
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
 
+
+namespace QMC2
+{
+
+
 class ExpandedBasis : public Orbitals {
 public:
-    ExpandedBasis(GeneralParams & gp) :
-        Orbitals(gp.n_p, gp.dim) {
 
+    ExpandedBasis() {}
+
+    ExpandedBasis(Orbitals* basis, const arma::mat &coeffs)
+    {
+        setBasis(basis);
+        setCoeffs(coeffs);
     }
 
     void setBasis(Orbitals* basis) {
@@ -38,7 +40,7 @@ public:
         return basis->get_parameter(n);
     }
 
-    arma::mat getCoeffs() {
+    const arma::mat & getCoeffs() {
         return coeffs;
     }
 
@@ -92,5 +94,4 @@ protected:
 
 };
 
-#endif	/* EXPANDEDBASIS_H */
-
+}

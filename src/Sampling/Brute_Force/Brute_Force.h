@@ -1,14 +1,12 @@
-/* 
- * File:   Brute_Force.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:43 PM
- */
+#pragma once
 
-#ifndef BRUTE_FORCE_H
-#define	BRUTE_FORCE_H
 
 #include "../Sampling.h"
+
+
+namespace QMC2
+{
+
 
 /*! \brief Implementation of the Brute Force QMC.
  * Uses the Simle diffusion class.
@@ -53,5 +51,4 @@ public:
 
 };
 
-#endif	/* BRUTE_FORCE_H */
-
+}

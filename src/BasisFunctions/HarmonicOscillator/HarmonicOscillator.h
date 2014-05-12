@@ -1,9 +1,11 @@
-
-        
-#ifndef HARMONICOSCILLATOR_H
-#define HARMONICOSCILLATOR_H 
+#pragma once
 
 #include "../BasisFunctions.h"
+
+
+namespace QMC2
+{
+
 
 //Superclass 
 class HarmonicOscillator : public BasisFunctions {
@@ -1039,5 +1041,4 @@ public:
     -------------------------  END 27  -------------------------
 */
 
-
-#endif /* HARMONICOSCILLATOR_H */
+}

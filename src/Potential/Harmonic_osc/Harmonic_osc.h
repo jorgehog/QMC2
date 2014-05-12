@@ -1,14 +1,13 @@
-/* 
- * File:   Harmonic_osc.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:42 PM
- */
+#pragma once
 
-#ifndef HARMONIC_OSC_H
-#define	HARMONIC_OSC_H
 
 #include "../Potential.h"
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 /*! \brief Implementation of the Harmonic Oscillator potential. 0.5*w**2*r**2
@@ -31,5 +30,4 @@ public:
 
 };
 
-#endif	/* HARMONIC_OSC_H */
-
+}

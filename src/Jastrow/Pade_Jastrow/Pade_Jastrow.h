@@ -1,16 +1,15 @@
-/* 
- * File:   Pade_Jastrow.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:38 PM
- */
+#pragma once
 
-#ifndef PADE_JASTROW_H
-#define	PADE_JASTROW_H
 
 #include "../Jastrow.h"
 
 #include <armadillo>
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 struct VariationalParams;
 
@@ -56,5 +55,4 @@ public:
 
 };
 
-#endif	/* PADE_JASTROW_H */
-
+}

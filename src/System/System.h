@@ -1,15 +1,13 @@
-/* 
- * File:   System.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 16:49
- */
+#pragma once
 
-#ifndef SYSTEM_H
-#define	SYSTEM_H
 
 #include <vector>
 #include <string>
+
+
+namespace QMC2
+{
+
 
 class Walker;
 class Orbitals;
@@ -122,6 +120,8 @@ public:
     void push_potential_samples();
     
     std::string dump_samples(bool mean_of_means = false);
+
+    void reset_potential_samples();
     
     Orbitals* get_orbital_ptr() {
         return orbital;
@@ -136,4 +136,4 @@ public:
     }
 };
 
-#endif	/* SYSTEM_H */
+}

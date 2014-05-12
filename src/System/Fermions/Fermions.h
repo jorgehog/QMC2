@@ -1,17 +1,16 @@
-/* 
- * File:   Fermions.h
- * Author: jorgmeister
- *
- * Created on October 12, 2012, 2:44 PM
- */
+#pragma once
 
-#ifndef FERMIONS_H
-#define	FERMIONS_H
 
 #include "../System.h"
+#include "../../Walker/Walker.h"
 
 #include <armadillo>
-#include "../../Walker/Walker.h"
+
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 
 
@@ -104,5 +103,4 @@ public:
 
 };
 
-#endif	/* FERMIONS_H */
-
+}

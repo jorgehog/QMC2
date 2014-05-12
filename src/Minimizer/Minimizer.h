@@ -1,21 +1,20 @@
-/* 
- * File:   MINIMIZER.h
- * Author: jorgehog
- *
- * Created on 23. August 2012, 16:52
- */
+#pragma once
 
-#ifndef MINIMIZER_H
-#define	MINIMIZER_H
-
-class Jastrow;
-class Orbitals;
-class STDOUT;
 
 #include "../QMC/VMC/VMC.h"
+
 #include <vector>
 #include <armadillo>
 #include <string>
+
+
+namespace QMC2
+{
+
+
+class Jastrow;
+class Orbitals;
+
 
 /*!\brief Class for minimization methods used to obtain optimal variational parameters.
  */
@@ -27,7 +26,6 @@ protected:
 
     VMC* vmc; //!< Uses VMC methods to calculate stochastic variational gradients.
 
-    STDOUT* std_out; //!< Output object. Wraps and replaces std::cout.
     std::stringstream s; 
     
     int Nspatial_params; //!< The number of variational parameters in the spatial trial wave function.
@@ -69,5 +67,4 @@ public:
 
 };
 
-
-#endif	/* MINIMIZER_H */
+}

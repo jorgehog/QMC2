@@ -11,6 +11,9 @@
 #include "../../Walker/Walker.h"
 
 
+using namespace QMC2;
+
+
 Coulomb::Coulomb(GeneralParams & gP)
 : Potential(gP.n_p, gP.dim) {
     name = "Coulomb";

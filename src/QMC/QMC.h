@@ -1,12 +1,5 @@
-/* 
- * File:   QMC.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 17:42
- */
+#pragma once
 
-#ifndef QMC_H
-#define	QMC_H
 
 #include <sstream>
 #include <string>
@@ -15,11 +8,15 @@
 
 #include "../Sampler/Sampler.h"
 
+
+namespace QMC2
+{
+
+
 struct GeneralParams;
 struct ParParams;
 struct SystemObjects;
 
-class STDOUT;
 class ErrorEstimator;
 class Walker;
 class System;
@@ -36,8 +33,6 @@ class Sampler;
 class QMC {
 protected:
 
-    STDOUT* std_out; //!< Output object. Wraps and replaces std::cout.
-    std::stringstream s;
     unsigned int output_tresh;
 
     unsigned int n_w_size; //!< The total number of allocated walkers.
@@ -77,6 +72,8 @@ protected:
 
     double dtOrig;
 
+    double error;
+
     Walker *trial_walker; //!< The trial walker used to test a move.
     Walker **original_walkers; //!< A list of n_w walkers used in DMC.
 
@@ -91,7 +88,7 @@ protected:
 
     virtual void reset_all();
 
-    void update_samplers(const Walker* walker);
+    void update_samplers(Walker *walker);
 
     //! Method for setting the trial position of the QMC method's walkers.
     /*!
@@ -174,7 +171,7 @@ protected:
     /*!
      * Estimates and finalizes the ErrorEstimator object initialized in the error_estimator vector.
      */
-    void estimate_error() const;
+    void estimate_error();
 
     /*!
      * Since the spatial wave function is split, certain values are unchanged if
@@ -225,11 +222,17 @@ public:
     //! Method used for executing the solver.
     virtual void run_method(bool initialize = true) = 0;
 
-    void add_subsample(Sampler * sampler){
+    void add_subsample(Sampler * sampler)
+    {
         samplers.push_back(sampler);
     }
 
     void dump_subsamples(bool mean_of_means = false);
+
+    const double get_error() const
+    {
+        return error;
+    }
 
     //! Method for calculating the Quantum Force.
     void get_QF(Walker* walker) const;
@@ -299,4 +302,4 @@ public:
 
 };
 
-#endif	/* QMC_H */
+}

@@ -1,12 +1,9 @@
-/* 
- * File:   Jastrow.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 16:52
- */
+#pragma once
 
-#ifndef JASTROW_H
-#define	JASTROW_H
+
+namespace QMC2
+{
+
 
 class Walker;
 
@@ -22,12 +19,6 @@ protected:
 
     bool active; //!< Parameter false if No_Jastrow is loaded.
 
-    //! Returns variational parameters
-    /*!
-     * @param n The index of the sought variational parameter
-     * @return Variational parameter with index [n]
-     */
-    virtual double get_parameter(int n) = 0;
 
     //! Sets variational parameters
     /*!
@@ -60,6 +51,12 @@ protected:
 public:
     Jastrow(int n_p, int dim);
     Jastrow();
+    //! Returns variational parameters
+    /*!
+     * @param n The index of the sought variational parameter
+     * @return Variational parameter with index [n]
+     */
+    virtual double get_parameter(int n) = 0;
 
     /*!
      * Initializes the non-variational parameters needed by the Jastrow Factor.
@@ -118,4 +115,4 @@ public:
 
 };
 
-#endif	/* JASTROW_H */
+}

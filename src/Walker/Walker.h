@@ -1,15 +1,13 @@
-/* 
- * File:   Walker.h
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 16:50
- */
+#pragma once
 
-#ifndef WALKER_H
-#define	WALKER_H
 
 #include <armadillo>
 #include <string>
+
+
+namespace QMC2
+{
+
 
 /*! \brief Class representing a Random Walker.
  * Holds position data, alive state, etc.
@@ -80,7 +78,7 @@ public:
 
     void calc_r_i() {
         for (int i = 0; i < n_p; i++) {
-            this->calc_r_i2(i);
+            this->calc_r_i(i);
         }
     }
 
@@ -167,4 +165,4 @@ public:
 
 };
 
-#endif	/* WALKER_H */
+}

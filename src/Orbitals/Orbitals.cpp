@@ -11,6 +11,7 @@
 #include "../QMC/QMC.h"
 #include "../BasisFunctions/BasisFunctions.h"
 
+using namespace QMC2;
 
 Orbitals::Orbitals(int n_p, int dim) {
     this->n_p = n_p;

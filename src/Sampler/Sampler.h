@@ -1,27 +1,51 @@
-#ifndef SAMPLER_H
-#define SAMPLER_H
+#pragma once
 
-#define SKIPVALUE -1337
+
+#include "../ErrorEstimator/SimpleVar/SimpleVar.h"
 
 #include "../defines.h"
+
+#include "../structs.h"
+
 #include <string>
+
+
+namespace QMC2
+{
+
 
 class Walker;
 
 class Sampler {
 public:
 
-    Sampler() {
-        m_counter = mm_counter = 0;
-        mean = mean_of_means = 0;
+    Sampler() :
+        m_counter(0),
+        mm_counter(0),
+        mean(0),
+        mean_of_means(0),
+        error(0)
+    {
+        setErrorEstimator(MEAN, new SimpleVar(pp));
+        setErrorEstimator(MEANOFMEANS, new SimpleVar(pp));
     }
 
-    void setValue(const Walker* walker) {
-        queue_value(calculateValue(walker));
+    virtual void push_values(Walker* walker)
+    {
+        (void) walker;
+        std::cout << "This method should never be called." << std::endl;
+        exit(1);
     }
 
-    void queue_value(const double value) {
+    void queue_value(const double value)
+    {
         queued_value = value;
+    }
+
+    void push_value(const double value)
+    {
+        queue_value(value);
+        update_mean();
     }
 
     void update_mean(const double weight = 1) {
@@ -29,6 +53,8 @@ public:
         if (queued_value == SKIPVALUE) return;
 
         double newVal = weight*queued_value;
+
+        meanErrorEstimator->update_data(newVal);
 
         mean += newVal;
         m_counter++;
@@ -38,8 +64,12 @@ public:
 
         if (m_counter == 0) return;
         
-        
-        mean_of_means += extract_mean();
+        double M = extract_mean();
+
+        meanOfMeansErrorEstimator->update_data(M);
+
+
+        mean_of_means += M;
         mm_counter++;
 
     }
@@ -71,9 +101,77 @@ public:
 
     }
 
+    double extract_mean_error() {
+
+        double err = meanErrorEstimator->estimate_error();
+
+        meanErrorEstimator->reset();
+
+        return err;
+
+    }
+
+    double extract_mean_of_means_error() {
+
+        double err = meanOfMeansErrorEstimator->estimate_error();
+
+        meanOfMeansErrorEstimator->reset();
+
+        return err;
+
+    }
+
+    ErrorEstimator * meanErrorEstimator;
+    ErrorEstimator * meanOfMeansErrorEstimator;
+
+    enum meanType
+    {
+        MEAN,
+        MEANOFMEANS
+    };
+
+    void setErrorEstimator(const meanType type, ErrorEstimator * errorEstimator)
+    {
+        switch (type) {
+        case MEAN:
+            meanErrorEstimator = errorEstimator;
+            break;
+        case MEANOFMEANS:
+            meanOfMeansErrorEstimator = errorEstimator;
+            break;
+        default:
+            std::cout << "Invalid type " << type << std::endl;
+            exit(1);
+            break;
+        }
+    }
+
+    void reset()
+    {
+
+        meanErrorEstimator->reset();
+        meanOfMeansErrorEstimator->reset();
+
+        mean = 0;
+        m_counter = 0;
+
+        mean_of_means = 0;
+        mm_counter = 0;
+
+
+    }
+
+    const double SKIPVALUE = 1337;
+
+
+    static void setParParams(const ParParams & pp)
+    {
+        Sampler::pp = pp;
+    }
 
 
 protected:
+    static ParParams pp;
 
     unsigned long int m_counter;
     unsigned long int mm_counter;
@@ -82,12 +180,8 @@ protected:
     double mean;
     double mean_of_means;
 
-    virtual double calculateValue(const Walker * walker) {
+    double error;
 
-        (void) walker;
-
-        return 0.0;
-    }
 };
 
-#endif /* SAMPLER_H */
+}

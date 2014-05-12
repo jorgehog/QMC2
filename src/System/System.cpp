@@ -1,10 +1,3 @@
-/* 
- * File:   System.cpp
- * Author: jorgehog
- * 
- * Created on 30. mars 2012, 16:49
- */
-
 #include "System.h"
 
 #include <math.h>
@@ -13,6 +6,8 @@
 
 #include "../Potential/Potential.h"
 
+
+using namespace QMC2;
 
 System::System(int n_p, int dim, Orbitals* orbital) {
     this->n_p = n_p;
@@ -82,4 +77,12 @@ std::string System::dump_samples(bool mean_of_means) {
 
     return s.str();
 
+}
+
+void System::reset_potential_samples()
+{
+    for (Potential * potential : potentials)
+    {
+        potential->pot_sampler.reset();
+    }
 }

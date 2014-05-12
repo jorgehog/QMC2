@@ -1,12 +1,8 @@
-/* 
- * File:   Jastrow.cpp
- * Author: jorgehog
- * 
- * Created on 30. mars 2012, 16:52
- */
-
 #include "Jastrow.h"
 #include "../Walker/Walker.h"
+
+
+using namespace QMC2;
 
 Jastrow::Jastrow(int n_p, int dim) {
     this->n_p = n_p;

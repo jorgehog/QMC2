@@ -1,16 +1,14 @@
-/* 
- * File:   ErrorEstimator.h
- * Author: jorgmeister
- *
- * Created on October 29, 2012, 3:58 PM
- */
+#pragma once
 
-#ifndef ERRORESTIMATOR_H
-#define	ERRORESTIMATOR_H
 
 #include <string>
 #include <fstream>
 #include <armadillo>
+
+
+namespace QMC2
+{
+
 
 /*! \brief Class handling error estimations of the QMC methods.
  * The QMC class holds an object of this type, calling the update_data
@@ -113,5 +111,4 @@ protected:
 
 };
 
-#endif	/* ERRORESTIMATOR_H */
-
+}

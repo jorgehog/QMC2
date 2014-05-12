@@ -1,10 +1,3 @@
-/* 
- * File:   QMC.cpp
- * Author: jorgehog
- *
- * Created on 30. mars 2012, 17:42
- */
-
 #include "QMC.h"
 
 #include <iomanip>
@@ -15,9 +8,14 @@
 #include "../System/System.h"
 #include "../Orbitals/Orbitals.h"
 #include "../Sampling/Sampling.h"
+#include "../Sampling/Importance/Importance.h"
 #include "../Jastrow/Jastrow.h"
 #include "../ErrorEstimator/ErrorEstimator.h"
 #include "../OutputHandler/Distribution/Distribution.h"
+#include "../Jastrow/No_Jastrow/No_Jastrow.h"
+
+
+using namespace QMC2;
 
 QMC::QMC(GeneralParams & gP, int n_c,
          SystemObjects & sO,
@@ -44,8 +42,24 @@ QMC::QMC(GeneralParams & gP, int n_c,
         original_walkers[i] = new Walker(n_p, dim);
     }
 
-    jastrow = sO.jastrow;
-    sampling = sO.sample_method;
+    if (sO.jastrow != NULL)
+    {
+        jastrow = sO.jastrow;
+    }
+    else
+    {
+        jastrow = new No_Jastrow();
+    }
+
+    if (sO.sample_method != NULL)
+    {
+        sampling = sO.sample_method;
+    }
+    else
+    {
+        sampling = new Importance(gP);
+    }
+
     system = sO.system;
 
     sampling->set_qmc_ptr(this);
@@ -60,12 +74,6 @@ QMC::QMC(GeneralParams & gP, int n_c,
     parallel = pp.parallel;
 
     jastrow->initialize();
-
-    if (is_master) {
-        std_out = new STDOUT();
-    } else {
-        std_out = new NO_STDOUT();
-    }
 
     runpath = gP.runpath;
     dist_path = runpath + "walker_positions/";
@@ -92,12 +100,10 @@ void QMC::update_subsamples(double weight) {
 }
 
 void QMC::push_subsamples() {
-    kinetic_sampler.push_mean();
-    system->push_potential_samples();
 
-    for (Sampler * sampler : samplers) {
-        sampler->push_mean();
-    }
+    kinetic_sampler.push_mean();
+
+    system->push_potential_samples();
 
 }
 
@@ -106,6 +112,15 @@ void QMC::reset_all()
 {
 
     error_estimator->reset();
+
+    kinetic_sampler.reset();
+
+    system->reset_potential_samples();
+
+    for (Sampler * sampler : samplers)
+    {
+        sampler->reset();
+    }
 
     accepted = 0;
     total_samples = 0;
@@ -116,11 +131,12 @@ void QMC::reset_all()
 
 }
 
-void QMC::update_samplers(const Walker *walker)
+void QMC::update_samplers(Walker *walker)
 {
 
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->setValue(walker);
+    for (Sampler * sampler_method : samplers)
+    {
+        sampler_method->push_values(walker);
     }
 
 }
@@ -129,6 +145,8 @@ void QMC::update_samplers(const Walker *walker)
 void QMC::dump_subsamples(bool mean_of_means) {
 
     using namespace std;
+
+    stringstream s;
 
     s << "Kinetic " << setprecision(6) << fixed;
     if (mean_of_means) {
@@ -146,8 +164,6 @@ void QMC::dump_subsamples(bool mean_of_means) {
         cout << s.str();
     }
 
-    s.str(string());
-
 }
 
 void QMC::finalize_distribution(){
@@ -164,9 +180,10 @@ void QMC::finalize_distribution(){
     dist.reset();
 }
 
-void QMC::estimate_error() const {
+void QMC::estimate_error()
+{
 
-    double error = error_estimator->estimate_error();
+    error = error_estimator->estimate_error();
 
     if (is_master) {
         if ((error != 0) && (!silent)) std::cout << "Estimated Error: " << error << std::endl;
@@ -338,13 +355,21 @@ void QMC::get_QF(Walker* walker) const {
 
 void QMC::get_accepted_ratio() {
 
+    using namespace std;
+
+    stringstream s;
+
     if (silent) return;
 
     double ratio = ((double) accepted) / total_samples;
 
-    s << "Acceptance ratio: " << error_estimator->combine_mean(ratio, total_samples);
-    s << std::endl;
-    std_out->cout(s);
+    s << "Acceptance ratio: " << error_estimator->combine_mean(ratio, total_samples) << endl;
+
+    if (is_master)
+    {
+        cout << s.str();
+    }
+
 }
 
 void QMC::clean() {

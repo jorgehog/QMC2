@@ -1,17 +1,20 @@
-#ifndef ORBITALSFACTORY_H
-#define ORBITALSFACTORY_H
+#pragma once
+
 
 #include "Orbitals.h"
 
 #include "../structs.h"
 
 #include "ExpandedBasis/ExpandedBasis.h"
-#include "Gaussians/oxygen3-21G/oxygen3_21g.h"
 #include "hydrogenicOrbitals/hydrogenicOrbitals.h"
 
+
+namespace QMC2
+{
+
+
 enum FACTORYTYPE {EXPANDED,
-                  OXYGEN3_21G,
-                 ATOMS};
+                  ATOMS};
 
 
 class OrbitalsFactory {
@@ -29,7 +32,7 @@ public:
         switch (type) {
         case EXPANDED:
         {
-            ExpandedBasis* expbasis = new ExpandedBasis(gP);
+            ExpandedBasis* expbasis = new ExpandedBasis();
             expbasis->setBasis(basisForExpanded->create(gP, vP));
             expbasis->setCoeffs(C);
 
@@ -37,12 +40,7 @@ public:
 
             break;
         }
-        case OXYGEN3_21G:
-        {
-            basis = new Oxygen3_21G();
 
-            break;
-        }
         case ATOMS:
         {
             basis = new hydrogenicOrbitals(gP, vP);
@@ -66,4 +64,4 @@ public:
 
 };
 
-#endif // ORBITALSFACTORY_H
+}

@@ -1,15 +1,14 @@
-/* 
- * File:   stdoutASGD.h
- * Author: jorgmeister
- *
- * Created on October 29, 2012, 3:05 PM
- */
+#pragma once
 
-#ifndef STDOUTASGD_H
-#define	STDOUTASGD_H
 
 #include "../OutputHandler.h"
+
 #include <armadillo>
+
+
+namespace QMC2
+{
+
 class ASGD;
 
 /*!
@@ -34,5 +33,4 @@ private:
 
 };
 
-#endif	/* STDOUTASGD_H */
-
+}

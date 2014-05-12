@@ -1,15 +1,11 @@
-/* 
- * File:   stdoutASGD.cpp
- * Author: jorgmeister
- * 
- * Created on October 29, 2012, 3:05 PM
- */
-
 #include "stdoutASGD.h"
 
 #include "../../Minimizer/ASGD/ASGD.h"
 #include "../../Orbitals/Orbitals.h"
 #include "../../Jastrow/Jastrow.h"
+
+
+using namespace QMC2;
 
 stdoutASGD::stdoutASGD(ASGD* asgd, std::string path)
 : OutputHandler("ASGD_out", path, false, 0, 1) {

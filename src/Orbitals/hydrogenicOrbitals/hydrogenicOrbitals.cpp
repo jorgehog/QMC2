@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+using namespace QMC2;
+
 hydrogenicOrbitals::hydrogenicOrbitals(GeneralParams & gP, VariationalParams & vP)
 : Orbitals(gP.n_p, gP.dim) {
 

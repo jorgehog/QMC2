@@ -1,7 +1,12 @@
-#ifndef NBODYTRANSFORM_H
-#define NBODYTRANSFORM_H
+#pragma once
+
 
 #include "../OrbitalsFactory.h"
+
+
+namespace QMC2
+{
+
 
 struct GeneralParams;
 struct VariationalParams;
@@ -54,4 +59,4 @@ private:
 
 };
 
-#endif // NBODYTRANSFORM_H
+}

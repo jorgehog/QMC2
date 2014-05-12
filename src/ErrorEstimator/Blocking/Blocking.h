@@ -1,14 +1,12 @@
-/* 
- * File:   Blocking.h
- * Author: jorgmeister
- *
- * Created on October 29, 2012, 3:58 PM
- */
+#pragma once
 
-#ifndef BLOCKING_H
-#define	BLOCKING_H
 
 #include "../ErrorEstimator.h"
+
+
+namespace QMC2
+{
+
 struct ParParams;
 
 class Blocking : public ErrorEstimator {
@@ -64,5 +62,4 @@ protected:
 
 };
 
-#endif	/* BLOCKING_H */
-
+}

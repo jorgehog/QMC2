@@ -1,0 +1,12 @@
+*.o
+*.pyc
+*.dat
+Makefile
+QMC2.pro.user
+scratch/*
+
+#executables:
+apps/virials/virials
+apps/default/QMC2_default
+apps/forces/forces
+

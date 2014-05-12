@@ -1,16 +1,14 @@
-/* 
- * File:   OutputHandler.h
- * Author: jorgehog
- *
- * Created on 3. sept 2012, 13:17
- */
+#pragma once
 
-#ifndef OUTPUTHANDLER_H
-#define	OUTPUTHANDLER_H
 
 #include <string>
 #include <sstream>
 #include <fstream>
+
+
+namespace QMC2
+{
+
 
 class QMC;
 class DMC;
@@ -83,5 +81,4 @@ public:
 
 };
 
-
-#endif	/* OUTPUTHANDLER_H */
+}

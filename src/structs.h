@@ -1,5 +1,4 @@
-#ifndef MISC_H
-#define MISC_H
+#pragma once
 
 #include "defines.h"
 
@@ -7,6 +6,9 @@
 #include <iostream>
 
 #include <sys/time.h>
+
+namespace QMC2
+{
 
 //! Struct used to initialize DMC parameters.
 struct DMCparams {
@@ -54,7 +56,7 @@ struct GeneralParams {
     bool deadlock = false; //! If true, freezes one particle;
     double deadlock_x = 0; //! Position of the locked particle. y=z=0;
     
-    std::string runpath = "../scratch/QMC_SCRATCH/"; //!< The directory which the simulation is set to run.
+    std::string runpath = "../../scratch/QMC_SCRATCH/"; //!< The directory which the simulation is set to run.
 
 };
 
@@ -95,89 +97,11 @@ class Jastrow;
  */
 struct SystemObjects {
     
-    Orbitals* SP_basis;
-    System* system;
-    Sampling* sample_method;
-    Jastrow* jastrow;
+    Orbitals* SP_basis = NULL;
+    System* system = NULL;
+    Sampling* sample_method  = NULL;
+    Jastrow* jastrow = NULL;
 
 };
-
-
-/*! \brief Class for handling standard output.
- * Only the master node has this object.
- */
-class STDOUT {
-public:
-
-    virtual void cout(std::stringstream & a) {
-        std::cout << a.str() << std::endl;
-        a.str(std::string());
-        a.clear();
-    }
-};
-
-/*! \brief Class for suppressing standard output.
- * Every node but the master has this. If-tests around cout is avoided.
- */
-class NO_STDOUT : public STDOUT {
-public:
-
-    virtual void cout(std::stringstream & a) {
-        a.str(std::string());
-        a.clear();
-    }
-};
-
-inline void initMPI(struct ParParams & parParams, int argc, char ** argv){
-#ifdef MPI_ON
-    int node, n_nodes;
-
-    MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &n_nodes);
-    MPI_Comm_rank(MPI_COMM_WORLD, &node);
-
-    parParams.n_nodes = n_nodes;
-    parParams.node = node;
-    parParams.parallel = (parParams.n_nodes > 1);
-    parParams.is_master = (parParams.node == 0);
-#else
-    parParams.parallel = false;
-    parParams.node = 0;
-    parParams.n_nodes = 1;
-    parParams.is_master = true;
-#endif
-}
-
-inline void scaleWithProcs(struct ParParams & parParams,
-                           struct GeneralParams & generalParams,
-                           struct MinimizerParams & minimizerParams,
-                           struct VMCparams & vmcParams,
-                           struct DMCparams & dmcParams){
-
-    generalParams.random_seed -= parParams.node;
-    minimizerParams.n_c_SGD /= parParams.n_nodes;
-
-    vmcParams.n_c /= parParams.n_nodes;
-    dmcParams.n_w /= parParams.n_nodes;
-
-    if (minimizerParams.n_c_SGD == 0) {
-        minimizerParams.n_c_SGD = 1;
-    }
-
-    if (vmcParams.n_c == 0) {
-        vmcParams.n_c = 1;
-    }
-
-    if (dmcParams.n_w == 0) {
-        dmcParams.n_w = 1;
-    }
 
 }
-
-
-
-
-
-
-
-#endif /* MISC_H */

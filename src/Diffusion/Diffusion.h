@@ -1,14 +1,12 @@
-/* 
- * File:   Diffusion.h
- * Author: jorgehog
- *
- * Created on 16. april 2012, 14:03
- */
-
-#ifndef DIFFUSION_H
-#define	DIFFUSION_H
+#pragma once
 
 #include "../defines.h"
+
+
+namespace QMC2
+{
+
+
 class QMC;
 class Walker;
 
@@ -73,6 +71,4 @@ public:
 
 };
 
-
-#endif	/* DIFFUSION_H */
-
+}

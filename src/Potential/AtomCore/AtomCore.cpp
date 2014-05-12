@@ -10,6 +10,7 @@
 #include "../../structs.h"
 #include "../../Walker/Walker.h"
 
+using namespace QMC2;
 
 AtomCore::AtomCore(GeneralParams & gP)
 : Potential(gP.n_p, gP.dim) {
