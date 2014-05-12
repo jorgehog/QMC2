@@ -38,19 +38,3 @@ QMAKE_CXXFLAGS += -std=c++0x -DARMA_USE_CXX11
 QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CXXFLAGS -g
 
 QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS -O3 -DARMA_NO_DEBUG
-
-
-DIRS = scratch/QMC_SCRATCH/walker_positions
-
-for(DIR, DIRS) {
-     mkcommands += $$TOP_OUT_PWD/$$DIR
-}
-
-createDirs.commands = $(MKDIR) $$mkcommands
-
-first.depends = $(first) createDirs
-export(first.depends)
-export(createDirs.commands)
-
-QMAKE_EXTRA_TARGETS += first createDirs
-
