@@ -1,8 +1,5 @@
 #pragma once
 
-
-#include "../ErrorEstimator/SimpleVar/SimpleVar.h"
-
 #include "../defines.h"
 
 #include "../structs.h"
@@ -15,20 +12,12 @@ namespace QMC2
 
 
 class Walker;
+class ErrorEstimator;
 
 class Sampler {
 public:
 
-    Sampler() :
-        m_counter(0),
-        mm_counter(0),
-        mean(0),
-        mean_of_means(0),
-        error(0)
-    {
-        setErrorEstimator(MEAN, new SimpleVar(pp));
-        setErrorEstimator(MEANOFMEANS, new SimpleVar(pp));
-    }
+    Sampler();
 
     virtual void push_values(Walker* walker)
     {
@@ -48,31 +37,9 @@ public:
         update_mean();
     }
 
-    void update_mean(const double weight = 1) {
+    void update_mean(const double weight = 1);
 
-        if (queued_value == SKIPVALUE) return;
-
-        double newVal = weight*queued_value;
-
-        meanErrorEstimator->update_data(newVal);
-
-        mean += newVal;
-        m_counter++;
-    }
-
-    void push_mean() {
-
-        if (m_counter == 0) return;
-        
-        double M = extract_mean();
-
-        meanOfMeansErrorEstimator->update_data(M);
-
-
-        mean_of_means += M;
-        mm_counter++;
-
-    }
+    void push_mean();
 
     double extract_mean() {
 
@@ -101,25 +68,9 @@ public:
 
     }
 
-    double extract_mean_error() {
+    double extract_mean_error();
 
-        double err = meanErrorEstimator->estimate_error();
-
-        meanErrorEstimator->reset();
-
-        return err;
-
-    }
-
-    double extract_mean_of_means_error() {
-
-        double err = meanOfMeansErrorEstimator->estimate_error();
-
-        meanOfMeansErrorEstimator->reset();
-
-        return err;
-
-    }
+    double extract_mean_of_means_error();
 
     ErrorEstimator * meanErrorEstimator;
     ErrorEstimator * meanOfMeansErrorEstimator;
@@ -146,32 +97,19 @@ public:
         }
     }
 
-    void reset()
-    {
-
-        meanErrorEstimator->reset();
-        meanOfMeansErrorEstimator->reset();
-
-        mean = 0;
-        m_counter = 0;
-
-        mean_of_means = 0;
-        mm_counter = 0;
-
-
-    }
+    void reset();
 
     const double SKIPVALUE = 1337;
 
 
-    static void setParParams(const ParParams & pp)
+    static void setParParams(ParParams & pp)
     {
-        Sampler::pp = pp;
+        Sampler::m_pp = &pp;
     }
 
 
 protected:
-    static ParParams pp;
+    static ParParams *m_pp;
 
     unsigned long int m_counter;
     unsigned long int mm_counter;

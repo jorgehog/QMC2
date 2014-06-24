@@ -1,3 +1,4 @@
+
 #include "DMC.h"
 
 #include <iomanip>
@@ -136,7 +137,7 @@ void DMC::Evolve_walker(int k, double GB) {
         }
 
         E += GB * local_E;
-        samples++;
+        samples++; //Should be += branch_mean?
 
         if (thermalized) {
             update_subsamples(GB);
