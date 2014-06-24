@@ -4,4 +4,4 @@ TEMPLATE = app
 
 LIBS += -L$$TOP_OUT_PWD/lib -lQMC2
 
-INCLUDEPATH += ../include
+INCLUDEPATH += $$TOP_PWD/include
