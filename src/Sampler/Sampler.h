@@ -17,7 +17,7 @@ class ErrorEstimator;
 class Sampler {
 public:
 
-    Sampler();
+    Sampler(std::string name);
 
     virtual void push_values(Walker* walker)
     {
@@ -75,11 +75,30 @@ public:
     ErrorEstimator * meanErrorEstimator;
     ErrorEstimator * meanOfMeansErrorEstimator;
 
+    ErrorEstimator *getMeanErrorEstimator() const
+    {
+        return meanErrorEstimator;
+    }
+
+    ErrorEstimator *getMeanOfMeansErrorEstimator() const
+    {
+        return meanOfMeansErrorEstimator;
+    }
+
     enum meanType
     {
         MEAN,
         MEANOFMEANS
     };
+
+    enum _ErrorEstimators
+    {
+        SIMPLE,
+        BLOCKING
+    };
+
+    static int standardErrorEstimator_mean;
+    static int standardErrorEstimator_mean_of_means;
 
     void setErrorEstimator(const meanType type, ErrorEstimator * errorEstimator)
     {

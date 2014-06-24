@@ -15,8 +15,8 @@ using namespace QMC2;
 
 
 Coulomb::Coulomb(GeneralParams & gP)
-: Potential(gP.n_p, gP.dim) {
-    name = "Coulomb";
+: Potential(gP.n_p, gP.dim, "Coulomb") {
+
 }
 
 double Coulomb::get_pot_E(const Walker* walker) const {

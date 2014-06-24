@@ -7,10 +7,9 @@
 using namespace QMC2;
 
 Harmonic_osc::Harmonic_osc(GeneralParams & gP)
-: Potential(gP.n_p, gP.dim) {
+: Potential(gP.n_p, gP.dim, "Oscillator") {
 
     this->w = gP.systemConstant;
-    name = "Oscillator";
     
 }
 

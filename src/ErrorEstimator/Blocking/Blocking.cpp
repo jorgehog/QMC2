@@ -1,7 +1,7 @@
 /* 
  * File:   Blocking.cpp
  * Author: jorgmeister
- * 
+ *
  * Created on October 29, 2012, 3:58 PM
  */
 
@@ -13,13 +13,13 @@
 using namespace QMC2;
 
 Blocking::Blocking(int n_c, ParParams & pp,
-        std::string filename,
-        std::string path,
-        int n_b,
-        int maxb,
-        int minb,
-        bool rerun)
-: ErrorEstimator(n_c, filename, path, pp.parallel, pp.node, pp.n_nodes, rerun) {
+                   std::string filename,
+                   std::string path,
+                   int n_b,
+                   int maxb,
+                   int minb,
+                   bool rerun)
+    : ErrorEstimator(n_c, filename, path, pp.parallel, pp.node, pp.n_nodes, rerun) {
     n_block_samples = n_b;
     max_block_size = maxb / n_nodes;
     min_block_size = minb / n_nodes;
@@ -60,13 +60,14 @@ Blocking::Blocking(int n_c, ParParams & pp,
 
 }
 
-Blocking::Blocking(int n_c, std::string filename, std::string path, int n_b, int maxb, int minb)
-: ErrorEstimator(n_c, filename, path, false, 0, 1, false) {
-    n_block_samples = n_b;
-    max_block_size = maxb;
-    min_block_size = minb;
+Blocking::Blocking(ParParams &pp, std::string filename) :
+    ErrorEstimator(1, filename, default_path, pp.parallel, pp.node, pp.n_nodes, false) {
 
+    n_block_samples = 1;
+    max_block_size = 1;
+    min_block_size = 1;
 }
+
 
 double Blocking::estimate_error() {
 
@@ -83,7 +84,7 @@ double Blocking::estimate_error() {
     arma::Row<int> block_sizes = arma::zeros<arma::Row<int> >(n_block_samples);
 
     get_unique_blocks(block_sizes, n);
-    
+
     for (int j = 0; j < n; j++) {
         block_size = block_sizes(j);
 
@@ -93,7 +94,7 @@ double Blocking::estimate_error() {
 
         if (is_master) {
             error = sqrt(var / ((n_nodes * n_c) / block_size - 1.0));
-            
+
             file << block_size * n_nodes << "\t" << error << std::endl;
             if (j % 9 == 0) {
                 std::cout << "\rBlocking progress: " << (double) (j + 1) / n * 100 << "%";
@@ -101,7 +102,7 @@ double Blocking::estimate_error() {
             }
         }
     }
-    
+
     if (is_master) std::cout << " Done." << std::endl;
     return error;
 }
@@ -124,13 +125,13 @@ void Blocking::block_data(int block_size, double &var, double &mean) {
     }
 
     mean /= n_b;
-    
+
     var = mean2/(n_b-1) - n_b*mean*mean/(n_b-1);
 }
 
 void Blocking::get_initial_error() {
     using namespace std;
-    
+
     double var = arma::var(data);
     double mean = arma::mean(data);
     var = combine_variance(var, mean);
@@ -147,6 +148,6 @@ void Blocking::get_unique_blocks(arma::Row<int>& block_sizes, int& n) {
         block_sizes(j) = min_block_size + j * block_step_length;
     }
     block_sizes = arma::unique(block_sizes);
-    
+
     n = block_sizes.n_elem;
 }

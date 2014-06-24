@@ -119,10 +119,16 @@ public:
     
     void push_potential_samples();
     
+    void setMeanErrorEstimatorNumberOfCycles(int n_c);
+
+    void setMeanOfMeansErrorEstimatorNumberOfCycles(int n_c);
+
     std::string dump_samples(bool mean_of_means = false);
 
     void reset_potential_samples();
     
+    void finalize_potential_samples();
+
     Orbitals* get_orbital_ptr() {
         return orbital;
     }

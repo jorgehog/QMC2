@@ -32,7 +32,7 @@ QMAKE_CXXFLAGS += $$system(mpic++ --showme:compile) -DMPICH_IGNORE_CXX_SEEK
 
 
 #C++11 features
-QMAKE_CXXFLAGS += -std=c++0x -DARMA_USE_CXX11
+QMAKE_CXXFLAGS += -std=c++11
 
 QMAKE_CXXFLAGS_DEBUG = $$QMAKE_CXXFLAGS -g
 

@@ -85,12 +85,11 @@ QMC::QMC(GeneralParams & gP, int n_c,
         p_start = 1;
         sampling->set_deadlock(gP.deadlock_x); //Allowed since the constructor is a friend of Sampling
     }
-
 }
 
 
 void QMC::update_subsamples(double weight) {
-    kinetic_sampler.update_mean(weight);
+    kinetic_sampler->update_mean(weight);
     system->update_potential_samples(weight);
 
     for (Sampler * sampler_method : samplers) {
@@ -101,10 +100,26 @@ void QMC::update_subsamples(double weight) {
 
 void QMC::push_subsamples() {
 
-    kinetic_sampler.push_mean();
+    kinetic_sampler->push_mean();
 
     system->push_potential_samples();
 
+}
+
+void QMC::finalize()
+{
+
+    error_estimator->finalize();
+
+    kinetic_sampler->getMeanErrorEstimator()->finalize();
+    kinetic_sampler->getMeanOfMeansErrorEstimator()->finalize();
+
+    system->finalize_potential_samples();
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->getMeanErrorEstimator()->finalize();
+        sampler_method->getMeanOfMeansErrorEstimator()->finalize();
+    }
 }
 
 
@@ -113,7 +128,7 @@ void QMC::reset_all()
 
     error_estimator->reset();
 
-    kinetic_sampler.reset();
+    kinetic_sampler->reset();
 
     system->reset_potential_samples();
 
@@ -150,9 +165,9 @@ void QMC::dump_subsamples(bool mean_of_means) {
 
     s << "Kinetic " << setprecision(6) << fixed;
     if (mean_of_means) {
-        s << kinetic_sampler.extract_mean_of_means();
+        s << kinetic_sampler->extract_mean_of_means();
     } else {
-        s << kinetic_sampler.extract_mean();
+        s << kinetic_sampler->extract_mean();
     }
 
     s << endl;
@@ -188,8 +203,6 @@ void QMC::estimate_error()
     if (is_master) {
         if ((error != 0) && (!silent)) std::cout << "Estimated Error: " << error << std::endl;
     }
-
-    error_estimator->finalize();
 
 }
 
@@ -344,7 +357,7 @@ double QMC::get_KE(const Walker* walker) {
 
     e_kinetic = -xterm - 0.5 * walker->lapl_sum;
 
-    kinetic_sampler.queue_value(e_kinetic);
+    kinetic_sampler->queue_value(e_kinetic);
 
     return e_kinetic;
 }
@@ -373,6 +386,7 @@ void QMC::get_accepted_ratio() {
 }
 
 void QMC::clean() {
+    m_currentlyRunningMethod = "None";
     sampling->clear_deadlock();
 }
 
@@ -462,3 +476,5 @@ double QMC::get_wf_value(const Walker* walker) const {
 void QMC::get_laplsum(Walker* walker) const {
     walker->lapl_sum = system->get_spatial_lapl_sum(walker) + jastrow->get_lapl_sum(walker);
 }
+
+std::string QMC::m_currentlyRunningMethod = "None";

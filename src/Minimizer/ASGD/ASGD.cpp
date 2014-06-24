@@ -101,6 +101,7 @@ void ASGD::get_total_grad() {
 void ASGD::minimize(bool initialize) {
 
     vmc->get_sampling_ptr()->set_dt(vmc->dtOrig);
+    QMC::setCurrentlyRunningMethod("ASGD");
 
     if (initialize){
         initializeParameters();
@@ -154,6 +155,8 @@ void ASGD::minimize(bool initialize) {
     if (is_master) ASGDout->finalize();
 
     vmc->accepted = 0;
+    QMC::setCurrentlyRunningMethod("None");
+
 }
 
 void ASGD::update_parameters() {

@@ -26,6 +26,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     std::stringstream name;
     name << sO.SP_basis->getName() << "_dmc";
     distribution = new Distribution(pp, gP.runpath, name.str(), silent);
+    kinetic_sampler = new Sampler("kinetic");
 
     dist_tresh = 25;
 
@@ -47,6 +48,13 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
         n_w_list = arma::zeros<arma::uvec > (n_nodes);
     }
 
+
+    kinetic_sampler->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
+    system->setMeanOfMeansErrorEstimatorNumberOfCycles(n_c);
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
+    }
 
 }
 
@@ -190,6 +198,7 @@ void DMC::iterate_walker(int k) {
 void DMC::run_method(bool initialize) {
 
     sampling->set_dt(dtOrig);
+    m_currentlyRunningMethod = "DMC";
 
     if (initialize) {
         set_trial_positions();
@@ -248,6 +257,7 @@ void DMC::run_method(bool initialize) {
 //    free_walkers();
 //    dump_subsamples(true); //This should be called from the outside if wanted.
     estimate_error();
+    finalize();
     finalize_distribution();
     get_accepted_ratio();
     clean();

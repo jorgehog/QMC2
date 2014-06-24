@@ -9,6 +9,13 @@ namespace QMC2
 
 class SampleRadius : public Sampler
 {
+public:
+    SampleRadius() :
+        Sampler("radius")
+    {
+
+    }
+
     // Sampler interface
 public:
     void push_values(Walker *walker)
@@ -22,6 +29,13 @@ public:
 
 class CalculateAndSampleRadius : public Sampler
 {
+public:
+    CalculateAndSampleRadius() :
+        Sampler("radius")
+    {
+
+    }
+
     // Sampler interface
 public:
     void push_values(Walker *walker)
@@ -37,6 +51,12 @@ public:
 
 class SampleRadiusSquared : public Sampler
 {
+public:
+    SampleRadiusSquared() :
+        Sampler("radiusSquared")
+    {
+
+    }
     // Sampler interface
 public:
     void push_values(Walker *walker)
@@ -50,6 +70,13 @@ public:
 
 class CalculateAndSampleRadiusSquared : public Sampler
 {
+public:
+    CalculateAndSampleRadiusSquared() :
+        Sampler("radiusSquared")
+    {
+
+    }
+
     // Sampler interface
 public:
     void push_values(Walker *walker)
@@ -65,6 +92,13 @@ public:
 
 class SampleRelativeDistance : public Sampler
 {
+public:
+    SampleRelativeDistance() :
+        Sampler("relativeDistance")
+    {
+
+    }
+
     // Sampler interface
 public:
     void push_values(Walker *walker)

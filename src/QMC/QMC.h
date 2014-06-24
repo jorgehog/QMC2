@@ -153,6 +153,7 @@ protected:
 
     void push_subsamples();
 
+    void finalize();
 
     //! Method for storing positional data.
     /*!
@@ -199,12 +200,22 @@ protected:
      */
     void test_gradients(Walker* walker);
 
-
+    static std::string m_currentlyRunningMethod;
     
     
 public:
 
-    Sampler kinetic_sampler;
+    Sampler* kinetic_sampler;
+
+    static void setCurrentlyRunningMethod(const std::string name)
+    {
+        m_currentlyRunningMethod = name;
+    }
+
+    static std::string currentlyRunningMethod()
+    {
+        return m_currentlyRunningMethod;
+    }
 
     //! Constructor.
     /*!

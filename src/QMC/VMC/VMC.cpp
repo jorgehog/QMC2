@@ -9,6 +9,7 @@
 #include "../../ErrorEstimator/ErrorEstimator.h"
 #include "../../OutputHandler/Distribution/Distribution.h"
 #include "../../Orbitals/Orbitals.h"
+#include "../../System/System.h"
 
 
 using namespace QMC2;
@@ -20,6 +21,7 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     std::stringstream name;
     name << sO.SP_basis->getName() << "_vmc";
     distribution = new Distribution(pp, gP.runpath, name.str(), silent);
+    kinetic_sampler = new Sampler("kinetic");
 
     pop_tresh = n_c / n_w;
     offset = n_c - n_w*pop_tresh;
@@ -39,6 +41,14 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
 
     vmc_E = 0;
     thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
+
+    kinetic_sampler->getMeanErrorEstimator()->setNumberOfCycles(n_c);
+    system->setMeanErrorEstimatorNumberOfCycles(n_c);
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);
+    }
+
 
 }
 
@@ -82,6 +92,7 @@ void VMC::run_method(bool initialize) {
     using namespace std;
 
     sampling->set_dt(dtOrig);
+    m_currentlyRunningMethod = "VMC";
 
     if (initialize) {
 
@@ -122,11 +133,12 @@ void VMC::run_method(bool initialize) {
     node_comm();
     output();
 
-//    dump_subsamples(); //This should be called from the outside if wanted.
     get_accepted_ratio();
 
     finalize_distribution();
     estimate_error();
+
+    finalize();
 
     clean();
 }

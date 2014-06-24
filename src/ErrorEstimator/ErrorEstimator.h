@@ -88,7 +88,19 @@ public:
      */
     virtual void update_data(double val); 
 
+    void setPath(const std::string path)
+    {
+        this->path = path;
+    }
+
+    void setNumberOfCycles(const int n_c)
+    {
+        data.resize(n_c);
+    }
+
     virtual void reset();
+
+    static std::string default_path;
 
 
 protected:

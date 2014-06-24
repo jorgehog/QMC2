@@ -2,6 +2,7 @@
 #include "../defines.h"
 
 #include "../OutputHandler/OutputHandler.h"
+#include "../QMC/QMC.h"
 
 using namespace QMC2;
 
@@ -72,7 +73,7 @@ void ErrorEstimator::finalize() {
     if (data_to_file && is_master) {
 
         stringstream s;
-        s << path << filename << OutputHandler::suffix << "_RAWDATA.arma";
+        s << path << filename << "_" << QMC::currentlyRunningMethod() << OutputHandler::suffix << "_RAWDATA.arma";
         data.save(s.str());
     }
 
@@ -81,17 +82,6 @@ void ErrorEstimator::finalize() {
     data.clear();
 
 }
-
-//void ErrorEstimator::normalize() {
-//#ifdef MPI_ON
-//    arma::Row<int> sample_sizes = arma::zeros<arma::Row<int> >(n_nodes);
-//
-//    MPI_Allgather(&i, 1, MPI_INT, sample_sizes.memptr(), 1, MPI_INT, MPI_COMM_WORLD);
-//
-//    data.resize(sample_sizes.min());
-//    sample_sizes.clear();
-//#endif
-//}
 
 void ErrorEstimator::node_comm_gather_data() {
 #ifdef MPI_ON
@@ -213,3 +203,5 @@ void ErrorEstimator::reset()
     data.set_size(n_c);
     i = 0;
 }
+
+std::string ErrorEstimator::default_path = "./";

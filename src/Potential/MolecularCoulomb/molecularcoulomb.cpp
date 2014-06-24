@@ -8,10 +8,10 @@
 using namespace QMC2;
 
 MolecularCoulomb::MolecularCoulomb(GeneralParams &gP, NBodyTransform *orbitals) :
-    Potential(gP.n_p, gP.dim),
+    Potential(gP.n_p, gP.dim, "MolecularCoulomb"),
     nBodyOrbitals(orbitals)
 {
-    name = "MolecularCoulomb";
+
 }
 
 double MolecularCoulomb::get_pot_E(const Walker *walker) const

@@ -21,12 +21,7 @@ public:
             int minb = 10,
             bool rerun = false);
 
-    Blocking(int n_c, 
-            std::string filename = "blocking_out",
-            std::string path = "./",
-            int n_b = 100,
-            int maxb = 10000,
-            int minb = 10); //NOT NEEDED?
+    Blocking(ParParams & pp, std::string filename = "blocking_out");
 
     double estimate_error();
     

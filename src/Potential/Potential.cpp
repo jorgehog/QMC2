@@ -2,15 +2,19 @@
 
 using namespace QMC2;
 
-Potential::Potential(int n_p, int dim) {
+Potential::Potential(int n_p, int dim, std::string name) :
+    name(name)
+{
 
     this->n_p = n_p;
     this->dim = dim;
 
-    name = "Potential";
+    pot_sampler = new Sampler(name);
     
 }
 
 Potential::Potential(){
     
 }
+
+std::string Potential::name_suffix;

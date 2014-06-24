@@ -4,7 +4,7 @@
 using namespace QMC2;
 
 SampleForce::SampleForce(double * R, int n_p) :
-    Sampler(), n_p(n_p)
+    Sampler("force"), n_p(n_p)
 {
     this->R = R;
 }

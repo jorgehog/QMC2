@@ -8,12 +8,10 @@ using namespace QMC2;
 
 //TODO: Create a general well potential.
 DoubleWell::DoubleWell(GeneralParams& gp, double R) :
-Potential(gp.n_p, gp.dim){
+Potential(gp.n_p, gp.dim, "DoubleWell"){
     
     this->w = gp.systemConstant; 
     this->R = &R;
-    
-    name = "DoubleWell";
     
 }
 

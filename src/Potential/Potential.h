@@ -26,7 +26,7 @@ protected:
 public:
 
 
-    Potential(int n_p, int dim);
+    Potential(int n_p, int dim, std::string name = "Potential");
     Potential();
 
     //! Method for calculating a walker's potential energy.
@@ -37,7 +37,9 @@ public:
      */
     virtual double get_pot_E(const Walker* walker) const = 0;
 
-    Sampler pot_sampler;
+    Sampler* pot_sampler;
+
+    static std::string name_suffix;
     
     std::string get_name(){
         return name;

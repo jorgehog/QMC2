@@ -1,18 +1,35 @@
 #include "Sampler.h"
 
+#include "../ErrorEstimator/Blocking/Blocking.h"
 #include "../ErrorEstimator/SimpleVar/SimpleVar.h"
 
 using namespace QMC2;
 
-Sampler::Sampler() :
+Sampler::Sampler(std::string name) :
     m_counter(0),
     mm_counter(0),
     mean(0),
     mean_of_means(0),
     error(0)
 {
-    setErrorEstimator(MEAN, new SimpleVar(m_pp));
-    setErrorEstimator(MEANOFMEANS, new SimpleVar(m_pp));
+    if (standardErrorEstimator_mean == BLOCKING)
+    {
+        setErrorEstimator(MEAN, new Blocking(m_pp, "blocking_out_" + name));
+    }
+    else
+    {
+        setErrorEstimator(MEAN, new SimpleVar(m_pp));
+    }
+
+    if (standardErrorEstimator_mean_of_means == BLOCKING)
+    {
+        setErrorEstimator(MEANOFMEANS, new Blocking(m_pp, "blocking_out_" + name));
+    }
+    else
+    {
+        setErrorEstimator(MEANOFMEANS, new SimpleVar(m_pp));
+    }
+
 }
 
 void Sampler::update_mean(const double weight)
@@ -81,3 +98,6 @@ void Sampler::reset()
 }
 
 ParParams Sampler::m_pp;
+
+int Sampler::standardErrorEstimator_mean = Sampler::SIMPLE;
+int Sampler::standardErrorEstimator_mean_of_means = Sampler::SIMPLE;
