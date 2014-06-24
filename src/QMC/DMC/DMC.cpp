@@ -24,7 +24,7 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     if (is_master) DMCout = new stdoutDMC(this, gP.runpath);
 
     std::stringstream name;
-    name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "dmc";
+    name << sO.SP_basis->getName() << "_dmc";
     distribution = new Distribution(pp, gP.runpath, name.str(), silent);
 
     dist_tresh = 25;

@@ -100,7 +100,8 @@ HEADERS += \
     Sampler/standardsamplers.h \
     misc.h
 
-OTHER_FILES += ../include/QMC2.h ../install/include/QMC2.h
+OTHER_FILES += ../include/QMC2.h \
+    ../include/parametermap.h
 
 NO_MPI {
     DEFINES += QMC2_NO_MPI

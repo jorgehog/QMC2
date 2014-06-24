@@ -217,19 +217,19 @@ void Distribution::generate_distribution3D(arma::mat& dist,
         normalized_radd *= n_p / (accu(normalized_radd) * dr_R);
 
 
-        s << path << "walker_positions/dist_out_" << name << "_edge" << bin_edge << ".arma3D";
+        s << path << "walker_positions/dist_out_" << name + suffix << "_edge" << bin_edge << ".arma3D";
         normalized_dist.save(s.str());
         normalized_dist.reset();
         s.str(std::string());
 
         if (!rerun) {
-            s << path << "walker_positions/dist_rawdata_" << name << ".arma";
+            s << path << "walker_positions/dist_rawdata_" << name + suffix << ".arma";
             tot_dist.save(s.str());
             tot_dist.reset();
             s.str(std::string());
         }
 
-        s << path << "walker_positions/radial_out_" << name << "_edge" << bin_edge << ".arma";
+        s << path << "walker_positions/radial_out_" << name + suffix << "_edge" << bin_edge << ".arma";
         normalized_radd.save(s.str());
         normalized_radd.reset();
         s.str(std::string());
@@ -416,18 +416,18 @@ void Distribution::generate_distribution2D(arma::mat & dist,
         normalized_radd *= n_p / (accu(normalized_radd) * dr_R);
 
         if (!rerun) {
-            s << path << "walker_positions/dist_rawdata_" << name << ".arma";
+            s << path << "walker_positions/dist_rawdata_" << name + suffix<< ".arma";
             tot_dist.save(s.str());
             tot_dist.reset();
             s.str(std::string());
         }
 
-        s << path << "walker_positions/dist_out_" << name << "_edge" << bin_edge << ".arma";
+        s << path << "walker_positions/dist_out_" << name + suffix<< "_edge" << bin_edge << ".arma";
         normalized_dist.save(s.str());
         normalized_dist.reset();
         s.str(std::string());
 
-        s << path << "walker_positions/radial_out_" << name << "_edge" << bin_edge << ".arma";
+        s << path << "walker_positions/radial_out_" << name + suffix<< "_edge" << bin_edge << ".arma";
         normalized_radd.save(s.str());
         normalized_radd.reset();
         s.str(std::string());
@@ -448,7 +448,7 @@ void Distribution::rerun(int n_p, int N, double bin_edge) {
     int n, dim;
 
     if (node == 0) {
-        s << path << "walker_positions/dist_rawdata_" << name << ".arma";
+        s << path << "walker_positions/dist_rawdata_" << name + suffix<< ".arma";
         dist.load(s.str());
         s.str(std::string());
         n = dist.n_rows / n_nodes;

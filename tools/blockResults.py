@@ -686,12 +686,10 @@ def main():
             
             for root, dirs, files in os.walk(mainDir):
                 
-                if root == mainDir:
-                    continue
-                
                 for outfile in files:
                     if re.findall(plotTool.nametag, outfile):
                         plotTool.filepath = pjoin(root, outfile)
+                        print "Figurizing", plotTool.filepath
                         plotTool.mainloop()
     
     if not forceTerminal:

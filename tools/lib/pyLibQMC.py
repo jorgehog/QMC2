@@ -13,7 +13,7 @@ class paths:
     src = join(CODE, "src")
     scratchPath = join(CODE ,"scratch")
     iniFilePath = join(CODE ,"iniFiles")
-    programPath =join(CODE, "apps", "default")
+    programPath = "/home/jorgen/code/build-QMC2-Desktop_Qt_5_2_1_GCC_64bit-Release/apps/default"
     
     
 

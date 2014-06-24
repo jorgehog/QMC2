@@ -18,7 +18,7 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
 : QMC(gP, vP.n_c, sO, pp, silent, vP.dt, n_w) {
 
     std::stringstream name;
-    name << sO.SP_basis->getName() << gP.n_p << "c" << gP.systemConstant << "vmc";
+    name << sO.SP_basis->getName() << "_vmc";
     distribution = new Distribution(pp, gP.runpath, name.str(), silent);
 
     pop_tresh = n_c / n_w;
@@ -61,6 +61,11 @@ void VMC::save_distribution() {
 }
 
 void VMC::store_walkers() {
+
+    if (!do_store_walkers)
+    {
+        return;
+    }
 
     if ((cycle > offset) && (cycle % pop_tresh == 0)) {
         copy_walker(original_walker, original_walkers[last_walker]);

@@ -11,8 +11,8 @@ Sampler::Sampler() :
     mean_of_means(0),
     error(0)
 {
-    setErrorEstimator(MEAN, new SimpleVar(*m_pp));
-    setErrorEstimator(MEANOFMEANS, new SimpleVar(*m_pp));
+    setErrorEstimator(MEAN, new SimpleVar(m_pp));
+    setErrorEstimator(MEANOFMEANS, new SimpleVar(m_pp));
 }
 
 void Sampler::update_mean(const double weight)
@@ -80,4 +80,4 @@ void Sampler::reset()
 
 }
 
-ParParams *Sampler::m_pp;
+ParParams Sampler::m_pp;

@@ -1,7 +1,10 @@
 #pragma once
 
+#include "parametermap.h"
+
 #include "../src/structs.h"
 #include "../src/misc.h"
+
 
 #include "../src/QMC/VMC/VMC.h"
 #include "../src/QMC/DMC/DMC.h"

@@ -8,10 +8,10 @@ OutputHandler::OutputHandler() {
 }
 
 OutputHandler::OutputHandler(std::string filename,
-        std::string path,
-        bool parallel,
-        int node,
-        int n_nodes) {
+                             std::string path,
+                             bool parallel,
+                             int node,
+                             int n_nodes) {
 
     this->node = node;
     this->n_nodes = n_nodes;
@@ -30,8 +30,22 @@ OutputHandler::OutputHandler(std::string filename,
 }
 
 void OutputHandler::init_file() {
+
+    using std::stringstream;
+
     use_file = true;
-    this->file.open(((path + filename) + ".dat").c_str());
+
+    stringstream s;
+
+    s << path << filename;
+
+    if (!suffix.empty()) {
+        s << suffix;
+    }
+
+    s << ".dat";
+
+    this->file.open(s.str().c_str());
 }
 
 void OutputHandler::finalize() {
@@ -40,3 +54,5 @@ void OutputHandler::finalize() {
     }
     file.close();
 }
+
+std::string OutputHandler::suffix;

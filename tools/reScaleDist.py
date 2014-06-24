@@ -9,6 +9,15 @@ import sys, re, subprocess, os, shutil
 from os.path import join as pjoin
 from pyLibQMC import parseCML, paths, misc
 
+import errno
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
 
 def recalcVMCdist(VMC_raw_path, VMC_raw_name, n_p, bin_edge, N, n_cores, MPI_flag):
     
@@ -56,14 +65,14 @@ def main():
     else:
         N = "200"
     
-    VMC_name = re.findall("dist_rawdata_(.+?)vmc\.arma", VMC_raw_name)[0]
-    DMC_name = re.findall("dist_out_(.+?)dmc_", DMC_dist_name)[0]
+    VMC_name = re.findall("dist_rawdata_(.+?)\.arma", VMC_raw_name)[0]
+    DMC_name = re.findall("dist_out_(.+?)_edge", DMC_dist_name)[0]
     
-    if VMC_name != DMC_name:
+    if VMC_name.replace("vmc", "dmc") != DMC_name:
         raise Exception("Distributions does not match. (%s != %s)" % (VMC_name, DMC_name))
     
-    n_p = re.findall("(\d+)c\d+", VMC_name)[0]
-    bin_edge = re.findall("dist_out.+?dmc_edge(\d+\.?\d*)\.arma", DMC_dist_name)[0]
+    n_p = re.findall("N(\d+)\w", VMC_name)[0]
+    bin_edge = re.findall("dist_out.+?_edge(\d+\.?\d*)\.arma", DMC_dist_name)[0]
     
 #    print n_p
 #    print bin_edge
@@ -75,13 +84,13 @@ def main():
     
     recalcVMCdist(VMC_raw_path, VMC_raw_name, n_p, bin_edge, N, n_cores, MPI_flag)
     
-    new_dir = pjoin("OneBodyDensities", DMC_name)
+    new_dir = pjoin("OneBodyDensities", DMC_name.replace("dmc", ""))
     new_path = pjoin(paths.scratchPath, new_dir)
 
-    new_VMC_dist = "dist_out_%svmc_edge%s.%s" % (VMC_name, bin_edge, ending)
-    new_VMC_dist_rad = "radial_out_%svmc_edge%s.arma" % (VMC_name, bin_edge)
+    new_VMC_dist = "dist_out_%s_edge%s.%s" % (VMC_name, bin_edge, ending)
+    new_VMC_dist_rad = "radial_out_%s_edge%s.arma" % (VMC_name, bin_edge)
     
-    DMC_dist_rad = "radial_out_%sdmc_edge%s.arma" % (DMC_name, bin_edge)
+    DMC_dist_rad = "radial_out_%s_edge%s.arma" % (DMC_name, bin_edge)
     
 #    print new_path
 #    print new_VMC_dist
@@ -94,7 +103,7 @@ def main():
         
     
     if not os.path.exists(new_path):
-        os.mkdir(new_path)
+        mkdir_p(new_path)
         
     shutil.copy(pjoin(VMC_raw_path, new_VMC_dist), new_path)
     shutil.copy(pjoin(VMC_raw_path, new_VMC_dist_rad), new_path)

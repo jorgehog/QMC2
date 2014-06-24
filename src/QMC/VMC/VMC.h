@@ -75,6 +75,8 @@ public:
         return vmc_E;
     }
 
+    bool do_store_walkers = true;
+
     void run_method(bool initialize = true);
     
     void output();

@@ -130,6 +130,10 @@ public:
 
     void output();
 
+    double get_energy() const {
+        return dmc_E;
+    }
+
     friend class stdoutDMC;
 
 };

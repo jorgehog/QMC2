@@ -5,7 +5,7 @@ CONFIG += ordered
 
 SUBDIRS += src apps
 
-OTHER_FILES += .qmake.conf .gitignore README.md LICENSE.txt
+OTHER_FILES += .gitignore README.md LICENSE.txt
 
 
 DIRS = scratch/QMC_SCRATCH/walker_positions

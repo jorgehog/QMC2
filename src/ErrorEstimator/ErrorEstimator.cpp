@@ -1,6 +1,8 @@
 #include "ErrorEstimator.h"
 #include "../defines.h"
 
+#include "../OutputHandler/OutputHandler.h"
+
 using namespace QMC2;
 
 
@@ -61,12 +63,17 @@ void ErrorEstimator::init_file() {
 
 void ErrorEstimator::finalize() {
 
+    using std::stringstream;
+
     if (data_to_file) {
         node_comm_gather_data();
     }
 
     if (data_to_file && is_master) {
-        data.save(path + (filename + "_RAWDATA.arma"));
+
+        stringstream s;
+        s << path << filename << OutputHandler::suffix << "_RAWDATA.arma";
+        data.save(s.str());
     }
 
     if (output_to_file && is_master) file.close();

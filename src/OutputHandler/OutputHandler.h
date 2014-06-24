@@ -46,6 +46,8 @@ protected:
 public:
 
     OutputHandler();
+
+    static std::string suffix ;
     
     //! Constructor.
     /*!

@@ -104,12 +104,12 @@ public:
 
     static void setParParams(ParParams & pp)
     {
-        Sampler::m_pp = &pp;
+        Sampler::m_pp = pp;
     }
 
 
 protected:
-    static ParParams *m_pp;
+    static ParParams m_pp;
 
     unsigned long int m_counter;
     unsigned long int mm_counter;

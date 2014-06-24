@@ -35,7 +35,7 @@ inline void initMPI(struct ParParams & parParams, int argc, char ** argv){
 
         else
         {
-            std::cout << "MPI load successful." << std::endl;
+            std::cout << "MPI load on " << n_nodes << " cores successful." << std::endl;
         }
     }
 

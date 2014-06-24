@@ -24,7 +24,6 @@ class Jastrow;
 class Sampling;
 class Orbitals;
 class Distribution;
-class Sampler;
 
 /*! \brief The QMC superclass.
  * Holds implementations of general functions for both VMC and DMC in order to
@@ -229,7 +228,9 @@ public:
 
     void dump_subsamples(bool mean_of_means = false);
 
-    const double get_error() const
+    virtual double get_energy() const = 0;
+
+    double get_error() const
     {
         return error;
     }
