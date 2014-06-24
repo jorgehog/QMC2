@@ -49,13 +49,6 @@ DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp,
     }
 
 
-    kinetic_sampler->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
-    system->setMeanOfMeansErrorEstimatorNumberOfCycles(n_c);
-
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
-    }
-
 }
 
 void DMC::initFromVMC(VMC *vmc)
@@ -148,7 +141,7 @@ void DMC::Evolve_walker(int k, double GB) {
         samples++; //Should be += branch_mean?
 
         if (thermalized) {
-            update_subsamples(GB);
+            update_samplers(original_walkers[k], GB);
         }
 
     }
@@ -177,8 +170,6 @@ void DMC::iterate_walker(int k) {
 
         diffuse_walker(original_walkers[k], trial_walker);
 
-        if (thermalized) update_samplers(original_walkers[k]);
-
         calculate_energy_necessities(original_walkers[k]);
         local_E = calculate_local_energy(original_walkers[k]);
         original_walkers[k]->set_E(local_E);
@@ -199,6 +190,13 @@ void DMC::run_method(bool initialize) {
 
     sampling->set_dt(dtOrig);
     m_currentlyRunningMethod = "DMC";
+
+    kinetic_sampler->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
+    system->setMeanOfMeansErrorEstimatorNumberOfCycles(n_c);
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
+    }
 
     if (initialize) {
         set_trial_positions();

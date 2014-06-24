@@ -87,7 +87,7 @@ protected:
 
     virtual void reset_all();
 
-    void update_samplers(Walker *walker);
+    void update_samplers(Walker *walker, double weight);
 
     //! Method for setting the trial position of the QMC method's walkers.
     /*!

@@ -19,9 +19,10 @@ public:
 
     Sampler(std::string name);
 
-    virtual void push_values(Walker* walker)
+    virtual void push_values(Walker* walker, double weight = 1)
     {
         (void) walker;
+        (void) weight;
         std::cout << "This method should never be called." << std::endl;
         exit(1);
     }
@@ -31,10 +32,10 @@ public:
         queued_value = value;
     }
 
-    void push_value(const double value)
+    void push_value(const double value, double weight = 1)
     {
         queue_value(value);
-        update_mean();
+        update_mean(weight);
     }
 
     void update_mean(const double weight = 1);

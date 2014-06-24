@@ -91,11 +91,6 @@ QMC::QMC(GeneralParams & gP, int n_c,
 void QMC::update_subsamples(double weight) {
     kinetic_sampler->update_mean(weight);
     system->update_potential_samples(weight);
-
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->update_mean(weight);
-    }
-
 }
 
 void QMC::push_subsamples() {
@@ -104,6 +99,9 @@ void QMC::push_subsamples() {
 
     system->push_potential_samples();
 
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->push_mean();
+    }
 }
 
 void QMC::finalize()
@@ -146,12 +144,12 @@ void QMC::reset_all()
 
 }
 
-void QMC::update_samplers(Walker *walker)
+void QMC::update_samplers(Walker *walker, double weight = 1.0)
 {
 
     for (Sampler * sampler_method : samplers)
     {
-        sampler_method->push_values(walker);
+        sampler_method->push_values(walker, weight);
     }
 
 }

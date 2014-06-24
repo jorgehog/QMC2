@@ -42,14 +42,6 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     vmc_E = 0;
     thermalization = n_c / 10 * (n_c < 1e6) + 1e5 * (n_c >= 1e6);
 
-    kinetic_sampler->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    system->setMeanErrorEstimatorNumberOfCycles(n_c);
-
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    }
-
-
 }
 
 VMC::~VMC() {
@@ -94,6 +86,13 @@ void VMC::run_method(bool initialize) {
     sampling->set_dt(dtOrig);
     m_currentlyRunningMethod = "VMC";
 
+    kinetic_sampler->getMeanErrorEstimator()->setNumberOfCycles(n_c);
+    system->setMeanErrorEstimatorNumberOfCycles(n_c);
+
+    for (Sampler * sampler_method : samplers) {
+        sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);
+    }
+
     if (initialize) {
 
         set_trial_positions();
@@ -120,7 +119,7 @@ void VMC::run_method(bool initialize) {
 
         vmc_E += local_E;
 
-        update_samplers(original_walker);
+        update_samplers(original_walker, 1);
 
         output();
         update_subsamples();

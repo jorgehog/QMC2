@@ -18,11 +18,11 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(Walker *walker, double weight = 1)
     {
         for (const double & r : walker->abs_r)
         {
-            push_value(r);
+            push_value(r, weight);
         }
     }
 };
@@ -38,13 +38,13 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(Walker *walker, double weight = 1)
     {
         walker->calc_r_i();
 
         for (const double & r : walker->abs_r)
         {
-            push_value(r);
+            push_value(r, weight);
         }
     }
 };
@@ -59,11 +59,11 @@ public:
     }
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(Walker *walker, double weight = 1)
     {
         for (const double & r : walker->r2)
         {
-            push_value(r);
+            push_value(r, weight);
         }
     }
 };
@@ -79,13 +79,13 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(Walker *walker, double weight = 1)
     {
         walker->calc_r_i2();
 
         for (const double & r : walker->r2)
         {
-            push_value(r);
+            push_value(r, weight);
         }
     }
 };
@@ -101,13 +101,13 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(Walker *walker, double weight = 1)
     {
         for (uint i = 0; i < walker->r_rel.n_cols; ++i)
         {
             for (uint j = i + 1; j < walker->r_rel.n_cols; ++j)
             {
-                push_value(walker->r_rel(i, j));
+                push_value(walker->r_rel(i, j), weight);
             }
         }
     }
