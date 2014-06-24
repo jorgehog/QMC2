@@ -6,7 +6,6 @@ ABEL {
 
     INCLUDEPATH += $$ARMAPATH/usr/include \
                 /cluster/software/VERSIONS/intel-2013.2/mkl/include
-                .
 
     LIBS +=  -L/cluster/software/VERSIONS/intel-2013.2/mkl/lib/intel64 \
              -L$$ARMAPATH/usr/lib64 \
@@ -28,8 +27,8 @@ QMAKE_LINK = $$QMAKE_CXX
 QMAKE_CC = mpicc
 
 QMAKE_CFLAGS += $$system(mpicc --showme:compile)
-QMAKE_LFLAGS += $$system(mpicxx --showme:link)
-QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
+QMAKE_LFLAGS += $$system(mpic++ --showme:link)
+QMAKE_CXXFLAGS += $$system(mpic++ --showme:compile) -DMPICH_IGNORE_CXX_SEEK
 
 
 #C++11 features
