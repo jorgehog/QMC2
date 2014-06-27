@@ -85,41 +85,62 @@ QMC::QMC(GeneralParams & gP, int n_c,
         p_start = 1;
         sampling->set_deadlock(gP.deadlock_x); //Allowed since the constructor is a friend of Sampling
     }
+
+    kinetic_sampler = new Sampler("kinetic");
+
 }
 
 
-void QMC::update_subsamples(double weight) {
+void QMC::update_sampler_means(double weight) {
+
     kinetic_sampler->update_mean(weight);
     system->update_potential_samples(weight);
+
+    for (Sampler *sampler : samplers)
+    {
+        sampler->update_mean(weight);
+    }
+
 }
 
-void QMC::push_subsamples() {
+void QMC::push_subsample_means() {
 
     kinetic_sampler->push_mean();
-
     system->push_potential_samples();
 
-    for (Sampler * sampler_method : samplers) {
+    for (Sampler * sampler_method : samplers)
+    {
         sampler_method->push_mean();
     }
 }
 
-void QMC::finalize()
+void QMC::finalize_subsamples()
 {
 
     error_estimator->finalize();
 
-    kinetic_sampler->getMeanErrorEstimator()->finalize();
-    kinetic_sampler->getMeanOfMeansErrorEstimator()->finalize();
+    kinetic_sampler->getErrorEstimator()->finalize();
 
     system->finalize_potential_samples();
 
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanErrorEstimator()->finalize();
-        sampler_method->getMeanOfMeansErrorEstimator()->finalize();
+    for (Sampler * sampler_method : samplers)
+    {
+        sampler_method->getErrorEstimator()->finalize();
     }
 }
 
+
+void QMC::end_simulation()
+{
+    get_accepted_ratio();
+
+    finalize_distribution();
+    estimate_error();
+
+    finalize_subsamples();
+
+    clean();
+}
 
 void QMC::reset_all()
 {
@@ -144,47 +165,41 @@ void QMC::reset_all()
 
 }
 
-void QMC::initializeRun(const std::string method, int sampleType)
+void QMC::initializeRun(const std::string method, Sampler::_SampleState sampleType)
 {
     sampling->set_dt(dtOrig);
     m_currentlyRunningMethod = method;
 
-    kinetic_sampler->getErrorEstimator()->setNumberOfCycles(n_c);
-    system->setErrorEstimatorNumberOfCycles(n_c);
+    kinetic_sampler->initializeErrorEstimator(sampleType, n_c);
+    system->initializeSamplingErrorEstimators(sampleType, n_c);
 
     for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);
+        sampler_method->initializeErrorEstimator(sampleType, n_c);
     }
 
 }
 
-void QMC::update_samplers(Walker *walker, double weight = 1.0)
+void QMC::queue_subsample_values(const Walker *walker)
 {
-
     for (Sampler * sampler_method : samplers)
     {
-        sampler_method->push_values(walker, weight);
+        sampler_method->push_values(walker);
     }
-
 }
 
 
-void QMC::dump_subsamples(bool mean_of_means) {
+void QMC::dump_subsamples() {
 
     using namespace std;
 
     stringstream s;
 
     s << "Kinetic " << setprecision(6) << fixed;
-    if (mean_of_means) {
-        s << kinetic_sampler->extract_mean_of_means();
-    } else {
-        s << kinetic_sampler->extract_mean();
-    }
+    s << kinetic_sampler->result();
 
     s << endl;
 
-    s << system->dump_samples(mean_of_means) << endl;
+    s << system->dump_samples() << endl;
 
     if (is_master) {
         cout << setprecision(6) << fixed;
@@ -249,11 +264,7 @@ bool QMC::metropolis_test(double A) {
     double r = sampling->call_RNG();
 
     if (r <= A) {
-        //        if (!system->allow_transition()) {
-        //            std::cout << "move " << total_samples << " rejected due to fixed node" << std::endl;
-        //        }
         return true;
-
     } else {
         return false;
     }
@@ -369,21 +380,11 @@ double QMC::get_KE(const Walker* walker) {
 
     e_kinetic = -xterm - 0.5 * walker->lapl_sum;
 
-    kinetic_sampler->queue_value(e_kinetic);
+    kinetic_sampler->push_value(e_kinetic);
 
     return e_kinetic;
 }
 
-void QMC::queue_weight(double weight)
-{
-    kinetic_sampler->queue_weight(weight);
-
-    for (Potential *potential : system->potentials)
-    {
-        potential->
-    }
-
-}
 
 void QMC::get_QF(Walker* walker) const {
     walker->qforce = 2 * (walker->jast_grad + walker->spatial_grad);

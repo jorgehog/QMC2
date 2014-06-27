@@ -11,17 +11,14 @@ struct ParParams;
 
 class Blocking : public ErrorEstimator {
 public:
-    
-    //RYDD OPP
+
     Blocking(int n_c, ParParams & pp,
             std::string filename = "blocking_out",
-            std::string path = "./",
+            std::string path = "",
             int n_b = 100,
             int maxb = 10000,
             int minb = 10,
             bool rerun = false);
-
-    Blocking(ParParams & pp, std::string filename = "blocking_out");
 
     double estimate_error();
     

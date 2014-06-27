@@ -21,7 +21,6 @@ VMC::VMC(GeneralParams & gP, VMCparams & vP, SystemObjects & sO, ParParams & pp,
     std::stringstream name;
     name << sO.SP_basis->getName() << "_vmc";
     distribution = new Distribution(pp, gP.runpath, name.str(), silent);
-    kinetic_sampler = new Sampler("kinetic");
 
     pop_tresh = n_c / n_w;
     offset = n_c - n_w*pop_tresh;
@@ -80,17 +79,7 @@ void VMC::store_walkers() {
 
 void VMC::run_method(bool initialize) {
 
-    initializeRun("VMC");
-
-    sampling->set_dt(dtOrig);
-    m_currentlyRunningMethod = "VMC";
-
-    kinetic_sampler->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    system->setMeanErrorEstimatorNumberOfCycles(n_c);
-
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    }
+    initializeRun("VMC", Sampler::MEAN);
 
     if (initialize) {
 
@@ -117,13 +106,13 @@ void VMC::run_method(bool initialize) {
         local_E = calculate_local_energy(original_walker);
 
         vmc_E += local_E;
+        error_estimator->update_data(local_E);
 
-        update_samplers(original_walker, 1);
+        queue_subsample_values(original_walker);
+        update_sampler_means();
 
         output();
-        update_subsamples();
         save_distribution();
-        error_estimator->update_data(local_E);
         store_walkers();
 
     }
@@ -131,14 +120,8 @@ void VMC::run_method(bool initialize) {
     node_comm();
     output();
 
-    get_accepted_ratio();
+    end_simulation();
 
-    finalize_distribution();
-    estimate_error();
-
-    finalize();
-
-    clean();
 }
 
 void VMC::output() {

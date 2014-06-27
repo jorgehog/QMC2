@@ -19,7 +19,7 @@ public:
 
     Sampler(std::string name);
 
-    virtual void push_values(Walker* walker)
+    virtual void push_values(const Walker* walker)
     {
         (void) walker;
         std::cout << "This method should never be called." << std::endl;
@@ -28,19 +28,15 @@ public:
 
     void initializeErrorEstimator(const int type, int n_c);
 
-    void update_mean(const double weight);
-
     void push_value(const double value);
+
+    void update_mean(const double weight);
 
     void push_mean();
 
-    double extract_mean();
+    double result();
 
-    double extract_mean_of_means();
-
-    double extract_mean_error();
-
-    double extract_mean_of_means_error();
+    double error();
 
     ErrorEstimator * errorEstimator;
 
@@ -84,6 +80,13 @@ protected:
 
     std::vector<double> queued_samples;
     int sampleState;
+
+    std::string name;
+
+
+    double _extract_mean();
+
+    double _extract_mean_of_means();
 
 };
 

@@ -121,7 +121,7 @@ public:
     
     void push_potential_samples();
 
-    std::string dump_samples(bool mean_of_means = false);
+    std::string dump_samples();
 
     void initializeSamplingErrorEstimators(int type, int n_c);
 

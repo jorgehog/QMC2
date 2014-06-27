@@ -85,11 +85,20 @@ protected:
 
     std::vector<Sampler*> samplers;
 
+    void end_simulation();
+
     virtual void reset_all();
 
-    void initializeRun(const std::string method);
+    void initializeRun(const std::string method, Sampler::_SampleState sampleType);
 
-    void update_samplers(Walker *walker, double weight);
+    void queue_subsample_values(const Walker *walker);
+
+    void update_sampler_means(double weight = 1.0);
+
+    void push_subsample_means();
+
+    void finalize_subsamples();
+
 
     //! Method for setting the trial position of the QMC method's walkers.
     /*!
@@ -150,14 +159,6 @@ protected:
 
     //! Method for calculating the kinetic energy of a walker.
     double get_KE(const Walker* walker);
-
-    void queue_weight(double weight);
-
-    void update_subsamples(double weight = 1.0);
-
-    void push_subsamples();
-
-    void finalize();
 
     //! Method for storing positional data.
     /*!
@@ -241,7 +242,7 @@ public:
         samplers.push_back(sampler);
     }
 
-    void dump_subsamples(bool mean_of_means = false);
+    void dump_subsamples();
 
     virtual double get_energy() const = 0;
 

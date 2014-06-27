@@ -19,14 +19,13 @@ using namespace QMC2;
 
 
 DMC::DMC(GeneralParams & gP, DMCparams & dP, SystemObjects & sO, ParParams & pp, bool silent)
-: QMC(gP, dP.n_c, sO, pp, silent, dP.dt, dP.n_w, K) {
+    : QMC(gP, dP.n_c, sO, pp, silent, dP.dt, dP.n_w, K) {
 
     if (is_master) DMCout = new stdoutDMC(this, gP.runpath);
 
     std::stringstream name;
     name << sO.SP_basis->getName() << "_dmc";
     distribution = new Distribution(pp, gP.runpath, name.str(), silent);
-    kinetic_sampler = new Sampler("kinetic");
 
     dist_tresh = 25;
 
@@ -115,7 +114,7 @@ void DMC::output() {
             cout.flush();
 
 #ifdef LINED_OUTPUT
-                cout << endl;
+            cout << endl;
 #endif
 
         }
@@ -140,10 +139,6 @@ void DMC::Evolve_walker(int k, double GB) {
         E += GB * local_E;
         samples++; //Should be += branch_mean?
 
-        if (thermalized) {
-            update_samplers(original_walkers[k], GB);
-        }
-
     }
 }
 
@@ -154,9 +149,6 @@ void DMC::update_energies() {
     E_T = E / samples;
     dmc_E_unscaled += E_T;
     dmc_E = dmc_E_unscaled / cycle;
-
-    push_subsamples();
-
 
 }
 
@@ -174,7 +166,17 @@ void DMC::iterate_walker(int k) {
         local_E = calculate_local_energy(original_walkers[k]);
         original_walkers[k]->set_E(local_E);
 
+        if (thermalized)
+        {
+            queue_subsample_values(original_walkers[k]);
+        }
+
         double GB = sampling->get_branching_Gfunc(local_E, local_E_prev, E_T);
+
+        if (thermalized)
+        {
+            update_sampler_means(GB);
+        }
 
         Evolve_walker(k, GB);
 
@@ -188,23 +190,13 @@ void DMC::iterate_walker(int k) {
 
 void DMC::run_method(bool initialize) {
 
-    initializeRun("DMC");
-    sampling->set_dt(dtOrig);
-    m_currentlyRunningMethod = "DMC";
-
-    kinetic_sampler->getErrorEstimator()->setNumberOfCycles(n_c);
-    system->setMeanOfMeansErrorEstimatorNumberOfCycles(n_c);
-
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
-    }
+    initializeRun("DMC", Sampler::MEANOFMEANS);
 
     if (initialize) {
         set_trial_positions();
     } else {
         reset_all();
     }
-
 
     for (cycle = 1; cycle <= thermalization; cycle++) {
 
@@ -239,6 +231,7 @@ void DMC::run_method(bool initialize) {
         }
 
         error_estimator->update_data(E / samples);
+        push_subsample_means();
 
         bury_the_dead();
         update_energies();
@@ -247,19 +240,15 @@ void DMC::run_method(bool initialize) {
 
         output();
         save_distribution();
+
         if (is_master) DMCout->dump();
 
     }
 
     if (is_master) DMCout->finalize();
 
-//    free_walkers();
-//    dump_subsamples(true); //This should be called from the outside if wanted.
-    estimate_error();
-    finalize();
-    finalize_distribution();
-    get_accepted_ratio();
-    clean();
+    end_simulation();
+
 }
 
 void DMC::save_distribution() {
@@ -430,7 +419,7 @@ void DMC::normalize_population() {
     //At this point we have at most a unbalance of n_nodes-1 at one node.
     //optimal in this case is a unbalance of 1 on n_nodes-1 nodes.
     //To do this shuffeling we send walkers from the highest to the lowest untill
-    //the highest reaches avg+1 walkers. The lowest is shifted every time it recieves a 
+    //the highest reaches avg+1 walkers. The lowest is shifted every time it recieves a
     //walker.
 
     snw = sort_index(n_w_list, 1);
