@@ -25,6 +25,17 @@ protected:
 
 public:
 
+    const int &_n_p() const
+    {
+        return n_p;
+    }
+
+    const int &_dim() const
+    {
+        return dim;
+    }
+
+
     //! Constructor.
     /*!
      * @param alive If false, the walker is initialized dead.

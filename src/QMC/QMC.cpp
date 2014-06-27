@@ -134,10 +134,10 @@ void QMC::end_simulation()
 {
     get_accepted_ratio();
 
-    finalize_distribution();
+    finalize_subsamples();
     estimate_error();
 
-    finalize_subsamples();
+    finalize_distribution();
 
     clean();
 }
@@ -183,7 +183,7 @@ void QMC::queue_subsample_values(const Walker *walker)
 {
     for (Sampler * sampler_method : samplers)
     {
-        sampler_method->push_values(walker);
+        sampler_method->push_value_from_walker(walker);
     }
 }
 

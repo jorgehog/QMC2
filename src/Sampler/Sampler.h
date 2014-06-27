@@ -19,7 +19,7 @@ public:
 
     Sampler(std::string name);
 
-    virtual void push_values(const Walker* walker)
+    virtual void push_value_from_walker(const Walker* walker)
     {
         (void) walker;
         std::cout << "This method should never be called." << std::endl;
@@ -78,7 +78,7 @@ protected:
     double mean;
     double mean_of_means;
 
-    std::vector<double> queued_samples;
+    double queued_sample;
     int sampleState;
 
     std::string name;

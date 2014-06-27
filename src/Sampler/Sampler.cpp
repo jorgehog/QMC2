@@ -35,6 +35,7 @@ void Sampler::initializeErrorEstimator(const int type, int n_c)
     case SIMPLE:
         errorEstimator = new SimpleVar(m_pp);
 
+        break;
     default:
         errorEstimator = NULL;
     }
@@ -42,27 +43,22 @@ void Sampler::initializeErrorEstimator(const int type, int n_c)
 
 void Sampler::update_mean(const double weight)
 {
-    for (const double & sample : queued_samples)
+
+    double value = weight*queued_sample;
+
+    if (sampleState == MEAN)
     {
-
-        double value = weight*sample;
-
-        if (sampleState == MEAN)
-        {
-            errorEstimator->update_data(value);
-        }
-
-        mean += value;
-        m_counter++;
-
+        errorEstimator->update_data(value);
     }
 
-    queued_samples.clear();
+    mean += value;
+    m_counter++;
+
 }
 
 void Sampler::push_value(const double value)
 {
-    queued_samples.push_back(value);
+    queued_sample = value;
 }
 
 
@@ -145,8 +141,6 @@ void Sampler::reset()
 
     mean_of_means = 0;
     mm_counter = 0;
-
-    queued_samples.clear();
 
 }
 

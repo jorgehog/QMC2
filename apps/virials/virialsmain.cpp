@@ -76,7 +76,7 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
     gP.n_p = np;
     mP.n_c_SGD = 100*pp.n_nodes;
-    mP.SGDsamples = 2000;
+    mP.SGDsamples = 500;
 
     mP.alpha(0) = a0;
     mP.beta(0) = b0;
@@ -84,6 +84,7 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     vmcP.n_c = pp.n_nodes*1E6;
 
     dmcP.n_w = pp.n_nodes*250;
+
 
     scaleWithProcs(pp, gP, mP, vmcP, dmcP);
 
@@ -119,20 +120,13 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     dmc.set_error_estimator(new Blocking(dmcP.n_c, pp, "blocking_out", gP.runpath));
 
     CalculateAndSampleRadius sr;
-    SampleRadiusSquared sr2;
     SampleRelativeDistance srij;
 
     vmc.add_subsample(&sr);
-    vmc.add_subsample(&sr2);
     vmc.add_subsample(&srij);
 
-    EnergySampler se;
-
-    dmc.add_subsample(&se);
     dmc.add_subsample(&sr);
-    dmc.add_subsample(&sr2);
     dmc.add_subsample(&srij);
-
 
     vec wList = linspace(w0, w1, Nw);
 
@@ -142,7 +136,7 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     if (pp.is_master)
     {
         name << gP.runpath << "/w_t_HO_COL_N" << gP.n_p << ".dat";
-        results.set_size(Nw, 31);
+        results.set_size(Nw, 15);
     }
 
     results.zeros();
@@ -184,14 +178,12 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
         double vho_vmc = HO.pot_sampler->result();
         double vcol_vmc = COL.pot_sampler->result();
         double r_vmc = sr.result();
-        double r2_vmc = sr2.result();
         double rij_vmc = srij.result();
 
         double err_T_vmc = vmc.kinetic_sampler->error();
         double err_vho_vmc = HO.pot_sampler->error();
         double err_vcol_vmc = COL.pot_sampler->error();
         double err_r_vmc = sr.error();
-        double err_r2_vmc = sr2.error();
         double err_rij_vmc = srij.error();
 
         if (pp.is_master)
@@ -201,7 +193,6 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
             cout << "<vho>  " << setprecision(8) << fixed << vho_vmc  << " " << err_vho_vmc << endl;
             cout << "<vcol> " << setprecision(8) << fixed << vcol_vmc << " " << err_vcol_vmc << endl;
             cout << "<r>    " << setprecision(8) << fixed << r_vmc    << " " << err_r_vmc << endl;
-            cout << "<r2>   " << setprecision(8) << fixed << r2_vmc   << " " << err_r2_vmc << endl;
             cout << "<rij>  " << setprecision(8) << fixed << rij_vmc  << " " << err_rij_vmc << endl;
         }
 
@@ -216,32 +207,26 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
         double E_dmc = dmc.get_energy();
         double err_E_dmc = dmc.get_error();
-        double Es_dmc = se.result();
-        double err_Es_dmc = se.error();
 
         double T_dmc = dmc.kinetic_sampler->result();
         double vho_dmc = HO.pot_sampler->result();
         double vcol_dmc = COL.pot_sampler->result();
         double r_dmc = sr.result();
-        double r2_dmc = sr2.result();
         double rij_dmc = srij.result();
 
         double err_T_dmc = dmc.kinetic_sampler->error();
         double err_vho_dmc = HO.pot_sampler->error();
         double err_vcol_dmc = COL.pot_sampler->error();
         double err_r_dmc = sr.error();
-        double err_r2_dmc = sr2.error();
         double err_rij_dmc = srij.error();
 
         if (pp.is_master)
         {
-            cout << "<Edmc> " << setprecision(8) << fixed << Es_dmc   << " " << err_Es_dmc << endl;
-            cout << "<E>    " << setprecision(8) << fixed << E_dmc    << " " << err_E_dmc << endl;
-            cout << "<T>    " << setprecision(8) << fixed << T_dmc    << " " << err_T_dmc << endl;
+            cout << "<E>    " << setprecision(8) << fixed << E_dmc    << " " << err_E_dmc   << endl;
+            cout << "<T>    " << setprecision(8) << fixed << T_dmc    << " " << err_T_dmc   << endl;
             cout << "<vho>  " << setprecision(8) << fixed << vho_dmc  << " " << err_vho_dmc << endl;
-            cout << "<vcol> " << setprecision(8) << fixed << vcol_dmc << " " << err_vcol_dmc << endl;
-            cout << "<r>    " << setprecision(8) << fixed << r_dmc    << " " << err_r_dmc << endl;
-            cout << "<r2>   " << setprecision(8) << fixed << r2_dmc   << " " << err_r2_dmc << endl;
+            cout << "<vcol> " << setprecision(8) << fixed << vcol_dmc << " " << err_vcol_dmc<< endl;
+            cout << "<r>    " << setprecision(8) << fixed << r_dmc    << " " << err_r_dmc   << endl;
             cout << "<rij>  " << setprecision(8) << fixed << rij_dmc  << " " << err_rij_dmc << endl;
         }
 
@@ -257,29 +242,13 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
                                      vho_vmc,
                                      vcol_vmc,
                                      r_vmc,
-                                     r2_vmc,
                                      rij_vmc,
-                                     err_E_vmc,
-                                     err_T_vmc,
-                                     err_vho_vmc,
-                                     err_vcol_vmc,
-                                     err_r_vmc,
-                                     err_r2_vmc,
-                                     err_rij_vmc,
                                      E_dmc,
                                      T_dmc,
                                      vho_dmc,
                                      vcol_dmc,
                                      r_dmc,
-                                     r2_dmc,
-                                     rij_dmc,
-                                     err_E_dmc,
-                                     err_T_dmc,
-                                     err_vho_dmc,
-                                     err_vcol_dmc,
-                                     err_r_dmc,
-                                     err_r2_dmc,
-                                     err_rij_dmc});
+                                     rij_dmc});
 
             results.save(name.str(), raw_ascii);
         }
