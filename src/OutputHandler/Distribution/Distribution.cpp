@@ -173,14 +173,14 @@ void Distribution::generate_distribution3D(arma::mat& dist,
         }
 
     } else {
-        MPI_Reduce(distribution.memptr(), MPI_DATATYPE_NULL, N * N*N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(radial_dist.memptr(), MPI_DATATYPE_NULL, N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(distribution.memptr(), NULL, N * N*N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(radial_dist.memptr(), NULL, N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
 
         if (!rerun) {
             for (int i = 0; i < dim; i++) {
                 MPI_Gatherv(dist.colptr(i), n, MPI_DOUBLE,
-                        MPI_DATATYPE_NULL, NULL, NULL,
-                        MPI_DATATYPE_NULL, 0, MPI_COMM_WORLD);
+                        NULL, NULL, NULL,
+                        NULL, 0, MPI_COMM_WORLD);
             }
         }
 
@@ -374,8 +374,8 @@ void Distribution::generate_distribution2D(arma::mat & dist,
         }
 
     } else {
-        MPI_Reduce(distribution.memptr(), MPI_DATATYPE_NULL, N*N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(radial_dist.memptr(), MPI_DATATYPE_NULL, N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(distribution.memptr(), NULL, N*N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(radial_dist.memptr(), NULL, N, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
 
         radial_dist.reset();
         distribution.reset();
@@ -383,8 +383,8 @@ void Distribution::generate_distribution2D(arma::mat & dist,
         if (!rerun) {
             for (int i = 0; i < dim; i++) {
                 MPI_Gatherv(dist.colptr(i), n, MPI_DOUBLE,
-                        MPI_DATATYPE_NULL, NULL, NULL,
-                        MPI_DATATYPE_NULL, 0, MPI_COMM_WORLD);
+                        NULL, NULL, NULL,
+                        NULL, 0, MPI_COMM_WORLD);
             }
         }
 
