@@ -12,7 +12,7 @@ ABEL {
              -lpthread \
              -liomp5
 
-    DEFINES += MKL_LP64
+    DEFINES += MKL_LP64 LINED_OUTPUT
     QMAKE_CXXFLAGS += -openmp
 
     QMAKE_LFLAGS -= -lm -O1
