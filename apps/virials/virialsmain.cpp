@@ -4,12 +4,27 @@
 
 #include <armadillo>
 
+#include <iomanip>
+
 using namespace QMC2;
 using namespace arma;
 using namespace std;
 
 inline
 void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double a0, double b0, std::string op);
+
+class EnergySampler : public Sampler
+{
+public:
+    EnergySampler() : Sampler("Energy") {}
+
+    // Sampler interface
+public:
+    void push_values(const Walker *walker)
+    {
+        push_value(walker->E);
+    }
+};
 
 
 int main(int argc, char** argv)
@@ -29,7 +44,7 @@ int main(int argc, char** argv)
     string op = argv[2];
     op += "/";
 
-    uint NW = 5;
+    uint NW = 20;
 
     Parameters p;
 
@@ -111,10 +126,12 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     vmc.add_subsample(&sr2);
     vmc.add_subsample(&srij);
 
+    EnergySampler se;
+
+    dmc.add_subsample(&se);
     dmc.add_subsample(&sr);
     dmc.add_subsample(&sr2);
     dmc.add_subsample(&srij);
-
 
 
     vec wList = linspace(w0, w1, Nw);
@@ -146,6 +163,10 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
         bool init = i == Nw-1;
 
+        if (pp.is_master)
+        {
+            cout << "\nRunning w = " << w  << " (" << Nw - i << "/" << Nw << ")" << endl;
+        }
 
         //MINIMIZING
         asgd.minimize(init);
@@ -173,6 +194,17 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
         double err_r2_vmc = sr2.error();
         double err_rij_vmc = srij.error();
 
+        if (pp.is_master)
+        {
+            cout << "<E>    " << setprecision(8) << fixed << E_vmc    << " " << err_E_vmc << endl;
+            cout << "<T>    " << setprecision(8) << fixed << T_vmc    << " " << err_T_vmc << endl;
+            cout << "<vho>  " << setprecision(8) << fixed << vho_vmc  << " " << err_vho_vmc << endl;
+            cout << "<vcol> " << setprecision(8) << fixed << vcol_vmc << " " << err_vcol_vmc << endl;
+            cout << "<r>    " << setprecision(8) << fixed << r_vmc    << " " << err_r_vmc << endl;
+            cout << "<r2>   " << setprecision(8) << fixed << r2_vmc   << " " << err_r2_vmc << endl;
+            cout << "<rij>  " << setprecision(8) << fixed << rij_vmc  << " " << err_rij_vmc << endl;
+        }
+
         //DMC
         if (init)
         {
@@ -184,6 +216,8 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
         double E_dmc = dmc.get_energy();
         double err_E_dmc = dmc.get_error();
+        double Es_dmc = se.result();
+        double err_Es_dmc = se.error();
 
         double T_dmc = dmc.kinetic_sampler->result();
         double vho_dmc = HO.pot_sampler->result();
@@ -192,13 +226,24 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
         double r2_dmc = sr2.result();
         double rij_dmc = srij.result();
 
-        double err_T_dmc = dmc.kinetic_sampler->result();
-        double err_vho_dmc = HO.pot_sampler->result();
-        double err_vcol_dmc = COL.pot_sampler->result();
-        double err_r_dmc = sr.result();
-        double err_r2_dmc = sr2.result();
-        double err_rij_dmc = srij.result();
+        double err_T_dmc = dmc.kinetic_sampler->error();
+        double err_vho_dmc = HO.pot_sampler->error();
+        double err_vcol_dmc = COL.pot_sampler->error();
+        double err_r_dmc = sr.error();
+        double err_r2_dmc = sr2.error();
+        double err_rij_dmc = srij.error();
 
+        if (pp.is_master)
+        {
+            cout << "<Edmc> " << setprecision(8) << fixed << Es_dmc   << " " << err_Es_dmc << endl;
+            cout << "<E>    " << setprecision(8) << fixed << E_dmc    << " " << err_E_dmc << endl;
+            cout << "<T>    " << setprecision(8) << fixed << T_dmc    << " " << err_T_dmc << endl;
+            cout << "<vho>  " << setprecision(8) << fixed << vho_dmc  << " " << err_vho_dmc << endl;
+            cout << "<vcol> " << setprecision(8) << fixed << vcol_dmc << " " << err_vcol_dmc << endl;
+            cout << "<r>    " << setprecision(8) << fixed << r_dmc    << " " << err_r_dmc << endl;
+            cout << "<r2>   " << setprecision(8) << fixed << r2_dmc   << " " << err_r2_dmc << endl;
+            cout << "<rij>  " << setprecision(8) << fixed << rij_dmc  << " " << err_rij_dmc << endl;
+        }
 
         //dump data
 
