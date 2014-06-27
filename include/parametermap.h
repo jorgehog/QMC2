@@ -4,9 +4,7 @@
 #include <vector>
 #include <string>
 
-using std::map;
-using std::vector;
-using std::string;
+using namespace std;
 
 namespace QMC2
 {
