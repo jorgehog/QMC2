@@ -3,48 +3,56 @@
 #include "../ErrorEstimator/Blocking/Blocking.h"
 #include "../ErrorEstimator/SimpleVar/SimpleVar.h"
 
+#include <assert.h>
+
 using namespace QMC2;
 
 Sampler::Sampler(std::string name) :
     m_counter(0),
     mm_counter(0),
     mean(0),
-    mean_of_means(0),
-    error(0)
+    mean_of_means(0)
 {
-    if (standardErrorEstimator_mean == BLOCKING)
-    {
-        setErrorEstimator(MEAN, new Blocking(m_pp, "blocking_out_" + name));
-    }
-    else
-    {
-        setErrorEstimator(MEAN, new SimpleVar(m_pp));
-    }
 
-    if (standardErrorEstimator_mean_of_means == BLOCKING)
-    {
-        setErrorEstimator(MEANOFMEANS, new Blocking(m_pp, "blocking_out_" + name));
-    }
-    else
-    {
-        setErrorEstimator(MEANOFMEANS, new SimpleVar(m_pp));
+    switch (standardErrorEstimator) {
+    case BLOCKING:
+        errorEstimator = new Blocking(m_pp, "blocking_out_" + name);
+
+        break;
+    case SIMPLE:
+        errorEstimator = new SimpleVar(m_pp);
+
+    default:
+        errorEstimator = NULL;
     }
 
 }
 
 void Sampler::update_mean(const double weight)
 {
+    for (const double & sample : queued_samples)
+    {
 
-    if (queued_value == SKIPVALUE) return;
+        double value = weight*sample;
 
-    double newVal = weight*queued_value;
+        if (sampleState == MEAN)
+        {
+            errorEstimator->update_data(value);
+        }
 
-    meanErrorEstimator->update_data(newVal);
+        mean += value;
+        m_counter++;
 
-    mean += newVal;
-    m_counter++;
+    }
 
+    queued_samples.clear();
 }
+
+void Sampler::push_value(const double value)
+{
+    queued_samples.push_back(value);
+}
+
 
 void Sampler::push_mean()
 {
@@ -52,31 +60,52 @@ void Sampler::push_mean()
 
     double M = extract_mean();
 
-    meanOfMeansErrorEstimator->update_data(M);
-
+    if (sampleState == MEANOFMEANS)
+    {
+        errorEstimator->update_data(M);
+    }
 
     mean_of_means += M;
     mm_counter++;
 
 }
 
-double Sampler::extract_mean_error()
+double Sampler::extract_mean()
 {
 
-    double err = meanErrorEstimator->estimate_error();
+#ifdef MPI_ON
+    MPI_Allreduce(MPI_IN_PLACE, &mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &m_counter, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
+#endif
 
-    meanErrorEstimator->reset();
+    double M = mean /= m_counter;
 
-    return err;
+    mean = 0;
+    m_counter = 0;
+
+
+    return M;
+}
+
+double Sampler::extract_mean_of_means()
+{
+
+    double M = mean_of_means / mm_counter;
+
+    mean_of_means = 0;
+    mm_counter = 0;
+
+    return M;
 
 }
 
-double Sampler::extract_mean_of_means_error()
+
+double Sampler::extract_error()
 {
 
-    double err = meanOfMeansErrorEstimator->estimate_error();
+    double err = errorEstimator->estimate_error();
 
-    meanOfMeansErrorEstimator->reset();
+    errorEstimator->reset();
 
     return err;
 
@@ -84,9 +113,7 @@ double Sampler::extract_mean_of_means_error()
 
 void Sampler::reset()
 {
-
-    meanErrorEstimator->reset();
-    meanOfMeansErrorEstimator->reset();
+    errorEstimator->reset();
 
     mean = 0;
     m_counter = 0;
@@ -94,6 +121,7 @@ void Sampler::reset()
     mean_of_means = 0;
     mm_counter = 0;
 
+    queued_samples.clear();
 
 }
 

@@ -360,6 +360,17 @@ double QMC::get_KE(const Walker* walker) {
     return e_kinetic;
 }
 
+void QMC::queue_weight(double weight)
+{
+    kinetic_sampler->queue_weight(weight);
+
+    for (Potential *potential : system->potentials)
+    {
+        potential->
+    }
+
+}
+
 void QMC::get_QF(Walker* walker) const {
     walker->qforce = 2 * (walker->jast_grad + walker->spatial_grad);
 }

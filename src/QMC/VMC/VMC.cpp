@@ -80,8 +80,7 @@ void VMC::store_walkers() {
 
 void VMC::run_method(bool initialize) {
 
-    using namespace arma;
-    using namespace std;
+    initializeRun("VMC");
 
     sampling->set_dt(dtOrig);
     m_currentlyRunningMethod = "VMC";

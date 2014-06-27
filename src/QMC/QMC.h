@@ -149,6 +149,8 @@ protected:
     //! Method for calculating the kinetic energy of a walker.
     double get_KE(const Walker* walker);
 
+    void queue_weight(double weight);
+
     void update_subsamples(double weight = 1.0);
 
     void push_subsamples();
