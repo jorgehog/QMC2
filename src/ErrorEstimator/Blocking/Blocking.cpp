@@ -60,8 +60,8 @@ Blocking::Blocking(int n_c, ParParams & pp,
 
 }
 
-Blocking::Blocking(ParParams &pp, std::string filename) :
-    ErrorEstimator(1, filename, default_path, pp.parallel, pp.node, pp.n_nodes, false) {
+Blocking::Blocking(int n_c, ParParams &pp, std::string filename) :
+    ErrorEstimator(n_c, filename, default_path, pp.parallel, pp.node, pp.n_nodes, false) {
 
     n_block_samples = 1;
     max_block_size = 1;

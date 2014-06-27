@@ -14,6 +14,14 @@ Sampler::Sampler(std::string name) :
     mean_of_means(0)
 {
 
+
+
+}
+
+void Sampler::initializeErrorEstimator(const int type, int n_c)
+{
+    sampleState = type;
+
     switch (standardErrorEstimator) {
     case BLOCKING:
         errorEstimator = new Blocking(m_pp, "blocking_out_" + name);
@@ -25,7 +33,6 @@ Sampler::Sampler(std::string name) :
     default:
         errorEstimator = NULL;
     }
-
 }
 
 void Sampler::update_mean(const double weight)

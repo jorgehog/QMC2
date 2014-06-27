@@ -26,13 +26,22 @@ void System::add_potential(Potential* pot) {
     potentials.push_back(pot);
 }
 
+void System::forEachPotentialDo(std::function<void(Potential *pot)> func)
+{
+    for (Potential *pot : potentials)
+    {
+        func(pot);
+    }
+}
+
 double System::get_potential_energy(const Walker* walker) {
     double potE = 0;
     double potE_i;
 
-    for (std::vector<Potential*>::iterator pot = potentials.begin(); pot != potentials.end(); ++pot) {
-        potE_i = (*pot)->get_pot_E(walker);
-        (*pot)->pot_sampler->queue_value(potE_i);
+    for (Potential *pot : potentials)
+    {
+        potE_i = pot->get_pot_E(walker);
+        pot->pot_sampler->queue_value(potE_i);
         potE += potE_i;
     }
 
@@ -51,19 +60,11 @@ void System::push_potential_samples() {
     }
 }
 
-void System::setMeanErrorEstimatorNumberOfCycles(int n_c)
+void System::initializeSamplingErrorEstimators(int type, int n_c)
 {
     for (Potential *pot : potentials)
     {
-        pot->pot_sampler->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    }
-}
-
-void System::setMeanOfMeansErrorEstimatorNumberOfCycles(int n_c)
-{
-    for (Potential *pot : potentials)
-    {
-        pot->pot_sampler->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
+        pot->pot_sampler->initializeErrorEstimator(type, n_c);
     }
 }
 
@@ -108,7 +109,6 @@ void System::finalize_potential_samples()
 {
     for (Potential * potential : potentials)
     {
-        potential->pot_sampler->getMeanErrorEstimator()->finalize();
-        potential->pot_sampler->getMeanOfMeansErrorEstimator()->finalize();
+        potential->pot_sampler->getErrorEstimator()->finalize();
     }
 }

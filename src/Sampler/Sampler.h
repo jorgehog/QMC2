@@ -26,6 +26,8 @@ public:
         exit(1);
     }
 
+    void initializeErrorEstimator(const int type, int n_c);
+
     void update_mean(const double weight);
 
     void push_value(const double value);

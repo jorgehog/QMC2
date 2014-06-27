@@ -87,6 +87,8 @@ protected:
 
     virtual void reset_all();
 
+    void initializeRun(const std::string method);
+
     void update_samplers(Walker *walker, double weight);
 
     //! Method for setting the trial position of the QMC method's walkers.

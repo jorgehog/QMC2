@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <functional>
 #include <vector>
 #include <string>
 
@@ -115,15 +115,15 @@ public:
      */
     virtual bool allow_transition() = 0;
 
+    void forEachPotentialDo(std::function<void(Potential *pot)>);
+
     void update_potential_samples(double weight = 1.0);
     
     void push_potential_samples();
-    
-    void setMeanErrorEstimatorNumberOfCycles(int n_c);
-
-    void setMeanOfMeansErrorEstimatorNumberOfCycles(int n_c);
 
     std::string dump_samples(bool mean_of_means = false);
+
+    void initializeSamplingErrorEstimators(int type, int n_c);
 
     void reset_potential_samples();
     
