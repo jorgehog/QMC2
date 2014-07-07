@@ -145,7 +145,9 @@ void Blocking::get_unique_blocks(arma::Row<int>& block_sizes, int& n) {
     for (int j = 0; j < n_block_samples; j++) {
         block_sizes(j) = min_block_size + j * block_step_length;
     }
+#if ARMA_VERSION_MAJOR > 3
     block_sizes = arma::unique(block_sizes);
+#endif
 
     n = block_sizes.n_elem;
 }
