@@ -84,6 +84,7 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
     vmcP.n_c = pp.n_nodes*1E6;
 
     dmcP.n_w = pp.n_nodes*250;
+    dmcP.therm = 500;
 
 
     scaleWithProcs(pp, gP, mP, vmcP, dmcP);
