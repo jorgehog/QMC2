@@ -235,21 +235,21 @@ void calcVirialPlot(int np, double w0, double w1, int Nw, ParParams & pp, double
 
         if (pp.is_master)
         {
-            results.row(i) = rowvec({w,
-                                     alpha,
-                                     beta,
-                                     E_vmc,
-                                     T_vmc,
-                                     vho_vmc,
-                                     vcol_vmc,
-                                     r_vmc,
-                                     rij_vmc,
-                                     E_dmc,
-                                     T_dmc,
-                                     vho_dmc,
-                                     vcol_dmc,
-                                     r_dmc,
-                                     rij_dmc});
+            results(i,  0) = w;
+            results(i,  1) = alpha;
+            results(i,  2) = beta;
+            results(i,  3) = E_vmc;
+            results(i,  4) = T_vmc;
+            results(i,  5) = vho_vmc;
+            results(i,  6) = vcol_vmc;
+            results(i,  7) = r_vmc;
+            results(i,  8) = rij_vmc;
+            results(i,  9) = E_dmc;
+            results(i, 10) = T_dmc;
+            results(i, 11) = vho_dmc;
+            results(i, 12) = vcol_dmc;
+            results(i, 13) = r_dmc;
+            results(i, 14) = rij_dmc;
 
             results.save(name.str(), raw_ascii);
         }

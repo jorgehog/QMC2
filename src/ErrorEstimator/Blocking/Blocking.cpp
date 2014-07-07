@@ -116,6 +116,7 @@ void Blocking::block_data(int block_size, double &var, double &mean) {
 
     int n_b = n_c / block_size;
     for (int j = 0; j < n_b; j++) {
+
         block_mean = arma::mean(data(span(j*block_size, (j + 1) * block_size - 1)));
 
         mean += block_mean;
