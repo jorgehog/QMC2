@@ -18,8 +18,15 @@ Blocking::Blocking(int n_c, ParParams & pp,
                    int n_b,
                    int maxb,
                    int minb,
-                   bool rerun)
-    : ErrorEstimator(n_c, filename, path, pp.parallel, pp.node, pp.n_nodes, rerun) {
+                   bool rerun) :
+    ErrorEstimator(n_c,
+                   filename,
+                   path.empty() ? default_path : path,
+                   pp.parallel,
+                   pp.node,
+                   pp.n_nodes,
+                   rerun)
+{
     n_block_samples = n_b;
     max_block_size = maxb / n_nodes;
     min_block_size = minb / n_nodes;
@@ -59,15 +66,6 @@ Blocking::Blocking(int n_c, ParParams & pp,
     }
 
 }
-
-Blocking::Blocking(int n_c, ParParams &pp, std::string filename) :
-    ErrorEstimator(n_c, filename, default_path, pp.parallel, pp.node, pp.n_nodes, false) {
-
-    n_block_samples = 1;
-    max_block_size = 1;
-    min_block_size = 1;
-}
-
 
 double Blocking::estimate_error() {
 

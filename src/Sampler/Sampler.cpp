@@ -3,15 +3,14 @@
 #include "../ErrorEstimator/Blocking/Blocking.h"
 #include "../ErrorEstimator/SimpleVar/SimpleVar.h"
 
-#include <assert.h>
-
 using namespace QMC2;
 
 Sampler::Sampler(std::string name) :
     m_counter(0),
     mm_counter(0),
     mean(0),
-    mean_of_means(0)
+    mean_of_means(0),
+    name(name)
 {
 
 
@@ -20,11 +19,17 @@ Sampler::Sampler(std::string name) :
 
 void Sampler::initializeErrorEstimator(const int type, int n_c)
 {
+
+    if (m_counter != 0 || mm_counter != 0)
+    {
+        throw std::runtime_error("Sampler not reset before initialized.");
+    }
+
     sampleState = type;
 
     switch (standardErrorEstimator) {
     case BLOCKING:
-        errorEstimator = new Blocking(m_pp, "blocking_out_" + name);
+        errorEstimator = new Blocking(n_c, m_pp, "blocking_out_" + name);
 
         break;
     case SIMPLE:
@@ -65,7 +70,7 @@ void Sampler::push_mean()
 {
     if (m_counter == 0) return;
 
-    double M = extract_mean();
+    double M = _extract_mean();
 
     if (sampleState == MEANOFMEANS)
     {
@@ -77,7 +82,7 @@ void Sampler::push_mean()
 
 }
 
-double Sampler::extract_mean()
+double Sampler::_extract_mean()
 {
 
 #ifdef MPI_ON
@@ -94,7 +99,7 @@ double Sampler::extract_mean()
     return M;
 }
 
-double Sampler::extract_mean_of_means()
+double Sampler::_extract_mean_of_means()
 {
 
     double M = mean_of_means / mm_counter;
@@ -106,8 +111,21 @@ double Sampler::extract_mean_of_means()
 
 }
 
+double Sampler::result()
+{
+    if (sampleState == MEAN)
+    {
+        return _extract_mean();
+    }
 
-double Sampler::extract_error()
+    else if (sampleState == MEANOFMEANS)
+    {
+        return _extract_mean_of_means();
+    }
+}
+
+
+double Sampler::error()
 {
 
     double err = errorEstimator->estimate_error();
@@ -134,5 +152,4 @@ void Sampler::reset()
 
 ParParams Sampler::m_pp;
 
-int Sampler::standardErrorEstimator_mean = Sampler::SIMPLE;
-int Sampler::standardErrorEstimator_mean_of_means = Sampler::SIMPLE;
+int Sampler::standardErrorEstimator = Sampler::SIMPLE;

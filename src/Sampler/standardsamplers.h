@@ -18,7 +18,7 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(const Walker *walker)
     {
         for (const double & r : walker->abs_r)
         {
@@ -38,13 +38,11 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(const Walker *walker)
     {
-        walker->calc_r_i();
-
-        for (const double & r : walker->abs_r)
+        for (const double & r2 : walker->r2)
         {
-            push_value(r);
+            push_value(sqrt(r2));
         }
     }
 };
@@ -59,30 +57,8 @@ public:
     }
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(const Walker *walker)
     {
-        for (const double & r : walker->r2)
-        {
-            push_value(r);
-        }
-    }
-};
-
-class CalculateAndSampleRadiusSquared : public Sampler
-{
-public:
-    CalculateAndSampleRadiusSquared() :
-        Sampler("radiusSquared")
-    {
-
-    }
-
-    // Sampler interface
-public:
-    void push_values(Walker *walker)
-    {
-        walker->calc_r_i2();
-
         for (const double & r : walker->r2)
         {
             push_value(r);
@@ -101,7 +77,7 @@ public:
 
     // Sampler interface
 public:
-    void push_values(Walker *walker)
+    void push_values(const Walker *walker)
     {
         for (uint i = 0; i < walker->r_rel.n_cols; ++i)
         {
