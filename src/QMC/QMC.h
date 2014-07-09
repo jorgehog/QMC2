@@ -87,7 +87,7 @@ protected:
 
     virtual void reset_all();
 
-    void initializeRun(const std::string method);
+    void initializeRun(const std::string method, int sampleType);
 
     void update_samplers(Walker *walker, double weight);
 

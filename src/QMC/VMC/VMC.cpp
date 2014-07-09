@@ -82,16 +82,6 @@ void VMC::run_method(bool initialize) {
 
     initializeRun("VMC");
 
-    sampling->set_dt(dtOrig);
-    m_currentlyRunningMethod = "VMC";
-
-    kinetic_sampler->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    system->setMeanErrorEstimatorNumberOfCycles(n_c);
-
-    for (Sampler * sampler_method : samplers) {
-        sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);
-    }
-
     if (initialize) {
 
         set_trial_positions();

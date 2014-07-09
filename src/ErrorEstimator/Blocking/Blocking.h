@@ -21,7 +21,7 @@ public:
             int minb = 10,
             bool rerun = false);
 
-    Blocking(ParParams & pp, std::string filename = "blocking_out");
+    Blocking(int n_c, ParParams & pp, std::string filename = "blocking_out");
 
     double estimate_error();
     

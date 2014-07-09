@@ -115,7 +115,7 @@ public:
      */
     virtual bool allow_transition() = 0;
 
-    void forEachPotentialDo(std::function<void(Potential *pot)>);
+    void forEachPotentialDo(std::function<void(Potential *pot)> func);
 
     void update_potential_samples(double weight = 1.0);
     

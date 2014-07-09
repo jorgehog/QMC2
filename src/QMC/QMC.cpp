@@ -149,8 +149,8 @@ void QMC::initializeRun(const std::string method, int sampleType)
     sampling->set_dt(dtOrig);
     m_currentlyRunningMethod = method;
 
-    kinetic_sampler->getErrorEstimator()->setNumberOfCycles(n_c);
-    system->setErrorEstimatorNumberOfCycles(n_c);
+    kinetic_sampler->initializeErrorEstimator(sampleType, n_c);
+    system->initializeErrorEstimator(sampleType, n_c);
 
     for (Sampler * sampler_method : samplers) {
         sampler_method->getMeanErrorEstimator()->setNumberOfCycles(n_c);

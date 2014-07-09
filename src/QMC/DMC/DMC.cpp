@@ -189,11 +189,6 @@ void DMC::iterate_walker(int k) {
 void DMC::run_method(bool initialize) {
 
     initializeRun("DMC");
-    sampling->set_dt(dtOrig);
-    m_currentlyRunningMethod = "DMC";
-
-    kinetic_sampler->getErrorEstimator()->setNumberOfCycles(n_c);
-    system->setMeanOfMeansErrorEstimatorNumberOfCycles(n_c);
 
     for (Sampler * sampler_method : samplers) {
         sampler_method->getMeanOfMeansErrorEstimator()->setNumberOfCycles(n_c);
